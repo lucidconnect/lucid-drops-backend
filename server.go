@@ -25,7 +25,6 @@ func main() {
 	router := chi.NewRouter()
 	router.Use(internal.UserAuthMiddleWare())
 	loadCORS(router)
-
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
 
