@@ -7,9 +7,8 @@ package graph
 import (
 	"context"
 	"fmt"
-	"log"
 
-	uuid "github.com/satori/go.uuid"
+	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/internal/customError"
@@ -28,12 +27,12 @@ func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDe
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	log.Println(authenticationDetails)
+	creatorInfo, err := engine.CreateCreatorProfileIfAddressIsMissing(authenticationDetails.VerifiedCredentials[0].Address)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
 
-	return &model.CreatorDetails{
-		CreatorID: uuid.NewV1().String(),
-		Address:   authenticationDetails.VerifiedCredentials[0].Address,
-	}, nil
+	return creatorInfo.ToGraphData(), nil
 }
 
 // Mutation returns MutationResolver implementation.
