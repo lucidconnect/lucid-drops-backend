@@ -7,6 +7,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"inverse.so/models"
 )
 
 var DB *gorm.DB
@@ -55,8 +56,9 @@ func initialiseDB(dsn string) {
 
 func SetupDB(dsn string) *gorm.DB {
 	initialiseDB(dsn)
-	//Connect Account Related
-	DB.AutoMigrate()
+
+	//User managment
+	DB.AutoMigrate(&models.Creator{})
 
 	return DB
 }
