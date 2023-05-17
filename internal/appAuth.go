@@ -3,12 +3,10 @@ package internal
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strings"
-
-	"github.com/golang-jwt/jwt"
 )
 
 type contextKey struct {
@@ -16,8 +14,7 @@ type contextKey struct {
 }
 
 type AuthDetails struct {
-	DeviceId string
-	UserUUID string
+	Address string
 }
 
 var (
@@ -56,36 +53,32 @@ func UserAuthMiddleWare() func(http.Handler) http.Handler {
 			// 	// 	return
 			// }
 
-			rawDecodedText, err := base64.StdEncoding.DecodeString(jwtParts[0])
-			if err == nil {
+			rawDecodedText, _ := base64.URLEncoding.DecodeString(jwtParts[1])
+			if string(rawDecodedText) != "" {
 				ctx := context.WithValue(r.Context(), userAuthToken, rawDecodedText)
 				next.ServeHTTP(w, r.WithContext(ctx))
 			} else {
-				fmt.Println(err)
 				w.WriteHeader(http.StatusUnauthorized)
 			}
 		})
 	}
 }
 
-func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, err error) {
-	claims, ok := ctx.Value(userAuthToken).(jwt.MapClaims)
+func GetAuthDetailsFromContext(ctx context.Context) (authDetails *DynamicJWTMetadata, err error) {
+	jwtClaims, ok := ctx.Value(userAuthToken).([]byte)
 	if !ok {
 		return nil, errJWTCreationError
 	}
 
-	userUUID, casted := claims["user_id"].(string)
-	if !casted {
-		return nil, errJWTCreationError
+	var jwtInfo DynamicJWTMetadata
+	err = json.Unmarshal(jwtClaims, &jwtInfo)
+	if err != nil {
+		return nil, err
 	}
+	// jwtInfo, casted := claims["user_id"].(DynamicJWTMetadata)
+	// if !casted {
+	// 	return nil, errJWTCreationError
+	// }
 
-	deviceId, casted := claims["device_id"].(string)
-	if !casted {
-		return nil, errJWTCreationError
-	}
-
-	return &AuthDetails{
-		UserUUID: userUUID,
-		DeviceId: deviceId,
-	}, nil
+	return &jwtInfo, nil
 }
