@@ -7,8 +7,13 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 
+	uuid "github.com/satori/go.uuid"
 	"inverse.so/graph/model"
+	"inverse.so/internal"
+	"inverse.so/internal/customError"
+	"inverse.so/structure"
 )
 
 // CreateTodo is the resolver for the createTodo field.
@@ -16,9 +21,19 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// GetCreatorDetails is the resolver for the getCreatorDetails field.
+func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	log.Println(authenticationDetails)
+
+	return &model.CreatorDetails{
+		CreatorID: uuid.NewV1().String(),
+		Address:   authenticationDetails.VerifiedCredentials[0].Address,
+	}, nil
 }
 
 // Mutation returns MutationResolver implementation.
