@@ -2,17 +2,18 @@
 
 package model
 
+type Collection struct {
+	ID         string `json:"ID"`
+	Name       string `json:"name"`
+	ContentURI string `json:"contentURI"`
+}
+
 type CreatorDetails struct {
 	CreatorID string `json:"creatorID"`
 	Address   string `json:"address"`
 }
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
-}
-
-type Todo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+type NewCollection struct {
+	Name       string `json:"name"`
+	ContentURI string `json:"contentURI"`
 }

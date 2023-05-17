@@ -64,7 +64,7 @@ func UserAuthMiddleWare() func(http.Handler) http.Handler {
 	}
 }
 
-func GetAuthDetailsFromContext(ctx context.Context) (authDetails *DynamicJWTMetadata, err error) {
+func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, err error) {
 	jwtClaims, ok := ctx.Value(userAuthToken).([]byte)
 	if !ok {
 		return nil, errJWTCreationError
@@ -75,10 +75,9 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *DynamicJWTMeta
 	if err != nil {
 		return nil, err
 	}
-	// jwtInfo, casted := claims["user_id"].(DynamicJWTMetadata)
-	// if !casted {
-	// 	return nil, errJWTCreationError
-	// }
 
-	return &jwtInfo, nil
+	// TODO add JWT verification and assert address is present before proceeding
+	return &AuthDetails{
+		Address: jwtInfo.VerifiedCredentials[0].Address,
+	}, nil
 }

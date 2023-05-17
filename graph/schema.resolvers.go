@@ -6,18 +6,23 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
-	"inverse.so/engine"
+	"inverse.so/engine/collections"
+	"inverse.so/engine/onboarding"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/internal/customError"
 	"inverse.so/structure"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// CreateCollection is the resolver for the createCollection field.
+func (r *mutationResolver) CreateCollection(ctx context.Context, input model.NewCollection) (*model.Collection, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return collections.CreateCollection(&input, authenticationDetails)
 }
 
 // GetCreatorDetails is the resolver for the getCreatorDetails field.
@@ -27,7 +32,7 @@ func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDe
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	creatorInfo, err := engine.CreateCreatorProfileIfAddressIsMissing(authenticationDetails.VerifiedCredentials[0].Address)
+	creatorInfo, err := onboarding.CreateCreatorProfileIfAddressIsMissing(authenticationDetails.Address)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}

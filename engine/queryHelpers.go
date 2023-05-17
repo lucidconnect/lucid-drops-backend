@@ -18,16 +18,6 @@ func GetCreatorByAddress(address string) (*models.Creator, error) {
 	return &creator, nil
 }
 
-func CreateCreatorProfileIfAddressIsMissing(address string) (*models.Creator, error) {
-	cachedCreator, err := GetCreatorByAddress(address)
-	if err != nil {
-		newCreator := models.Creator{WalletAddress: address}
-		creationErr := utils.DB.Create(&newCreator).Error
-		if creationErr != nil {
-			return nil, creationErr
-		}
-		return &newCreator, nil
-	}
-
-	return cachedCreator, nil
+func CreateCollection(newCollection *models.Collection) error {
+	return utils.DB.Create(newCollection).Error
 }

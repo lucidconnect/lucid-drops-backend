@@ -1,6 +1,21 @@
 package onboarding
 
-func CreateProfileForCreator() error {
+import (
+	"inverse.so/engine"
+	"inverse.so/models"
+	"inverse.so/utils"
+)
 
-	return nil
+func CreateCreatorProfileIfAddressIsMissing(address string) (*models.Creator, error) {
+	cachedCreator, err := engine.GetCreatorByAddress(address)
+	if err != nil {
+		newCreator := models.Creator{WalletAddress: address}
+		creationErr := utils.DB.Create(&newCreator).Error
+		if creationErr != nil {
+			return nil, creationErr
+		}
+		return &newCreator, nil
+	}
+
+	return cachedCreator, nil
 }
