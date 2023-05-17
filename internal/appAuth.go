@@ -53,8 +53,8 @@ func UserAuthMiddleWare() func(http.Handler) http.Handler {
 			// 	// 	return
 			// }
 
-			rawDecodedText, _ := base64.URLEncoding.DecodeString(jwtParts[1])
-			if string(rawDecodedText) != "" {
+			rawDecodedText, err := base64.RawStdEncoding.DecodeString(jwtParts[1])
+			if err == nil {
 				ctx := context.WithValue(r.Context(), userAuthToken, rawDecodedText)
 				next.ServeHTTP(w, r.WithContext(ctx))
 			} else {

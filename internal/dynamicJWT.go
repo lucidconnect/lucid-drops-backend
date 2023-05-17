@@ -56,7 +56,6 @@ type DynamicJWTMetadata struct {
 	Iss                      string                `json:"iss,omitempty"`
 	Sub                      string                `json:"sub,omitempty"`
 	Sid                      string                `json:"sid,omitempty"`
-	Alias                    string                `json:"alias,omitempty"`
 	EnvironmentID            string                `json:"environment_id,omitempty"`
 	Lists                    []interface{}         `json:"lists,omitempty"`
 	MissingFields            []interface{}         `json:"missing_fields,omitempty"`
@@ -70,22 +69,41 @@ type DynamicJWTMetadata struct {
 	Exp                      int                   `json:"exp,omitempty"`
 }
 
+// type MissingFields struct {
+// 	Name     string `json:"name,omitempty"`
+// 	Required bool   `json:"required,omitempty"`
+// 	Enabled  bool   `json:"enabled,omitempty"`
+// 	Unique   bool   `json:"unique,omitempty"`
+// 	Verify   bool   `json:"verify,omitempty"`
+// }
+type VerifiedCredentials struct {
+	Address          string      `json:"address,omitempty"`
+	Chain            string      `json:"chain,omitempty"`
+	ID               string      `json:"id,omitempty"`
+	NameService      interface{} `json:"name_service,omitempty"`
+	PublicIdentifier string      `json:"public_identifier,omitempty"`
+	WalletName       string      `json:"wallet_name,omitempty"`
+	WalletProvider   string      `json:"wallet_provider,omitempty"`
+	Format           string      `json:"format,omitempty"`
+}
+
 type NameService struct {
 }
-type VerifiedCredentials struct {
-	Address            string        `json:"address,omitempty"`
-	Chain              string        `json:"chain,omitempty"`
-	ID                 string        `json:"id,omitempty"`
-	NameService        NameService   `json:"name_service,omitempty"`
-	PublicIdentifier   string        `json:"public_identifier,omitempty"`
-	WalletName         string        `json:"wallet_name,omitempty"`
-	WalletProvider     string        `json:"wallet_provider,omitempty"`
-	Format             string        `json:"format,omitempty"`
-	OauthProvider      string        `json:"oauth_provider,omitempty"`
-	OauthUsername      string        `json:"oauth_username,omitempty"`
-	OauthDisplayName   interface{}   `json:"oauth_display_name,omitempty"`
-	OauthAccountID     string        `json:"oauth_account_id,omitempty"`
-	OauthAccountPhotos []interface{} `json:"oauth_account_photos,omitempty"`
-	OauthEmails        []interface{} `json:"oauth_emails,omitempty"`
-	Email              string        `json:"email,omitempty"`
-}
+
+// type VerifiedCredentials struct {
+// 	Address            string        `json:"address,omitempty"`
+// 	Chain              string        `json:"chain,omitempty"`
+// 	ID                 string        `json:"id,omitempty"`
+// 	NameService        NameService   `json:"name_service,omitempty"`
+// 	PublicIdentifier   string        `json:"public_identifier,omitempty"`
+// 	WalletName         string        `json:"wallet_name,omitempty"`
+// 	WalletProvider     string        `json:"wallet_provider,omitempty"`
+// 	Format             string        `json:"format,omitempty"`
+// 	OauthProvider      string        `json:"oauth_provider,omitempty"`
+// 	OauthUsername      string        `json:"oauth_username,omitempty"`
+// 	OauthDisplayName   interface{}   `json:"oauth_display_name,omitempty"`
+// 	OauthAccountID     string        `json:"oauth_account_id,omitempty"`
+// 	OauthAccountPhotos []interface{} `json:"oauth_account_photos,omitempty"`
+// 	OauthEmails        []interface{} `json:"oauth_emails,omitempty"`
+// 	Email              string        `json:"email,omitempty"`
+// }
