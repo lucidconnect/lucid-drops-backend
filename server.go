@@ -13,6 +13,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"inverse.so/graph"
 	"inverse.so/internal"
+	"inverse.so/route"
 	"inverse.so/utils"
 )
 
@@ -46,6 +47,7 @@ func main() {
 
 	loadCORS(router)
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/health", http.HandlerFunc(route.HealthCheckHandler))
 	router.Handle("/query", srv)
 
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
