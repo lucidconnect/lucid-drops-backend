@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
@@ -34,14 +36,26 @@ func main() {
 	utils.SetupDB(dsn)
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.Options{})
+	srv.Use(extension.Introspection{})
+
 	router := chi.NewRouter()
 	router.Use(internal.UserAuthMiddleWare())
+
 	loadCORS(router)
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Err(http.ListenAndServe(":"+port, nil))
+	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
+
+	httpServer := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
+	}
+
+	log.Err(httpServer.ListenAndServe())
 }
 
 func loadCORS(router *chi.Mux) {
