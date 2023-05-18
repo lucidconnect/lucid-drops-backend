@@ -1,0 +1,24 @@
+package structure
+
+type StabilityImageRequest struct {
+	Height      int                   `json:"height"`
+	Width       int                   `json:"width"`
+	TextPrompts []StabilityTextPrompt `json:"text_prompts"`
+	Samples     int                   `json:"samples"`
+	StylePreset string                `json:"style_preset,omitempty"`
+}
+
+type StabilityImageResponse struct {
+	Artifacts []StabilityResponse `json:"artifacts"`
+}
+
+type StabilityResponse struct {
+	Base64       string  `json:"base64"`
+	FinishReason string  `json:"finishReason"`
+	Seed         float64 `json:"seed"`
+}
+
+type StabilityTextPrompt struct {
+	Text   string  `json:"text"`
+	Weight float64 `json:"weight"`
+}
