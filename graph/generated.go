@@ -52,24 +52,33 @@ type ComplexityRoot struct {
 	}
 
 	CreatorDetails struct {
-		Address   func(childComplexity int) int
-		CreatorID func(childComplexity int) int
+		Address         func(childComplexity int) int
+		CreatorID       func(childComplexity int) int
+		InverseUsername func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateCollection func(childComplexity int, input model.NewCollection) int
+		CreateCollection        func(childComplexity int, input model.NewCollection) int
+		RegisterInverseUsername func(childComplexity int, input model.NewUsernameRegisgration) int
+	}
+
+	OnboardingProgress struct {
+		RegisterdInverseUsername func(childComplexity int) int
 	}
 
 	Query struct {
-		GetCreatorDetails func(childComplexity int) int
+		GetCreatorDetails    func(childComplexity int) int
+		GetOnboardinProgress func(childComplexity int) int
 	}
 }
 
 type MutationResolver interface {
+	RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error)
 	CreateCollection(ctx context.Context, input model.NewCollection) (*model.Collection, error)
 }
 type QueryResolver interface {
 	GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error)
+	GetOnboardinProgress(ctx context.Context) (*model.OnboardingProgress, error)
 }
 
 type executableSchema struct {
@@ -122,6 +131,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CreatorDetails.CreatorID(childComplexity), true
 
+	case "CreatorDetails.inverseUsername":
+		if e.complexity.CreatorDetails.InverseUsername == nil {
+			break
+		}
+
+		return e.complexity.CreatorDetails.InverseUsername(childComplexity), true
+
 	case "Mutation.createCollection":
 		if e.complexity.Mutation.CreateCollection == nil {
 			break
@@ -134,12 +150,38 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateCollection(childComplexity, args["input"].(model.NewCollection)), true
 
+	case "Mutation.registerInverseUsername":
+		if e.complexity.Mutation.RegisterInverseUsername == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_registerInverseUsername_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RegisterInverseUsername(childComplexity, args["input"].(model.NewUsernameRegisgration)), true
+
+	case "OnboardingProgress.registerdInverseUsername":
+		if e.complexity.OnboardingProgress.RegisterdInverseUsername == nil {
+			break
+		}
+
+		return e.complexity.OnboardingProgress.RegisterdInverseUsername(childComplexity), true
+
 	case "Query.getCreatorDetails":
 		if e.complexity.Query.GetCreatorDetails == nil {
 			break
 		}
 
 		return e.complexity.Query.GetCreatorDetails(childComplexity), true
+
+	case "Query.getOnboardinProgress":
+		if e.complexity.Query.GetOnboardinProgress == nil {
+			break
+		}
+
+		return e.complexity.Query.GetOnboardinProgress(childComplexity), true
 
 	}
 	return 0, false
@@ -150,6 +192,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewCollection,
+		ec.unmarshalInputNewUsernameRegisgration,
 	)
 	first := true
 
@@ -236,6 +279,21 @@ func (ec *executionContext) field_Mutation_createCollection_args(ctx context.Con
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewCollection2inverseᚗsoᚋgraphᚋmodelᚐNewCollection(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_registerInverseUsername_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewUsernameRegisgration
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewUsernameRegisgration2inverseᚗsoᚋgraphᚋmodelᚐNewUsernameRegisgration(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -517,6 +575,110 @@ func (ec *executionContext) fieldContext_CreatorDetails_address(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _CreatorDetails_inverseUsername(ctx context.Context, field graphql.CollectedField, obj *model.CreatorDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.InverseUsername, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreatorDetails_inverseUsername(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreatorDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_registerInverseUsername(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_registerInverseUsername(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RegisterInverseUsername(rctx, fc.Args["input"].(model.NewUsernameRegisgration))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CreatorDetails)
+	fc.Result = res
+	return ec.marshalNCreatorDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐCreatorDetails(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_registerInverseUsername(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "creatorID":
+				return ec.fieldContext_CreatorDetails_creatorID(ctx, field)
+			case "address":
+				return ec.fieldContext_CreatorDetails_address(ctx, field)
+			case "inverseUsername":
+				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_registerInverseUsername_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createCollection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createCollection(ctx, field)
 	if err != nil {
@@ -580,6 +742,50 @@ func (ec *executionContext) fieldContext_Mutation_createCollection(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _OnboardingProgress_registerdInverseUsername(ctx context.Context, field graphql.CollectedField, obj *model.OnboardingProgress) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OnboardingProgress_registerdInverseUsername(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.RegisterdInverseUsername, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OnboardingProgress_registerdInverseUsername(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OnboardingProgress",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_getCreatorDetails(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_getCreatorDetails(ctx, field)
 	if err != nil {
@@ -623,8 +829,58 @@ func (ec *executionContext) fieldContext_Query_getCreatorDetails(ctx context.Con
 				return ec.fieldContext_CreatorDetails_creatorID(ctx, field)
 			case "address":
 				return ec.fieldContext_CreatorDetails_address(ctx, field)
+			case "inverseUsername":
+				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getOnboardinProgress(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getOnboardinProgress(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetOnboardinProgress(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.OnboardingProgress)
+	fc.Result = res
+	return ec.marshalNOnboardingProgress2ᚖinverseᚗsoᚋgraphᚋmodelᚐOnboardingProgress(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getOnboardinProgress(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "registerdInverseUsername":
+				return ec.fieldContext_OnboardingProgress_registerdInverseUsername(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type OnboardingProgress", field.Name)
 		},
 	}
 	return fc, nil
@@ -2570,6 +2826,35 @@ func (ec *executionContext) unmarshalInputNewCollection(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewUsernameRegisgration(ctx context.Context, obj interface{}) (model.NewUsernameRegisgration, error) {
+	var it model.NewUsernameRegisgration
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"inverseUsername"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "inverseUsername":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inverseUsername"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.InverseUsername = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -2644,6 +2929,10 @@ func (ec *executionContext) _CreatorDetails(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "inverseUsername":
+
+			out.Values[i] = ec._CreatorDetails_inverseUsername(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2674,11 +2963,48 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
+		case "registerInverseUsername":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_registerInverseUsername(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createCollection":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createCollection(ctx, field)
 			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var onboardingProgressImplementors = []string{"OnboardingProgress"}
+
+func (ec *executionContext) _OnboardingProgress(ctx context.Context, sel ast.SelectionSet, obj *model.OnboardingProgress) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, onboardingProgressImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("OnboardingProgress")
+		case "registerdInverseUsername":
+
+			out.Values[i] = ec._OnboardingProgress_registerdInverseUsername(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -2723,6 +3049,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_getCreatorDetails(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getOnboardinProgress":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getOnboardinProgress(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3138,6 +3487,25 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 func (ec *executionContext) unmarshalNNewCollection2inverseᚗsoᚋgraphᚋmodelᚐNewCollection(ctx context.Context, v interface{}) (model.NewCollection, error) {
 	res, err := ec.unmarshalInputNewCollection(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewUsernameRegisgration2inverseᚗsoᚋgraphᚋmodelᚐNewUsernameRegisgration(ctx context.Context, v interface{}) (model.NewUsernameRegisgration, error) {
+	res, err := ec.unmarshalInputNewUsernameRegisgration(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNOnboardingProgress2inverseᚗsoᚋgraphᚋmodelᚐOnboardingProgress(ctx context.Context, sel ast.SelectionSet, v model.OnboardingProgress) graphql.Marshaler {
+	return ec._OnboardingProgress(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNOnboardingProgress2ᚖinverseᚗsoᚋgraphᚋmodelᚐOnboardingProgress(ctx context.Context, sel ast.SelectionSet, v *model.OnboardingProgress) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._OnboardingProgress(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {

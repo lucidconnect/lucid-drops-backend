@@ -4,12 +4,14 @@ import "inverse.so/graph/model"
 
 type Creator struct {
 	Base
-	WalletAddress string
+	WalletAddress   string
+	InverseUsername *string
 }
 
 func (c *Creator) ToGraphData() *model.CreatorDetails {
 	return &model.CreatorDetails{
-		Address:   c.WalletAddress,
-		CreatorID: c.ID.String(),
+		Address:         c.WalletAddress,
+		CreatorID:       c.ID.String(),
+		InverseUsername: c.InverseUsername,
 	}
 }

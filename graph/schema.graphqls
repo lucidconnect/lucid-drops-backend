@@ -1,28 +1,37 @@
 type Query {
   getCreatorDetails: CreatorDetails!
+  getOnboardinProgress: OnboardingProgress!
 }
 
 type Mutation {
   createCollection(input: NewCollection!): Collection!
+  registerInverseUsername(input: NewUsernameRegisgration!): CreatorDetails!
 }
 
 """ Time formated in the time.RFC3339Nano Format """
 scalar Time
+
+input NewUsernameRegisgration {
+  inverseUsername: String!
+}
 
 input NewCollection {
   name: String!
   contentURI: String!
 }
 
+type OnboardingProgress{
+  registerdInverseUsername: Boolean!
+}
+
+type CreatorDetails {
+  creatorID: ID!
+  address: String!
+  inverseUsername: String
+}
 
 type Collection {
   ID: ID!
   name: String!
   contentURI: String!
-}
-
-
-type CreatorDetails {
-  creatorID: ID!
-  address: String!
 }

@@ -15,6 +15,16 @@ import (
 	"inverse.so/structure"
 )
 
+// RegisterInverseUsername is the resolver for the registerInverseUsername field.
+func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return onboarding.RegisterInverseUsername(authenticationDetails.Address, &input)
+}
+
 // CreateCollection is the resolver for the createCollection field.
 func (r *mutationResolver) CreateCollection(ctx context.Context, input model.NewCollection) (*model.Collection, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
@@ -38,6 +48,21 @@ func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDe
 	}
 
 	return creatorInfo.ToGraphData(), nil
+}
+
+// GetOnboardinProgress is the resolver for the getOnboardinProgress field.
+func (r *queryResolver) GetOnboardinProgress(ctx context.Context) (*model.OnboardingProgress, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	onbaordingInfo, err := onboarding.GetOnboardinProgress(authenticationDetails.Address)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return onbaordingInfo, nil
 }
 
 // Mutation returns MutationResolver implementation.

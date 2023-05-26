@@ -9,11 +9,20 @@ type Collection struct {
 }
 
 type CreatorDetails struct {
-	CreatorID string `json:"creatorID"`
-	Address   string `json:"address"`
+	CreatorID       string  `json:"creatorID"`
+	Address         string  `json:"address"`
+	InverseUsername *string `json:"inverseUsername,omitempty"`
 }
 
 type NewCollection struct {
 	Name       string `json:"name"`
 	ContentURI string `json:"contentURI"`
+}
+
+type NewUsernameRegisgration struct {
+	InverseUsername string `json:"inverseUsername"`
+}
+
+type OnboardingProgress struct {
+	RegisterdInverseUsername bool `json:"registerdInverseUsername"`
 }
