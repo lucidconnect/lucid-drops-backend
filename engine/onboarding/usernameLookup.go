@@ -7,7 +7,7 @@ import (
 
 func CheckIfInverseNameIsAvailable(input *model.NewUsernameRegisgration) (bool, error) {
 	_, err := engine.GetCreatorByInverseUsername(input.InverseUsername)
-	if err != nil {
+	if err == nil {
 		return false, nil
 	}
 

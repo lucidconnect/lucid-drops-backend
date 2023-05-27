@@ -68,7 +68,7 @@ func (r *queryResolver) GetOnboardinProgress(ctx context.Context) (*model.Onboar
 
 // IsInverseNameIsAvailable is the resolver for the isInverseNameIsAvailable field.
 func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input model.NewUsernameRegisgration) (bool, error) {
-	panic(fmt.Errorf("not implemented: IsInverseNameIsAvailable - isInverseNameIsAvailable"))
+	return onboarding.CheckIfInverseNameIsAvailable(&input)
 }
 
 // Mutation returns MutationResolver implementation.
