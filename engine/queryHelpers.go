@@ -56,5 +56,5 @@ func CreateCollection(newCollection *models.Collection) error {
 }
 
 func SaveCollection(collection *models.Collection) error {
-	return utils.DB.Create(collection).Error
+	return utils.DB.Save(collection).Error
 }

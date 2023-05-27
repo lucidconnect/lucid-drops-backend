@@ -43,7 +43,7 @@ func UpdateCollection(authDetails *internal.AuthDetails, collectionID string, in
 
 	collection, err := engine.GetCollectionByID(collectionID)
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded to create a new collection")
+		return nil, errors.New("collection not found")
 	}
 
 	if creator.ID != collection.CreatorID {
@@ -66,7 +66,7 @@ func UpdateCollection(authDetails *internal.AuthDetails, collectionID string, in
 		collection.Description = *input.Description
 	}
 
-	err = engine.CreateCollection(collection)
+	err = engine.SaveCollection(collection)
 	if err != nil {
 		return nil, errors.New("couldn't create new collection")
 	}
