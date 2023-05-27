@@ -3,20 +3,24 @@
 package model
 
 type Collection struct {
-	ID         string `json:"ID"`
-	Name       string `json:"name"`
-	ContentURI string `json:"contentURI"`
+	ID          string `json:"ID"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Image       string `json:"image"`
+	Thumbnail   string `json:"thumbnail"`
+}
+
+type CollectionInput struct {
+	Name        *string `json:"name,omitempty"`
+	Description *string `json:"description,omitempty"`
+	Image       *string `json:"image,omitempty"`
+	Thumbnail   *string `json:"thumbnail,omitempty"`
 }
 
 type CreatorDetails struct {
 	CreatorID       string  `json:"creatorID"`
 	Address         string  `json:"address"`
 	InverseUsername *string `json:"inverseUsername,omitempty"`
-}
-
-type NewCollection struct {
-	Name       string `json:"name"`
-	ContentURI string `json:"contentURI"`
 }
 
 type NewUsernameRegisgration struct {

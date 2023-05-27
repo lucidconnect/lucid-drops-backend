@@ -29,6 +29,32 @@ func GetCreatorByInverseUsername(inverseUsername string) (*models.Creator, error
 	return &creator, nil
 }
 
+func GetCollectionByID(collectionID string) (*models.Collection, error) {
+	var collection models.Collection
+
+	err := utils.DB.Where("id=?", collectionID).First(&collection).Error
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	return &collection, nil
+}
+
+func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {
+	var collections []*models.Collection
+
+	err := utils.DB.Where("creator_id=?", creatorID).Find(&collections).Error
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	return collections, nil
+}
+
 func CreateCollection(newCollection *models.Collection) error {
 	return utils.DB.Create(newCollection).Error
+}
+
+func SaveCollection(collection *models.Collection) error {
+	return utils.DB.Create(collection).Error
 }

@@ -17,13 +17,23 @@ import (
 )
 
 // CreateCollection is the resolver for the createCollection field.
-func (r *mutationResolver) CreateCollection(ctx context.Context, input model.NewCollection) (*model.Collection, error) {
+func (r *mutationResolver) CreateCollection(ctx context.Context, input model.CollectionInput) (*model.Collection, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
 	return collections.CreateCollection(&input, authenticationDetails)
+}
+
+// UpdateCollection is the resolver for the updateCollection field.
+func (r *mutationResolver) UpdateCollection(ctx context.Context, collectionID string, input model.CollectionInput) (*model.Collection, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return collections.UpdateCollection(authenticationDetails, collectionID, &input)
 }
 
 // RegisterInverseUsername is the resolver for the registerInverseUsername field.
@@ -71,6 +81,21 @@ func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input mode
 	return onboarding.CheckIfInverseNameIsAvailable(&input)
 }
 
+// FetchCollectionByID is the resolver for the fetchCollectionById field.
+func (r *queryResolver) FetchCollectionByID(ctx context.Context, collectionID string) (*model.Collection, error) {
+	return collections.FetchCollectionByID(collectionID)
+}
+
+// FetchCreatorCollections is the resolver for the fetchCreatorCollections field.
+func (r *queryResolver) FetchCreatorCollections(ctx context.Context) ([]*model.Collection, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return collections.FetchCreatorCollections(authenticationDetails)
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -86,6 +111,6 @@ type queryResolver struct{ *Resolver }
 //  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //    it when you're done.
 //  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) CheckIfInverseNameIsAvailable(ctx context.Context, input model.NewUsernameRegisgration) (bool, error) {
-	panic(fmt.Errorf("not implemented: CheckIfInverseNameIsAvailable - checkIfInverseNameIsAvailable"))
+func (r *queryResolver) FetchCollections(ctx context.Context) ([]*model.Collection, error) {
+	panic(fmt.Errorf("not implemented: FetchCollections - fetchCollections"))
 }

@@ -46,9 +46,11 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Collection struct {
-		ContentURI func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Name       func(childComplexity int) int
+		Description func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Image       func(childComplexity int) int
+		Name        func(childComplexity int) int
+		Thumbnail   func(childComplexity int) int
 	}
 
 	CreatorDetails struct {
@@ -58,8 +60,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateCollection        func(childComplexity int, input model.NewCollection) int
+		CreateCollection        func(childComplexity int, input model.CollectionInput) int
 		RegisterInverseUsername func(childComplexity int, input model.NewUsernameRegisgration) int
+		UpdateCollection        func(childComplexity int, collectionID string, input model.CollectionInput) int
 	}
 
 	OnboardingProgress struct {
@@ -67,6 +70,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		FetchCollectionByID      func(childComplexity int, collectionID string) int
+		FetchCreatorCollections  func(childComplexity int) int
 		GetCreatorDetails        func(childComplexity int) int
 		GetOnboardinProgress     func(childComplexity int) int
 		IsInverseNameIsAvailable func(childComplexity int, input model.NewUsernameRegisgration) int
@@ -74,13 +79,16 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateCollection(ctx context.Context, input model.NewCollection) (*model.Collection, error)
+	CreateCollection(ctx context.Context, input model.CollectionInput) (*model.Collection, error)
+	UpdateCollection(ctx context.Context, collectionID string, input model.CollectionInput) (*model.Collection, error)
 	RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error)
 }
 type QueryResolver interface {
 	GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error)
 	GetOnboardinProgress(ctx context.Context) (*model.OnboardingProgress, error)
 	IsInverseNameIsAvailable(ctx context.Context, input model.NewUsernameRegisgration) (bool, error)
+	FetchCollectionByID(ctx context.Context, collectionID string) (*model.Collection, error)
+	FetchCreatorCollections(ctx context.Context) ([]*model.Collection, error)
 }
 
 type executableSchema struct {
@@ -98,12 +106,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Collection.contentURI":
-		if e.complexity.Collection.ContentURI == nil {
+	case "Collection.description":
+		if e.complexity.Collection.Description == nil {
 			break
 		}
 
-		return e.complexity.Collection.ContentURI(childComplexity), true
+		return e.complexity.Collection.Description(childComplexity), true
 
 	case "Collection.ID":
 		if e.complexity.Collection.ID == nil {
@@ -112,12 +120,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Collection.ID(childComplexity), true
 
+	case "Collection.image":
+		if e.complexity.Collection.Image == nil {
+			break
+		}
+
+		return e.complexity.Collection.Image(childComplexity), true
+
 	case "Collection.name":
 		if e.complexity.Collection.Name == nil {
 			break
 		}
 
 		return e.complexity.Collection.Name(childComplexity), true
+
+	case "Collection.thumbnail":
+		if e.complexity.Collection.Thumbnail == nil {
+			break
+		}
+
+		return e.complexity.Collection.Thumbnail(childComplexity), true
 
 	case "CreatorDetails.address":
 		if e.complexity.CreatorDetails.Address == nil {
@@ -150,7 +172,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateCollection(childComplexity, args["input"].(model.NewCollection)), true
+		return e.complexity.Mutation.CreateCollection(childComplexity, args["input"].(model.CollectionInput)), true
 
 	case "Mutation.registerInverseUsername":
 		if e.complexity.Mutation.RegisterInverseUsername == nil {
@@ -164,12 +186,43 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RegisterInverseUsername(childComplexity, args["input"].(model.NewUsernameRegisgration)), true
 
+	case "Mutation.updateCollection":
+		if e.complexity.Mutation.UpdateCollection == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateCollection_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateCollection(childComplexity, args["collectionID"].(string), args["input"].(model.CollectionInput)), true
+
 	case "OnboardingProgress.registerdInverseUsername":
 		if e.complexity.OnboardingProgress.RegisterdInverseUsername == nil {
 			break
 		}
 
 		return e.complexity.OnboardingProgress.RegisterdInverseUsername(childComplexity), true
+
+	case "Query.fetchCollectionById":
+		if e.complexity.Query.FetchCollectionByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_fetchCollectionById_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FetchCollectionByID(childComplexity, args["collectionID"].(string)), true
+
+	case "Query.fetchCreatorCollections":
+		if e.complexity.Query.FetchCreatorCollections == nil {
+			break
+		}
+
+		return e.complexity.Query.FetchCreatorCollections(childComplexity), true
 
 	case "Query.getCreatorDetails":
 		if e.complexity.Query.GetCreatorDetails == nil {
@@ -205,7 +258,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
-		ec.unmarshalInputNewCollection,
+		ec.unmarshalInputCollectionInput,
 		ec.unmarshalInputNewUsernameRegisgration,
 	)
 	first := true
@@ -289,10 +342,10 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_createCollection_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.NewCollection
+	var arg0 model.CollectionInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewCollection2inverseᚗsoᚋgraphᚋmodelᚐNewCollection(ctx, tmp)
+		arg0, err = ec.unmarshalNCollectionInput2inverseᚗsoᚋgraphᚋmodelᚐCollectionInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -316,6 +369,30 @@ func (ec *executionContext) field_Mutation_registerInverseUsername_args(ctx cont
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateCollection_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["collectionID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collectionID"] = arg0
+	var arg1 model.CollectionInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNCollectionInput2inverseᚗsoᚋgraphᚋmodelᚐCollectionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -328,6 +405,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_fetchCollectionById_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["collectionID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["collectionID"] = arg0
 	return args, nil
 }
 
@@ -472,8 +564,8 @@ func (ec *executionContext) fieldContext_Collection_name(ctx context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Collection_contentURI(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Collection_contentURI(ctx, field)
+func (ec *executionContext) _Collection_description(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_description(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -486,7 +578,7 @@ func (ec *executionContext) _Collection_contentURI(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ContentURI, nil
+		return obj.Description, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -503,7 +595,95 @@ func (ec *executionContext) _Collection_contentURI(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Collection_contentURI(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Collection_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collection_image(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_image(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Image, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_image(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Collection_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_thumbnail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Thumbnail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_thumbnail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Collection",
 		Field:      field,
@@ -659,7 +839,7 @@ func (ec *executionContext) _Mutation_createCollection(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateCollection(rctx, fc.Args["input"].(model.NewCollection))
+		return ec.resolvers.Mutation().CreateCollection(rctx, fc.Args["input"].(model.CollectionInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -688,8 +868,12 @@ func (ec *executionContext) fieldContext_Mutation_createCollection(ctx context.C
 				return ec.fieldContext_Collection_ID(ctx, field)
 			case "name":
 				return ec.fieldContext_Collection_name(ctx, field)
-			case "contentURI":
-				return ec.fieldContext_Collection_contentURI(ctx, field)
+			case "description":
+				return ec.fieldContext_Collection_description(ctx, field)
+			case "image":
+				return ec.fieldContext_Collection_image(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Collection_thumbnail(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -702,6 +886,73 @@ func (ec *executionContext) fieldContext_Mutation_createCollection(ctx context.C
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createCollection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateCollection(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateCollection(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateCollection(rctx, fc.Args["collectionID"].(string), fc.Args["input"].(model.CollectionInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Collection)
+	fc.Result = res
+	return ec.marshalNCollection2ᚖinverseᚗsoᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateCollection(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Collection_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Collection_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Collection_description(ctx, field)
+			case "image":
+				return ec.fieldContext_Collection_image(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateCollection_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -966,6 +1217,129 @@ func (ec *executionContext) fieldContext_Query_isInverseNameIsAvailable(ctx cont
 	if fc.Args, err = ec.field_Query_isInverseNameIsAvailable_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_fetchCollectionById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_fetchCollectionById(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FetchCollectionByID(rctx, fc.Args["collectionID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Collection)
+	fc.Result = res
+	return ec.marshalNCollection2ᚖinverseᚗsoᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_fetchCollectionById(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Collection_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Collection_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Collection_description(ctx, field)
+			case "image":
+				return ec.fieldContext_Collection_image(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_fetchCollectionById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_fetchCreatorCollections(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_fetchCreatorCollections(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FetchCreatorCollections(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Collection)
+	fc.Result = res
+	return ec.marshalNCollection2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐCollectionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_fetchCreatorCollections(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Collection_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Collection_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Collection_description(ctx, field)
+			case "image":
+				return ec.fieldContext_Collection_image(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -2872,14 +3246,14 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputNewCollection(ctx context.Context, obj interface{}) (model.NewCollection, error) {
-	var it model.NewCollection
+func (ec *executionContext) unmarshalInputCollectionInput(ctx context.Context, obj interface{}) (model.CollectionInput, error) {
+	var it model.CollectionInput
 	asMap := map[string]interface{}{}
 	for k, v := range obj.(map[string]interface{}) {
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "contentURI"}
+	fieldsInOrder := [...]string{"name", "description", "image", "thumbnail"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -2890,20 +3264,38 @@ func (ec *executionContext) unmarshalInputNewCollection(ctx context.Context, obj
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Name = data
-		case "contentURI":
+		case "description":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contentURI"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("description"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ContentURI = data
+			it.Description = data
+		case "image":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Image = data
+		case "thumbnail":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("thumbnail"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Thumbnail = data
 		}
 	}
 
@@ -2971,9 +3363,23 @@ func (ec *executionContext) _Collection(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "contentURI":
+		case "description":
 
-			out.Values[i] = ec._Collection_contentURI(ctx, field, obj)
+			out.Values[i] = ec._Collection_description(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "image":
+
+			out.Values[i] = ec._Collection_image(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "thumbnail":
+
+			out.Values[i] = ec._Collection_thumbnail(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3051,6 +3457,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createCollection(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateCollection":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateCollection(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -3179,6 +3594,52 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_isInverseNameIsAvailable(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "fetchCollectionById":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_fetchCollectionById(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "fetchCreatorCollections":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_fetchCreatorCollections(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -3552,6 +4013,50 @@ func (ec *executionContext) marshalNCollection2inverseᚗsoᚋgraphᚋmodelᚐCo
 	return ec._Collection(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNCollection2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐCollectionᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Collection) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCollection2ᚖinverseᚗsoᚋgraphᚋmodelᚐCollection(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalNCollection2ᚖinverseᚗsoᚋgraphᚋmodelᚐCollection(ctx context.Context, sel ast.SelectionSet, v *model.Collection) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -3560,6 +4065,11 @@ func (ec *executionContext) marshalNCollection2ᚖinverseᚗsoᚋgraphᚋmodel�
 		return graphql.Null
 	}
 	return ec._Collection(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCollectionInput2inverseᚗsoᚋgraphᚋmodelᚐCollectionInput(ctx context.Context, v interface{}) (model.CollectionInput, error) {
+	res, err := ec.unmarshalInputCollectionInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNCreatorDetails2inverseᚗsoᚋgraphᚋmodelᚐCreatorDetails(ctx context.Context, sel ast.SelectionSet, v model.CreatorDetails) graphql.Marshaler {
@@ -3589,11 +4099,6 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNNewCollection2inverseᚗsoᚋgraphᚋmodelᚐNewCollection(ctx context.Context, v interface{}) (model.NewCollection, error) {
-	res, err := ec.unmarshalInputNewCollection(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewUsernameRegisgration2inverseᚗsoᚋgraphᚋmodelᚐNewUsernameRegisgration(ctx context.Context, v interface{}) (model.NewUsernameRegisgration, error) {

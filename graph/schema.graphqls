@@ -2,10 +2,13 @@ type Query {
   getCreatorDetails: CreatorDetails!
   getOnboardinProgress: OnboardingProgress!
   isInverseNameIsAvailable(input: NewUsernameRegisgration!): Boolean!
+  fetchCollectionById(collectionID: String!): Collection!
+  fetchCreatorCollections: [Collection!]!
 }
 
 type Mutation {
-  createCollection(input: NewCollection!): Collection!
+  createCollection(input: CollectionInput!): Collection!
+  updateCollection(collectionID: String!,input: CollectionInput!): Collection!
   registerInverseUsername(input: NewUsernameRegisgration!): CreatorDetails!
 }
 
@@ -16,9 +19,19 @@ input NewUsernameRegisgration {
   inverseUsername: String!
 }
 
-input NewCollection {
-  name: String!
-  contentURI: String!
+input CollectionInput {
+	name: String
+	description: String
+	image: String
+	thumbnail: String
+}
+
+type Collection {
+  ID: ID!
+	name: String!
+	description: String!
+	image: String!
+	thumbnail: String!
 }
 
 type OnboardingProgress{
@@ -29,10 +42,4 @@ type CreatorDetails {
   creatorID: ID!
   address: String!
   inverseUsername: String
-}
-
-type Collection {
-  ID: ID!
-  name: String!
-  contentURI: String!
 }

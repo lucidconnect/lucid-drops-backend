@@ -7,15 +7,19 @@ import (
 
 type Collection struct {
 	Base
-	CreatorID  uuid.UUID
-	Name       string
-	ContentURI string // TODO add support for multiple content types
+	CreatorID   uuid.UUID
+	Name        string
+	Image       string `json:"image"`
+	Thumbnail   string `json:"thumbnail"`
+	Description string `json:"description"`
 }
 
 func (c *Collection) ToGraphData() *model.Collection {
 	return &model.Collection{
-		ID:         c.ID.String(),
-		Name:       c.Name,
-		ContentURI: c.ContentURI,
+		ID:          c.ID.String(),
+		Name:        c.Name,
+		Description: c.Description,
+		Image:       c.Image,
+		Thumbnail:   c.Thumbnail,
 	}
 }
