@@ -1,6 +1,7 @@
 type Query {
   getCreatorDetails: CreatorDetails!
   getOnboardinProgress: OnboardingProgress!
+  isInverseNameIsAvailable(input: NewUsernameRegisgration!): Boolean!
 }
 
 type Mutation {

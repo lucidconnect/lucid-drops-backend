@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"inverse.so/engine/collections"
 	"inverse.so/engine/onboarding"
@@ -15,16 +16,6 @@ import (
 	"inverse.so/structure"
 )
 
-// RegisterInverseUsername is the resolver for the registerInverseUsername field.
-func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return onboarding.RegisterInverseUsername(authenticationDetails.Address, &input)
-}
-
 // CreateCollection is the resolver for the createCollection field.
 func (r *mutationResolver) CreateCollection(ctx context.Context, input model.NewCollection) (*model.Collection, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
@@ -33,6 +24,16 @@ func (r *mutationResolver) CreateCollection(ctx context.Context, input model.New
 	}
 
 	return collections.CreateCollection(&input, authenticationDetails)
+}
+
+// RegisterInverseUsername is the resolver for the registerInverseUsername field.
+func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return onboarding.RegisterInverseUsername(authenticationDetails.Address, &input)
 }
 
 // GetCreatorDetails is the resolver for the getCreatorDetails field.
@@ -65,6 +66,11 @@ func (r *queryResolver) GetOnboardinProgress(ctx context.Context) (*model.Onboar
 	return onbaordingInfo, nil
 }
 
+// IsInverseNameIsAvailable is the resolver for the isInverseNameIsAvailable field.
+func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input model.NewUsernameRegisgration) (bool, error) {
+	panic(fmt.Errorf("not implemented: IsInverseNameIsAvailable - isInverseNameIsAvailable"))
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -73,3 +79,13 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) CheckIfInverseNameIsAvailable(ctx context.Context, input model.NewUsernameRegisgration) (bool, error) {
+	panic(fmt.Errorf("not implemented: CheckIfInverseNameIsAvailable - checkIfInverseNameIsAvailable"))
+}
