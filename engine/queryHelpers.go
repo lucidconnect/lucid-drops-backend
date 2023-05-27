@@ -40,21 +40,43 @@ func GetCollectionByID(collectionID string) (*models.Collection, error) {
 	return &collection, nil
 }
 
+func GetItemByID(itemID string) (*models.Item, error) {
+	var item models.Item
+
+	err := utils.DB.Where("id=?", itemID).First(&item).Error
+	if err != nil {
+		return nil, errors.New("item not found")
+	}
+
+	return &item, nil
+}
+
 func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {
 	var collections []*models.Collection
 
 	err := utils.DB.Where("creator_id=?", creatorID).Find(&collections).Error
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("collections not found")
 	}
 
 	return collections, nil
 }
 
-func CreateCollection(newCollection *models.Collection) error {
-	return utils.DB.Create(newCollection).Error
+func GetCollectionItems(collectionID string) ([]*models.Item, error) {
+	var items []*models.Item
+
+	err := utils.DB.Where("collection_id=?", collectionID).Find(&items).Error
+	if err != nil {
+		return nil, errors.New("items not found")
+	}
+
+	return items, nil
 }
 
-func SaveCollection(collection *models.Collection) error {
-	return utils.DB.Save(collection).Error
+func CreateModel(newModel interface{}) error {
+	return utils.DB.Create(newModel).Error
+}
+
+func SaveModel(model interface{}) error {
+	return utils.DB.Save(model).Error
 }

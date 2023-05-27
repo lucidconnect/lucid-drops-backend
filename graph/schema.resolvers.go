@@ -9,12 +9,23 @@ import (
 	"fmt"
 
 	"inverse.so/engine/collections"
+	"inverse.so/engine/items"
 	"inverse.so/engine/onboarding"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/internal/customError"
 	"inverse.so/structure"
 )
+
+// RegisterInverseUsername is the resolver for the registerInverseUsername field.
+func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return onboarding.RegisterInverseUsername(authenticationDetails.Address, &input)
+}
 
 // CreateCollection is the resolver for the createCollection field.
 func (r *mutationResolver) CreateCollection(ctx context.Context, input model.CollectionInput) (*model.Collection, error) {
@@ -33,17 +44,27 @@ func (r *mutationResolver) UpdateCollection(ctx context.Context, collectionID st
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	return collections.UpdateCollection(authenticationDetails, collectionID, &input)
+	return collections.UpdateCollection(collectionID, &input, authenticationDetails)
 }
 
-// RegisterInverseUsername is the resolver for the registerInverseUsername field.
-func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
+// CreateItem is the resolver for the createItem field.
+func (r *mutationResolver) CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	return onboarding.RegisterInverseUsername(authenticationDetails.Address, &input)
+	return items.CreateItem(&input, authenticationDetails)
+}
+
+// UpdateItem is the resolver for the updateItem field.
+func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return items.UpdateItem(itemID, &input, authenticationDetails)
 }
 
 // GetCreatorDetails is the resolver for the getCreatorDetails field.
@@ -94,6 +115,22 @@ func (r *queryResolver) FetchCreatorCollections(ctx context.Context) ([]*model.C
 	}
 
 	return collections.FetchCreatorCollections(authenticationDetails)
+}
+
+// FetchItemsInCollection is the resolver for the fetchItemsInCollection field.
+func (r *queryResolver) FetchItemsInCollection(ctx context.Context, collectionID string) ([]*model.Item, error) {
+
+	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	// if err != nil {
+	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	// }
+
+	return items.FetchCollectionItems(collectionID, nil)
+}
+
+// FetchItemByID is the resolver for the fetchItemById field.
+func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*model.Item, error) {
+	return items.FetchItemByID(itemID)
 }
 
 // Mutation returns MutationResolver implementation.

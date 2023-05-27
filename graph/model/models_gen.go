@@ -23,6 +23,21 @@ type CreatorDetails struct {
 	InverseUsername *string `json:"inverseUsername,omitempty"`
 }
 
+type Item struct {
+	ID           string `json:"ID"`
+	Name         string `json:"name"`
+	Image        string `json:"image"`
+	Description  string `json:"description"`
+	CollectionID string `json:"collectionId"`
+}
+
+type ItemInput struct {
+	Name         *string `json:"name,omitempty"`
+	Image        *string `json:"image,omitempty"`
+	Description  *string `json:"description,omitempty"`
+	CollectionID *string `json:"collectionID,omitempty"`
+}
+
 type NewUsernameRegisgration struct {
 	InverseUsername string `json:"inverseUsername"`
 }

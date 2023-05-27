@@ -2,14 +2,22 @@ type Query {
   getCreatorDetails: CreatorDetails!
   getOnboardinProgress: OnboardingProgress!
   isInverseNameIsAvailable(input: NewUsernameRegisgration!): Boolean!
+
   fetchCollectionById(collectionID: String!): Collection!
   fetchCreatorCollections: [Collection!]!
+
+  fetchItemsInCollection(collectionID: String!): [Item!]!
+  fetchItemById(itemID: String!): Item!
 }
 
 type Mutation {
+  registerInverseUsername(input: NewUsernameRegisgration!): CreatorDetails!
+
   createCollection(input: CollectionInput!): Collection!
   updateCollection(collectionID: String!,input: CollectionInput!): Collection!
-  registerInverseUsername(input: NewUsernameRegisgration!): CreatorDetails!
+
+  createItem(input: ItemInput!): Item!
+  updateItem(itemID: String!,input: ItemInput!): Item!
 }
 
 """ Time formated in the time.RFC3339Nano Format """
@@ -24,6 +32,13 @@ input CollectionInput {
 	description: String
 	image: String
 	thumbnail: String
+}
+
+input ItemInput {
+	name: String
+	image: String
+	description: String
+	collectionID: String
 }
 
 type Collection {
@@ -42,4 +57,12 @@ type CreatorDetails {
   creatorID: ID!
   address: String!
   inverseUsername: String
+}
+
+type Item {
+  ID: ID!
+	name: String!
+	image: String!
+	description: String!
+	collectionId: String!
 }

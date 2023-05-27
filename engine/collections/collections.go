@@ -27,7 +27,7 @@ func CreateCollection(input *model.CollectionInput, authDetails *internal.AuthDe
 		Description: *input.Description,
 	}
 
-	err = engine.CreateCollection(newCollection)
+	err = engine.CreateModel(newCollection)
 	if err != nil {
 		return nil, errors.New("couldn't create new collection")
 	}
@@ -35,7 +35,7 @@ func CreateCollection(input *model.CollectionInput, authDetails *internal.AuthDe
 	return newCollection.ToGraphData(), nil
 }
 
-func UpdateCollection(authDetails *internal.AuthDetails, collectionID string, input *model.CollectionInput) (*model.Collection, error) {
+func UpdateCollection(collectionID string, input *model.CollectionInput, authDetails *internal.AuthDetails) (*model.Collection, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
 		return nil, errors.New("creator is has not been onboarded to create a new collection")
@@ -66,7 +66,7 @@ func UpdateCollection(authDetails *internal.AuthDetails, collectionID string, in
 		collection.Description = *input.Description
 	}
 
-	err = engine.SaveCollection(collection)
+	err = engine.SaveModel(collection)
 	if err != nil {
 		return nil, errors.New("couldn't create new collection")
 	}
