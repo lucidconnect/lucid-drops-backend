@@ -15,6 +15,8 @@ type Query {
 
   fetchItemsInCollection(collectionID: String!): [Item!]!
   fetchItemById(itemID: String!): Item!
+
+  getImageSuggestions(prompt: String!, preset: AiImageStyle ): [String!]!
 }
 
 type Mutation {
@@ -73,4 +75,10 @@ type Item {
 	image: String!
 	description: String!
 	collectionId: String!
+}
+
+enum AiImageStyle{
+  Anime
+  Artistic
+  Futuristic
 }

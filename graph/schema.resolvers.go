@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 
+	"inverse.so/engine/aiimages"
 	"inverse.so/engine/collections"
 	"inverse.so/engine/items"
 	"inverse.so/engine/onboarding"
@@ -17,8 +18,8 @@ import (
 )
 
 // Items is the resolver for the items field.
-func (r *collectionResolver) Items(ctx context.Context, collection *model.Collection) ([]*model.Item, error) {
-	return items.FetchCollectionItems(collection.ID, nil)
+func (r *collectionResolver) Items(ctx context.Context, obj *model.Collection) ([]*model.Item, error) {
+	return items.FetchCollectionItems(obj.ID, nil)
 }
 
 // RegisterInverseUsername is the resolver for the registerInverseUsername field.
@@ -134,6 +135,15 @@ func (r *queryResolver) FetchItemsInCollection(ctx context.Context, collectionID
 // FetchItemByID is the resolver for the fetchItemById field.
 func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*model.Item, error) {
 	return items.FetchItemByID(itemID)
+}
+
+// GetImageSuggestions is the resolver for the getImageSuggestions field.
+func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]string, error) {
+	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	// if err != nil {
+	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	// }
+	return aiimages.GetImageSuggestions(prompt, preset)
 }
 
 // Collection returns CollectionResolver implementation.

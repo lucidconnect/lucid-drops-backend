@@ -2,6 +2,12 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type Collection struct {
 	ID          string  `json:"ID"`
 	Name        string  `json:"name"`
@@ -45,4 +51,47 @@ type NewUsernameRegisgration struct {
 
 type OnboardingProgress struct {
 	RegisterdInverseUsername bool `json:"registerdInverseUsername"`
+}
+
+type AiImageStyle string
+
+const (
+	AiImageStyleAnime      AiImageStyle = "Anime"
+	AiImageStyleArtistic   AiImageStyle = "Artistic"
+	AiImageStyleFuturistic AiImageStyle = "Futuristic"
+)
+
+var AllAiImageStyle = []AiImageStyle{
+	AiImageStyleAnime,
+	AiImageStyleArtistic,
+	AiImageStyleFuturistic,
+}
+
+func (e AiImageStyle) IsValid() bool {
+	switch e {
+	case AiImageStyleAnime, AiImageStyleArtistic, AiImageStyleFuturistic:
+		return true
+	}
+	return false
+}
+
+func (e AiImageStyle) String() string {
+	return string(e)
+}
+
+func (e *AiImageStyle) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = AiImageStyle(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid AiImageStyle", str)
+	}
+	return nil
+}
+
+func (e AiImageStyle) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
