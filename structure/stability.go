@@ -1,5 +1,7 @@
 package structure
 
+import "inverse.so/graph/model"
+
 type StabilityImageRequest struct {
 	Height      int                   `json:"height"`
 	Width       int                   `json:"width"`
@@ -21,4 +23,16 @@ type StabilityResponse struct {
 type StabilityTextPrompt struct {
 	Text   string  `json:"text"`
 	Weight float64 `json:"weight"`
+}
+
+var ImageStyleMap = map[model.AiImageStyle]string{
+	model.AiImageStyleAnime:            "anime",
+	model.AiImageStyleCinematic:        "cinematic",
+	model.AiImageStyleDigitalArt:       "digital-art",
+	model.AiImageStyleFantasyArt:       "fantasy-art",
+	model.AiImageStyleLineArt:          "line-art",
+	model.AiImageStyleNeonPunk:         "neon-punk",
+	model.AiImageStyleOrigami:          "origami",
+	model.AiImageStylePixelArt:         "pixel-art",
+	model.AiImageStyleThreeDimensional: "3d-model",
 }
