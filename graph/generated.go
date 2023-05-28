@@ -37,6 +37,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Collection() CollectionResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -49,6 +50,7 @@ type ComplexityRoot struct {
 		Description func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Image       func(childComplexity int) int
+		Items       func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Thumbnail   func(childComplexity int) int
 	}
@@ -90,6 +92,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type CollectionResolver interface {
+	Items(ctx context.Context, obj *model.Collection) ([]*model.Item, error)
+}
 type MutationResolver interface {
 	RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error)
 	CreateCollection(ctx context.Context, input model.CollectionInput) (*model.Collection, error)
@@ -142,6 +147,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Collection.Image(childComplexity), true
+
+	case "Collection.items":
+		if e.complexity.Collection.Items == nil {
+			break
+		}
+
+		return e.complexity.Collection.Items(childComplexity), true
 
 	case "Collection.name":
 		if e.complexity.Collection.Name == nil {
@@ -865,6 +877,62 @@ func (ec *executionContext) fieldContext_Collection_thumbnail(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _Collection_items(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_items(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Collection().Items(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐItemᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _CreatorDetails_creatorID(ctx context.Context, field graphql.CollectedField, obj *model.CreatorDetails) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_CreatorDetails_creatorID(ctx, field)
 	if err != nil {
@@ -1326,6 +1394,8 @@ func (ec *executionContext) fieldContext_Mutation_createCollection(ctx context.C
 				return ec.fieldContext_Collection_image(ctx, field)
 			case "thumbnail":
 				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "items":
+				return ec.fieldContext_Collection_items(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -1393,6 +1463,8 @@ func (ec *executionContext) fieldContext_Mutation_updateCollection(ctx context.C
 				return ec.fieldContext_Collection_image(ctx, field)
 			case "thumbnail":
 				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "items":
+				return ec.fieldContext_Collection_items(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -1793,6 +1865,8 @@ func (ec *executionContext) fieldContext_Query_fetchCollectionById(ctx context.C
 				return ec.fieldContext_Collection_image(ctx, field)
 			case "thumbnail":
 				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "items":
+				return ec.fieldContext_Collection_items(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -1860,6 +1934,8 @@ func (ec *executionContext) fieldContext_Query_fetchCreatorCollections(ctx conte
 				return ec.fieldContext_Collection_image(ctx, field)
 			case "thumbnail":
 				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "items":
+				return ec.fieldContext_Collection_items(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
@@ -4067,36 +4143,56 @@ func (ec *executionContext) _Collection(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = ec._Collection_ID(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 
 			out.Values[i] = ec._Collection_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "description":
 
 			out.Values[i] = ec._Collection_description(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "image":
 
 			out.Values[i] = ec._Collection_image(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "thumbnail":
 
 			out.Values[i] = ec._Collection_thumbnail(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
+		case "items":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Collection_items(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

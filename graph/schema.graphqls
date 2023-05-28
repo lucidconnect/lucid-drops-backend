@@ -1,3 +1,10 @@
+# Use @goField(forceResolver: true) to lazily handle recursive or expensive fields that shouldn't be
+# resolved unless the caller asks for them
+directive @goField(
+    forceResolver: Boolean
+    name: String
+) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION
+
 type Query {
   getCreatorDetails: CreatorDetails!
   getOnboardinProgress: OnboardingProgress!
@@ -47,6 +54,7 @@ type Collection {
 	description: String!
 	image: String!
 	thumbnail: String!
+  items: [Item!]! @goField(forceResolver: true)
 }
 
 type OnboardingProgress{

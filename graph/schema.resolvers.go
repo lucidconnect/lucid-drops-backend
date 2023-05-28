@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"inverse.so/engine/collections"
 	"inverse.so/engine/items"
@@ -16,6 +15,11 @@ import (
 	"inverse.so/internal/customError"
 	"inverse.so/structure"
 )
+
+// Items is the resolver for the items field.
+func (r *collectionResolver) Items(ctx context.Context, collection *model.Collection) ([]*model.Item, error) {
+	return items.FetchCollectionItems(collection.ID, nil)
+}
 
 // RegisterInverseUsername is the resolver for the registerInverseUsername field.
 func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
@@ -119,7 +123,6 @@ func (r *queryResolver) FetchCreatorCollections(ctx context.Context) ([]*model.C
 
 // FetchItemsInCollection is the resolver for the fetchItemsInCollection field.
 func (r *queryResolver) FetchItemsInCollection(ctx context.Context, collectionID string) ([]*model.Item, error) {
-
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	// if err != nil {
 	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
@@ -133,21 +136,15 @@ func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*mode
 	return items.FetchItemByID(itemID)
 }
 
+// Collection returns CollectionResolver implementation.
+func (r *Resolver) Collection() CollectionResolver { return &collectionResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type collectionResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) FetchCollections(ctx context.Context) ([]*model.Collection, error) {
-	panic(fmt.Errorf("not implemented: FetchCollections - fetchCollections"))
-}
