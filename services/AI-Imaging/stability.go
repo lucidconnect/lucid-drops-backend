@@ -9,13 +9,40 @@ import (
 	"log"
 	"net/http"
 
+	"inverse.so/graph/model"
 	"inverse.so/structure"
 	"inverse.so/utils"
 )
 
 const stabilityURL = "https://api.stability.ai/v1/generation/stable-diffusion-v1-5"
 
-func GenerateStabilityImage(prompt, style string, number *int) (*structure.StabilityImageResponse, error) {
+type StabilityService struct{}
+
+func (s *StabilityService) GenerateImage(prompt string, style *model.AiImageStyle, number *int) ([]*model.ImageResponse, error) {
+
+	resp, err := GenerateStabilityImage(prompt, style, number)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []*model.ImageResponse
+	for _, artifact := range resp.Artifacts {
+		response = append(response, &model.ImageResponse{
+			Image:  artifact.Base64,
+			Format: model.ImageResolveFormaatBase64,
+		})
+	}
+
+	return response, nil
+}
+
+func GenerateStabilityImage(prompt string, style *model.AiImageStyle, number *int) (*structure.StabilityImageResponse, error) {
+
+	var stylePreset string = "fantasy-art"
+	if style != nil {
+		stylePreset = structure.ImageStyleMap[*style]
+		prompt = saltPrompt(prompt, *style)
+	}
 
 	var n int = 1
 	if number != nil {
@@ -23,8 +50,8 @@ func GenerateStabilityImage(prompt, style string, number *int) (*structure.Stabi
 	}
 
 	requestData := &structure.StabilityImageRequest{
-		Height: 512,
-		Width:  512,
+		Height: 1024,
+		Width:  1024,
 		TextPrompts: []structure.StabilityTextPrompt{
 			{
 				Text:   prompt,
@@ -32,7 +59,7 @@ func GenerateStabilityImage(prompt, style string, number *int) (*structure.Stabi
 			},
 		},
 		Samples:     n,
-		StylePreset: style,
+		StylePreset: stylePreset,
 	}
 
 	var response structure.StabilityImageResponse
@@ -73,7 +100,6 @@ func executeStabilityRequest(method, endpoint string, requestData, destination i
 
 	req.Header.Set("Authorization", utils.UseEnvOrDefault("STABILITY_API_KEY", "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
 	req.Header.Set("Content-Type", "application/json")
-	// req.Header.Set("Organization", utils.UseEnvOrDefault("STABILITY_ORG_ID", "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
 
 	var response *http.Response
 	log.Print("request: ", req)

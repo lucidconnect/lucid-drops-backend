@@ -20,14 +20,14 @@ import (
 const defaultPort = "8080"
 
 func main() {
+	utils.SetUpDefaultLogger()
+	utils.LoadEnvironmentVariables()
+	utils.SetUpLoggerFromConfig()
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
-
-	utils.SetUpDefaultLogger()
-	utils.LoadEnvironmentVariables()
-	utils.SetUpLoggerFromConfig()
 
 	dsn, present := os.LookupEnv("DATABASE_URL")
 	if !present {

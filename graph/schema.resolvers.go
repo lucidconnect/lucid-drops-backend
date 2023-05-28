@@ -138,7 +138,7 @@ func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*mode
 }
 
 // GetImageSuggestions is the resolver for the getImageSuggestions field.
-func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]string, error) {
+func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error) {
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	// if err != nil {
 	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)

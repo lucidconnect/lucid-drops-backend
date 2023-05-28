@@ -9,17 +9,42 @@ import (
 	"log"
 	"net/http"
 
+	"inverse.so/graph/model"
 	"inverse.so/structure"
 	"inverse.so/utils"
 )
 
 const openAIURL = "https://api.openai.com/v1"
 
-func GenerateOpenAIImage(prompt string, number *int) (*structure.ImageResponse, error) {
+type OpenAIService struct{}
+
+func (o *OpenAIService) GenerateImage(prompt string, style *model.AiImageStyle, number *int) ([]*model.ImageResponse, error) {
+
+	resp, err := GenerateOpenAIImage(prompt, style, number)
+	if err != nil {
+		return nil, err
+	}
+
+	var response []*model.ImageResponse
+	for _, image := range resp.Data {
+		response = append(response, &model.ImageResponse{
+			Image:  image.URL,
+			Format: model.ImageResolveFormaatURL,
+		})
+	}
+
+	return response, nil
+}
+
+func GenerateOpenAIImage(prompt string, style *model.AiImageStyle, number *int) (*structure.ImageResponse, error) {
 
 	var n int = 1
 	if number != nil {
 		n = *number
+	}
+
+	if style != nil {
+		prompt = saltPrompt(prompt, *style)
 	}
 
 	requestData := &structure.ImageRequest{
