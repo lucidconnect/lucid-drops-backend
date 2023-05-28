@@ -30,6 +30,11 @@ type CreatorDetails struct {
 	InverseUsername *string `json:"inverseUsername,omitempty"`
 }
 
+type ImageResponse struct {
+	Image  string              `json:"image"`
+	Format ImageResolveFormaat `json:"format"`
+}
+
 type Item struct {
 	ID           string `json:"ID"`
 	Name         string `json:"name"`
@@ -56,20 +61,36 @@ type OnboardingProgress struct {
 type AiImageStyle string
 
 const (
-	AiImageStyleAnime      AiImageStyle = "Anime"
-	AiImageStyleArtistic   AiImageStyle = "Artistic"
-	AiImageStyleFuturistic AiImageStyle = "Futuristic"
+	AiImageStyleAnime            AiImageStyle = "Anime"
+	AiImageStyleArtistic         AiImageStyle = "Artistic"
+	AiImageStyleFuturistic       AiImageStyle = "Futuristic"
+	AiImageStyleCinematic        AiImageStyle = "Cinematic"
+	AiImageStyleDigitalArt       AiImageStyle = "DigitalArt"
+	AiImageStyleFantasyArt       AiImageStyle = "FantasyArt"
+	AiImageStyleLineArt          AiImageStyle = "LineArt"
+	AiImageStyleNeonPunk         AiImageStyle = "NeonPunk"
+	AiImageStyleOrigami          AiImageStyle = "Origami"
+	AiImageStylePixelArt         AiImageStyle = "PixelArt"
+	AiImageStyleThreeDimensional AiImageStyle = "ThreeDimensional"
 )
 
 var AllAiImageStyle = []AiImageStyle{
 	AiImageStyleAnime,
 	AiImageStyleArtistic,
 	AiImageStyleFuturistic,
+	AiImageStyleCinematic,
+	AiImageStyleDigitalArt,
+	AiImageStyleFantasyArt,
+	AiImageStyleLineArt,
+	AiImageStyleNeonPunk,
+	AiImageStyleOrigami,
+	AiImageStylePixelArt,
+	AiImageStyleThreeDimensional,
 }
 
 func (e AiImageStyle) IsValid() bool {
 	switch e {
-	case AiImageStyleAnime, AiImageStyleArtistic, AiImageStyleFuturistic:
+	case AiImageStyleAnime, AiImageStyleArtistic, AiImageStyleFuturistic, AiImageStyleCinematic, AiImageStyleDigitalArt, AiImageStyleFantasyArt, AiImageStyleLineArt, AiImageStyleNeonPunk, AiImageStyleOrigami, AiImageStylePixelArt, AiImageStyleThreeDimensional:
 		return true
 	}
 	return false
@@ -93,5 +114,46 @@ func (e *AiImageStyle) UnmarshalGQL(v interface{}) error {
 }
 
 func (e AiImageStyle) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ImageResolveFormaat string
+
+const (
+	ImageResolveFormaatURL    ImageResolveFormaat = "Url"
+	ImageResolveFormaatBase64 ImageResolveFormaat = "Base64"
+)
+
+var AllImageResolveFormaat = []ImageResolveFormaat{
+	ImageResolveFormaatURL,
+	ImageResolveFormaatBase64,
+}
+
+func (e ImageResolveFormaat) IsValid() bool {
+	switch e {
+	case ImageResolveFormaatURL, ImageResolveFormaatBase64:
+		return true
+	}
+	return false
+}
+
+func (e ImageResolveFormaat) String() string {
+	return string(e)
+}
+
+func (e *ImageResolveFormaat) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ImageResolveFormaat(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ImageResolveFormaat", str)
+	}
+	return nil
+}
+
+func (e ImageResolveFormaat) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

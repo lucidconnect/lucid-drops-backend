@@ -61,6 +61,11 @@ type ComplexityRoot struct {
 		InverseUsername func(childComplexity int) int
 	}
 
+	ImageResponse struct {
+		Format func(childComplexity int) int
+		Image  func(childComplexity int) int
+	}
+
 	Item struct {
 		CollectionID func(childComplexity int) int
 		Description  func(childComplexity int) int
@@ -111,7 +116,7 @@ type QueryResolver interface {
 	FetchCreatorCollections(ctx context.Context) ([]*model.Collection, error)
 	FetchItemsInCollection(ctx context.Context, collectionID string) ([]*model.Item, error)
 	FetchItemByID(ctx context.Context, itemID string) (*model.Item, error)
-	GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]string, error)
+	GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error)
 }
 
 type executableSchema struct {
@@ -191,6 +196,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreatorDetails.InverseUsername(childComplexity), true
+
+	case "ImageResponse.format":
+		if e.complexity.ImageResponse.Format == nil {
+			break
+		}
+
+		return e.complexity.ImageResponse.Format(childComplexity), true
+
+	case "ImageResponse.image":
+		if e.complexity.ImageResponse.Image == nil {
+			break
+		}
+
+		return e.complexity.ImageResponse.Image(childComplexity), true
 
 	case "Item.collectionId":
 		if e.complexity.Item.CollectionID == nil {
@@ -1095,6 +1114,94 @@ func (ec *executionContext) fieldContext_CreatorDetails_inverseUsername(ctx cont
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageResponse_image(ctx context.Context, field graphql.CollectedField, obj *model.ImageResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageResponse_image(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Image, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageResponse_image(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageResponse_format(ctx context.Context, field graphql.CollectedField, obj *model.ImageResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageResponse_format(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Format, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.ImageResolveFormaat)
+	fc.Result = res
+	return ec.marshalNImageResolveFormaat2inverseᚗsoᚋgraphᚋmodelᚐImageResolveFormaat(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageResponse_format(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ImageResolveFormaat does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2141,9 +2248,9 @@ func (ec *executionContext) _Query_getImageSuggestions(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]string)
+	res := resTmp.([]*model.ImageResponse)
 	fc.Result = res
-	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+	return ec.marshalNImageResponse2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐImageResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_getImageSuggestions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2153,7 +2260,13 @@ func (ec *executionContext) fieldContext_Query_getImageSuggestions(ctx context.C
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			switch field.Name {
+			case "image":
+				return ec.fieldContext_ImageResponse_image(ctx, field)
+			case "format":
+				return ec.fieldContext_ImageResponse_format(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ImageResponse", field.Name)
 		},
 	}
 	defer func() {
@@ -4336,6 +4449,41 @@ func (ec *executionContext) _CreatorDetails(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var imageResponseImplementors = []string{"ImageResponse"}
+
+func (ec *executionContext) _ImageResponse(ctx context.Context, sel ast.SelectionSet, obj *model.ImageResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, imageResponseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ImageResponse")
+		case "image":
+
+			out.Values[i] = ec._ImageResponse_image(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "format":
+
+			out.Values[i] = ec._ImageResponse_format(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var itemImplementors = []string{"Item"}
 
 func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj *model.Item) graphql.Marshaler {
@@ -5146,6 +5294,54 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNImageResolveFormaat2inverseᚗsoᚋgraphᚋmodelᚐImageResolveFormaat(ctx context.Context, v interface{}) (model.ImageResolveFormaat, error) {
+	var res model.ImageResolveFormaat
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNImageResolveFormaat2inverseᚗsoᚋgraphᚋmodelᚐImageResolveFormaat(ctx context.Context, sel ast.SelectionSet, v model.ImageResolveFormaat) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNImageResponse2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐImageResponse(ctx context.Context, sel ast.SelectionSet, v []*model.ImageResponse) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOImageResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐImageResponse(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
 func (ec *executionContext) marshalNItem2inverseᚗsoᚋgraphᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v model.Item) graphql.Marshaler {
 	return ec._Item(ctx, sel, &v)
 }
@@ -5241,38 +5437,6 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]string, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	for i := range v {
-		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
-	}
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -5568,6 +5732,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOImageResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐImageResponse(ctx context.Context, sel ast.SelectionSet, v *model.ImageResponse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ImageResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
