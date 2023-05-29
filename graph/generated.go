@@ -67,19 +67,22 @@ type ComplexityRoot struct {
 	}
 
 	Item struct {
-		CollectionID func(childComplexity int) int
-		Description  func(childComplexity int) int
-		ID           func(childComplexity int) int
-		Image        func(childComplexity int) int
-		Name         func(childComplexity int) int
+		ClaimCriteria func(childComplexity int) int
+		CollectionID  func(childComplexity int) int
+		Description   func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Image         func(childComplexity int) int
+		Name          func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CreateCollection        func(childComplexity int, input model.CollectionInput) int
-		CreateItem              func(childComplexity int, input model.ItemInput) int
-		RegisterInverseUsername func(childComplexity int, input model.NewUsernameRegisgration) int
-		UpdateCollection        func(childComplexity int, collectionID string, input model.CollectionInput) int
-		UpdateItem              func(childComplexity int, itemID string, input model.ItemInput) int
+		CreateCollection            func(childComplexity int, input model.CollectionInput) int
+		CreateEmailDomainWhitelist  func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
+		CreateEmailWhitelistForItem func(childComplexity int, input model.NewEmailWhitelistInput) int
+		CreateItem                  func(childComplexity int, input model.ItemInput) int
+		RegisterInverseUsername     func(childComplexity int, input model.NewUsernameRegisgration) int
+		UpdateCollection            func(childComplexity int, collectionID string, input model.CollectionInput) int
+		UpdateItem                  func(childComplexity int, itemID string, input model.ItemInput) int
 	}
 
 	OnboardingProgress struct {
@@ -107,6 +110,8 @@ type MutationResolver interface {
 	UpdateCollection(ctx context.Context, collectionID string, input model.CollectionInput) (*model.Collection, error)
 	CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error)
 	UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error)
+	CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error)
+	CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error)
 }
 type QueryResolver interface {
 	GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error)
@@ -211,6 +216,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ImageResponse.Image(childComplexity), true
 
+	case "Item.claimCriteria":
+		if e.complexity.Item.ClaimCriteria == nil {
+			break
+		}
+
+		return e.complexity.Item.ClaimCriteria(childComplexity), true
+
 	case "Item.collectionId":
 		if e.complexity.Item.CollectionID == nil {
 			break
@@ -257,6 +269,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateCollection(childComplexity, args["input"].(model.CollectionInput)), true
+
+	case "Mutation.createEmailDomainWhitelist":
+		if e.complexity.Mutation.CreateEmailDomainWhitelist == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createEmailDomainWhitelist_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateEmailDomainWhitelist(childComplexity, args["input"].(model.NewEmailDomainWhitelistInput)), true
+
+	case "Mutation.createEmailWhitelistForItem":
+		if e.complexity.Mutation.CreateEmailWhitelistForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createEmailWhitelistForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateEmailWhitelistForItem(childComplexity, args["input"].(model.NewEmailWhitelistInput)), true
 
 	case "Mutation.createItem":
 		if e.complexity.Mutation.CreateItem == nil {
@@ -404,6 +440,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCollectionInput,
 		ec.unmarshalInputItemInput,
+		ec.unmarshalInputNewEmailDomainWhitelistInput,
+		ec.unmarshalInputNewEmailWhitelistInput,
 		ec.unmarshalInputNewUsernameRegisgration,
 	)
 	first := true
@@ -491,6 +529,36 @@ func (ec *executionContext) field_Mutation_createCollection_args(ctx context.Con
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNCollectionInput2inverseᚗsoᚋgraphᚋmodelᚐCollectionInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createEmailDomainWhitelist_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewEmailDomainWhitelistInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewEmailDomainWhitelistInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmailDomainWhitelistInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createEmailWhitelistForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewEmailWhitelistInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewEmailWhitelistInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmailWhitelistInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -983,6 +1051,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_description(ctx, field)
 			case "collectionId":
 				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -1427,6 +1497,47 @@ func (ec *executionContext) fieldContext_Item_collectionId(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Item_claimCriteria(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_claimCriteria(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClaimCriteria, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ClaimCriteriaType)
+	fc.Result = res
+	return ec.marshalOClaimCriteriaType2ᚖinverseᚗsoᚋgraphᚋmodelᚐClaimCriteriaType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_claimCriteria(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ClaimCriteriaType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_registerInverseUsername(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_registerInverseUsername(ctx, field)
 	if err != nil {
@@ -1677,6 +1788,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_description(ctx, field)
 			case "collectionId":
 				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -1744,6 +1857,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_description(ctx, field)
 			case "collectionId":
 				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -1756,6 +1871,144 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createEmailWhitelistForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createEmailWhitelistForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateEmailWhitelistForItem(rctx, fc.Args["input"].(model.NewEmailWhitelistInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createEmailWhitelistForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createEmailDomainWhitelist(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createEmailDomainWhitelist(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateEmailDomainWhitelist(rctx, fc.Args["input"].(model.NewEmailDomainWhitelistInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createEmailDomainWhitelist_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -2137,6 +2390,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_description(ctx, field)
 			case "collectionId":
 				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2204,6 +2459,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_description(ctx, field)
 			case "collectionId":
 				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -4297,6 +4554,82 @@ func (ec *executionContext) unmarshalInputItemInput(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewEmailDomainWhitelistInput(ctx context.Context, obj interface{}) (model.NewEmailDomainWhitelistInput, error) {
+	var it model.NewEmailDomainWhitelistInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"itemID", "authorizedSubdomain"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "itemID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ItemID = data
+		case "authorizedSubdomain":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorizedSubdomain"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AuthorizedSubdomain = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewEmailWhitelistInput(ctx context.Context, obj interface{}) (model.NewEmailWhitelistInput, error) {
+	var it model.NewEmailWhitelistInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"itemID", "authorizedEmails"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "itemID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ItemID = data
+		case "authorizedEmails":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorizedEmails"))
+			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AuthorizedEmails = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewUsernameRegisgration(ctx context.Context, obj interface{}) (model.NewUsernameRegisgration, error) {
 	var it model.NewUsernameRegisgration
 	asMap := map[string]interface{}{}
@@ -4529,6 +4862,10 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "claimCriteria":
+
+			out.Values[i] = ec._Item_claimCriteria(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4599,6 +4936,24 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateItem(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createEmailWhitelistForItem":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createEmailWhitelistForItem(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createEmailDomainWhitelist":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createEmailDomainWhitelist(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -5405,6 +5760,16 @@ func (ec *executionContext) unmarshalNItemInput2inverseᚗsoᚋgraphᚋmodelᚐI
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNNewEmailDomainWhitelistInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmailDomainWhitelistInput(ctx context.Context, v interface{}) (model.NewEmailDomainWhitelistInput, error) {
+	res, err := ec.unmarshalInputNewEmailDomainWhitelistInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewEmailWhitelistInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmailWhitelistInput(ctx context.Context, v interface{}) (model.NewEmailWhitelistInput, error) {
+	res, err := ec.unmarshalInputNewEmailWhitelistInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNNewUsernameRegisgration2inverseᚗsoᚋgraphᚋmodelᚐNewUsernameRegisgration(ctx context.Context, v interface{}) (model.NewUsernameRegisgration, error) {
 	res, err := ec.unmarshalInputNewUsernameRegisgration(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5437,6 +5802,38 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -5732,6 +6129,22 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOClaimCriteriaType2ᚖinverseᚗsoᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, v interface{}) (*model.ClaimCriteriaType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.ClaimCriteriaType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOClaimCriteriaType2ᚖinverseᚗsoᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, sel ast.SelectionSet, v *model.ClaimCriteriaType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalOImageResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐImageResponse(ctx context.Context, sel ast.SelectionSet, v *model.ImageResponse) graphql.Marshaler {

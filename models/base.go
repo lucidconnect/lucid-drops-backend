@@ -18,3 +18,9 @@ func (base *Base) BeforeCreate(scope *gorm.DB) error {
 	base.ID = uuid.NewV4()
 	return nil
 }
+
+type BaseWithoutPrimaryKey struct {
+	CreatedAt time.Time      `gorm:"not null"`
+	UpdatedAt time.Time      `gorm:"not null"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}

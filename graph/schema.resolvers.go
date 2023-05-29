@@ -11,6 +11,7 @@ import (
 	"inverse.so/engine/collections"
 	"inverse.so/engine/items"
 	"inverse.so/engine/onboarding"
+	"inverse.so/engine/whitelist"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/internal/customError"
@@ -70,6 +71,26 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input 
 	}
 
 	return items.UpdateItem(itemID, &input, authenticationDetails)
+}
+
+// CreateEmailWhitelistForItem is the resolver for the createEmailWhitelistForItem field.
+func (r *mutationResolver) CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return whitelist.CreateEmailWhitelistForItem(&input, authenticationDetails)
+}
+
+// CreateEmailDomainWhitelist is the resolver for the createEmailDomainWhitelist field.
+func (r *mutationResolver) CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return whitelist.CreateEmailDomainWhitelist(&input, authenticationDetails)
 }
 
 // GetCreatorDetails is the resolver for the getCreatorDetails field.

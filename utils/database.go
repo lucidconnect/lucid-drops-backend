@@ -58,7 +58,13 @@ func SetupDB(dsn string) *gorm.DB {
 	initialiseDB(dsn)
 
 	//User managment
-	DB.AutoMigrate(&models.Creator{}, &models.Collection{}, &models.Item{})
+	DB.AutoMigrate(
+		&models.Creator{},
+		&models.Collection{},
+		&models.Item{},
+		&models.EmailList{},
+		&models.EmailDomainWhiteList{},
+	)
 
 	return DB
 }

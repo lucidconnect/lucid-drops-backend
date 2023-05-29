@@ -36,11 +36,12 @@ type ImageResponse struct {
 }
 
 type Item struct {
-	ID           string `json:"ID"`
-	Name         string `json:"name"`
-	Image        string `json:"image"`
-	Description  string `json:"description"`
-	CollectionID string `json:"collectionId"`
+	ID            string             `json:"ID"`
+	Name          string             `json:"name"`
+	Image         string             `json:"image"`
+	Description   string             `json:"description"`
+	CollectionID  string             `json:"collectionId"`
+	ClaimCriteria *ClaimCriteriaType `json:"claimCriteria,omitempty"`
 }
 
 type ItemInput struct {
@@ -48,6 +49,16 @@ type ItemInput struct {
 	Image        *string `json:"image,omitempty"`
 	Description  *string `json:"description,omitempty"`
 	CollectionID *string `json:"collectionID,omitempty"`
+}
+
+type NewEmailDomainWhitelistInput struct {
+	ItemID              string `json:"itemID"`
+	AuthorizedSubdomain string `json:"authorizedSubdomain"`
+}
+
+type NewEmailWhitelistInput struct {
+	ItemID           string   `json:"itemID"`
+	AuthorizedEmails []string `json:"authorizedEmails"`
 }
 
 type NewUsernameRegisgration struct {
@@ -114,6 +125,51 @@ func (e *AiImageStyle) UnmarshalGQL(v interface{}) error {
 }
 
 func (e AiImageStyle) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ClaimCriteriaType string
+
+const (
+	ClaimCriteriaTypeEmailWhiteList ClaimCriteriaType = "emailWhiteList"
+	ClaimCriteriaTypeEmailDomain    ClaimCriteriaType = "emailDomain"
+	ClaimCriteriaTypeTwitter        ClaimCriteriaType = "twitter"
+	ClaimCriteriaTypeTelegram       ClaimCriteriaType = "telegram"
+)
+
+var AllClaimCriteriaType = []ClaimCriteriaType{
+	ClaimCriteriaTypeEmailWhiteList,
+	ClaimCriteriaTypeEmailDomain,
+	ClaimCriteriaTypeTwitter,
+	ClaimCriteriaTypeTelegram,
+}
+
+func (e ClaimCriteriaType) IsValid() bool {
+	switch e {
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitter, ClaimCriteriaTypeTelegram:
+		return true
+	}
+	return false
+}
+
+func (e ClaimCriteriaType) String() string {
+	return string(e)
+}
+
+func (e *ClaimCriteriaType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ClaimCriteriaType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ClaimCriteriaType", str)
+	}
+	return nil
+}
+
+func (e ClaimCriteriaType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

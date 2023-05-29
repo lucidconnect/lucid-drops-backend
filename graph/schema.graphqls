@@ -27,10 +27,23 @@ type Mutation {
 
   createItem(input: ItemInput!): Item!
   updateItem(itemID: String!,input: ItemInput!): Item!
+
+  createEmailWhitelistForItem(input: NewEmailWhitelistInput!): Item!
+  createEmailDomainWhitelist(input: NewEmailDomainWhitelistInput!): Item!
 }
 
 """ Time formated in the time.RFC3339Nano Format """
 scalar Time
+
+input NewEmailWhitelistInput {
+  itemID: String!
+  authorizedEmails: [String!]!
+}
+
+input NewEmailDomainWhitelistInput {
+  itemID: String!
+  authorizedSubdomain: String!
+}
 
 input NewUsernameRegisgration {
   inverseUsername: String!
@@ -75,11 +88,19 @@ type Item {
 	image: String!
 	description: String!
 	collectionId: String!
+  claimCriteria: ClaimCriteriaType
 }
 
 type ImageResponse {
   image: String!
   format: ImageResolveFormaat!
+}
+
+enum ClaimCriteriaType{
+  emailWhiteList
+  emailDomain
+  twitter
+  telegram
 }
 
 enum AiImageStyle{
