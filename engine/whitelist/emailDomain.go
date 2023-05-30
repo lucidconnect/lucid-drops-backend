@@ -39,6 +39,8 @@ func CreateEmailDomainWhitelist(input *model.NewEmailDomainWhitelistInput, authD
 
 	emailCriteria := model.ClaimCriteriaTypeEmailDomain
 	item.Criteria = &emailCriteria
+	item.ShowEmailDomainHints = input.Visible
+
 	itemUpdateErr := engine.SaveModel(item)
 	if itemUpdateErr != nil {
 		return nil, itemUpdateErr

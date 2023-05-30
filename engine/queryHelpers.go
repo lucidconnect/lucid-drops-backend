@@ -73,6 +73,17 @@ func GetCollectionItems(collectionID string) ([]*models.Item, error) {
 	return items, nil
 }
 
+func GetAuthorizedSubdomainsForItem(itemID string) ([]*models.EmailDomainWhiteList, error) {
+	var subDomains []*models.EmailDomainWhiteList
+
+	err := utils.DB.Where("item_id=?", itemID).Find(&subDomains).Error
+	if err != nil {
+		return nil, errors.New("subdomains not found")
+	}
+
+	return subDomains, nil
+}
+
 func CreateModel(newModel interface{}) error {
 	return utils.DB.Create(newModel).Error
 }

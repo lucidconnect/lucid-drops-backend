@@ -38,6 +38,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Collection() CollectionResolver
+	Item() ItemResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -67,12 +68,13 @@ type ComplexityRoot struct {
 	}
 
 	Item struct {
-		ClaimCriteria func(childComplexity int) int
-		CollectionID  func(childComplexity int) int
-		Description   func(childComplexity int) int
-		ID            func(childComplexity int) int
-		Image         func(childComplexity int) int
-		Name          func(childComplexity int) int
+		AuthorizedSubdomains func(childComplexity int) int
+		ClaimCriteria        func(childComplexity int) int
+		CollectionID         func(childComplexity int) int
+		Description          func(childComplexity int) int
+		ID                   func(childComplexity int) int
+		Image                func(childComplexity int) int
+		Name                 func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -103,6 +105,9 @@ type ComplexityRoot struct {
 
 type CollectionResolver interface {
 	Items(ctx context.Context, obj *model.Collection) ([]*model.Item, error)
+}
+type ItemResolver interface {
+	AuthorizedSubdomains(ctx context.Context, obj *model.Item) ([]string, error)
 }
 type MutationResolver interface {
 	RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error)
@@ -215,6 +220,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ImageResponse.Image(childComplexity), true
+
+	case "Item.authorizedSubdomains":
+		if e.complexity.Item.AuthorizedSubdomains == nil {
+			break
+		}
+
+		return e.complexity.Item.AuthorizedSubdomains(childComplexity), true
 
 	case "Item.claimCriteria":
 		if e.complexity.Item.ClaimCriteria == nil {
@@ -1053,6 +1065,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -1538,6 +1552,47 @@ func (ec *executionContext) fieldContext_Item_claimCriteria(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Item_authorizedSubdomains(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Item().AuthorizedSubdomains(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_authorizedSubdomains(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_registerInverseUsername(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_registerInverseUsername(ctx, field)
 	if err != nil {
@@ -1790,6 +1845,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -1859,6 +1916,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -1928,6 +1987,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -1997,6 +2058,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2392,6 +2455,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2461,6 +2526,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -4561,7 +4628,7 @@ func (ec *executionContext) unmarshalInputNewEmailDomainWhitelistInput(ctx conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"itemID", "authorizedSubdomains"}
+	fieldsInOrder := [...]string{"itemID", "visible", "authorizedSubdomains"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4577,6 +4644,15 @@ func (ec *executionContext) unmarshalInputNewEmailDomainWhitelistInput(ctx conte
 				return it, err
 			}
 			it.ItemID = data
+		case "visible":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visible"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Visible = data
 		case "authorizedSubdomains":
 			var err error
 
@@ -4832,40 +4908,57 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Item_ID(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 
 			out.Values[i] = ec._Item_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "image":
 
 			out.Values[i] = ec._Item_image(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "description":
 
 			out.Values[i] = ec._Item_description(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "collectionId":
 
 			out.Values[i] = ec._Item_collectionId(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "claimCriteria":
 
 			out.Values[i] = ec._Item_claimCriteria(ctx, field, obj)
 
+		case "authorizedSubdomains":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Item_authorizedSubdomains(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6152,6 +6245,44 @@ func (ec *executionContext) marshalOImageResponse2ᚖinverseᚗsoᚋgraphᚋmode
 		return graphql.Null
 	}
 	return ec._ImageResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

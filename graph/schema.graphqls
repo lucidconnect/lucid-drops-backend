@@ -42,6 +42,7 @@ input NewEmailWhitelistInput {
 
 input NewEmailDomainWhitelistInput {
   itemID: String!
+  visible: Boolean!
   authorizedSubdomains: [String!]!
 }
 
@@ -89,6 +90,7 @@ type Item {
 	description: String!
 	collectionId: String!
   claimCriteria: ClaimCriteriaType
+  authorizedSubdomains: [String!] @goField(forceResolver: true)
 }
 
 type ImageResponse {

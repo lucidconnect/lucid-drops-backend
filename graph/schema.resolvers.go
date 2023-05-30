@@ -23,6 +23,11 @@ func (r *collectionResolver) Items(ctx context.Context, obj *model.Collection) (
 	return items.FetchCollectionItems(obj.ID, nil)
 }
 
+// AuthorizedSubdomains is the resolver for the authorizedSubdomains field.
+func (r *itemResolver) AuthorizedSubdomains(ctx context.Context, obj *model.Item) ([]string, error) {
+	return items.FetchAuthotizedSubdomainsForItem(obj.ID)
+}
+
 // RegisterInverseUsername is the resolver for the registerInverseUsername field.
 func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
@@ -170,6 +175,9 @@ func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, 
 // Collection returns CollectionResolver implementation.
 func (r *Resolver) Collection() CollectionResolver { return &collectionResolver{r} }
 
+// Item returns ItemResolver implementation.
+func (r *Resolver) Item() ItemResolver { return &itemResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -177,5 +185,6 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type collectionResolver struct{ *Resolver }
+type itemResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

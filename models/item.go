@@ -7,11 +7,12 @@ import (
 
 type Item struct {
 	Base
-	Name         string
-	CollectionID uuid.UUID `gorm:"index"`
-	Image        string    `json:"image"`
-	Description  string    `json:"description"`
-	Criteria     *model.ClaimCriteriaType
+	Name                 string
+	CollectionID         uuid.UUID `gorm:"index"`
+	Image                string    `json:"image"`
+	Description          string    `json:"description"`
+	Criteria             *model.ClaimCriteriaType
+	ShowEmailDomainHints bool `gorm:"default:false"`
 }
 
 func (i *Item) ToGraphData() *model.Item {

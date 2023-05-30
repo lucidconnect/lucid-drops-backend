@@ -87,6 +87,29 @@ func UpdateItem(itemID string, input *model.ItemInput, authDetails *internal.Aut
 	return item.ToGraphData(), nil
 }
 
+func FetchAuthotizedSubdomainsForItem(itemID string) ([]string, error) {
+	item, err := engine.GetItemByID(itemID)
+	if err != nil {
+		return nil, errors.New("items not found")
+	}
+
+	if !item.ShowEmailDomainHints || item.Criteria == nil || *item.Criteria != model.ClaimCriteriaTypeEmailDomain {
+		return nil, nil
+	}
+
+	subdomains, err := engine.GetAuthorizedSubdomainsForItem(itemID)
+	if err != nil {
+		return nil, errors.New("authorized subdomains not found")
+	}
+
+	mappedDomains := make([]string, len(subdomains))
+	for idx, subDomainEntry := range subdomains {
+		mappedDomains[idx] = subDomainEntry.BaseDomain
+	}
+
+	return mappedDomains, nil
+}
+
 func FetchCollectionItems(collectionID string, authDetails *internal.AuthDetails) ([]*model.Item, error) {
 	// All Collection data will be public for now
 	// creator, err := engine.GetCreatorByAddress(authDetails.Address)

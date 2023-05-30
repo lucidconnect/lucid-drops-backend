@@ -36,12 +36,13 @@ type ImageResponse struct {
 }
 
 type Item struct {
-	ID            string             `json:"ID"`
-	Name          string             `json:"name"`
-	Image         string             `json:"image"`
-	Description   string             `json:"description"`
-	CollectionID  string             `json:"collectionId"`
-	ClaimCriteria *ClaimCriteriaType `json:"claimCriteria,omitempty"`
+	ID                   string             `json:"ID"`
+	Name                 string             `json:"name"`
+	Image                string             `json:"image"`
+	Description          string             `json:"description"`
+	CollectionID         string             `json:"collectionId"`
+	ClaimCriteria        *ClaimCriteriaType `json:"claimCriteria,omitempty"`
+	AuthorizedSubdomains []string           `json:"authorizedSubdomains,omitempty"`
 }
 
 type ItemInput struct {
@@ -53,6 +54,7 @@ type ItemInput struct {
 
 type NewEmailDomainWhitelistInput struct {
 	ItemID               string   `json:"itemID"`
+	Visible              bool     `json:"visible"`
 	AuthorizedSubdomains []string `json:"authorizedSubdomains"`
 }
 
