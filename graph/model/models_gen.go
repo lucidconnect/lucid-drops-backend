@@ -52,8 +52,8 @@ type ItemInput struct {
 }
 
 type NewEmailDomainWhitelistInput struct {
-	ItemID              string `json:"itemID"`
-	AuthorizedSubdomain string `json:"authorizedSubdomain"`
+	ItemID               string   `json:"itemID"`
+	AuthorizedSubdomains []string `json:"authorizedSubdomains"`
 }
 
 type NewEmailWhitelistInput struct {

@@ -42,7 +42,7 @@ input NewEmailWhitelistInput {
 
 input NewEmailDomainWhitelistInput {
   itemID: String!
-  authorizedSubdomain: String!
+  authorizedSubdomains: [String!]!
 }
 
 input NewUsernameRegisgration {

@@ -3,10 +3,12 @@ package whitelist
 import (
 	"errors"
 
+	"gorm.io/gorm/clause"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/models"
+	"inverse.so/utils"
 )
 
 func CreateEmailDomainWhitelist(input *model.NewEmailDomainWhitelistInput, authDetails *internal.AuthDetails) (*model.Item, error) {
@@ -20,14 +22,19 @@ func CreateEmailDomainWhitelist(input *model.NewEmailDomainWhitelistInput, authD
 		return nil, errors.New("item not found")
 	}
 
-	err = engine.SaveModel(&models.EmailDomainWhiteList{
-		ItemID:     item.ID,
-		CreatorID:  creator.ID,
-		BaseDomain: input.AuthorizedSubdomain,
-	})
+	dbEmails := make([]*models.EmailDomainWhiteList, len(input.AuthorizedSubdomains))
 
-	if err != nil {
-		return nil, err
+	for idx, domain := range input.AuthorizedSubdomains {
+		dbEmails[idx] = &models.EmailDomainWhiteList{
+			ItemID:     item.ID,
+			CreatorID:  creator.ID,
+			BaseDomain: domain,
+		}
+	}
+
+	insertionErr := utils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbEmails, 100).Error
+	if insertionErr != nil {
+		return nil, insertionErr
 	}
 
 	emailCriteria := model.ClaimCriteriaTypeEmailDomain

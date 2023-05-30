@@ -4561,7 +4561,7 @@ func (ec *executionContext) unmarshalInputNewEmailDomainWhitelistInput(ctx conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"itemID", "authorizedSubdomain"}
+	fieldsInOrder := [...]string{"itemID", "authorizedSubdomains"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4577,15 +4577,15 @@ func (ec *executionContext) unmarshalInputNewEmailDomainWhitelistInput(ctx conte
 				return it, err
 			}
 			it.ItemID = data
-		case "authorizedSubdomain":
+		case "authorizedSubdomains":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorizedSubdomain"))
-			data, err := ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authorizedSubdomains"))
+			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.AuthorizedSubdomain = data
+			it.AuthorizedSubdomains = data
 		}
 	}
 
