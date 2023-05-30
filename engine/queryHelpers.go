@@ -3,6 +3,7 @@ package engine
 import (
 	"errors"
 
+	uuid "github.com/satori/go.uuid"
 	"inverse.so/models"
 	"inverse.so/utils"
 )
@@ -49,6 +50,21 @@ func GetItemByID(itemID string) (*models.Item, error) {
 	}
 
 	return &item, nil
+}
+
+func GetEmailClaimIDByItemAndEmail(itemID *uuid.UUID, claimingEmail string) (*models.SingleEmailClaim, error) {
+	var claim models.SingleEmailClaim
+
+	err := utils.DB.Where(&models.SingleEmailClaim{
+		ItemID:       *itemID,
+		EmailAddress: claimingEmail,
+	}).First(&claim).Error
+
+	if err != nil {
+		return nil, errors.New("claim not found")
+	}
+
+	return &claim, nil
 }
 
 func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {

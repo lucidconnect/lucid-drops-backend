@@ -2,7 +2,7 @@ package models
 
 import uuid "github.com/satori/go.uuid"
 
-type EmailList struct {
+type SingleEmailClaim struct {
 	BaseWithoutPrimaryKey
 	CreatorID    uuid.UUID `gorm:"primaryKey"`
 	ItemID       uuid.UUID `gorm:"primaryKey"`

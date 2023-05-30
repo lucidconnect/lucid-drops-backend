@@ -26,9 +26,9 @@ func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetail
 		return nil, errors.New("please passing in email list")
 	}
 
-	dbEmails := make([]*models.EmailList, len(input.AuthorizedEmails))
+	dbEmails := make([]*models.SingleEmailClaim, len(input.AuthorizedEmails))
 	for idx, email := range input.AuthorizedEmails {
-		dbEmails[idx] = &models.EmailList{
+		dbEmails[idx] = &models.SingleEmailClaim{
 			CreatorID:    creator.ID,
 			ItemID:       item.ID,
 			EmailAddress: email,

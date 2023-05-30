@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"inverse.so/engine/aiimages"
 	"inverse.so/engine/collections"
@@ -96,6 +97,16 @@ func (r *mutationResolver) CreateEmailDomainWhitelist(ctx context.Context, input
 	}
 
 	return whitelist.CreateEmailDomainWhitelist(&input, authenticationDetails)
+}
+
+// StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.
+func (r *mutationResolver) StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error) {
+	return whitelist.StartEmailVerificationForClaim(&input)
+}
+
+// CompleteEmailVerificationForClaim is the resolver for the completeEmailVerificationForClaim field.
+func (r *mutationResolver) CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailClaimInput) (*model.MintAuthorizationResponse, error) {
+	panic(fmt.Errorf("not implemented: CompleteEmailVerificationForClaim - completeEmailVerificationForClaim"))
 }
 
 // GetCreatorDetails is the resolver for the getCreatorDetails field.

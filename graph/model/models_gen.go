@@ -24,10 +24,21 @@ type CollectionInput struct {
 	Thumbnail   *string `json:"thumbnail,omitempty"`
 }
 
+type CompleteEmailClaimInput struct {
+	Otp          string `json:"otp"`
+	OtpRequestID string `json:"otpRequestID"`
+}
+
 type CreatorDetails struct {
 	CreatorID       string  `json:"creatorID"`
 	Address         string  `json:"address"`
 	InverseUsername *string `json:"inverseUsername,omitempty"`
+}
+
+type EmailClaimInput struct {
+	ItemID          string `json:"itemID"`
+	EmailAddress    string `json:"emailAddress"`
+	ClaimingAddress string `json:"claimingAddress"`
 }
 
 type ImageResponse struct {
@@ -52,6 +63,10 @@ type ItemInput struct {
 	CollectionID *string `json:"collectionID,omitempty"`
 }
 
+type MintAuthorizationResponse struct {
+	MintingSignature string `json:"mintingSignature"`
+}
+
 type NewEmailDomainWhitelistInput struct {
 	ItemID               string   `json:"itemID"`
 	Visible              bool     `json:"visible"`
@@ -69,6 +84,10 @@ type NewUsernameRegisgration struct {
 
 type OnboardingProgress struct {
 	RegisterdInverseUsername bool `json:"registerdInverseUsername"`
+}
+
+type StartEmailVerificationResponse struct {
+	OtpRequestID string `json:"otpRequestID"`
 }
 
 type AiImageStyle string
