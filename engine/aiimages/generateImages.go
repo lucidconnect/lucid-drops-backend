@@ -5,7 +5,7 @@ import (
 	services "inverse.so/services/AI-Imaging"
 )
 
-var numberOfImagesToGenerate int = 6
+var numberOfImagesToGenerate int = 4
 
 type LLMProvider interface {
 	GenerateImage(prompt string, style *model.AiImageStyle, numberOfImagesToGenerate *int) ([]*model.ImageResponse, error)
