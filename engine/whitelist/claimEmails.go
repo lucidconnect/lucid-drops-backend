@@ -23,19 +23,24 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 		return nil, errors.New("items not found")
 	}
 
-	if item.Criteria == nil || !(*item.Criteria == model.ClaimCriteriaTypeEmailDomain || *item.Criteria == model.ClaimCriteriaTypeEmailWhiteList) {
+	if item.Criteria == nil {
 		return nil, errors.New("the item can only be claimed via Email Verification")
 	}
 
-	_, err = engine.GetEmailClaimIDByItemAndEmail(&item.ID, input.EmailAddress)
-	if err != nil {
-		return nil, errors.New("you aren't authorized to claim this item. Please try again")
+	switch *item.Criteria {
+	case model.ClaimCriteriaTypeEmailDomain:
+		_, err = engine.GetEmailClaimIDByItemAndEmail(&item.ID, input.EmailAddress)
+		if err != nil {
+			return nil, errors.New("you aren't authorized to claim this item. Please try again")
+		}
+	case model.ClaimCriteriaTypeEmailWhiteList:
+		_, err = engine.GetEmailClaimIDByItemAndEmailSubDomain(&item.ID, input.EmailAddress)
+		if err != nil {
+			return nil, errors.New("you aren't authorized to claim this item. Please try again")
+		}
+	default:
+		return nil, errors.New("the item can only be claimed via Email Verification")
 	}
-
-	// TODO add subdomain claim
-	// claim, err = engine.GetEmailClaimIDByItemAndEmail(&item.ID, *&input.ClaimingAddress) if err != nil {
-	// 	return nil, errors.New("you aren't authorized to claim this item. Please try again")
-	// }
 
 	generatedOTP := utils.RandomNumericRunes(5)
 

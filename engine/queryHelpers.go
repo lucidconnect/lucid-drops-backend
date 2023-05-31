@@ -2,6 +2,8 @@ package engine
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 
 	uuid "github.com/satori/go.uuid"
 	"inverse.so/models"
@@ -50,6 +52,26 @@ func GetItemByID(itemID string) (*models.Item, error) {
 	}
 
 	return &item, nil
+}
+
+func GetEmailClaimIDByItemAndEmailSubDomain(itemID *uuid.UUID, emailAddress string) (*models.SingleEmailClaim, error) {
+	emailParts := strings.Split(emailAddress, "@")
+	if len(emailParts) != 2 {
+		return nil, fmt.Errorf("(%s) is not a valid email", emailAddress)
+	}
+
+	var claim models.SingleEmailClaim
+
+	err := utils.DB.Where(&models.EmailDomainWhiteList{
+		ItemID:     *itemID,
+		BaseDomain: emailParts[1],
+	}).First(&claim).Error
+
+	if err != nil {
+		return nil, errors.New("claim not found")
+	}
+
+	return &claim, nil
 }
 
 func GetEmailClaimIDByItemAndEmail(itemID *uuid.UUID, claimingEmail string) (*models.SingleEmailClaim, error) {
