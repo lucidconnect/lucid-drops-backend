@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"inverse.so/engine/aiimages"
 	"inverse.so/engine/collections"
@@ -105,8 +104,13 @@ func (r *mutationResolver) StartEmailVerificationForClaim(ctx context.Context, i
 }
 
 // CompleteEmailVerificationForClaim is the resolver for the completeEmailVerificationForClaim field.
-func (r *mutationResolver) CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailClaimInput) (*model.MintAuthorizationResponse, error) {
-	panic(fmt.Errorf("not implemented: CompleteEmailVerificationForClaim - completeEmailVerificationForClaim"))
+func (r *mutationResolver) CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error) {
+	return whitelist.CompleteEmailVerificationForClaim(&input)
+}
+
+// GenerateSignatureForClaim is the resolver for the generateSignatureForClaim field.
+func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error) {
+	return whitelist.GenerateSignatureForClaim(&input)
 }
 
 // GetCreatorDetails is the resolver for the getCreatorDetails field.
@@ -120,6 +124,9 @@ func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDe
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
+	// 28,500 - 
+	// The hub karen ( )
+	// 
 
 	return creatorInfo.ToGraphData(), nil
 }

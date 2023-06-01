@@ -32,7 +32,8 @@ type Mutation {
   createEmailDomainWhitelist(input: NewEmailDomainWhitelistInput!): Item!
 
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
-  completeEmailVerificationForClaim(input: CompleteEmailClaimInput!): MintAuthorizationResponse!
+  completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
+  generateSignatureForClaim(input: GenerateClaimSignatureInput!): MintAuthorizationResponse!
 }
 
 """ Time formated in the time.RFC3339Nano Format """
@@ -46,12 +47,21 @@ input NewEmailWhitelistInput {
 input EmailClaimInput {
   itemID: String!
   emailAddress: String!
-  claimingAddress: String!
+}
+
+input CompleteEmailVerificationInput {
+  otp: String!
+  otpRequestID: String!
 }
 
 input CompleteEmailClaimInput {
   otp: String!
   otpRequestID: String!
+}
+
+input GenerateClaimSignatureInput {
+  otpRequestID: String!
+  claimingAddress: String!
 }
 
 input NewEmailDomainWhitelistInput {
@@ -116,8 +126,15 @@ type StartEmailVerificationResponse {
   otpRequestID: String!
 }
 
+type CompleteEmailVerificationResponse {
+  otpRequestID: String!
+}
+
 type MintAuthorizationResponse {
+  packedData: String!
+  mintingABI: String!
   mintingSignature: String!
+  smartContractAddress: String!
 }
 
 enum ClaimCriteriaType{

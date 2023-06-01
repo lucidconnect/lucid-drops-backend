@@ -122,6 +122,17 @@ func GetAuthorizedSubdomainsForItem(itemID string) ([]*models.EmailDomainWhiteLi
 	return subDomains, nil
 }
 
+func GetEmailOTPRecordByID(recordID string) (*models.EmailOTP, error) {
+	var emailOTP models.EmailOTP
+
+	err := utils.DB.Where("id=?", recordID).First(&emailOTP).Error
+	if err != nil {
+		return nil, errors.New("email verification not found")
+	}
+
+	return &emailOTP, nil
+}
+
 func CreateModel(newModel interface{}) error {
 	return utils.DB.Create(newModel).Error
 }

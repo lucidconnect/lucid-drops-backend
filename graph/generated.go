@@ -56,6 +56,10 @@ type ComplexityRoot struct {
 		Thumbnail   func(childComplexity int) int
 	}
 
+	CompleteEmailVerificationResponse struct {
+		OtpRequestID func(childComplexity int) int
+	}
+
 	CreatorDetails struct {
 		Address         func(childComplexity int) int
 		CreatorID       func(childComplexity int) int
@@ -78,15 +82,19 @@ type ComplexityRoot struct {
 	}
 
 	MintAuthorizationResponse struct {
-		MintingSignature func(childComplexity int) int
+		MintingAbi           func(childComplexity int) int
+		MintingSignature     func(childComplexity int) int
+		PackedData           func(childComplexity int) int
+		SmartContractAddress func(childComplexity int) int
 	}
 
 	Mutation struct {
-		CompleteEmailVerificationForClaim func(childComplexity int, input model.CompleteEmailClaimInput) int
+		CompleteEmailVerificationForClaim func(childComplexity int, input model.CompleteEmailVerificationInput) int
 		CreateCollection                  func(childComplexity int, input model.CollectionInput) int
 		CreateEmailDomainWhitelist        func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
 		CreateEmailWhitelistForItem       func(childComplexity int, input model.NewEmailWhitelistInput) int
 		CreateItem                        func(childComplexity int, input model.ItemInput) int
+		GenerateSignatureForClaim         func(childComplexity int, input model.GenerateClaimSignatureInput) int
 		RegisterInverseUsername           func(childComplexity int, input model.NewUsernameRegisgration) int
 		StartEmailVerificationForClaim    func(childComplexity int, input model.EmailClaimInput) int
 		UpdateCollection                  func(childComplexity int, collectionID string, input model.CollectionInput) int
@@ -128,7 +136,8 @@ type MutationResolver interface {
 	CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error)
 	CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error)
 	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
-	CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailClaimInput) (*model.MintAuthorizationResponse, error)
+	CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error)
+	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
 }
 type QueryResolver interface {
 	GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error)
@@ -197,6 +206,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Collection.Thumbnail(childComplexity), true
+
+	case "CompleteEmailVerificationResponse.otpRequestID":
+		if e.complexity.CompleteEmailVerificationResponse.OtpRequestID == nil {
+			break
+		}
+
+		return e.complexity.CompleteEmailVerificationResponse.OtpRequestID(childComplexity), true
 
 	case "CreatorDetails.address":
 		if e.complexity.CreatorDetails.Address == nil {
@@ -282,12 +298,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.Name(childComplexity), true
 
+	case "MintAuthorizationResponse.mintingABI":
+		if e.complexity.MintAuthorizationResponse.MintingAbi == nil {
+			break
+		}
+
+		return e.complexity.MintAuthorizationResponse.MintingAbi(childComplexity), true
+
 	case "MintAuthorizationResponse.mintingSignature":
 		if e.complexity.MintAuthorizationResponse.MintingSignature == nil {
 			break
 		}
 
 		return e.complexity.MintAuthorizationResponse.MintingSignature(childComplexity), true
+
+	case "MintAuthorizationResponse.packedData":
+		if e.complexity.MintAuthorizationResponse.PackedData == nil {
+			break
+		}
+
+		return e.complexity.MintAuthorizationResponse.PackedData(childComplexity), true
+
+	case "MintAuthorizationResponse.smartContractAddress":
+		if e.complexity.MintAuthorizationResponse.SmartContractAddress == nil {
+			break
+		}
+
+		return e.complexity.MintAuthorizationResponse.SmartContractAddress(childComplexity), true
 
 	case "Mutation.completeEmailVerificationForClaim":
 		if e.complexity.Mutation.CompleteEmailVerificationForClaim == nil {
@@ -299,7 +336,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CompleteEmailVerificationForClaim(childComplexity, args["input"].(model.CompleteEmailClaimInput)), true
+		return e.complexity.Mutation.CompleteEmailVerificationForClaim(childComplexity, args["input"].(model.CompleteEmailVerificationInput)), true
 
 	case "Mutation.createCollection":
 		if e.complexity.Mutation.CreateCollection == nil {
@@ -348,6 +385,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateItem(childComplexity, args["input"].(model.ItemInput)), true
+
+	case "Mutation.generateSignatureForClaim":
+		if e.complexity.Mutation.GenerateSignatureForClaim == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_generateSignatureForClaim_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.GenerateSignatureForClaim(childComplexity, args["input"].(model.GenerateClaimSignatureInput)), true
 
 	case "Mutation.registerInverseUsername":
 		if e.complexity.Mutation.RegisterInverseUsername == nil {
@@ -502,7 +551,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputCollectionInput,
 		ec.unmarshalInputCompleteEmailClaimInput,
+		ec.unmarshalInputCompleteEmailVerificationInput,
 		ec.unmarshalInputEmailClaimInput,
+		ec.unmarshalInputGenerateClaimSignatureInput,
 		ec.unmarshalInputItemInput,
 		ec.unmarshalInputNewEmailDomainWhitelistInput,
 		ec.unmarshalInputNewEmailWhitelistInput,
@@ -589,10 +640,10 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 func (ec *executionContext) field_Mutation_completeEmailVerificationForClaim_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.CompleteEmailClaimInput
+	var arg0 model.CompleteEmailVerificationInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCompleteEmailClaimInput2inverseᚗsoᚋgraphᚋmodelᚐCompleteEmailClaimInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCompleteEmailVerificationInput2inverseᚗsoᚋgraphᚋmodelᚐCompleteEmailVerificationInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -653,6 +704,21 @@ func (ec *executionContext) field_Mutation_createItem_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNItemInput2inverseᚗsoᚋgraphᚋmodelᚐItemInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_generateSignatureForClaim_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.GenerateClaimSignatureInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNGenerateClaimSignatureInput2inverseᚗsoᚋgraphᚋmodelᚐGenerateClaimSignatureInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1151,6 +1217,50 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CompleteEmailVerificationResponse_otpRequestID(ctx context.Context, field graphql.CollectedField, obj *model.CompleteEmailVerificationResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CompleteEmailVerificationResponse_otpRequestID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.OtpRequestID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CompleteEmailVerificationResponse_otpRequestID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CompleteEmailVerificationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1675,6 +1785,94 @@ func (ec *executionContext) fieldContext_Item_authorizedSubdomains(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _MintAuthorizationResponse_packedData(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MintAuthorizationResponse_packedData(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PackedData, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MintAuthorizationResponse_packedData(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MintAuthorizationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MintAuthorizationResponse_mintingABI(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MintAuthorizationResponse_mintingABI(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MintingAbi, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MintAuthorizationResponse_mintingABI(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MintAuthorizationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MintAuthorizationResponse_mintingSignature(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MintAuthorizationResponse_mintingSignature(ctx, field)
 	if err != nil {
@@ -1707,6 +1905,50 @@ func (ec *executionContext) _MintAuthorizationResponse_mintingSignature(ctx cont
 }
 
 func (ec *executionContext) fieldContext_MintAuthorizationResponse_mintingSignature(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MintAuthorizationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MintAuthorizationResponse_smartContractAddress(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MintAuthorizationResponse_smartContractAddress(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SmartContractAddress, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MintAuthorizationResponse_smartContractAddress(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "MintAuthorizationResponse",
 		Field:      field,
@@ -2277,7 +2519,66 @@ func (ec *executionContext) _Mutation_completeEmailVerificationForClaim(ctx cont
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CompleteEmailVerificationForClaim(rctx, fc.Args["input"].(model.CompleteEmailClaimInput))
+		return ec.resolvers.Mutation().CompleteEmailVerificationForClaim(rctx, fc.Args["input"].(model.CompleteEmailVerificationInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CompleteEmailVerificationResponse)
+	fc.Result = res
+	return ec.marshalNCompleteEmailVerificationResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐCompleteEmailVerificationResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_completeEmailVerificationForClaim(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "otpRequestID":
+				return ec.fieldContext_CompleteEmailVerificationResponse_otpRequestID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CompleteEmailVerificationResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_completeEmailVerificationForClaim_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_generateSignatureForClaim(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_generateSignatureForClaim(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().GenerateSignatureForClaim(rctx, fc.Args["input"].(model.GenerateClaimSignatureInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2294,7 +2595,7 @@ func (ec *executionContext) _Mutation_completeEmailVerificationForClaim(ctx cont
 	return ec.marshalNMintAuthorizationResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐMintAuthorizationResponse(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_completeEmailVerificationForClaim(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_generateSignatureForClaim(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -2302,8 +2603,14 @@ func (ec *executionContext) fieldContext_Mutation_completeEmailVerificationForCl
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "packedData":
+				return ec.fieldContext_MintAuthorizationResponse_packedData(ctx, field)
+			case "mintingABI":
+				return ec.fieldContext_MintAuthorizationResponse_mintingABI(ctx, field)
 			case "mintingSignature":
 				return ec.fieldContext_MintAuthorizationResponse_mintingSignature(ctx, field)
+			case "smartContractAddress":
+				return ec.fieldContext_MintAuthorizationResponse_smartContractAddress(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MintAuthorizationResponse", field.Name)
 		},
@@ -2315,7 +2622,7 @@ func (ec *executionContext) fieldContext_Mutation_completeEmailVerificationForCl
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_completeEmailVerificationForClaim_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_generateSignatureForClaim_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -4891,6 +5198,44 @@ func (ec *executionContext) unmarshalInputCompleteEmailClaimInput(ctx context.Co
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCompleteEmailVerificationInput(ctx context.Context, obj interface{}) (model.CompleteEmailVerificationInput, error) {
+	var it model.CompleteEmailVerificationInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"otp", "otpRequestID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "otp":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("otp"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Otp = data
+		case "otpRequestID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("otpRequestID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OtpRequestID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputEmailClaimInput(ctx context.Context, obj interface{}) (model.EmailClaimInput, error) {
 	var it model.EmailClaimInput
 	asMap := map[string]interface{}{}
@@ -4898,7 +5243,7 @@ func (ec *executionContext) unmarshalInputEmailClaimInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"itemID", "emailAddress", "claimingAddress"}
+	fieldsInOrder := [...]string{"itemID", "emailAddress"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4923,6 +5268,35 @@ func (ec *executionContext) unmarshalInputEmailClaimInput(ctx context.Context, o
 				return it, err
 			}
 			it.EmailAddress = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputGenerateClaimSignatureInput(ctx context.Context, obj interface{}) (model.GenerateClaimSignatureInput, error) {
+	var it model.GenerateClaimSignatureInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"otpRequestID", "claimingAddress"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "otpRequestID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("otpRequestID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OtpRequestID = data
 		case "claimingAddress":
 			var err error
 
@@ -5192,6 +5566,34 @@ func (ec *executionContext) _Collection(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var completeEmailVerificationResponseImplementors = []string{"CompleteEmailVerificationResponse"}
+
+func (ec *executionContext) _CompleteEmailVerificationResponse(ctx context.Context, sel ast.SelectionSet, obj *model.CompleteEmailVerificationResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, completeEmailVerificationResponseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CompleteEmailVerificationResponse")
+		case "otpRequestID":
+
+			out.Values[i] = ec._CompleteEmailVerificationResponse_otpRequestID(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var creatorDetailsImplementors = []string{"CreatorDetails"}
 
 func (ec *executionContext) _CreatorDetails(ctx context.Context, sel ast.SelectionSet, obj *model.CreatorDetails) graphql.Marshaler {
@@ -5353,9 +5755,30 @@ func (ec *executionContext) _MintAuthorizationResponse(ctx context.Context, sel 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MintAuthorizationResponse")
+		case "packedData":
+
+			out.Values[i] = ec._MintAuthorizationResponse_packedData(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "mintingABI":
+
+			out.Values[i] = ec._MintAuthorizationResponse_mintingABI(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "mintingSignature":
 
 			out.Values[i] = ec._MintAuthorizationResponse_mintingSignature(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "smartContractAddress":
+
+			out.Values[i] = ec._MintAuthorizationResponse_smartContractAddress(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -5466,6 +5889,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_completeEmailVerificationForClaim(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "generateSignatureForClaim":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_generateSignatureForClaim(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -6160,9 +6592,23 @@ func (ec *executionContext) unmarshalNCollectionInput2inverseᚗsoᚋgraphᚋmod
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCompleteEmailClaimInput2inverseᚗsoᚋgraphᚋmodelᚐCompleteEmailClaimInput(ctx context.Context, v interface{}) (model.CompleteEmailClaimInput, error) {
-	res, err := ec.unmarshalInputCompleteEmailClaimInput(ctx, v)
+func (ec *executionContext) unmarshalNCompleteEmailVerificationInput2inverseᚗsoᚋgraphᚋmodelᚐCompleteEmailVerificationInput(ctx context.Context, v interface{}) (model.CompleteEmailVerificationInput, error) {
+	res, err := ec.unmarshalInputCompleteEmailVerificationInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCompleteEmailVerificationResponse2inverseᚗsoᚋgraphᚋmodelᚐCompleteEmailVerificationResponse(ctx context.Context, sel ast.SelectionSet, v model.CompleteEmailVerificationResponse) graphql.Marshaler {
+	return ec._CompleteEmailVerificationResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCompleteEmailVerificationResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐCompleteEmailVerificationResponse(ctx context.Context, sel ast.SelectionSet, v *model.CompleteEmailVerificationResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CompleteEmailVerificationResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNCreatorDetails2inverseᚗsoᚋgraphᚋmodelᚐCreatorDetails(ctx context.Context, sel ast.SelectionSet, v model.CreatorDetails) graphql.Marshaler {
@@ -6181,6 +6627,11 @@ func (ec *executionContext) marshalNCreatorDetails2ᚖinverseᚗsoᚋgraphᚋmod
 
 func (ec *executionContext) unmarshalNEmailClaimInput2inverseᚗsoᚋgraphᚋmodelᚐEmailClaimInput(ctx context.Context, v interface{}) (model.EmailClaimInput, error) {
 	res, err := ec.unmarshalInputEmailClaimInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNGenerateClaimSignatureInput2inverseᚗsoᚋgraphᚋmodelᚐGenerateClaimSignatureInput(ctx context.Context, v interface{}) (model.GenerateClaimSignatureInput, error) {
+	res, err := ec.unmarshalInputGenerateClaimSignatureInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

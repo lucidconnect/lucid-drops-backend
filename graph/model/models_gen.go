@@ -29,6 +29,15 @@ type CompleteEmailClaimInput struct {
 	OtpRequestID string `json:"otpRequestID"`
 }
 
+type CompleteEmailVerificationInput struct {
+	Otp          string `json:"otp"`
+	OtpRequestID string `json:"otpRequestID"`
+}
+
+type CompleteEmailVerificationResponse struct {
+	OtpRequestID string `json:"otpRequestID"`
+}
+
 type CreatorDetails struct {
 	CreatorID       string  `json:"creatorID"`
 	Address         string  `json:"address"`
@@ -36,8 +45,12 @@ type CreatorDetails struct {
 }
 
 type EmailClaimInput struct {
-	ItemID          string `json:"itemID"`
-	EmailAddress    string `json:"emailAddress"`
+	ItemID       string `json:"itemID"`
+	EmailAddress string `json:"emailAddress"`
+}
+
+type GenerateClaimSignatureInput struct {
+	OtpRequestID    string `json:"otpRequestID"`
 	ClaimingAddress string `json:"claimingAddress"`
 }
 
@@ -64,7 +77,10 @@ type ItemInput struct {
 }
 
 type MintAuthorizationResponse struct {
-	MintingSignature string `json:"mintingSignature"`
+	PackedData           string `json:"packedData"`
+	MintingAbi           string `json:"mintingABI"`
+	MintingSignature     string `json:"mintingSignature"`
+	SmartContractAddress string `json:"smartContractAddress"`
 }
 
 type NewEmailDomainWhitelistInput struct {

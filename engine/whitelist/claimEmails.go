@@ -1,20 +1,25 @@
 package whitelist
 
 import (
+	"encoding/hex"
 	"errors"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/rs/zerolog/log"
 	"inverse.so/emails"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
+	"inverse.so/magic"
 	"inverse.so/models"
 	"inverse.so/utils"
 )
 
 const (
 	//emailOTPttl is the number of minutes the Email OTP will be valid
-	emailOTPttl = 10
+	emailOTPttl          = 10
+	maximumOTPReattempts = 3
 )
 
 func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartEmailVerificationResponse, error) {
@@ -28,12 +33,12 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 	}
 
 	switch *item.Criteria {
-	case model.ClaimCriteriaTypeEmailDomain:
+	case model.ClaimCriteriaTypeEmailWhiteList:
 		_, err = engine.GetEmailClaimIDByItemAndEmail(&item.ID, input.EmailAddress)
 		if err != nil {
 			return nil, errors.New("you aren't authorized to claim this item. Please try again")
 		}
-	case model.ClaimCriteriaTypeEmailWhiteList:
+	case model.ClaimCriteriaTypeEmailDomain:
 		_, err = engine.GetEmailClaimIDByItemAndEmailSubDomain(&item.ID, input.EmailAddress)
 		if err != nil {
 			return nil, errors.New("you aren't authorized to claim this item. Please try again")
@@ -55,13 +60,12 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 	}
 
 	newEmailOTP := &models.EmailOTP{
-		IssuedAt:        time.Now().Unix(),
-		ExpiresAt:       time.Now().Add(time.Minute * time.Duration(emailOTPttl)).Unix(),
-		ItemID:          item.ID,
-		UserEmail:       input.EmailAddress,
-		ClaimingAddress: input.ClaimingAddress,
-		ExpectedOTP:     generatedOTP,
-		Attempts:        0,
+		IssuedAt:    time.Now().Unix(),
+		ExpiresAt:   time.Now().Add(time.Minute * time.Duration(emailOTPttl)).Unix(),
+		ItemID:      item.ID,
+		UserEmail:   input.EmailAddress,
+		ExpectedOTP: generatedOTP,
+		Attempts:    0,
 	}
 
 	err = engine.CreateModel(newEmailOTP)
@@ -72,5 +76,91 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 
 	return &model.StartEmailVerificationResponse{
 		OtpRequestID: newEmailOTP.ID.String(),
+	}, nil
+}
+
+func CompleteEmailVerificationForClaim(input *model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error) {
+	otpDetails, err := engine.GetEmailOTPRecordByID(input.OtpRequestID)
+	if err != nil {
+		return nil, errors.New("email verification attempt could not be found")
+	}
+
+	if otpDetails.VerifiedAt != nil {
+		return nil, errors.New("email has already been verified please procced to claim page")
+	}
+
+	if otpDetails.Attempts >= maximumOTPReattempts {
+		return nil, errors.New("email verification attempts have been exceded")
+	}
+
+	timeToTime := time.Unix(otpDetails.ExpiresAt, 0)
+	if time.Now().After(timeToTime) {
+		return nil, errors.New("email verification OTP has expired try again")
+	}
+
+	if otpDetails.ExpectedOTP != input.Otp {
+		otpDetails.Attempts++
+		otpSaveError := engine.SaveModel(otpDetails)
+		if otpSaveError != nil {
+			log.Info().Msgf("🚨 OTP Model failed to updated in DB %+v", otpDetails)
+			return nil, errors.New("an error occured when verifying the OTP")
+		}
+
+		return nil, errors.New("otp is invalid try again")
+	}
+
+	now := time.Now().Unix()
+	otpDetails.VerifiedAt = &now
+	otpSaveError := engine.SaveModel(otpDetails)
+	if otpSaveError != nil {
+		log.Info().Msgf("🚨 OTP Model failed to updated in DB %+v", otpDetails)
+		return nil, errors.New("an error when verifying the OTP")
+	}
+
+	return &model.CompleteEmailVerificationResponse{
+		OtpRequestID: input.OtpRequestID,
+	}, nil
+}
+
+func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error) {
+	otpDetails, err := engine.GetEmailOTPRecordByID(input.OtpRequestID)
+	if err != nil {
+		return nil, errors.New("email verification attempt could not be found")
+	}
+
+	if otpDetails.VerifiedAt == nil {
+		return nil, errors.New("email has not been verified yet")
+	}
+
+	if IsThisAValidEthAddress(input.ClaimingAddress) {
+		return nil, errors.New("the passed in address in not a valid Ethereum address")
+	}
+
+	otpDetails.ClaimingAddress = input.ClaimingAddress
+	otpSaveError := engine.SaveModel(otpDetails)
+	if otpSaveError != nil {
+		log.Info().Msgf("🚨 OTP Model failed to updated in DB %+v", otpDetails)
+		return nil, errors.New("an error when verifying the Claim")
+	}
+
+	dataInPackedFormat := utils.EncodePacked(
+		// utils.EncodeAddress("0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160"),
+		utils.EncodeAddress(input.ClaimingAddress), // Some Addresss
+		utils.EncodeUint256("123"),
+		utils.EncodeBytesString(hex.EncodeToString([]byte("coffee and donuts"))),
+		utils.EncodeUint256("1"),
+	)
+
+	rawData := hexutil.Encode(dataInPackedFormat)
+
+	keccakOfTheMessageInBytes := crypto.Keccak256(dataInPackedFormat)
+
+	signature := magic.SecretlySignThisMessage("\x19Ethereum Signed Message:\n32" + string(keccakOfTheMessageInBytes))
+
+	return &model.MintAuthorizationResponse{
+		PackedData:           rawData,
+		MintingAbi:           "['function mint(address _to) public']",
+		MintingSignature:     signature,
+		SmartContractAddress: "0x34bE7f35132E97915633BC1fc020364EA5134863",
 	}, nil
 }
