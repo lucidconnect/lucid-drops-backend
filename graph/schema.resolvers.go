@@ -23,6 +23,11 @@ func (r *collectionResolver) Items(ctx context.Context, obj *model.Collection) (
 	return items.FetchCollectionItems(obj.ID, nil)
 }
 
+// Creator is the resolver for the creator field.
+func (r *itemResolver) Creator(ctx context.Context, obj *model.Item) (*model.CreatorDetails, error) {
+	return onboarding.FetchItemCreatorByCollectionId(obj.CollectionID)
+}
+
 // AuthorizedSubdomains is the resolver for the authorizedSubdomains field.
 func (r *itemResolver) AuthorizedSubdomains(ctx context.Context, obj *model.Item) ([]string, error) {
 	return items.FetchAuthotizedSubdomainsForItem(obj.ID)
@@ -124,9 +129,9 @@ func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDe
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
-	// 28,500 - 
+	// 28,500 -
 	// The hub karen ( )
-	// 
+	//
 
 	return creatorInfo.ToGraphData(), nil
 }

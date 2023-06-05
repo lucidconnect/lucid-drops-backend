@@ -114,6 +114,7 @@ type Item {
 	description: String!
 	collectionId: String!
   claimCriteria: ClaimCriteriaType
+  creator: CreatorDetails! @goField(forceResolver: true)
   authorizedSubdomains: [String!] @goField(forceResolver: true)
 }
 

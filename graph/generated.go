@@ -75,6 +75,7 @@ type ComplexityRoot struct {
 		AuthorizedSubdomains func(childComplexity int) int
 		ClaimCriteria        func(childComplexity int) int
 		CollectionID         func(childComplexity int) int
+		Creator              func(childComplexity int) int
 		Description          func(childComplexity int) int
 		ID                   func(childComplexity int) int
 		Image                func(childComplexity int) int
@@ -125,6 +126,7 @@ type CollectionResolver interface {
 	Items(ctx context.Context, obj *model.Collection) ([]*model.Item, error)
 }
 type ItemResolver interface {
+	Creator(ctx context.Context, obj *model.Item) (*model.CreatorDetails, error)
 	AuthorizedSubdomains(ctx context.Context, obj *model.Item) ([]string, error)
 }
 type MutationResolver interface {
@@ -269,6 +271,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.CollectionID(childComplexity), true
+
+	case "Item.creator":
+		if e.complexity.Item.Creator == nil {
+			break
+		}
+
+		return e.complexity.Item.Creator(childComplexity), true
 
 	case "Item.description":
 		if e.complexity.Item.Description == nil {
@@ -1213,6 +1222,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
@@ -1744,6 +1755,58 @@ func (ec *executionContext) fieldContext_Item_claimCriteria(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Item_creator(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_creator(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Item().Creator(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.CreatorDetails)
+	fc.Result = res
+	return ec.marshalNCreatorDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐCreatorDetails(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_creator(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "creatorID":
+				return ec.fieldContext_CreatorDetails_creatorID(ctx, field)
+			case "address":
+				return ec.fieldContext_CreatorDetails_address(ctx, field)
+			case "inverseUsername":
+				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Item_authorizedSubdomains(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 	if err != nil {
@@ -2213,6 +2276,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
@@ -2284,6 +2349,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
@@ -2355,6 +2422,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
@@ -2426,6 +2495,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
@@ -3006,6 +3077,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
@@ -3077,6 +3150,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			}
@@ -5717,6 +5792,26 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Item_claimCriteria(ctx, field, obj)
 
+		case "creator":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Item_creator(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "authorizedSubdomains":
 			field := field
 

@@ -10,6 +10,17 @@ import (
 	"inverse.so/utils"
 )
 
+func GetCreatorByID(creatorID string) (*models.Creator, error) {
+	var creator models.Creator
+
+	err := utils.DB.Where("id=?", creatorID).First(&creator).Error
+	if err != nil {
+		return nil, errors.New("crator not found")
+	}
+
+	return &creator, nil
+}
+
 func GetCreatorByAddress(address string) (*models.Creator, error) {
 	var creator models.Creator
 

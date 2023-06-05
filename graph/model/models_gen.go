@@ -66,6 +66,7 @@ type Item struct {
 	Description          string             `json:"description"`
 	CollectionID         string             `json:"collectionId"`
 	ClaimCriteria        *ClaimCriteriaType `json:"claimCriteria,omitempty"`
+	Creator              *CreatorDetails    `json:"creator"`
 	AuthorizedSubdomains []string           `json:"authorizedSubdomains,omitempty"`
 }
 
