@@ -30,5 +30,11 @@ func RegisterInverseUsername(address string, input *model.NewUsernameRegisgratio
 		return nil, fmt.Errorf("creator already has (%s) as there inverse name", *cachedCreator.InverseUsername)
 	}
 
+	cachedCreator.InverseUsername = utils.GetStringPtr(input.InverseUsername)
+	creationErr := utils.DB.Save(&cachedCreator).Error
+	if creationErr != nil {
+		return nil, creationErr
+	}
+
 	return cachedCreator.ToGraphData(), nil
 }
