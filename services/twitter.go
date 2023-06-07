@@ -1,0 +1,110 @@
+package services
+
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"strings"
+
+	"inverse.so/graph/model"
+	"inverse.so/structure"
+)
+
+func FetchTweetDetails(link string) (*model.TweetDetails, error) {
+
+	id, err := StripTweetIDFromLink(link)
+	if err != nil {
+		return nil, err
+	}
+
+	tweet, err := fetchTweetFromID(*id)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, tweet := range tweet.Data.ThreadedConversationWithInjectionsV2.Instructions[0].Entries {
+
+		if strings.EqualFold(tweet.EntryID, fmt.Sprintf("tweet-%s", *id)) {
+			return &model.TweetDetails{
+				ProfilePhoto: tweet.Content.ItemContent.TweetResults.Result.Core.UserResults.Result.Legacy.ProfileImageURLHTTPS,
+				ProfileName: tweet.Content.ItemContent.TweetResults.Result.Core.UserResults.Result.Legacy.Name,
+				ProfileHandle: tweet.Content.ItemContent.TweetResults.Result.Core.UserResults.Result.Legacy.ScreenName,
+				TweetText: tweet.Content.ItemContent.TweetResults.Result.Legacy.FullText,
+			}, nil
+		}
+	}
+
+	return nil, errors.New("tweet not found")
+}
+
+func StripTweetIDFromLink(link string) (*string, error) {
+
+	idSegment := strings.Split(link, "/")[5]
+	if len(idSegment) < 4 {
+		return nil, errors.New("the tweet link provided seems to be invalid, please provide a valid link")
+	}
+
+	tweetID := strings.SplitN(idSegment, "?", 2)[0]
+	return &tweetID, nil
+}
+
+func fetchTweetFromID(id string) (*structure.TweetResponse, error) {
+
+	url := "https://twitter.com/i/api/graphql/tPRAv4UnqM9dOgDWggph7Q/TweetDetail?variables=%7B%22focalTweetId%22%3A%22" + id + "%22%2C%22with_rux_injections%22%3Afalse%2C%22includePromotedContent%22%3Atrue%2C%22withCommunity%22%3Atrue%2C%22withQuickPromoteEligibilityTweetFields%22%3Atrue%2C%22withBirdwatchNotes%22%3Afalse%2C%22withVoice%22%3Atrue%2C%22withV2Timeline%22%3Atrue%7D&features=%7B%22rweb_lists_timeline_redesign_enabled%22%3Atrue%2C%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22tweetypie_unmention_optimization_enabled%22%3Atrue%2C%22responsive_web_edit_tweet_api_enabled%22%3Atrue%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Atrue%2C%22view_counts_everywhere_api_enabled%22%3Atrue%2C%22longform_notetweets_consumption_enabled%22%3Atrue%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Atrue%2C%22standardized_nudges_misinfo%22%3Atrue%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Afalse%2C%22longform_notetweets_rich_text_read_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Afalse%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%7D"
+
+	var req *http.Request
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Host", "twitter.com")
+	req.Header.Add("Connection", "keep-alive")
+	req.Header.Add("sec-ch-ua", "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"")
+	req.Header.Add("x-twitter-client-language", "en-GB")
+	req.Header.Add("x-csrf-token", "81056247571840546c7c2f1874c5b61c")
+	req.Header.Add("sec-ch-ua-mobile", "?0")
+	req.Header.Add("authorization", "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA")
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+	req.Header.Add("content-type", "application/json")
+	req.Header.Add("x-guest-token", "1666362692196528129")
+	req.Header.Add("x-twitter-active-user", "yes")
+	req.Header.Add("sec-ch-ua-platform", "\"macOS\"")
+	req.Header.Add("Accept", "*/*")
+	req.Header.Add("Sec-Fetch-Site", "same-origin")
+	req.Header.Add("Sec-Fetch-Mode", "cors")
+	req.Header.Add("Sec-Fetch-Dest", "empty")
+	req.Header.Add("Referer", "https://twitter.com/tolusaba/status/1666176351022247937?s=46&t=GErzm5E5rICUqInKxbjCbA")
+	req.Header.Add("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
+	req.Header.Add("Cookie", "guest_id=v1%3A168609151061125362; guest_id_ads=v1%3A168609151061125362; guest_id_marketing=v1%3A168609151061125362; personalization_id=\"v1_PjJQ9U+VY5UVOc4BAouPNQ==\"")
+
+	var response *http.Response
+	log.Print("request: ", req)
+	response, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	responseCode := response.StatusCode
+	if responseCode != 200 && responseCode != 201 {
+		log.Print("error processing request: ", response)
+		return nil, errors.New("error processing request")
+	}
+
+	defer response.Body.Close()
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp structure.TweetResponse
+	err = json.Unmarshal(responseBody, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
+}
