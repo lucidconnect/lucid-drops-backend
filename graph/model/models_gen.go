@@ -95,6 +95,20 @@ type NewEmailWhitelistInput struct {
 	AuthorizedEmails []string `json:"authorizedEmails"`
 }
 
+type NewTelegramCriteriaInput struct {
+	ItemID      string `json:"itemID"`
+	ChannelLink string `json:"channelLink"`
+}
+
+type NewTwitterCriteriaInput struct {
+	ItemID      string             `json:"itemID"`
+	ProfileLink *string            `json:"profileLink,omitempty"`
+	TweetLink   *string            `json:"tweetLink,omitempty"`
+	Interaction []*InteractionType `json:"interaction,omitempty"`
+	// Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
+	CutOffDate *string `json:"cutOffDate,omitempty"`
+}
+
 type NewUsernameRegisgration struct {
 	InverseUsername string `json:"inverseUsername"`
 }
@@ -105,6 +119,13 @@ type OnboardingProgress struct {
 
 type StartEmailVerificationResponse struct {
 	OtpRequestID string `json:"otpRequestID"`
+}
+
+type TweetDetails struct {
+	ProfilePhoto  string `json:"profilePhoto"`
+	ProfileName   string `json:"profileName"`
+	ProfileHandle string `json:"profileHandle"`
+	TweetText     string `json:"tweetText"`
 }
 
 type AiImageStyle string
@@ -249,5 +270,48 @@ func (e *ImageResolveFormaat) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ImageResolveFormaat) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type InteractionType string
+
+const (
+	InteractionTypeLikes    InteractionType = "likes"
+	InteractionTypeRetweets InteractionType = "retweets"
+	InteractionTypeReplies  InteractionType = "replies"
+)
+
+var AllInteractionType = []InteractionType{
+	InteractionTypeLikes,
+	InteractionTypeRetweets,
+	InteractionTypeReplies,
+}
+
+func (e InteractionType) IsValid() bool {
+	switch e {
+	case InteractionTypeLikes, InteractionTypeRetweets, InteractionTypeReplies:
+		return true
+	}
+	return false
+}
+
+func (e InteractionType) String() string {
+	return string(e)
+}
+
+func (e *InteractionType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = InteractionType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid InteractionType", str)
+	}
+	return nil
+}
+
+func (e InteractionType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

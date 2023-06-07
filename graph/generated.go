@@ -95,6 +95,8 @@ type ComplexityRoot struct {
 		CreateEmailDomainWhitelist        func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
 		CreateEmailWhitelistForItem       func(childComplexity int, input model.NewEmailWhitelistInput) int
 		CreateItem                        func(childComplexity int, input model.ItemInput) int
+		CreateTelegramCriteriaForItem     func(childComplexity int, input model.NewTelegramCriteriaInput) int
+		CreateTwitterCriteriaForItem      func(childComplexity int, input model.NewTwitterCriteriaInput) int
 		GenerateSignatureForClaim         func(childComplexity int, input model.GenerateClaimSignatureInput) int
 		RegisterInverseUsername           func(childComplexity int, input model.NewUsernameRegisgration) int
 		StartEmailVerificationForClaim    func(childComplexity int, input model.EmailClaimInput) int
@@ -114,11 +116,19 @@ type ComplexityRoot struct {
 		GetCreatorDetails        func(childComplexity int) int
 		GetImageSuggestions      func(childComplexity int, prompt string, preset *model.AiImageStyle) int
 		GetOnboardinProgress     func(childComplexity int) int
+		GetTweetDetails          func(childComplexity int, tweetLink string) int
 		IsInverseNameIsAvailable func(childComplexity int, input model.NewUsernameRegisgration) int
 	}
 
 	StartEmailVerificationResponse struct {
 		OtpRequestID func(childComplexity int) int
+	}
+
+	TweetDetails struct {
+		ProfileHandle func(childComplexity int) int
+		ProfileName   func(childComplexity int) int
+		ProfilePhoto  func(childComplexity int) int
+		TweetText     func(childComplexity int) int
 	}
 }
 
@@ -137,6 +147,8 @@ type MutationResolver interface {
 	UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error)
 	CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error)
 	CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error)
+	CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error)
+	CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error)
 	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
 	CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error)
 	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
@@ -150,6 +162,7 @@ type QueryResolver interface {
 	FetchItemsInCollection(ctx context.Context, collectionID string) ([]*model.Item, error)
 	FetchItemByID(ctx context.Context, itemID string) (*model.Item, error)
 	GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error)
+	GetTweetDetails(ctx context.Context, tweetLink string) (*model.TweetDetails, error)
 }
 
 type executableSchema struct {
@@ -395,6 +408,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateItem(childComplexity, args["input"].(model.ItemInput)), true
 
+	case "Mutation.createTelegramCriteriaForItem":
+		if e.complexity.Mutation.CreateTelegramCriteriaForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTelegramCriteriaForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTelegramCriteriaForItem(childComplexity, args["input"].(model.NewTelegramCriteriaInput)), true
+
+	case "Mutation.createTwitterCriteriaForItem":
+		if e.complexity.Mutation.CreateTwitterCriteriaForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createTwitterCriteriaForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateTwitterCriteriaForItem(childComplexity, args["input"].(model.NewTwitterCriteriaInput)), true
+
 	case "Mutation.generateSignatureForClaim":
 		if e.complexity.Mutation.GenerateSignatureForClaim == nil {
 			break
@@ -531,6 +568,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetOnboardinProgress(childComplexity), true
 
+	case "Query.getTweetDetails":
+		if e.complexity.Query.GetTweetDetails == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getTweetDetails_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetTweetDetails(childComplexity, args["tweetLink"].(string)), true
+
 	case "Query.isInverseNameIsAvailable":
 		if e.complexity.Query.IsInverseNameIsAvailable == nil {
 			break
@@ -550,6 +599,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.StartEmailVerificationResponse.OtpRequestID(childComplexity), true
 
+	case "TweetDetails.profileHandle":
+		if e.complexity.TweetDetails.ProfileHandle == nil {
+			break
+		}
+
+		return e.complexity.TweetDetails.ProfileHandle(childComplexity), true
+
+	case "TweetDetails.profileName":
+		if e.complexity.TweetDetails.ProfileName == nil {
+			break
+		}
+
+		return e.complexity.TweetDetails.ProfileName(childComplexity), true
+
+	case "TweetDetails.profilePhoto":
+		if e.complexity.TweetDetails.ProfilePhoto == nil {
+			break
+		}
+
+		return e.complexity.TweetDetails.ProfilePhoto(childComplexity), true
+
+	case "TweetDetails.tweetText":
+		if e.complexity.TweetDetails.TweetText == nil {
+			break
+		}
+
+		return e.complexity.TweetDetails.TweetText(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -566,6 +643,8 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputItemInput,
 		ec.unmarshalInputNewEmailDomainWhitelistInput,
 		ec.unmarshalInputNewEmailWhitelistInput,
+		ec.unmarshalInputNewTelegramCriteriaInput,
+		ec.unmarshalInputNewTwitterCriteriaInput,
 		ec.unmarshalInputNewUsernameRegisgration,
 	)
 	first := true
@@ -713,6 +792,36 @@ func (ec *executionContext) field_Mutation_createItem_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNItemInput2inverseᚗsoᚋgraphᚋmodelᚐItemInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createTelegramCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewTelegramCriteriaInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewTelegramCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐNewTelegramCriteriaInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createTwitterCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewTwitterCriteriaInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewTwitterCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐNewTwitterCriteriaInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -895,6 +1004,21 @@ func (ec *executionContext) field_Query_getImageSuggestions_args(ctx context.Con
 		}
 	}
 	args["preset"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getTweetDetails_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["tweetLink"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tweetLink"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["tweetLink"] = arg0
 	return args, nil
 }
 
@@ -2517,6 +2641,152 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createTwitterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createTwitterCriteriaForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTwitterCriteriaForItem(rctx, fc.Args["input"].(model.NewTwitterCriteriaInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTwitterCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createTelegramCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createTelegramCriteriaForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateTelegramCriteriaForItem(rctx, fc.Args["input"].(model.NewTelegramCriteriaInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createTelegramCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_startEmailVerificationForClaim(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_startEmailVerificationForClaim(ctx, field)
 	if err != nil {
@@ -3233,6 +3503,71 @@ func (ec *executionContext) fieldContext_Query_getImageSuggestions(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getTweetDetails(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTweetDetails(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetTweetDetails(rctx, fc.Args["tweetLink"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.TweetDetails)
+	fc.Result = res
+	return ec.marshalNTweetDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐTweetDetails(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getTweetDetails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "profilePhoto":
+				return ec.fieldContext_TweetDetails_profilePhoto(ctx, field)
+			case "profileName":
+				return ec.fieldContext_TweetDetails_profileName(ctx, field)
+			case "profileHandle":
+				return ec.fieldContext_TweetDetails_profileHandle(ctx, field)
+			case "tweetText":
+				return ec.fieldContext_TweetDetails_tweetText(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TweetDetails", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getTweetDetails_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -3396,6 +3731,182 @@ func (ec *executionContext) _StartEmailVerificationResponse_otpRequestID(ctx con
 func (ec *executionContext) fieldContext_StartEmailVerificationResponse_otpRequestID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "StartEmailVerificationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TweetDetails_profilePhoto(ctx context.Context, field graphql.CollectedField, obj *model.TweetDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TweetDetails_profilePhoto(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProfilePhoto, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TweetDetails_profilePhoto(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TweetDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TweetDetails_profileName(ctx context.Context, field graphql.CollectedField, obj *model.TweetDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TweetDetails_profileName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProfileName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TweetDetails_profileName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TweetDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TweetDetails_profileHandle(ctx context.Context, field graphql.CollectedField, obj *model.TweetDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TweetDetails_profileHandle(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProfileHandle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TweetDetails_profileHandle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TweetDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TweetDetails_tweetText(ctx context.Context, field graphql.CollectedField, obj *model.TweetDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_TweetDetails_tweetText(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TweetText, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_TweetDetails_tweetText(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TweetDetails",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -5528,6 +6039,109 @@ func (ec *executionContext) unmarshalInputNewEmailWhitelistInput(ctx context.Con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewTelegramCriteriaInput(ctx context.Context, obj interface{}) (model.NewTelegramCriteriaInput, error) {
+	var it model.NewTelegramCriteriaInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"itemID", "channelLink"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "itemID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ItemID = data
+		case "channelLink":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("channelLink"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ChannelLink = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewTwitterCriteriaInput(ctx context.Context, obj interface{}) (model.NewTwitterCriteriaInput, error) {
+	var it model.NewTwitterCriteriaInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"itemID", "profileLink", "tweetLink", "interaction", "cutOffDate"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "itemID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ItemID = data
+		case "profileLink":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("profileLink"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ProfileLink = data
+		case "tweetLink":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tweetLink"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TweetLink = data
+		case "interaction":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("interaction"))
+			data, err := ec.unmarshalOInteractionType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Interaction = data
+		case "cutOffDate":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cutOffDate"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CutOffDate = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewUsernameRegisgration(ctx context.Context, obj interface{}) (model.NewUsernameRegisgration, error) {
 	var it model.NewUsernameRegisgration
 	asMap := map[string]interface{}{}
@@ -5971,6 +6585,24 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createTwitterCriteriaForItem":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTwitterCriteriaForItem(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createTelegramCriteriaForItem":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createTelegramCriteriaForItem(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "startEmailVerificationForClaim":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -6240,6 +6872,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "getTweetDetails":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getTweetDetails(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -6276,6 +6931,55 @@ func (ec *executionContext) _StartEmailVerificationResponse(ctx context.Context,
 		case "otpRequestID":
 
 			out.Values[i] = ec._StartEmailVerificationResponse_otpRequestID(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var tweetDetailsImplementors = []string{"TweetDetails"}
+
+func (ec *executionContext) _TweetDetails(ctx context.Context, sel ast.SelectionSet, obj *model.TweetDetails) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tweetDetailsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TweetDetails")
+		case "profilePhoto":
+
+			out.Values[i] = ec._TweetDetails_profilePhoto(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "profileName":
+
+			out.Values[i] = ec._TweetDetails_profileName(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "profileHandle":
+
+			out.Values[i] = ec._TweetDetails_profileHandle(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tweetText":
+
+			out.Values[i] = ec._TweetDetails_tweetText(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -6880,6 +7584,16 @@ func (ec *executionContext) unmarshalNNewEmailWhitelistInput2inverseᚗsoᚋgrap
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNNewTelegramCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐNewTelegramCriteriaInput(ctx context.Context, v interface{}) (model.NewTelegramCriteriaInput, error) {
+	res, err := ec.unmarshalInputNewTelegramCriteriaInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewTwitterCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐNewTwitterCriteriaInput(ctx context.Context, v interface{}) (model.NewTwitterCriteriaInput, error) {
+	res, err := ec.unmarshalInputNewTwitterCriteriaInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNNewUsernameRegisgration2inverseᚗsoᚋgraphᚋmodelᚐNewUsernameRegisgration(ctx context.Context, v interface{}) (model.NewUsernameRegisgration, error) {
 	res, err := ec.unmarshalInputNewUsernameRegisgration(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -6958,6 +7672,20 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalNTweetDetails2inverseᚗsoᚋgraphᚋmodelᚐTweetDetails(ctx context.Context, sel ast.SelectionSet, v model.TweetDetails) graphql.Marshaler {
+	return ec._TweetDetails(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTweetDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐTweetDetails(ctx context.Context, sel ast.SelectionSet, v *model.TweetDetails) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TweetDetails(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -7276,6 +8004,83 @@ func (ec *executionContext) marshalOImageResponse2ᚖinverseᚗsoᚋgraphᚋmode
 		return graphql.Null
 	}
 	return ec._ImageResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOInteractionType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx context.Context, v interface{}) ([]*model.InteractionType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.InteractionType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOInteractionType2ᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOInteractionType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx context.Context, sel ast.SelectionSet, v []*model.InteractionType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOInteractionType2ᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOInteractionType2ᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx context.Context, v interface{}) (*model.InteractionType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.InteractionType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInteractionType2ᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx context.Context, sel ast.SelectionSet, v *model.InteractionType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {

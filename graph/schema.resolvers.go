@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"fmt"
 
 	"inverse.so/engine/aiimages"
 	"inverse.so/engine/collections"
@@ -15,6 +16,7 @@ import (
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/internal/customError"
+	"inverse.so/services"
 	"inverse.so/structure"
 )
 
@@ -101,6 +103,21 @@ func (r *mutationResolver) CreateEmailDomainWhitelist(ctx context.Context, input
 	}
 
 	return whitelist.CreateEmailDomainWhitelist(&input, authenticationDetails)
+}
+
+// CreateTwitterCriteriaForItem is the resolver for the createTwitterCriteriaForItem field.
+func (r *mutationResolver) CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return whitelist.CreateTwitterCriteria(input, authenticationDetails)
+}
+
+// CreateTelegramCriteriaForItem is the resolver for the createTelegramCriteriaForItem field.
+func (r *mutationResolver) CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error) {
+	panic(fmt.Errorf("not implemented: CreateTelegramCriteriaForItem - createTelegramCriteriaForItem"))
 }
 
 // StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.
@@ -193,6 +210,11 @@ func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, 
 	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	// }
 	return aiimages.GetImageSuggestions(prompt, preset)
+}
+
+// GetTweetDetails is the resolver for the getTweetDetails field.
+func (r *queryResolver) GetTweetDetails(ctx context.Context, tweetLink string) (*model.TweetDetails, error) {
+	return services.FetchTweetDetails(tweetLink)
 }
 
 // Collection returns CollectionResolver implementation.

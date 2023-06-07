@@ -17,6 +17,7 @@ type Query {
   fetchItemById(itemID: String!): Item!
 
   getImageSuggestions(prompt: String!, preset: AiImageStyle ): [ImageResponse]!
+  getTweetDetails(tweetLink: String!): TweetDetails!
 }
 
 type Mutation {
@@ -30,6 +31,8 @@ type Mutation {
 
   createEmailWhitelistForItem(input: NewEmailWhitelistInput!): Item!
   createEmailDomainWhitelist(input: NewEmailDomainWhitelistInput!): Item!
+  createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
+  createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
 
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
@@ -88,6 +91,22 @@ input ItemInput {
 	collectionID: String
 }
 
+input NewTwitterCriteriaInput {
+	itemID: String!
+	profileLink: String
+	tweetLink: String
+	interaction: [InteractionType]
+  """
+  Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
+  """
+	cutOffDate: String
+}
+
+input NewTelegramCriteriaInput {
+	itemID: String!
+	channelLink: String!
+}
+
 type Collection {
   ID: ID!
 	name: String!
@@ -138,6 +157,13 @@ type MintAuthorizationResponse {
   smartContractAddress: String!
 }
 
+type TweetDetails {
+  profilePhoto: String!
+  profileName: String!
+  profileHandle: String!
+  tweetText: String!
+}
+
 enum ClaimCriteriaType{
   emailWhiteList
   emailDomain
@@ -162,6 +188,12 @@ enum AiImageStyle{
 enum ImageResolveFormaat {
   Url
   Base64
+}
+
+enum InteractionType {
+  likes
+  retweets
+  replies
 }
 
 
