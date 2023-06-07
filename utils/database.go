@@ -65,6 +65,7 @@ func SetupDB(dsn string) *gorm.DB {
 		&models.SingleEmailClaim{},
 		&models.EmailDomainWhiteList{},
 		&models.EmailOTP{},
+		&models.TwitterCriteria{},
 	)
 
 	return DB
