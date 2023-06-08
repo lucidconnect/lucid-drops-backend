@@ -117,7 +117,12 @@ func (r *mutationResolver) CreateTwitterCriteriaForItem(ctx context.Context, inp
 
 // CreateTelegramCriteriaForItem is the resolver for the createTelegramCriteriaForItem field.
 func (r *mutationResolver) CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: CreateTelegramCriteriaForItem - createTelegramCriteriaForItem"))
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+	
+	return whitelist.CreateTelegramCriteria(input, authenticationDetails)
 }
 
 // StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.
