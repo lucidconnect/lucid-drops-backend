@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
 	"inverse.so/engine/aiimages"
 	"inverse.so/engine/collections"
@@ -121,7 +120,7 @@ func (r *mutationResolver) CreateTelegramCriteriaForItem(ctx context.Context, in
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
-	
+
 	return whitelist.CreateTelegramCriteria(input, authenticationDetails)
 }
 
