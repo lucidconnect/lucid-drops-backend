@@ -37,6 +37,8 @@ type Mutation {
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
   generateSignatureForClaim(input: GenerateClaimSignatureInput!): MintAuthorizationResponse!
+
+  storeSignerInfo(input: SignerInfo!): Boolean!
 }
 
 """ Time formated in the time.RFC3339Nano Format """
@@ -105,6 +107,12 @@ input NewTwitterCriteriaInput {
 input NewTelegramCriteriaInput {
 	itemID: String!
 	channelLink: String!
+}
+
+input SignerInfo {
+  address: String!
+  signature: String
+  provider: SignerProvider!
 }
 
 type Collection {
@@ -195,5 +203,11 @@ enum InteractionType {
   retweets
   replies
 }
+
+enum SignerProvider {
+  dynamic
+  magic
+}
+
 
 

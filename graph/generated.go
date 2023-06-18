@@ -100,6 +100,7 @@ type ComplexityRoot struct {
 		GenerateSignatureForClaim         func(childComplexity int, input model.GenerateClaimSignatureInput) int
 		RegisterInverseUsername           func(childComplexity int, input model.NewUsernameRegisgration) int
 		StartEmailVerificationForClaim    func(childComplexity int, input model.EmailClaimInput) int
+		StoreSignerInfo                   func(childComplexity int, input model.SignerInfo) int
 		UpdateCollection                  func(childComplexity int, collectionID string, input model.CollectionInput) int
 		UpdateItem                        func(childComplexity int, itemID string, input model.ItemInput) int
 	}
@@ -152,6 +153,7 @@ type MutationResolver interface {
 	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
 	CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error)
 	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
+	StoreSignerInfo(ctx context.Context, input model.SignerInfo) (bool, error)
 }
 type QueryResolver interface {
 	GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error)
@@ -468,6 +470,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.StartEmailVerificationForClaim(childComplexity, args["input"].(model.EmailClaimInput)), true
 
+	case "Mutation.storeSignerInfo":
+		if e.complexity.Mutation.StoreSignerInfo == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_storeSignerInfo_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.StoreSignerInfo(childComplexity, args["input"].(model.SignerInfo)), true
+
 	case "Mutation.updateCollection":
 		if e.complexity.Mutation.UpdateCollection == nil {
 			break
@@ -646,6 +660,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNewTelegramCriteriaInput,
 		ec.unmarshalInputNewTwitterCriteriaInput,
 		ec.unmarshalInputNewUsernameRegisgration,
+		ec.unmarshalInputSignerInfo,
 	)
 	first := true
 
@@ -867,6 +882,21 @@ func (ec *executionContext) field_Mutation_startEmailVerificationForClaim_args(c
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNEmailClaimInput2inverseᚗsoᚋgraphᚋmodelᚐEmailClaimInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_storeSignerInfo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.SignerInfo
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNSignerInfo2inverseᚗsoᚋgraphᚋmodelᚐSignerInfo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2964,6 +2994,61 @@ func (ec *executionContext) fieldContext_Mutation_generateSignatureForClaim(ctx 
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_generateSignatureForClaim_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_storeSignerInfo(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_storeSignerInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().StoreSignerInfo(rctx, fc.Args["input"].(model.SignerInfo))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_storeSignerInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_storeSignerInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -6171,6 +6256,53 @@ func (ec *executionContext) unmarshalInputNewUsernameRegisgration(ctx context.Co
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSignerInfo(ctx context.Context, obj interface{}) (model.SignerInfo, error) {
+	var it model.SignerInfo
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"address", "signature", "provider"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "address":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Address = data
+		case "signature":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("signature"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Signature = data
+		case "provider":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("provider"))
+			data, err := ec.unmarshalNSignerProvider2inverseᚗsoᚋgraphᚋmodelᚐSignerProvider(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Provider = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -6625,6 +6757,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_generateSignatureForClaim(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "storeSignerInfo":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_storeSignerInfo(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -7611,6 +7752,21 @@ func (ec *executionContext) marshalNOnboardingProgress2ᚖinverseᚗsoᚋgraph�
 		return graphql.Null
 	}
 	return ec._OnboardingProgress(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNSignerInfo2inverseᚗsoᚋgraphᚋmodelᚐSignerInfo(ctx context.Context, v interface{}) (model.SignerInfo, error) {
+	res, err := ec.unmarshalInputSignerInfo(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNSignerProvider2inverseᚗsoᚋgraphᚋmodelᚐSignerProvider(ctx context.Context, v interface{}) (model.SignerProvider, error) {
+	var res model.SignerProvider
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNSignerProvider2inverseᚗsoᚋgraphᚋmodelᚐSignerProvider(ctx context.Context, sel ast.SelectionSet, v model.SignerProvider) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNStartEmailVerificationResponse2inverseᚗsoᚋgraphᚋmodelᚐStartEmailVerificationResponse(ctx context.Context, sel ast.SelectionSet, v model.StartEmailVerificationResponse) graphql.Marshaler {

@@ -139,6 +139,16 @@ func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input 
 	return whitelist.GenerateSignatureForClaim(&input)
 }
 
+// StoreSignerInfo is the resolver for the storeSignerInfo field.
+func (r *mutationResolver) StoreSignerInfo(ctx context.Context, input model.SignerInfo) (bool, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return false, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return onboarding.StoreUserAccountSignerAddress(input, authenticationDetails)
+}
+
 // GetCreatorDetails is the resolver for the getCreatorDetails field.
 func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)

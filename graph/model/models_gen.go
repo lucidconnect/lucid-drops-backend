@@ -117,6 +117,12 @@ type OnboardingProgress struct {
 	RegisterdInverseUsername bool `json:"registerdInverseUsername"`
 }
 
+type SignerInfo struct {
+	Address   string         `json:"address"`
+	Signature *string        `json:"signature,omitempty"`
+	Provider  SignerProvider `json:"provider"`
+}
+
 type StartEmailVerificationResponse struct {
 	OtpRequestID string `json:"otpRequestID"`
 }
@@ -313,5 +319,46 @@ func (e *InteractionType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e InteractionType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type SignerProvider string
+
+const (
+	SignerProviderDynamic SignerProvider = "dynamic"
+	SignerProviderMagic   SignerProvider = "magic"
+)
+
+var AllSignerProvider = []SignerProvider{
+	SignerProviderDynamic,
+	SignerProviderMagic,
+}
+
+func (e SignerProvider) IsValid() bool {
+	switch e {
+	case SignerProviderDynamic, SignerProviderMagic:
+		return true
+	}
+	return false
+}
+
+func (e SignerProvider) String() string {
+	return string(e)
+}
+
+func (e *SignerProvider) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SignerProvider(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SignerProvider", str)
+	}
+	return nil
+}
+
+func (e SignerProvider) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
