@@ -6,6 +6,7 @@ type Creator struct {
 	Base
 	WalletAddress   string
 	InverseUsername *string
+	SignerInfo      []SignerInfo `gorm:"foreignKey:CreatorID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (c *Creator) ToGraphData() *model.CreatorDetails {
