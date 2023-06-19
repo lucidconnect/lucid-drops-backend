@@ -5,8 +5,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
+
+	"inverse.so/services"
 )
 
 type contextKey struct {
@@ -19,13 +22,13 @@ type AuthDetails struct {
 
 var (
 	userAuthToken       = &contextKey{"userAuthToken"}
+	provider            = &contextKey{"provider"}
 	errJWTCreationError = errors.New("authentication Failed")
 )
 
 func UserAuthMiddleWare() func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// secretKey := utils.UseEnvOrDefault("JWT_SECRET_KEY", "n0t50r4n60m")
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
 				next.ServeHTTP(w, r)
@@ -39,45 +42,75 @@ func UserAuthMiddleWare() func(http.Handler) http.Handler {
 				return
 			}
 
-			jwtToken := authHeader
-
-			jwtParts := strings.Split(jwtToken, ".")
-
-			// if len(jwtParts) != 3 {
-			// 	// 	// All authentication related checks will be done within the various queries and mutations
-			// 	// 	// w.WriteHeader(http.StatusUnauthorized)
-			// 	// 	// _ = json.NewEncoder(w).Encode(map[string]interface{}{
-			// 	// 	// 	"message": "Unauthorized",
-			// 	// 	// })
-			// 	// 	next.ServeHTTP(w, r)
-			// 	// 	return
-			// }
-
-			rawDecodedText, err := base64.RawStdEncoding.DecodeString(jwtParts[1])
-			if err == nil {
-				ctx := context.WithValue(r.Context(), userAuthToken, rawDecodedText)
+			var contextMap = make(map[string]interface{})
+			switch authHeader[:1] {
+			case "e":
+				jwtToken := authHeader
+				jwtParts := strings.Split(jwtToken, ".")
+				rawDecodedText, err := base64.RawStdEncoding.DecodeString(jwtParts[1])
+				if err == nil {
+					contextMap["authHeader"] = rawDecodedText
+					contextMap["provider"] = "dynamic"
+					ctx := context.WithValue(r.Context(), userAuthToken, contextMap)
+					next.ServeHTTP(w, r.WithContext(ctx))
+				} else {
+					w.WriteHeader(http.StatusUnauthorized)
+				}
+			case "W":
+				contextMap["authHeader"] = authHeader
+				contextMap["provider"] = "magic"
+				ctx := context.WithValue(r.Context(), userAuthToken, contextMap)
 				next.ServeHTTP(w, r.WithContext(ctx))
-			} else {
-				w.WriteHeader(http.StatusUnauthorized)
 			}
 		})
 	}
 }
 
 func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, err error) {
-	jwtClaims, ok := ctx.Value(userAuthToken).([]byte)
+
+	claims, ok := ctx.Value(userAuthToken).(map[string]interface{})
 	if !ok {
-		return nil, errJWTCreationError
+		return nil, errors.New("jwt claims not found in context")
 	}
 
-	var jwtInfo DynamicJWTMetadata
-	err = json.Unmarshal(jwtClaims, &jwtInfo)
-	if err != nil {
-		return nil, err
+	provider, ok := claims["provider"].(string)
+	if !ok {
+		return nil, errors.New("jwt claims not found in context")
 	}
 
-	// TODO add JWT verification and assert address is present before proceeding
-	return &AuthDetails{
-		Address: jwtInfo.VerifiedCredentials[0].Address,
-	}, nil
+	var info AuthDetails
+	switch provider {
+	case "dynamic":
+		jwtClaims, ok := claims["authHeader"].([]byte)
+		if !ok {
+			return nil, errors.New("jwt claims not found in context")
+		}
+		var jwtInfo DynamicJWTMetadata
+		err = json.Unmarshal(jwtClaims, &jwtInfo)
+		if err != nil {
+			return nil, err
+		}
+
+		// TODO add JWT verification and assert address is present before proceeding
+		info.Address = jwtInfo.VerifiedCredentials[0].Address
+	case "magic":
+		log.Print("🚨 ggot to magic")
+		jwtClaims, ok := claims["authHeader"].(string)
+		if !ok {
+			return nil, errors.New("jwt claims not found in context")
+		}
+		magicPayload, err := services.GenerateMagicJWT(string(jwtClaims))
+		if err != nil {
+			return nil, err
+		}
+
+		publicAddress, err := services.GetMagicAddress(magicPayload)
+		if err != nil {
+			return nil, err
+		}
+
+		info.Address = *publicAddress
+	}
+
+	return &info, nil
 }

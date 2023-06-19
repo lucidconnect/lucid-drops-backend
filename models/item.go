@@ -12,8 +12,9 @@ type Item struct {
 	Image                string    `json:"image"`
 	Description          string    `json:"description"`
 	Criteria             *model.ClaimCriteriaType
-	TwitterCriteria      *TwitterCriteria `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	ShowEmailDomainHints bool             `gorm:"default:false"`
+	TwitterCriteria      *TwitterCriteria  `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	TelegramCriteria     *TelegramCriteria `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	ShowEmailDomainHints bool              `gorm:"default:false"`
 }
 
 func (i *Item) ToGraphData() *model.Item {
