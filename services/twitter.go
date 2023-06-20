@@ -84,6 +84,32 @@ func StripTweetIDFromLink(link string) (*string, error) {
 	return &tweetID, nil
 }
 
+func FetchTwitterAccessToken(token, verifier *string) (*TwitterAccessTokenResponse, error) {
+
+	url := fmt.Sprintf("https://api.twitter.com/oauth/access_token?oauth_token=%sx&oauth_verifier=%s", *token, *verifier)
+
+	res, err := utils.HttpPost(url, nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Response().Body.Close()
+	log.Print(res)
+	// body, err := ioutil.ReadAll(res.Response().Body)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return nil, err
+	// }
+
+	// var resp TwitterAccessTokenResponse
+	// err = json.Unmarshal(body, &resp)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	return nil, nil
+}
+
 func fetchTweetFromID(id, token string) (*structure.TweetResponse, error) {
 
 	url := "https://twitter.com/i/api/graphql/tPRAv4UnqM9dOgDWggph7Q/TweetDetail?variables=%7B%22focalTweetId%22%3A%22" + id + "%22%2C%22with_rux_injections%22%3Afalse%2C%22includePromotedContent%22%3Atrue%2C%22withCommunity%22%3Atrue%2C%22withQuickPromoteEligibilityTweetFields%22%3Atrue%2C%22withBirdwatchNotes%22%3Afalse%2C%22withVoice%22%3Atrue%2C%22withV2Timeline%22%3Atrue%7D&features=%7B%22rweb_lists_timeline_redesign_enabled%22%3Atrue%2C%22responsive_web_graphql_exclude_directive_enabled%22%3Atrue%2C%22verified_phone_label_enabled%22%3Afalse%2C%22creator_subscriptions_tweet_preview_api_enabled%22%3Atrue%2C%22responsive_web_graphql_timeline_navigation_enabled%22%3Atrue%2C%22responsive_web_graphql_skip_user_profile_image_extensions_enabled%22%3Afalse%2C%22tweetypie_unmention_optimization_enabled%22%3Atrue%2C%22responsive_web_edit_tweet_api_enabled%22%3Atrue%2C%22graphql_is_translatable_rweb_tweet_is_translatable_enabled%22%3Atrue%2C%22view_counts_everywhere_api_enabled%22%3Atrue%2C%22longform_notetweets_consumption_enabled%22%3Atrue%2C%22tweet_awards_web_tipping_enabled%22%3Afalse%2C%22freedom_of_speech_not_reach_fetch_enabled%22%3Atrue%2C%22standardized_nudges_misinfo%22%3Atrue%2C%22tweet_with_visibility_results_prefer_gql_limited_actions_policy_enabled%22%3Afalse%2C%22longform_notetweets_rich_text_read_enabled%22%3Atrue%2C%22longform_notetweets_inline_media_enabled%22%3Afalse%2C%22responsive_web_enhance_cards_enabled%22%3Afalse%7D"
@@ -187,4 +213,9 @@ func fetchPrelimPage(url string) (*string, error) {
 	}
 
 	return utils.GetStrPtr(string(respBody)), nil
+}
+
+type TwitterAccessTokenResponse struct {
+	Token  string `json:"oauth_token"`
+	Secret string `json:"oauth_token_secret"`
 }

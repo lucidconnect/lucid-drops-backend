@@ -49,6 +49,7 @@ func main() {
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/health", http.HandlerFunc(route.HealthCheckHandler))
 	router.Handle("/query", srv)
+	router.Handle("/twitter01/callback/", http.HandlerFunc(route.TwitterCallBack))
 
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
 
