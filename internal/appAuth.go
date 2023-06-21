@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 	"strings"
 
@@ -94,7 +93,6 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 		// TODO add JWT verification and assert address is present before proceeding
 		info.Address = jwtInfo.VerifiedCredentials[0].Address
 	case "magic":
-		log.Print("🚨 ggot to magic")
 		jwtClaims, ok := claims["authHeader"].(string)
 		if !ok {
 			return nil, errors.New("jwt claims not found in context")
