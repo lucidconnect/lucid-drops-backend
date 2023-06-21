@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -86,26 +87,44 @@ func StripTweetIDFromLink(link string) (*string, error) {
 
 func FetchTwitterAccessToken(token, verifier *string) (*TwitterAccessTokenResponse, error) {
 
-	url := fmt.Sprintf("https://api.twitter.com/oauth/access_token?oauth_token=%sx&oauth_verifier=%s", *token, *verifier)
+	params := url.Values{}
+	params.Set("oauth_token", *token)
+	params.Set("oauth_verifier", *verifier)
+	url := fmt.Sprintf("https://api.twitter.com/oauth/access_token?%s", params.Encode())
 
-	res, err := utils.HttpPost(url, nil, nil)
+	req, err := http.NewRequest(http.MethodPost, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	defer res.Response().Body.Close()
-	log.Print(res)
-	// body, err := ioutil.ReadAll(res.Response().Body)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return nil, err
-	// }
+	req.Header.Add("User-Agent", "PostmanRuntime/7.32.3")
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Cache-Control", "no-cache")
+	req.Header.Add("Postman-Token", "cc265e91-2d7d-42d2-841a-b6fc4cd7f43e")
+	req.Header.Add("Host", "api.twitter.com")
+	req.Header.Add("Accept-Encoding", "gzip, deflate, br")
+	req.Header.Add("Connection", "keep-alive")
+	req.Header.Add("Cookie", "guest_id=v1%3A168728163881072847; guest_id_ads=v1%3A168728163881072847; guest_id_marketing=v1%3A168728163881072847; personalization_id=\"v1_Dpt96HQoIskLobYpTwUrQA==\"")
+	req.Header.Add("Content-Length", "0")
 
-	// var resp TwitterAccessTokenResponse
-	// err = json.Unmarshal(body, &resp)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	var res *http.Response
+	log.Print("request: ", req)
+	res, err = utils.GetDebugClient().Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	var resp TwitterAccessTokenResponse
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, err
+	}
 
 	return nil, nil
 }
