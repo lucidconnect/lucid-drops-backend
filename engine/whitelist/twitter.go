@@ -22,6 +22,10 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 		return nil, errors.New("item not found")
 	}
 
+	if item.TwitterCriteria != nil {
+		return nil, errors.New("item already has a twitter criteria")
+	}
+
 	tweetID, err := services.StripTweetIDFromLink(*input.TweetLink)
 	if err != nil {
 		return nil, errors.New("invalid tweet link")
