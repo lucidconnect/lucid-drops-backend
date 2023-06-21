@@ -68,6 +68,7 @@ func SetupDB(dsn string) *gorm.DB {
 		&models.TwitterCriteria{},
 		&models.TelegramCriteria{},
 		&models.SignerInfo{},
+		&models.TwitterAuthDetails{},
 	)
 
 	return DB

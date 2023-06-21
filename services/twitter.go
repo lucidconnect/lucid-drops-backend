@@ -1,17 +1,20 @@
 package services
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
 
 	"inverse.so/graph/model"
+	"inverse.so/models"
 	"inverse.so/structure"
 	"inverse.so/utils"
 )
@@ -82,6 +85,61 @@ func StripTweetIDFromLink(link string) (*string, error) {
 
 	tweetID := strings.SplitN(idSegment, "?", 2)[0]
 	return &tweetID, nil
+}
+
+func FetchTwitterAccessToken(token, verifier *string) (*models.TwitterAuthDetails, error) {
+
+	params := url.Values{}
+	params.Set("oauth_token", *token)
+	params.Set("oauth_verifier", *verifier)
+	url := fmt.Sprintf("https://api.twitter.com/oauth/access_token?%s", params.Encode())
+
+	req, err := http.NewRequest(http.MethodPost, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("User-Agent", "PostmanRuntime/7.32.3")
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Cache-Control", "no-cache")
+	req.Header.Add("Postman-Token", "cc265e91-2d7d-42d2-841a-b6fc4cd7f43e")
+	req.Header.Add("Host", "api.twitter.com")
+	req.Header.Add("Connection", "keep-alive")
+	req.Header.Add("Cookie", "guest_id=v1%3A168728163881072847; guest_id_ads=v1%3A168728163881072847; guest_id_marketing=v1%3A168728163881072847; personalization_id=\"v1_Dpt96HQoIskLobYpTwUrQA==\"")
+	req.Header.Add("Content-Length", "0")
+
+	var res *http.Response
+	log.Print("request: ", req)
+	res, err = utils.GetDebugClient().Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	splitString := strings.Split(bytes.NewBuffer(body).String(), "&")
+	var resp models.TwitterAuthDetails
+	for _, s := range splitString {
+		split := strings.Split(s, "=")
+		if len(split) > 1 {
+			switch split[0] {
+			case "oauth_token":
+				resp.OAuthToken = split[1]
+			case "oauth_token_secret":
+				resp.OAuthTokenSecret = split[1]
+			case "user_id":
+				resp.UserID = split[1]
+			case "screen_name":
+				resp.ScreenName = split[1]
+			}
+		}
+	}
+
+	return &resp, nil
 }
 
 func fetchTweetFromID(id, token string) (*structure.TweetResponse, error) {
