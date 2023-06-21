@@ -32,11 +32,21 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 		interactions += string(*input.Interaction[i]) + ","
 	}
 
+	var tweetLink string
+	if input.TweetLink != nil {
+		tweetLink = *input.TweetLink
+	}
+
+	var profileLink string
+	if input.ProfileLink != nil {
+		profileLink = *input.ProfileLink
+	}
+
 	criteria := &models.TwitterCriteria{
 		ItemID:       item.ID.String(),
 		CreatorID:    creator.ID.String(),
-		ProfileLink:  *input.ProfileLink,
-		TweetLink:    *input.TweetLink,
+		ProfileLink:  profileLink,
+		TweetLink:    tweetLink,
 		TweetID:      *tweetID,
 		Interactions: interactions,
 		CutOffDate:   *input.CutOffDate,
@@ -48,4 +58,21 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 	}
 
 	return item.ToGraphData(), nil
+}
+
+func ProcessTwitterCallback(token, verifier *string) (*string, error) {
+
+	tweetInfo, err := services.FetchTwitterAccessToken(token, verifier)
+	if err != nil {
+		return nil, err
+	}
+
+	// do other claim specific stuff here
+	err = engine.SaveModel(tweetInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	ID := tweetInfo.ID.String()
+	return &ID, nil
 }

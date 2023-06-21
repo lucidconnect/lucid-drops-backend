@@ -15,11 +15,12 @@ func TwitterCallBack(w http.ResponseWriter, r *http.Request) {
 	oauthVerifier := r.URL.Query().Get("oauth_verifier")
 
 	// TODO: check if the token is valid
+	authID, err := whitelist.ProcessTwitterCallback(&oauthToken, &oauthVerifier)
+	if err != nil {
+		log.Error().Msgf("TwitterCallBack: %+v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
-	//process claim stuff
-	// itemID := chi.URLParam(r, "itemID")
-	// twitterHandle := chi.URLParam(r, "twitterHandle")
-
-	// log.Info().Msgf("TwitterCallBack: %s %s %s", itemID, twitterHandle, oauthToken)
-	whitelist.ProcessTwitterCallback(&oauthToken, &oauthVerifier)
+	http.Redirect(w, r, "https://inverse.wtf/whitelist/twitter/"+*authID, http.StatusFound)
 }

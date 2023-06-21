@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"strings"
 
 	"inverse.so/graph/model"
+	"inverse.so/models"
 	"inverse.so/structure"
 	"inverse.so/utils"
 )
@@ -85,7 +87,7 @@ func StripTweetIDFromLink(link string) (*string, error) {
 	return &tweetID, nil
 }
 
-func FetchTwitterAccessToken(token, verifier *string) (*TwitterAccessTokenResponse, error) {
+func FetchTwitterAccessToken(token, verifier *string) (*models.TwitterAuthDetails, error) {
 
 	params := url.Values{}
 	params.Set("oauth_token", *token)
@@ -102,7 +104,6 @@ func FetchTwitterAccessToken(token, verifier *string) (*TwitterAccessTokenRespon
 	req.Header.Add("Cache-Control", "no-cache")
 	req.Header.Add("Postman-Token", "cc265e91-2d7d-42d2-841a-b6fc4cd7f43e")
 	req.Header.Add("Host", "api.twitter.com")
-	req.Header.Add("Accept-Encoding", "gzip, deflate, br")
 	req.Header.Add("Connection", "keep-alive")
 	req.Header.Add("Cookie", "guest_id=v1%3A168728163881072847; guest_id_ads=v1%3A168728163881072847; guest_id_marketing=v1%3A168728163881072847; personalization_id=\"v1_Dpt96HQoIskLobYpTwUrQA==\"")
 	req.Header.Add("Content-Length", "0")
@@ -120,13 +121,25 @@ func FetchTwitterAccessToken(token, verifier *string) (*TwitterAccessTokenRespon
 		return nil, err
 	}
 
-	var resp TwitterAccessTokenResponse
-	err = json.Unmarshal(body, &resp)
-	if err != nil {
-		return nil, err
+	splitString := strings.Split(bytes.NewBuffer(body).String(), "&")
+	var resp models.TwitterAuthDetails
+	for _, s := range splitString {
+		split := strings.Split(s, "=")
+		if len(split) > 1 {
+			switch split[0] {
+			case "oauth_token":
+				resp.OAuthToken = split[1]
+			case "oauth_token_secret":
+				resp.OAuthTokenSecret = split[1]
+			case "user_id":
+				resp.UserID = split[1]
+			case "screen_name":
+				resp.ScreenName = split[1]
+			}
+		}
 	}
 
-	return nil, nil
+	return &resp, nil
 }
 
 func fetchTweetFromID(id, token string) (*structure.TweetResponse, error) {
@@ -232,9 +245,4 @@ func fetchPrelimPage(url string) (*string, error) {
 	}
 
 	return utils.GetStrPtr(string(respBody)), nil
-}
-
-type TwitterAccessTokenResponse struct {
-	Token  string `json:"oauth_token"`
-	Secret string `json:"oauth_token_secret"`
 }
