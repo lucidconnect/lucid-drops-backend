@@ -57,7 +57,7 @@ func GetCollectionByID(collectionID string) (*models.Collection, error) {
 func GetItemByID(itemID string) (*models.Item, error) {
 	var item models.Item
 
-	err := utils.DB.Where("id=?", itemID).First(&item).Error
+	err := utils.DB.Preload(utils.GetRelationalName(models.TwitterCriteria{})).Where("id=?", itemID).First(&item).Error
 	if err != nil {
 		return nil, errors.New("item not found")
 	}

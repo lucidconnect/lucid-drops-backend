@@ -98,6 +98,7 @@ input NewTwitterCriteriaInput {
 	profileLink: String
 	tweetLink: String
 	interaction: [InteractionType]
+  criteriaType: ClaimCriteriaType!
   """
   Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
   """
@@ -143,6 +144,7 @@ type Item {
   claimCriteria: ClaimCriteriaType
   creator: CreatorDetails! @goField(forceResolver: true)
   authorizedSubdomains: [String!] @goField(forceResolver: true)
+  interaction: [InteractionType]
 }
 
 type ImageResponse {
@@ -175,7 +177,8 @@ type TweetDetails {
 enum ClaimCriteriaType{
   emailWhiteList
   emailDomain
-  twitter
+  twitterInteractions
+  twitterFollowers
   telegram
 }
 

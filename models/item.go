@@ -1,6 +1,8 @@
 package models
 
 import (
+	"strings"
+
 	uuid "github.com/satori/go.uuid"
 	"inverse.so/graph/model"
 )
@@ -18,7 +20,8 @@ type Item struct {
 }
 
 func (i *Item) ToGraphData() *model.Item {
-	return &model.Item{
+
+	item := &model.Item{
 		ID:            i.ID.String(),
 		Name:          i.Name,
 		Image:         i.Image,
@@ -26,4 +29,28 @@ func (i *Item) ToGraphData() *model.Item {
 		CollectionID:  i.CollectionID.String(),
 		ClaimCriteria: i.Criteria,
 	}
+
+	if i.TwitterCriteria != nil {
+		item.Interaction = interactionsToArr(i.TwitterCriteria.Interactions)
+	}
+
+	return item
+}
+
+func interactionsToArr(interaction string) []*model.InteractionType {
+	interactions := strings.Split(interaction, ",")
+	if len(interactions) == 0 {
+		return nil
+	}
+
+	var interactionArr []*model.InteractionType
+	for i := range interactions {
+		if interactions[i] == "" {
+			continue
+		}
+		
+		interactionArr = append(interactionArr, (*model.InteractionType)(&interactions[i]))
+	}
+
+	return interactionArr
 }

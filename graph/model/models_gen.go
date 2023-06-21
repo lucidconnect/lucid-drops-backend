@@ -68,6 +68,7 @@ type Item struct {
 	ClaimCriteria        *ClaimCriteriaType `json:"claimCriteria,omitempty"`
 	Creator              *CreatorDetails    `json:"creator"`
 	AuthorizedSubdomains []string           `json:"authorizedSubdomains,omitempty"`
+	Interaction          []*InteractionType `json:"interaction,omitempty"`
 }
 
 type ItemInput struct {
@@ -101,10 +102,11 @@ type NewTelegramCriteriaInput struct {
 }
 
 type NewTwitterCriteriaInput struct {
-	ItemID      string             `json:"itemID"`
-	ProfileLink *string            `json:"profileLink,omitempty"`
-	TweetLink   *string            `json:"tweetLink,omitempty"`
-	Interaction []*InteractionType `json:"interaction,omitempty"`
+	ItemID       string             `json:"itemID"`
+	ProfileLink  *string            `json:"profileLink,omitempty"`
+	TweetLink    *string            `json:"tweetLink,omitempty"`
+	Interaction  []*InteractionType `json:"interaction,omitempty"`
+	CriteriaType ClaimCriteriaType  `json:"criteriaType"`
 	// Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
 	CutOffDate *string `json:"cutOffDate,omitempty"`
 }
@@ -196,22 +198,24 @@ func (e AiImageStyle) MarshalGQL(w io.Writer) {
 type ClaimCriteriaType string
 
 const (
-	ClaimCriteriaTypeEmailWhiteList ClaimCriteriaType = "emailWhiteList"
-	ClaimCriteriaTypeEmailDomain    ClaimCriteriaType = "emailDomain"
-	ClaimCriteriaTypeTwitter        ClaimCriteriaType = "twitter"
-	ClaimCriteriaTypeTelegram       ClaimCriteriaType = "telegram"
+	ClaimCriteriaTypeEmailWhiteList      ClaimCriteriaType = "emailWhiteList"
+	ClaimCriteriaTypeEmailDomain         ClaimCriteriaType = "emailDomain"
+	ClaimCriteriaTypeTwitterInteractions ClaimCriteriaType = "twitterInteractions"
+	ClaimCriteriaTypeTwitterFollowers    ClaimCriteriaType = "twitterFollowers"
+	ClaimCriteriaTypeTelegram            ClaimCriteriaType = "telegram"
 )
 
 var AllClaimCriteriaType = []ClaimCriteriaType{
 	ClaimCriteriaTypeEmailWhiteList,
 	ClaimCriteriaTypeEmailDomain,
-	ClaimCriteriaTypeTwitter,
+	ClaimCriteriaTypeTwitterInteractions,
+	ClaimCriteriaTypeTwitterFollowers,
 	ClaimCriteriaTypeTelegram,
 }
 
 func (e ClaimCriteriaType) IsValid() bool {
 	switch e {
-	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitter, ClaimCriteriaTypeTelegram:
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram:
 		return true
 	}
 	return false

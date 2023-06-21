@@ -42,14 +42,27 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 		profileLink = *input.ProfileLink
 	}
 
+	var date string
+	if input.CutOffDate != nil {
+		date = *input.CutOffDate
+	}
+
 	criteria := &models.TwitterCriteria{
 		ItemID:       item.ID.String(),
 		CreatorID:    creator.ID.String(),
 		ProfileLink:  profileLink,
 		TweetLink:    tweetLink,
 		TweetID:      *tweetID,
+		CriteriaType: input.CriteriaType,
 		Interactions: interactions,
-		CutOffDate:   *input.CutOffDate,
+		CutOffDate:   date,
+	}
+
+	twitterCriteria := input.CriteriaType
+	item.Criteria = &twitterCriteria
+	itemUpdateErr := engine.SaveModel(item)
+	if itemUpdateErr != nil {
+		return nil, itemUpdateErr
 	}
 
 	criteriaUpdateErr := engine.SaveModel(criteria)

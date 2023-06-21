@@ -79,6 +79,7 @@ type ComplexityRoot struct {
 		Description          func(childComplexity int) int
 		ID                   func(childComplexity int) int
 		Image                func(childComplexity int) int
+		Interaction          func(childComplexity int) int
 		Name                 func(childComplexity int) int
 	}
 
@@ -314,6 +315,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.Image(childComplexity), true
+
+	case "Item.interaction":
+		if e.complexity.Item.Interaction == nil {
+			break
+		}
+
+		return e.complexity.Item.Interaction(childComplexity), true
 
 	case "Item.name":
 		if e.complexity.Item.Name == nil {
@@ -1380,6 +1388,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "interaction":
+				return ec.fieldContext_Item_interaction(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2002,6 +2012,47 @@ func (ec *executionContext) fieldContext_Item_authorizedSubdomains(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _Item_interaction(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_interaction(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Interaction, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.InteractionType)
+	fc.Result = res
+	return ec.marshalOInteractionType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_interaction(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type InteractionType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MintAuthorizationResponse_packedData(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MintAuthorizationResponse_packedData(ctx, field)
 	if err != nil {
@@ -2434,6 +2485,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "interaction":
+				return ec.fieldContext_Item_interaction(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2507,6 +2560,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "interaction":
+				return ec.fieldContext_Item_interaction(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2580,6 +2635,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "interaction":
+				return ec.fieldContext_Item_interaction(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2653,6 +2710,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "interaction":
+				return ec.fieldContext_Item_interaction(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2726,6 +2785,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "interaction":
+				return ec.fieldContext_Item_interaction(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2799,6 +2860,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "interaction":
+				return ec.fieldContext_Item_interaction(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -3436,6 +3499,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "interaction":
+				return ec.fieldContext_Item_interaction(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -3509,6 +3574,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "interaction":
+				return ec.fieldContext_Item_interaction(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -6169,7 +6236,7 @@ func (ec *executionContext) unmarshalInputNewTwitterCriteriaInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"itemID", "profileLink", "tweetLink", "interaction", "cutOffDate"}
+	fieldsInOrder := [...]string{"itemID", "profileLink", "tweetLink", "interaction", "criteriaType", "cutOffDate"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6212,6 +6279,15 @@ func (ec *executionContext) unmarshalInputNewTwitterCriteriaInput(ctx context.Co
 				return it, err
 			}
 			it.Interaction = data
+		case "criteriaType":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("criteriaType"))
+			data, err := ec.unmarshalNClaimCriteriaType2inverseᚗsoᚋgraphᚋmodelᚐClaimCriteriaType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CriteriaType = data
 		case "cutOffDate":
 			var err error
 
@@ -6575,6 +6651,10 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 				return innerFunc(ctx)
 
 			})
+		case "interaction":
+
+			out.Values[i] = ec._Item_interaction(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7467,6 +7547,16 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNClaimCriteriaType2inverseᚗsoᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, v interface{}) (model.ClaimCriteriaType, error) {
+	var res model.ClaimCriteriaType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNClaimCriteriaType2inverseᚗsoᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, sel ast.SelectionSet, v model.ClaimCriteriaType) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNCollection2inverseᚗsoᚋgraphᚋmodelᚐCollection(ctx context.Context, sel ast.SelectionSet, v model.Collection) graphql.Marshaler {
