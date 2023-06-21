@@ -145,6 +145,8 @@ type Item {
   creator: CreatorDetails! @goField(forceResolver: true)
   authorizedSubdomains: [String!] @goField(forceResolver: true)
   twitterClaimCriteriaInteractions: [InteractionType]
+  tweetLink: String
+  profileLink: String
 }
 
 type ImageResponse {

@@ -32,6 +32,8 @@ func (i *Item) ToGraphData() *model.Item {
 
 	if i.TwitterCriteria != nil {
 		item.TwitterClaimCriteriaInteractions = interactionsToArr(i.TwitterCriteria.Interactions)
+		item.TweetLink = &i.TwitterCriteria.TweetLink
+		item.ProfileLink = &i.TwitterCriteria.ProfileLink
 	}
 
 	return item
