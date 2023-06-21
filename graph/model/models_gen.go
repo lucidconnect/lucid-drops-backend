@@ -60,15 +60,15 @@ type ImageResponse struct {
 }
 
 type Item struct {
-	ID                   string             `json:"ID"`
-	Name                 string             `json:"name"`
-	Image                string             `json:"image"`
-	Description          string             `json:"description"`
-	CollectionID         string             `json:"collectionId"`
-	ClaimCriteria        *ClaimCriteriaType `json:"claimCriteria,omitempty"`
-	Creator              *CreatorDetails    `json:"creator"`
-	AuthorizedSubdomains []string           `json:"authorizedSubdomains,omitempty"`
-	Interaction          []*InteractionType `json:"interaction,omitempty"`
+	ID                               string             `json:"ID"`
+	Name                             string             `json:"name"`
+	Image                            string             `json:"image"`
+	Description                      string             `json:"description"`
+	CollectionID                     string             `json:"collectionId"`
+	ClaimCriteria                    *ClaimCriteriaType `json:"claimCriteria,omitempty"`
+	Creator                          *CreatorDetails    `json:"creator"`
+	AuthorizedSubdomains             []string           `json:"authorizedSubdomains,omitempty"`
+	TwitterClainCriteriaInteractions []*InteractionType `json:"twitterClainCriteriaInteractions,omitempty"`
 }
 
 type ItemInput struct {
