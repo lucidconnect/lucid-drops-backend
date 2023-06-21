@@ -80,7 +80,7 @@ type ComplexityRoot struct {
 		ID                               func(childComplexity int) int
 		Image                            func(childComplexity int) int
 		Name                             func(childComplexity int) int
-		TwitterClainCriteriaInteractions func(childComplexity int) int
+		TwitterClaimCriteriaInteractions func(childComplexity int) int
 	}
 
 	MintAuthorizationResponse struct {
@@ -323,12 +323,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.Name(childComplexity), true
 
-	case "Item.twitterClainCriteriaInteractions":
-		if e.complexity.Item.TwitterClainCriteriaInteractions == nil {
+	case "Item.twitterClaimCriteriaInteractions":
+		if e.complexity.Item.TwitterClaimCriteriaInteractions == nil {
 			break
 		}
 
-		return e.complexity.Item.TwitterClainCriteriaInteractions(childComplexity), true
+		return e.complexity.Item.TwitterClaimCriteriaInteractions(childComplexity), true
 
 	case "MintAuthorizationResponse.mintingABI":
 		if e.complexity.MintAuthorizationResponse.MintingAbi == nil {
@@ -1388,8 +1388,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClainCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2012,8 +2012,8 @@ func (ec *executionContext) fieldContext_Item_authorizedSubdomains(ctx context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_twitterClainCriteriaInteractions(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+func (ec *executionContext) _Item_twitterClaimCriteriaInteractions(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -2026,7 +2026,7 @@ func (ec *executionContext) _Item_twitterClainCriteriaInteractions(ctx context.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.TwitterClainCriteriaInteractions, nil
+		return obj.TwitterClaimCriteriaInteractions, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2040,7 +2040,7 @@ func (ec *executionContext) _Item_twitterClainCriteriaInteractions(ctx context.C
 	return ec.marshalOInteractionType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Item_twitterClainCriteriaInteractions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Item_twitterClaimCriteriaInteractions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Item",
 		Field:      field,
@@ -2485,8 +2485,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClainCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2560,8 +2560,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClainCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2635,8 +2635,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClainCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2710,8 +2710,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClainCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2785,8 +2785,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClainCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -2860,8 +2860,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClainCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -3499,8 +3499,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClainCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -3574,8 +3574,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClainCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClainCriteriaInteractions(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -6651,9 +6651,9 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 				return innerFunc(ctx)
 
 			})
-		case "twitterClainCriteriaInteractions":
+		case "twitterClaimCriteriaInteractions":
 
-			out.Values[i] = ec._Item_twitterClainCriteriaInteractions(ctx, field, obj)
+			out.Values[i] = ec._Item_twitterClaimCriteriaInteractions(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))

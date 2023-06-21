@@ -68,7 +68,7 @@ type Item struct {
 	ClaimCriteria                    *ClaimCriteriaType `json:"claimCriteria,omitempty"`
 	Creator                          *CreatorDetails    `json:"creator"`
 	AuthorizedSubdomains             []string           `json:"authorizedSubdomains,omitempty"`
-	TwitterClainCriteriaInteractions []*InteractionType `json:"twitterClainCriteriaInteractions,omitempty"`
+	TwitterClaimCriteriaInteractions []*InteractionType `json:"twitterClaimCriteriaInteractions,omitempty"`
 }
 
 type ItemInput struct {
