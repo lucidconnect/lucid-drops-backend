@@ -110,7 +110,7 @@ func FetchTwitterAccessToken(token, verifier *string) (*models.TwitterAuthDetail
 
 	var res *http.Response
 	log.Print("request: ", req)
-	res, err = utils.GetDebugClient().Do(req)
+	res, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
