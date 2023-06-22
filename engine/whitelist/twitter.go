@@ -125,6 +125,14 @@ func validateTwitterAuthWithCriteria(auth *models.TwitterAuthDetails, criteria *
 				if !validateReplyCriteria(auth, criteria) {
 					return false, errors.New("twitter account does not meet the reply criteria")
 				}
+			case model.InteractionTypeRetweets:
+				if !validateRetweetCriteria(auth, criteria) {
+					return false, errors.New("twitter account does not meet the retweet criteria")
+				}
+			case model.InteractionTypeLikes:
+				if !validateLikeCriteria(auth, criteria) {
+					return false, errors.New("twitter account does not meet the like criteria")
+				}
 			}
 		}
 
@@ -172,6 +180,16 @@ func validateReplyCriteria(auth *models.TwitterAuthDetails, criteria *models.Twi
 			}
 		}
 	}
+
+	return false
+}
+
+func validateRetweetCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) bool {
+
+	return false
+}
+
+func validateLikeCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) bool {
 
 	return false
 }
