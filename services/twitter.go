@@ -21,7 +21,21 @@ import (
 
 const (
 	twitterAuthEntryPoint = "https://twitter.com/damndeji/status/1421901257988575234?s=21&t=-nCCU8hHFcvpr103Q9MWRQ"
+	twwitterAPIURL        = "https://api.twitter.com/2/"
 )
+
+func FetchTweetLikers(tweetID string) (*structure.TweetLikesResponse, error	) {
+
+	endpoint := fmt.Sprintf("tweets/%s/liking_users", tweetID)
+
+	var response structure.TweetLikesResponse
+	err := executeTwitterRequest("GET", endpoint, nil, response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
 
 func FetchTweetDetails(link string) (*model.TweetDetails, error) {
 
@@ -264,4 +278,51 @@ func fetchPrelimPage(url string) (*string, error) {
 	}
 
 	return utils.GetStrPtr(string(respBody)), nil
+}
+
+func executeTwitterRequest(method, endpoint string, requestData, destination interface{}) error {
+
+	url := fmt.Sprintf("%s/%s", twwitterAPIURL, endpoint)
+	requestBody, err := json.Marshal(requestData)
+	if err != nil {
+		return err
+	}
+
+	var req *http.Request
+
+	if requestData == nil {
+		req, err = http.NewRequest(method, url, nil)
+		if err != nil {
+			return err
+		}
+	} else {
+		req, err = http.NewRequest(method, url, bytes.NewBuffer(requestBody))
+		if err != nil {
+			return err
+		}
+	}
+
+	req.Header.Set("Authorization", "Bearer "+utils.UseEnvOrDefault("TWITTER_BEARER_TOKEN", "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
+	req.Header.Set("Content-Type", "application/json")
+
+	var response *http.Response
+	log.Print("request: ", req)
+	response, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	responseCode := response.StatusCode
+	if responseCode != 200 && responseCode != 201 {
+		log.Print("error processing request: ", response)
+		return errors.New("error processing request")
+	}
+
+	defer response.Body.Close()
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(responseBody, destination)
 }
