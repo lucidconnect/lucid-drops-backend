@@ -29,7 +29,7 @@ func FetchTweetLikers(tweetID string) (*structure.TweetLikesResponse, error	) {
 	endpoint := fmt.Sprintf("tweets/%s/liking_users", tweetID)
 
 	var response structure.TweetLikesResponse
-	err := executeTwitterRequest("GET", endpoint, nil, response)
+	err := executeTwitterRequest("GET", endpoint, nil, &response)
 	if err != nil {
 		return nil, err
 	}
