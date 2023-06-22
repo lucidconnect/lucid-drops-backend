@@ -37,11 +37,11 @@ func FetchTweetLikers(tweetID string) (*structure.TweetLikesResponse, error	) {
 	return &response, nil
 }
 
-func FetchTweetRetweetsResponse(id string) (*structure.TweetRetweetsResponse, error) {
-	endpoint := fmt.Sprintf("tweets/%s/retweeted_by",id) 
+func FetchTweetRetweetsResponse(tweetID string) (*structure.TweetRetweetsResponse, error) {
+	endpoint := fmt.Sprintf("tweets/%s/retweeted_by",tweetID) 
 
 	var response structure.TweetRetweetsResponse
-	err := executeTwitterRequest("GET", endpoint, nil, response)
+	err := executeTwitterRequest("GET", endpoint, nil, &response)
 
 	if err != nil {
 		return nil, err
@@ -106,7 +106,6 @@ func getGuestToken(url string) *string {
 		log.Println(err)
 		return nil
 	}
-	log.Print(*body)
 
 	return utils.GetStrPtr(extractGuestToken(*body))
 }
@@ -157,7 +156,6 @@ func FetchTwitterAccessToken(token, verifier *string) (*models.TwitterAuthDetail
 	req.Header.Add("Content-Length", "0")
 
 	var res *http.Response
-	log.Print("request: ", req)
 	res, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -221,7 +219,6 @@ func fetchTweetFromID(id, token string) (*structure.TweetResponse, error) {
 	req.Header.Add("Cookie", "guest_id=v1%3A168609151061125362; guest_id_ads=v1%3A168609151061125362; guest_id_marketing=v1%3A168609151061125362; personalization_id=\"v1_PjJQ9U+VY5UVOc4BAouPNQ==\"")
 
 	var response *http.Response
-	log.Print("request: ", req)
 	response, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -321,7 +318,6 @@ func executeTwitterRequest(method, endpoint string, requestData, destination int
 	req.Header.Set("Content-Type", "application/json")
 
 	var response *http.Response
-	log.Print("request: ", req)
 	response, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return err
