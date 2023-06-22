@@ -22,5 +22,5 @@ func TwitterCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "https://inverse.wtf/whitelist/twitter/"+*authID, http.StatusFound)
+	http.Redirect(w, r, "http://localhost:3000/whitelist/twitter/"+*authID, http.StatusFound)
 }

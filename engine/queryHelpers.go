@@ -144,6 +144,17 @@ func GetEmailOTPRecordByID(recordID string) (*models.EmailOTP, error) {
 	return &emailOTP, nil
 }
 
+func FetchTwitterAuthByID(authID string) (*models.TwitterAuthDetails, error) {
+	
+	var twitterAuth models.TwitterAuthDetails
+	err := utils.DB.Where("id=?", authID).First(&twitterAuth).Error
+	if err != nil {
+		return nil, errors.New("twitter auth not found")
+	}
+
+	return &twitterAuth, nil
+}
+
 func CreateModel(newModel interface{}) error {
 	return utils.DB.Create(newModel).Error
 }

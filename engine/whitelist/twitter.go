@@ -2,6 +2,7 @@ package whitelist
 
 import (
 	"errors"
+	"strings"
 
 	"inverse.so/engine"
 	"inverse.so/graph/model"
@@ -92,4 +93,85 @@ func ProcessTwitterCallback(token, verifier *string) (*string, error) {
 
 	ID := tweetInfo.ID.String()
 	return &ID, nil
+}
+
+func ValidateTwitterCriteriaForItem(itemID, authID string) (bool, error) {
+
+	item, err := engine.GetItemByID(itemID)
+	if err != nil {
+		return false, errors.New("item not found")
+	}
+
+	if item.TwitterCriteria == nil {
+		return false, errors.New("item does not have a twitter criteria")
+	}
+
+	auth, err := engine.FetchTwitterAuthByID(authID)
+	if err != nil {
+		return false, errors.New("twitter account not authorized")
+	}
+
+	return validateTwitterAuthWithCriteria(auth, item.TwitterCriteria)
+}
+
+func validateTwitterAuthWithCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) (bool, error) {
+
+	// check reply criteria
+	if criteria.CriteriaType == model.ClaimCriteriaTypeTwitterInteractions {
+
+		for _, x := range models.InteractionsToArr(criteria.Interactions) {
+			switch *x {
+			case model.InteractionTypeReplies:
+				if !validateReplyCriteria(auth, criteria) {
+					return false, errors.New("twitter account does not meet the reply criteria")
+				}
+			}
+		}
+
+	}
+
+	auth.WhiteListed = true
+	auth.ItemID = &criteria.ItemID
+	err := engine.SaveModel(auth)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func validateReplyCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) bool {
+
+	tweet, err := services.FetchTweetByID(criteria.TweetID)
+	if err != nil {
+		return false
+	}
+
+	for _, x := range tweet.Data.ThreadedConversationWithInjectionsV2.Instructions[0].Entries {
+
+		// check if tweet is a reply
+		if strings.Split(x.EntryID, "-")[0] != "conversationthread" {
+			continue
+		}
+
+		for _, y := range x.Content.Items {
+			if y.Item.ItemContent.TweetResults.Result.Core.UserResults.Result.RestID == auth.UserID {
+
+				replyDeets := y.Item.ItemContent.TweetResults.Result.Legacy
+				// check if tweet is a reply
+				if replyDeets.InReplyToStatusIDStr == "" {
+					return false
+				}
+
+				// check if tweet is a reply to the criteria tweet
+				if replyDeets.InReplyToStatusIDStr != criteria.TweetID {
+					return false
+				}
+
+				return true
+			}
+		}
+	}
+
+	return false
 }

@@ -19,6 +19,10 @@ import (
 	"inverse.so/utils"
 )
 
+const (
+	twitterAuthEntryPoint = "https://twitter.com/damndeji/status/1421901257988575234?s=21&t=-nCCU8hHFcvpr103Q9MWRQ"
+)
+
 func FetchTweetDetails(link string) (*model.TweetDetails, error) {
 
 	id, err := StripTweetIDFromLink(link)
@@ -49,6 +53,21 @@ func FetchTweetDetails(link string) (*model.TweetDetails, error) {
 	}
 
 	return nil, errors.New("tweet not found")
+}
+
+func FetchTweetByID(id string) (*structure.TweetResponse, error) {
+
+	token := getGuestToken(twitterAuthEntryPoint)
+	if token == nil {
+		return nil, errors.New("could not get guest token")
+	}
+
+	tweet, err := fetchTweetFromID(id, *token)
+	if err != nil {
+		return nil, err
+	}
+
+	return tweet, nil
 }
 
 func getGuestToken(url string) *string {

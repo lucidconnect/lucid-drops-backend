@@ -33,6 +33,7 @@ type Mutation {
   createEmailDomainWhitelist(input: NewEmailDomainWhitelistInput!): Item!
   createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
   createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
+  validateTwitterCriteriaForItem(itemID: String!, authID: String): Boolean!
 
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
