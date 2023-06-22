@@ -37,6 +37,21 @@ func FetchTweetLikers(tweetID string) (*structure.TweetLikesResponse, error	) {
 	return &response, nil
 }
 
+func FetchTweetRetweetsResponse(id string) (*structure.TweetRetweetsResponse, error) {
+	endpoint := fmt.Sprintf("tweets/%s/retweeted_by",id) 
+
+	var response structure.TweetRetweetsResponse
+	err := executeTwitterRequest("GET", endpoint, nil, response)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+
+
+}
+
 func FetchTweetDetails(link string) (*model.TweetDetails, error) {
 
 	id, err := StripTweetIDFromLink(link)
