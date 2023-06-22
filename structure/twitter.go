@@ -14,6 +14,9 @@ type TweetRetweetsResponse struct {
 		Name     string `json:"name"`
 		Username string `json:"username"`
 	} `json:"data"`
+	Meta struct {
+		ResultCount int `json:"result_count"`
+	} `json:"meta"`
 }
 
 type TweetResponse struct {
