@@ -123,6 +123,7 @@ type ComplexityRoot struct {
 		GetImageSuggestions      func(childComplexity int, prompt string, preset *model.AiImageStyle) int
 		GetOnboardinProgress     func(childComplexity int) int
 		GetTweetDetails          func(childComplexity int, tweetLink string) int
+		GetUserDetails           func(childComplexity int, userName string) int
 		IsInverseNameIsAvailable func(childComplexity int, input model.NewUsernameRegisgration) int
 	}
 
@@ -135,6 +136,12 @@ type ComplexityRoot struct {
 		ProfileName   func(childComplexity int) int
 		ProfilePhoto  func(childComplexity int) int
 		TweetText     func(childComplexity int) int
+	}
+
+	UserDetails struct {
+		ID       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Username func(childComplexity int) int
 	}
 }
 
@@ -171,6 +178,7 @@ type QueryResolver interface {
 	FetchItemByID(ctx context.Context, itemID string) (*model.Item, error)
 	GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error)
 	GetTweetDetails(ctx context.Context, tweetLink string) (*model.TweetDetails, error)
+	GetUserDetails(ctx context.Context, userName string) (*model.UserDetails, error)
 }
 
 type executableSchema struct {
@@ -640,6 +648,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetTweetDetails(childComplexity, args["tweetLink"].(string)), true
 
+	case "Query.getUserDetails":
+		if e.complexity.Query.GetUserDetails == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getUserDetails_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUserDetails(childComplexity, args["userName"].(string)), true
+
 	case "Query.isInverseNameIsAvailable":
 		if e.complexity.Query.IsInverseNameIsAvailable == nil {
 			break
@@ -686,6 +706,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.TweetDetails.TweetText(childComplexity), true
+
+	case "UserDetails.id":
+		if e.complexity.UserDetails.ID == nil {
+			break
+		}
+
+		return e.complexity.UserDetails.ID(childComplexity), true
+
+	case "UserDetails.name":
+		if e.complexity.UserDetails.Name == nil {
+			break
+		}
+
+		return e.complexity.UserDetails.Name(childComplexity), true
+
+	case "UserDetails.username":
+		if e.complexity.UserDetails.Username == nil {
+			break
+		}
+
+		return e.complexity.UserDetails.Username(childComplexity), true
 
 	}
 	return 0, false
@@ -1119,6 +1160,21 @@ func (ec *executionContext) field_Query_getTweetDetails_args(ctx context.Context
 		}
 	}
 	args["tweetLink"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getUserDetails_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["userName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userName"] = arg0
 	return args, nil
 }
 
@@ -4004,6 +4060,69 @@ func (ec *executionContext) fieldContext_Query_getTweetDetails(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getUserDetails(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getUserDetails(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUserDetails(rctx, fc.Args["userName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserDetails)
+	fc.Result = res
+	return ec.marshalNUserDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐUserDetails(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getUserDetails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_UserDetails_id(ctx, field)
+			case "name":
+				return ec.fieldContext_UserDetails_name(ctx, field)
+			case "username":
+				return ec.fieldContext_UserDetails_username(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type UserDetails", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getUserDetails_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -4343,6 +4462,138 @@ func (ec *executionContext) _TweetDetails_tweetText(ctx context.Context, field g
 func (ec *executionContext) fieldContext_TweetDetails_tweetText(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "TweetDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserDetails_id(ctx context.Context, field graphql.CollectedField, obj *model.UserDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserDetails_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserDetails_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserDetails_name(ctx context.Context, field graphql.CollectedField, obj *model.UserDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserDetails_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserDetails_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _UserDetails_username(ctx context.Context, field graphql.CollectedField, obj *model.UserDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_UserDetails_username(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Username, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_UserDetails_username(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "UserDetails",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -7421,6 +7672,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "getUserDetails":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUserDetails(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -7506,6 +7780,48 @@ func (ec *executionContext) _TweetDetails(ctx context.Context, sel ast.Selection
 		case "tweetText":
 
 			out.Values[i] = ec._TweetDetails_tweetText(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var userDetailsImplementors = []string{"UserDetails"}
+
+func (ec *executionContext) _UserDetails(ctx context.Context, sel ast.SelectionSet, obj *model.UserDetails) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userDetailsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("UserDetails")
+		case "id":
+
+			out.Values[i] = ec._UserDetails_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+
+			out.Values[i] = ec._UserDetails_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "username":
+
+			out.Values[i] = ec._UserDetails_username(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -8237,6 +8553,20 @@ func (ec *executionContext) marshalNTweetDetails2ᚖinverseᚗsoᚋgraphᚋmodel
 		return graphql.Null
 	}
 	return ec._TweetDetails(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUserDetails2inverseᚗsoᚋgraphᚋmodelᚐUserDetails(ctx context.Context, sel ast.SelectionSet, v model.UserDetails) graphql.Marshaler {
+	return ec._UserDetails(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐUserDetails(ctx context.Context, sel ast.SelectionSet, v *model.UserDetails) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserDetails(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

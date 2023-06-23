@@ -139,6 +139,12 @@ type TweetDetails struct {
 	TweetText     string `json:"tweetText"`
 }
 
+type UserDetails struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+}
+
 type AiImageStyle string
 
 const (

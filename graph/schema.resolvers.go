@@ -241,6 +241,11 @@ func (r *queryResolver) GetTweetDetails(ctx context.Context, tweetLink string) (
 	return services.FetchTweetDetails(tweetLink)
 }
 
+// GetUserDetails is the resolver for the getUserDetails field.
+func (r *queryResolver) GetUserDetails(ctx context.Context, userName string) (*model.UserDetails, error) {
+	return services.FetchUserDetails(userName)
+}
+
 // Collection returns CollectionResolver implementation.
 func (r *Resolver) Collection() CollectionResolver { return &collectionResolver{r} }
 

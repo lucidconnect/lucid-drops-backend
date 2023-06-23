@@ -26,6 +26,14 @@ type TweetRetweetsResponse struct {
 	} `json:"meta"`
 }
 
+type UserDetailsResponse struct {
+	Data struct{
+		ID string `json:"id"`
+		Name     string `json:"name"`
+        Username string `json:"username"`
+	}
+}
+
 type TweetResponse struct {
 	Data struct {
 		ThreadedConversationWithInjectionsV2 struct {
