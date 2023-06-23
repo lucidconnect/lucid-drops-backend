@@ -9,6 +9,7 @@ import (
 	"inverse.so/internal"
 	"inverse.so/models"
 	"inverse.so/services"
+	"inverse.so/structure"
 )
 
 func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *internal.AuthDetails) (*model.Item, error) {
@@ -186,10 +187,54 @@ func validateReplyCriteria(auth *models.TwitterAuthDetails, criteria *models.Twi
 
 func validateRetweetCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) bool {
 
+	var retweetedBy *structure.TweetRetweetsResponse
+	var err error
+	retweetedBy, err = services.FetchTweetRetweets(criteria.TweetID, nil)
+	if err != nil {
+		return false
+	}
+
+	for retweetedBy.Meta.NextToken != "" {
+
+		for _, x := range retweetedBy.Data {
+
+			if x.ID == auth.UserID {
+				return true
+			}
+		}
+
+		retweetedBy, err = services.FetchTweetRetweets(criteria.TweetID, &retweetedBy.Meta.NextToken)
+		if err != nil {
+			return false
+		}
+	}
+
 	return false
 }
 
 func validateLikeCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) bool {
+
+	var likingUsers *structure.TweetLikesResponse
+	var err error
+	likingUsers, err = services.FetchTweetLikingUsers(criteria.TweetID, nil)
+	if err != nil {
+		return false
+	}
+
+	for likingUsers.Meta.NextToken != "" {
+
+		for _, x := range likingUsers.Data {
+
+			if x.ID == auth.UserID {
+				return true
+			}
+		}
+
+		likingUsers, err = services.FetchTweetLikingUsers(criteria.TweetID, &likingUsers.Meta.NextToken)
+		if err != nil {
+			return false
+		}
+	}
 
 	return false
 }

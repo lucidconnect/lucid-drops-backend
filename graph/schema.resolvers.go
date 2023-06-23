@@ -264,6 +264,9 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) GetTwitterFollowersCount(ctx context.Context, profileLink string) (int, error) {
+	panic(fmt.Errorf("not implemented: GetTwitterFollowersCount - getTwitterFollowersCount"))
+}
 func (r *itemResolver) Interaction(ctx context.Context, obj *model.Item) ([]*model.InteractionType, error) {
 	panic(fmt.Errorf("not implemented: Interaction - interaction"))
 }

@@ -24,9 +24,12 @@ const (
 	twwitterAPIURL        = "https://api.twitter.com/2/"
 )
 
-func FetchTweetLikers(tweetID string) (*structure.TweetLikesResponse, error	) {
+func FetchTweetLikingUsers(tweetID string, nextToken *string) (*structure.TweetLikesResponse, error	) {
 
 	endpoint := fmt.Sprintf("tweets/%s/liking_users", tweetID)
+	if nextToken != nil {
+		endpoint = fmt.Sprintf("%s?pagination_token=%s", endpoint, *nextToken)
+	}
 
 	var response structure.TweetLikesResponse
 	err := executeTwitterRequest("GET", endpoint, nil, &response)
@@ -37,8 +40,11 @@ func FetchTweetLikers(tweetID string) (*structure.TweetLikesResponse, error	) {
 	return &response, nil
 }
 
-func FetchTweetRetweetsResponse(tweetID string) (*structure.TweetRetweetsResponse, error) {
+func FetchTweetRetweets(tweetID string, nextToken *string) (*structure.TweetRetweetsResponse, error) {
 	endpoint := fmt.Sprintf("tweets/%s/retweeted_by",tweetID) 
+	if nextToken != nil {
+		endpoint = fmt.Sprintf("%s?pagination_token=%s", endpoint, *nextToken)
+	}
 
 	var response structure.TweetRetweetsResponse
 	err := executeTwitterRequest("GET", endpoint, nil, &response)
@@ -48,8 +54,6 @@ func FetchTweetRetweetsResponse(tweetID string) (*structure.TweetRetweetsRespons
 	}
 
 	return &response, nil
-
-
 }
 
 func FetchTweetDetails(link string) (*model.TweetDetails, error) {
@@ -294,7 +298,7 @@ func fetchPrelimPage(url string) (*string, error) {
 
 func executeTwitterRequest(method, endpoint string, requestData, destination interface{}) error {
 
-	url := fmt.Sprintf("%s/%s", twwitterAPIURL, endpoint)
+	url := fmt.Sprintf("%s%s", twwitterAPIURL, endpoint)
 	requestBody, err := json.Marshal(requestData)
 	if err != nil {
 		return err
@@ -317,6 +321,7 @@ func executeTwitterRequest(method, endpoint string, requestData, destination int
 	req.Header.Set("Authorization", "Bearer "+utils.UseEnvOrDefault("TWITTER_BEARER_TOKEN", "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
 	req.Header.Set("Content-Type", "application/json")
 
+	log.Print("request: ", req)
 	var response *http.Response
 	response, err = http.DefaultClient.Do(req)
 	if err != nil {

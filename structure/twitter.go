@@ -6,6 +6,11 @@ type TweetLikesResponse struct {
 		Name     string `json:"name"`
 		Username string `json:"username"`
 	} `json:"data"`
+	Meta struct {
+		ResultCount   int    `json:"result_count"`
+		PreviousToken string `json:"previous_token"`
+		NextToken     string `json:"next_token"`
+	} `json:"meta"`
 }
 
 type TweetRetweetsResponse struct {
@@ -15,7 +20,9 @@ type TweetRetweetsResponse struct {
 		Username string `json:"username"`
 	} `json:"data"`
 	Meta struct {
-		ResultCount int `json:"result_count"`
+		ResultCount   int    `json:"result_count"`
+		PreviousToken string `json:"previous_token"`
+		NextToken     string `json:"next_token"`
 	} `json:"meta"`
 }
 
