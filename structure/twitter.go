@@ -8,6 +8,17 @@ type TweetLikesResponse struct {
 	} `json:"data"`
 }
 
+type TweetRetweetsResponse struct {
+	Data []struct {
+		ID       string `json:"id"`
+		Name     string `json:"name"`
+		Username string `json:"username"`
+	} `json:"data"`
+	Meta struct {
+		ResultCount int `json:"result_count"`
+	} `json:"meta"`
+}
+
 type TweetResponse struct {
 	Data struct {
 		ThreadedConversationWithInjectionsV2 struct {
