@@ -9,7 +9,7 @@ import (
 )
 
 func LoadEnvironmentVariables() {
-	env := "development"
+	env := os.Getenv("APP_ENV")
 
 	switch env {
 	case "development":

@@ -18,7 +18,7 @@ type Query {
 
   getImageSuggestions(prompt: String!, preset: AiImageStyle ): [ImageResponse]!
   getTweetDetails(tweetLink: String!): TweetDetails!
-  getUserDetails(userName: String!): UserDetails!
+  getTwitterUserDetails(userName: String!): UserDetails!
 }
 
 type Mutation {
