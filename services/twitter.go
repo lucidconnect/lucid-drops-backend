@@ -103,6 +103,19 @@ func FetchTweetDetails(link string) (*model.TweetDetails, error) {
 	return nil, errors.New("tweet not found")
 }
 
+func FetchUserDetails(userName string) (*model.UserDetails,error) {
+	details, err := fetchDetailsFromUserName(userName)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.UserDetails{
+		Name: details.Data.Name,
+		ID: details.Data.ID,
+		Username: details.Data.Username,
+	},nil
+}
+
 func FetchTweetByID(id string) (*structure.TweetResponse, error) {
 
 	token := getGuestToken(twitterAuthEntryPoint)
@@ -117,6 +130,7 @@ func FetchTweetByID(id string) (*structure.TweetResponse, error) {
 
 	return tweet, nil
 }
+
 
 func getGuestToken(url string) *string {
 
@@ -256,6 +270,62 @@ func fetchTweetFromID(id, token string) (*structure.TweetResponse, error) {
 	}
 
 	var resp structure.TweetResponse
+	err = json.Unmarshal(responseBody, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp, nil
+}
+
+func fetchDetailsFromUserName(userName string) (*structure.UserDetailsResponse, error) {
+
+	url := fmt.Sprintf("%s%s%s", twwitterAPIURL, "users/by/username/",userName)
+
+	var req *http.Request
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Host", "twitter.com")
+	req.Header.Add("Connection", "keep-alive")
+	req.Header.Add("sec-ch-ua", "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"")
+	req.Header.Add("x-twitter-client-language", "en-GB")
+	req.Header.Add("x-csrf-token", "81056247571840546c7c2f1874c5b61c")
+	req.Header.Add("sec-ch-ua-mobile", "?0")
+	req.Header.Add("authorization", "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA")
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+	req.Header.Add("content-type", "application/json")
+	req.Header.Add("x-twitter-active-user", "yes")
+	req.Header.Add("sec-ch-ua-platform", "\"macOS\"")
+	req.Header.Add("Accept", "*/*")
+	req.Header.Add("Sec-Fetch-Site", "same-origin")
+	req.Header.Add("Sec-Fetch-Mode", "cors")
+	req.Header.Add("Sec-Fetch-Dest", "empty")
+	req.Header.Add("Referer", "https://twitter.com/tolusaba/status/1666176351022247937?s=46&t=GErzm5E5rICUqInKxbjCbA")
+	req.Header.Add("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
+	req.Header.Add("Cookie", "guest_id=v1%3A168609151061125362; guest_id_ads=v1%3A168609151061125362; guest_id_marketing=v1%3A168609151061125362; personalization_id=\"v1_PjJQ9U+VY5UVOc4BAouPNQ==\"")
+
+	var response *http.Response
+	response, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	responseCode := response.StatusCode
+	if responseCode != 200 && responseCode != 201 {
+		log.Print("error processing request: ", response)
+		return nil, errors.New("error processing request")
+	}
+
+	defer response.Body.Close()
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp structure.UserDetailsResponse
 	err = json.Unmarshal(responseBody, &resp)
 	if err != nil {
 		return nil, err
