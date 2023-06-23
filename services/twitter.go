@@ -88,6 +88,19 @@ func FetchTweetDetails(link string) (*model.TweetDetails, error) {
 	return nil, errors.New("tweet not found")
 }
 
+func FetchUserDetails(userName string) (*model.UserDetails,error) {
+	details, err := fetchDetailsFromUserName(userName)
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.UserDetails{
+		Name: details.Data.Name,
+		ID: details.Data.ID,
+		Username: details.Data.Username,
+	},nil
+}
+
 func FetchTweetByID(id string) (*structure.TweetResponse, error) {
 
 	token := getGuestToken(twitterAuthEntryPoint)
@@ -102,6 +115,7 @@ func FetchTweetByID(id string) (*structure.TweetResponse, error) {
 
 	return tweet, nil
 }
+
 
 func getGuestToken(url string) *string {
 
@@ -247,6 +261,21 @@ func fetchTweetFromID(id, token string) (*structure.TweetResponse, error) {
 	}
 
 	return &resp, nil
+}
+
+func fetchDetailsFromUserName(userName string) (*structure.UserDetailsResponse, error) {
+
+	endpoint := fmt.Sprintf("users/by/username/%s", userName)
+
+	var response structure.UserDetailsResponse
+	err := executeTwitterRequest("GET", endpoint, nil, &response)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+	
 }
 
 func fetchPrelimPage(url string) (*string, error) {

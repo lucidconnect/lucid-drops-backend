@@ -18,6 +18,7 @@ type Query {
 
   getImageSuggestions(prompt: String!, preset: AiImageStyle ): [ImageResponse]!
   getTweetDetails(tweetLink: String!): TweetDetails!
+  getTwitterUserDetails(userName: String!): UserDetails!
 }
 
 type Mutation {
@@ -176,6 +177,13 @@ type TweetDetails {
   profileName: String!
   profileHandle: String!
   tweetText: String!
+}
+
+type UserDetails {
+  id: String!
+  name: String!
+  username: String!
+
 }
 
 enum ClaimCriteriaType{

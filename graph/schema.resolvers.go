@@ -241,6 +241,11 @@ func (r *queryResolver) GetTweetDetails(ctx context.Context, tweetLink string) (
 	return services.FetchTweetDetails(tweetLink)
 }
 
+// GetTwitterUserDetails is the resolver for the getTwitterUserDetails field.
+func (r *queryResolver) GetTwitterUserDetails(ctx context.Context, userName string) (*model.UserDetails, error) {
+	return services.FetchUserDetails(userName)
+}
+
 // Collection returns CollectionResolver implementation.
 func (r *Resolver) Collection() CollectionResolver { return &collectionResolver{r} }
 
@@ -264,6 +269,9 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) GetUserDetails(ctx context.Context, userName string) (*model.UserDetails, error) {
+	return services.FetchUserDetails(userName)
+}
 func (r *queryResolver) GetTwitterFollowersCount(ctx context.Context, profileLink string) (int, error) {
 	panic(fmt.Errorf("not implemented: GetTwitterFollowersCount - getTwitterFollowersCount"))
 }
