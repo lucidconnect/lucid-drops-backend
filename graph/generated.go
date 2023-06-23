@@ -123,7 +123,7 @@ type ComplexityRoot struct {
 		GetImageSuggestions      func(childComplexity int, prompt string, preset *model.AiImageStyle) int
 		GetOnboardinProgress     func(childComplexity int) int
 		GetTweetDetails          func(childComplexity int, tweetLink string) int
-		GetUserDetails           func(childComplexity int, userName string) int
+		GetTwitterUserDetails    func(childComplexity int, userName string) int
 		IsInverseNameIsAvailable func(childComplexity int, input model.NewUsernameRegisgration) int
 	}
 
@@ -178,7 +178,7 @@ type QueryResolver interface {
 	FetchItemByID(ctx context.Context, itemID string) (*model.Item, error)
 	GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error)
 	GetTweetDetails(ctx context.Context, tweetLink string) (*model.TweetDetails, error)
-	GetUserDetails(ctx context.Context, userName string) (*model.UserDetails, error)
+	GetTwitterUserDetails(ctx context.Context, userName string) (*model.UserDetails, error)
 }
 
 type executableSchema struct {
@@ -648,17 +648,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetTweetDetails(childComplexity, args["tweetLink"].(string)), true
 
-	case "Query.getUserDetails":
-		if e.complexity.Query.GetUserDetails == nil {
+	case "Query.getTwitterUserDetails":
+		if e.complexity.Query.GetTwitterUserDetails == nil {
 			break
 		}
 
-		args, err := ec.field_Query_getUserDetails_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_getTwitterUserDetails_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Query.GetUserDetails(childComplexity, args["userName"].(string)), true
+		return e.complexity.Query.GetTwitterUserDetails(childComplexity, args["userName"].(string)), true
 
 	case "Query.isInverseNameIsAvailable":
 		if e.complexity.Query.IsInverseNameIsAvailable == nil {
@@ -1163,7 +1163,7 @@ func (ec *executionContext) field_Query_getTweetDetails_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_getUserDetails_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_getTwitterUserDetails_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -4060,8 +4060,8 @@ func (ec *executionContext) fieldContext_Query_getTweetDetails(ctx context.Conte
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_getUserDetails(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getUserDetails(ctx, field)
+func (ec *executionContext) _Query_getTwitterUserDetails(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTwitterUserDetails(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4074,7 +4074,7 @@ func (ec *executionContext) _Query_getUserDetails(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetUserDetails(rctx, fc.Args["userName"].(string))
+		return ec.resolvers.Query().GetTwitterUserDetails(rctx, fc.Args["userName"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4091,7 +4091,7 @@ func (ec *executionContext) _Query_getUserDetails(ctx context.Context, field gra
 	return ec.marshalNUserDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐUserDetails(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_getUserDetails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_getTwitterUserDetails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -4116,7 +4116,7 @@ func (ec *executionContext) fieldContext_Query_getUserDetails(ctx context.Contex
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getUserDetails_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Query_getTwitterUserDetails_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -7672,7 +7672,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "getUserDetails":
+		case "getTwitterUserDetails":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -7681,7 +7681,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getUserDetails(ctx, field)
+				res = ec._Query_getTwitterUserDetails(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
