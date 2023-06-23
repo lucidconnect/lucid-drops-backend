@@ -48,12 +48,13 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Collection struct {
-		Description func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Image       func(childComplexity int) int
-		Items       func(childComplexity int) int
-		Name        func(childComplexity int) int
-		Thumbnail   func(childComplexity int) int
+		ContractAddress func(childComplexity int) int
+		Description     func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Image           func(childComplexity int) int
+		Items           func(childComplexity int) int
+		Name            func(childComplexity int) int
+		Thumbnail       func(childComplexity int) int
 	}
 
 	CompleteEmailVerificationResponse struct {
@@ -186,6 +187,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Collection.contractAddress":
+		if e.complexity.Collection.ContractAddress == nil {
+			break
+		}
+
+		return e.complexity.Collection.ContractAddress(childComplexity), true
 
 	case "Collection.description":
 		if e.complexity.Collection.Description == nil {
@@ -1387,6 +1395,47 @@ func (ec *executionContext) fieldContext_Collection_thumbnail(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _Collection_contractAddress(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_contractAddress(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ContractAddress, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_contractAddress(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Collection_items(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Collection_items(ctx, field)
 	if err != nil {
@@ -2481,6 +2530,8 @@ func (ec *executionContext) fieldContext_Mutation_createCollection(ctx context.C
 				return ec.fieldContext_Collection_image(ctx, field)
 			case "thumbnail":
 				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "contractAddress":
+				return ec.fieldContext_Collection_contractAddress(ctx, field)
 			case "items":
 				return ec.fieldContext_Collection_items(ctx, field)
 			}
@@ -2550,6 +2601,8 @@ func (ec *executionContext) fieldContext_Mutation_updateCollection(ctx context.C
 				return ec.fieldContext_Collection_image(ctx, field)
 			case "thumbnail":
 				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "contractAddress":
+				return ec.fieldContext_Collection_contractAddress(ctx, field)
 			case "items":
 				return ec.fieldContext_Collection_items(ctx, field)
 			}
@@ -3585,6 +3638,8 @@ func (ec *executionContext) fieldContext_Query_fetchCollectionById(ctx context.C
 				return ec.fieldContext_Collection_image(ctx, field)
 			case "thumbnail":
 				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "contractAddress":
+				return ec.fieldContext_Collection_contractAddress(ctx, field)
 			case "items":
 				return ec.fieldContext_Collection_items(ctx, field)
 			}
@@ -3654,6 +3709,8 @@ func (ec *executionContext) fieldContext_Query_fetchCreatorCollections(ctx conte
 				return ec.fieldContext_Collection_image(ctx, field)
 			case "thumbnail":
 				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "contractAddress":
+				return ec.fieldContext_Collection_contractAddress(ctx, field)
 			case "items":
 				return ec.fieldContext_Collection_items(ctx, field)
 			}
@@ -6659,6 +6716,10 @@ func (ec *executionContext) _Collection(ctx context.Context, sel ast.SelectionSe
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "contractAddress":
+
+			out.Values[i] = ec._Collection_contractAddress(ctx, field, obj)
+
 		case "items":
 			field := field
 

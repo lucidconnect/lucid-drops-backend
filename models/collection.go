@@ -15,11 +15,13 @@ type Collection struct {
 }
 
 func (c *Collection) ToGraphData() *model.Collection {
+	testAddress := "0xdEFdf3C58e416aD22b4b47613A41ce1e6050B13B"
 	return &model.Collection{
-		ID:          c.ID.String(),
-		Name:        c.Name,
-		Description: c.Description,
-		Image:       c.Image,
-		Thumbnail:   c.Thumbnail,
+		ID:              c.ID.String(),
+		Name:            c.Name,
+		Description:     c.Description,
+		Image:           c.Image,
+		Thumbnail:       c.Thumbnail,
+		ContractAddress: &testAddress,
 	}
 }

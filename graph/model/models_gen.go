@@ -9,12 +9,13 @@ import (
 )
 
 type Collection struct {
-	ID          string  `json:"ID"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Image       string  `json:"image"`
-	Thumbnail   string  `json:"thumbnail"`
-	Items       []*Item `json:"items"`
+	ID              string  `json:"ID"`
+	Name            string  `json:"name"`
+	Description     string  `json:"description"`
+	Image           string  `json:"image"`
+	Thumbnail       string  `json:"thumbnail"`
+	ContractAddress *string `json:"contractAddress,omitempty"`
+	Items           []*Item `json:"items"`
 }
 
 type CollectionInput struct {

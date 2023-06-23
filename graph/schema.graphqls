@@ -123,6 +123,7 @@ type Collection {
 	description: String!
 	image: String!
 	thumbnail: String!
+  contractAddress: String
   items: [Item!]! @goField(forceResolver: true)
 }
 
