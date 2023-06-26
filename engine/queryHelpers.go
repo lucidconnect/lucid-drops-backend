@@ -157,13 +157,14 @@ func FetchTwitterAuthByID(authID string) (*models.TwitterAuthDetails, error) {
 }
 
 func FetchTelegramCriteriaByLink(channelLink string) (*models.TelegramCriteria, error) {
-	var telegramCriteria models.TelegramCriteria
-	err := utils.DB.Where("channel_link=?", channelLink).First(&telegramCriteria).Error
+	var criteria models.TelegramCriteria
+
+	err := utils.DB.Where("channel_link=?", channelLink).First(&criteria).Error
 	if err != nil {
 		return nil, errors.New("telegram criteria not found")
 	}
 
-	return &telegramCriteria, nil
+	return &criteria, nil
 }
 
 func CreateModel(newModel interface{}) error {
