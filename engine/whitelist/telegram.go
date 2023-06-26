@@ -34,3 +34,17 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 
 	return item.ToGraphData(), nil
 }
+
+func ValidateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *internal.AuthDetails) (bool, error) {
+
+	item, err := engine.GetItemByID(input.ItemID)
+	if err != nil {
+		return false, errors.New("item not found")
+	}
+
+	if item.TelegramCriteria != nil {
+		return false, errors.New("item does not have a telegram criteria")
+	}
+
+	return item.TelegramCriteria.BotAdded, nil
+}

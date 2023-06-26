@@ -56,6 +56,21 @@ func FetchTweetRetweets(tweetID string, nextToken *string) (*structure.TweetRetw
 	return &response, nil
 }
 
+func FetchTwitterFollowers(profileID string, nextToken *string) (*structure.TwitterFollowersResponse, error) {
+	endpoint := fmt.Sprintf("users/%s/followers", profileID)
+	if nextToken != nil {
+		endpoint = fmt.Sprintf("%s?pagination_token=%s", endpoint, *nextToken)
+	}
+
+	var response structure.TwitterFollowersResponse
+	err := executeTwitterRequest("GET", endpoint, nil, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
 func FetchTweetDetails(link string) (*model.TweetDetails, error) {
 
 	id, err := StripTweetIDFromLink(link)

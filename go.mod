@@ -32,6 +32,7 @@ require (
 	github.com/gaukas/godicttls v0.0.3 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
+	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1 // indirect
 	github.com/gobuffalo/envy v1.10.2 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/pprof v0.0.0-20230602150820-91b7bce49751 // indirect

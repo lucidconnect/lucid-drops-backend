@@ -139,6 +139,12 @@ func validateTwitterAuthWithCriteria(auth *models.TwitterAuthDetails, criteria *
 
 	}
 
+	if criteria.CriteriaType == model.ClaimCriteriaTypeTwitterFollowers {
+		if !validateFollowerCriteria(auth, criteria) {
+			return false, errors.New("twitter account does not meet the follower criteria")
+		}
+	}
+
 	auth.WhiteListed = true
 	auth.ItemID = &criteria.ItemID
 	err := engine.SaveModel(auth)
@@ -238,3 +244,31 @@ func validateLikeCriteria(auth *models.TwitterAuthDetails, criteria *models.Twit
 
 	return false
 }
+
+func validateFollowerCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) bool {
+	
+	var followers *structure.TwitterFollowersResponse
+	var err error
+	followers, err = services.FetchTwitterFollowers(criteria.ProfileLink, nil)
+	if err != nil {
+		return false
+	}
+
+	for followers.Meta.NextToken != "" {
+
+		for _, x := range followers.Data {
+
+			if x.ID == auth.UserID {
+				return true
+			}
+		}
+
+		followers, err = services.FetchTwitterFollowers(criteria.ProfileLink, &followers.Meta.NextToken)
+		if err != nil {
+			return false
+		}
+	}
+
+	return false
+}
+

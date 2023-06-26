@@ -26,6 +26,19 @@ type TweetRetweetsResponse struct {
 	} `json:"meta"`
 }
 
+type TwitterFollowersResponse struct {
+	Data []struct {
+		ID       string `json:"id"`
+		Name     string `json:"name"`
+		Username string `json:"username"`
+	} `json:"data"`
+	Meta struct {
+		ResultCount int    `json:"result_count"`
+		NextToken   string `json:"next_token"`
+	} `json:"meta"`
+}
+
+
 type UserDetailsResponse struct {
 	Data struct{
 		ID string `json:"id"`
