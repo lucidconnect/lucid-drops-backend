@@ -35,6 +35,7 @@ type Mutation {
   createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
   createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
   validateTwitterCriteriaForItem(itemID: String!, authID: String): Boolean!
+  validateTelegramCriteriaForItem(itemID: String!, authID: String): Boolean!
 
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
@@ -109,7 +110,7 @@ input NewTwitterCriteriaInput {
 
 input NewTelegramCriteriaInput {
 	itemID: String!
-	channelLink: String!
+  groupID: String!
 }
 
 input SignerInfo {

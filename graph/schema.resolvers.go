@@ -134,6 +134,15 @@ func (r *mutationResolver) ValidateTwitterCriteriaForItem(ctx context.Context, i
 	return whitelist.ValidateTwitterCriteriaForItem(itemID, *authID)
 }
 
+// ValidateTelegramCriteriaForItem is the resolver for the validateTelegramCriteriaForItem field.
+func (r *mutationResolver) ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error) {
+	if authID == nil {
+		return false, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+	}
+
+	return whitelist.ValidateTelegramClaimCriteria(itemID, *authID)
+}
+
 // StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.
 func (r *mutationResolver) StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error) {
 	return whitelist.StartEmailVerificationForClaim(&input)

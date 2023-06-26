@@ -100,8 +100,8 @@ type NewEmailWhitelistInput struct {
 }
 
 type NewTelegramCriteriaInput struct {
-	ItemID      string `json:"itemID"`
-	ChannelLink string `json:"channelLink"`
+	ItemID  string `json:"itemID"`
+	GroupID string `json:"groupID"`
 }
 
 type NewTwitterCriteriaInput struct {
