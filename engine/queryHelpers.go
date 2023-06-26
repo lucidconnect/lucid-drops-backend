@@ -58,7 +58,7 @@ func GetCollectionByID(collectionID string) (*models.Collection, error) {
 func GetItemByID(itemID string) (*models.Item, error) {
 	var item models.Item
 
-	err := utils.DB.Preload(utils.GetRelationalName(clause.Associations)).Where("id=?", itemID).First(&item).Error
+	err := utils.DB.Preload(clause.Associations).Where("id=?", itemID).First(&item).Error
 	if err != nil {
 		return nil, errors.New("item not found")
 	}
@@ -154,6 +154,17 @@ func FetchTwitterAuthByID(authID string) (*models.TwitterAuthDetails, error) {
 	}
 
 	return &twitterAuth, nil
+}
+
+func FetchTelegramAuthByID(authID string) (*models.TelegramAuthDetails, error) {
+
+	var telegramAuth models.TelegramAuthDetails
+	err := utils.DB.Where("id=?", authID).First(&telegramAuth).Error
+	if err != nil {
+		return nil, errors.New("twitter auth not found")
+	}
+
+	return &telegramAuth, nil
 }
 
 func FetchTelegramCriteriaByLink(channelLink string) (*models.TelegramCriteria, error) {

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -10,41 +11,44 @@ import (
 	"inverse.so/engine"
 )
 
-func initTelegramBot() *telegrambot.BotAPI {
+type BotImplementation struct {
+	localBot *telegrambot.BotAPI
+}
+
+func InitTelegramBot() *BotImplementation {
 	bot, err := telegrambot.NewBotAPI(os.Getenv("TELEGRAM_BOT_TOKEN"))
 	if err != nil {
 		log.Print(err)
 	}
 
 	bot.Debug = true
-	return bot
+	loc := &BotImplementation{
+		localBot: bot,
+	}
+
+	go loc.getTelegramUpdates()
+	return loc
 }
 
-func getTelegramUpdates(bot *telegrambot.BotAPI) {
+func (bot *BotImplementation) getTelegramUpdates() {
 	u := telegrambot.NewUpdate(0)
 	u.Timeout = 60
-	u.AllowedUpdates = []string{"chat_member"}
+	// u.AllowedUpdates = []string{"chat_member"}
 
-	updates := bot.GetUpdatesChan(u)
+	updates := bot.localBot.GetUpdatesChan(u)
 	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-
-		go processTelegramUpdates(bot, &update)
+		bot.processTelegramUpdates(&update)
 	}
 }
 
-func processTelegramUpdates(bot *telegrambot.BotAPI, update *telegrambot.Update) {
+func (bot *BotImplementation) processTelegramUpdates(update *telegrambot.Update) {
 
-	var updateBool bool
-	switch updateBool {
-	case isNewMember(update):
-		processNewMemberEvent(bot, update)
+	if isGetID(update) {
+		bot.sendTelegramMessage(update.Message.Chat.ID, fmt.Sprintf("ID is %d", update.Message.Chat.ID))
 	}
 }
 
-func processNewMemberEvent(bot *telegrambot.BotAPI, update *telegrambot.Update) {
+func (bot *BotImplementation) processNewMemberEvent(update *telegrambot.Update) {
 
 	config := telegrambot.ChatInviteLinkConfig{
 		ChatConfig: telegrambot.ChatConfig{
@@ -53,7 +57,7 @@ func processNewMemberEvent(bot *telegrambot.BotAPI, update *telegrambot.Update) 
 		},
 	}
 
-	link, err := bot.GetInviteLink(config)
+	link, err := bot.localBot.GetInviteLink(config)
 	if err != nil {
 		log.Print(err)
 		return
@@ -65,8 +69,8 @@ func processNewMemberEvent(bot *telegrambot.BotAPI, update *telegrambot.Update) 
 		return
 	}
 
-	criteria.ChannelID = getChatID(update.Message)
-	criteria.BotAdded = true
+	criteria.GroupID = getChatID(update.Message)
+	// criteria.BotAdded = true
 
 	err = engine.SaveModel(criteria)
 	if err != nil {
@@ -77,7 +81,20 @@ func processNewMemberEvent(bot *telegrambot.BotAPI, update *telegrambot.Update) 
 
 func isNewMember(update *telegrambot.Update) bool {
 	botID, _ := strconv.Atoi(os.Getenv("TELEGRAM_BOT_ID"))
-	return update.ChatMember.NewChatMember.User.ID == int64(botID)
+
+	if update.ChatMember != nil {
+		return update.ChatMember.NewChatMember.User.ID == int64(botID)
+	}
+
+	return false
+}
+
+func isGetID(update *telegrambot.Update) bool {
+	if update.Message != nil && update.Message.Chat != nil {
+		return update.Message.Text == "/id"
+	}
+
+	return false
 }
 
 func isValidVerificationMessage(update *telegrambot.Update) bool {
@@ -93,17 +110,33 @@ func isValidVerificationMessage(update *telegrambot.Update) bool {
 	return false
 }
 
-func sendTelegramMessage(chatID int64, message string) error {
+func (bot *BotImplementation) sendTelegramMessage(chatID int64, message string) error {
 
-	bot := initTelegramBot()
 	msg := telegrambot.NewMessage(chatID, message)
-	_, err := bot.Send(msg)
+	_, err := bot.localBot.Send(msg)
 	if err != nil {
 		log.Print(err)
 		return err
 	}
 
 	return nil
+}
+
+func (bot *BotImplementation) GetTelegramGroupUser(chatID, userID int64) (*telegrambot.ChatMember, error) {
+
+	memberConfig := telegrambot.GetChatMemberConfig{
+		ChatConfigWithUser: telegrambot.ChatConfigWithUser{
+			ChatID: chatID,
+			UserID: userID,
+		},
+	}
+
+	member, err := bot.localBot.GetChatMember(memberConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	return &member, nil
 }
 
 func getChatID(m *telegrambot.Message) int64 {

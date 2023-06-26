@@ -11,13 +11,17 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog/log"
+	"inverse.so/engine/whitelist"
 	"inverse.so/graph"
 	"inverse.so/internal"
 	"inverse.so/route"
+	"inverse.so/services"
 	"inverse.so/utils"
 )
 
-const defaultPort = "8080"
+const (
+	defaultPort = "8080"
+)
 
 func main() {
 	utils.SetUpDefaultLogger()
@@ -50,6 +54,7 @@ func main() {
 	router.Handle("/health", http.HandlerFunc(route.HealthCheckHandler))
 	router.Handle("/query", srv)
 	router.Handle("/twitter01/callback/", http.HandlerFunc(route.TwitterCallBack))
+	router.Handle("/telegram/callback/", http.HandlerFunc(route.TelegramCallBack))
 
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
 
@@ -58,6 +63,7 @@ func main() {
 		Handler: router,
 	}
 
+	go createTelegramBotInstance()
 	log.Err(httpServer.ListenAndServe())
 }
 
@@ -76,4 +82,8 @@ func loadCORS(router *chi.Mux) {
 			AllowCredentials: false,
 		}).Handler)
 	}
+}
+
+func createTelegramBotInstance() {
+	whitelist.InverseBot = services.InitTelegramBot()
 }

@@ -2,12 +2,16 @@ package whitelist
 
 import (
 	"errors"
+	"strconv"
 
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/models"
+	"inverse.so/services"
 )
+
+var InverseBot *services.BotImplementation
 
 func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 
@@ -21,10 +25,15 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 		return nil, errors.New("item not found")
 	}
 
+	if input.GroupID[0] != '-' {
+		input.GroupID = "-" + input.GroupID
+	}
+
+	groupIDToInt, _ := strconv.Atoi(input.GroupID)
 	criteria := &models.TelegramCriteria{
-		ItemID:      item.ID.String(),
-		CreatorID:   creator.ID.String(),
-		ChannelLink: input.ChannelLink,
+		ItemID:    item.ID.String(),
+		CreatorID: creator.ID.String(),
+		GroupID:   int64(groupIDToInt),
 	}
 
 	criteriaUpdateErr := engine.SaveModel(criteria)
@@ -35,9 +44,9 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 	return item.ToGraphData(), nil
 }
 
-func ValidateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *internal.AuthDetails) (bool, error) {
+func ValidateTelegramClaimCriteria(itemID, authID string) (bool, error) {
 
-	item, err := engine.GetItemByID(input.ItemID)
+	item, err := engine.GetItemByID(itemID)
 	if err != nil {
 		return false, errors.New("item not found")
 	}
@@ -46,5 +55,38 @@ func ValidateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails 
 		return false, errors.New("item does not have a telegram criteria")
 	}
 
-	return item.TelegramCriteria.BotAdded, nil
+	auth, err := engine.FetchTwitterAuthByID(authID)
+	if err != nil {
+		return false, errors.New("telegram account not authorized")
+	}
+
+	IdToInt, _ := strconv.Atoi(auth.UserID)
+	member, err := InverseBot.GetTelegramGroupUser(item.TelegramCriteria.GroupID, int64(IdToInt))
+	if err != nil {
+		return false, errors.New("telegram account not authorized")
+	}
+
+	if member.User.IsBot {
+		return false, errors.New("telegram account cannot be a bot")
+	}
+
+	return member.IsMember, nil
+}
+
+func ProcessTelegramCallBack(id, username, hash, photoURL string) (*string, error) {
+
+	telegramInfo := &models.TelegramAuthDetails{
+		UserID:   id,
+		Username: username,
+		Hash:     hash,
+		PhotoURL: photoURL,
+	}
+
+	telegramInfoUpdateErr := engine.SaveModel(telegramInfo)
+	if telegramInfoUpdateErr != nil {
+		return nil, telegramInfoUpdateErr
+	}
+
+	ID := telegramInfo.ID.String()
+	return &ID, nil
 }
