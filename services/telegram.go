@@ -43,7 +43,7 @@ func (bot *BotImplementation) getTelegramUpdates() {
 
 func (bot *BotImplementation) processTelegramUpdates(update *telegrambot.Update) {
 
-	if isGetID(update) {
+	if isGetID(update, bot.localBot) {
 		bot.sendTelegramMessage(update.Message.Chat.ID, fmt.Sprintf("ID is %d", update.Message.Chat.ID))
 	}
 }
@@ -89,9 +89,9 @@ func isNewMember(update *telegrambot.Update) bool {
 	return false
 }
 
-func isGetID(update *telegrambot.Update) bool {
+func isGetID(update *telegrambot.Update, localBot *telegrambot.BotAPI) bool {
 	if update.Message != nil && update.Message.Chat != nil {
-		return update.Message.Text == "/id"
+		return update.Message.Text == fmt.Sprintf("@%s /id", localBot.Self.UserName)
 	}
 
 	return false
