@@ -7,6 +7,7 @@ require (
 	github.com/agnivade/levenshtein v1.1.1
 	github.com/ethereum/go-ethereum v1.12.0
 	github.com/go-chi/chi v1.5.4
+	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	github.com/imroc/req/v3 v3.37.0
 	github.com/joho/godotenv v1.5.1
 	github.com/machinebox/graphql v0.2.2
@@ -32,7 +33,6 @@ require (
 	github.com/gaukas/godicttls v0.0.3 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
-	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1 // indirect
 	github.com/gobuffalo/envy v1.10.2 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/pprof v0.0.0-20230602150820-91b7bce49751 // indirect

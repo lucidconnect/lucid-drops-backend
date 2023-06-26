@@ -106,7 +106,7 @@ type NewTelegramCriteriaInput struct {
 
 type NewTwitterCriteriaInput struct {
 	ItemID       string             `json:"itemID"`
-	ProfileLink  *string            `json:"profileLink,omitempty"`
+	ProfileID    *string            `json:"profileID,omitempty"`
 	TweetLink    *string            `json:"tweetLink,omitempty"`
 	Interaction  []*InteractionType `json:"interaction,omitempty"`
 	CriteriaType ClaimCriteriaType  `json:"criteriaType"`

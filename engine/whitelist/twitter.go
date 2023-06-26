@@ -43,9 +43,9 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 		tweetLink = *input.TweetLink
 	}
 
-	var profileLink string
-	if input.ProfileLink != nil {
-		profileLink = *input.ProfileLink
+	var profileID string
+	if input.ProfileID != nil {
+		profileID = *input.ProfileID
 	}
 
 	var date string
@@ -56,7 +56,7 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 	criteria := &models.TwitterCriteria{
 		ItemID:       item.ID.String(),
 		CreatorID:    creator.ID.String(),
-		ProfileLink:  profileLink,
+		ProfileID:    profileID,
 		TweetLink:    tweetLink,
 		TweetID:      *tweetID,
 		CriteriaType: input.CriteriaType,
@@ -246,10 +246,10 @@ func validateLikeCriteria(auth *models.TwitterAuthDetails, criteria *models.Twit
 }
 
 func validateFollowerCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) bool {
-	
+
 	var followers *structure.TwitterFollowersResponse
 	var err error
-	followers, err = services.FetchTwitterFollowers(criteria.ProfileLink, nil)
+	followers, err = services.FetchTwitterFollowers(criteria.ProfileID, nil)
 	if err != nil {
 		return false
 	}
@@ -271,4 +271,3 @@ func validateFollowerCriteria(auth *models.TwitterAuthDetails, criteria *models.
 
 	return false
 }
-

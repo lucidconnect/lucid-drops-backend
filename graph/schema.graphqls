@@ -97,7 +97,7 @@ input ItemInput {
 
 input NewTwitterCriteriaInput {
 	itemID: String!
-	profileLink: String
+	profileID: String
 	tweetLink: String
 	interaction: [InteractionType]
   criteriaType: ClaimCriteriaType!
