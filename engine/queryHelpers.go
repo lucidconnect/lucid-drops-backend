@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm/clause"
 	"inverse.so/models"
 	"inverse.so/utils"
 )
@@ -57,7 +58,7 @@ func GetCollectionByID(collectionID string) (*models.Collection, error) {
 func GetItemByID(itemID string) (*models.Item, error) {
 	var item models.Item
 
-	err := utils.DB.Preload(utils.GetRelationalName(models.TwitterCriteria{})).Where("id=?", itemID).First(&item).Error
+	err := utils.DB.Preload(utils.GetRelationalName(clause.Associations)).Where("id=?", itemID).First(&item).Error
 	if err != nil {
 		return nil, errors.New("item not found")
 	}
@@ -145,7 +146,7 @@ func GetEmailOTPRecordByID(recordID string) (*models.EmailOTP, error) {
 }
 
 func FetchTwitterAuthByID(authID string) (*models.TwitterAuthDetails, error) {
-	
+
 	var twitterAuth models.TwitterAuthDetails
 	err := utils.DB.Where("id=?", authID).First(&twitterAuth).Error
 	if err != nil {
@@ -153,6 +154,17 @@ func FetchTwitterAuthByID(authID string) (*models.TwitterAuthDetails, error) {
 	}
 
 	return &twitterAuth, nil
+}
+
+func FetchTelegramCriteriaByLink(channelLink string) (*models.TelegramCriteria, error) {
+	var criteria models.TelegramCriteria
+
+	err := utils.DB.Where("channel_link=?", channelLink).First(&criteria).Error
+	if err != nil {
+		return nil, errors.New("telegram criteria not found")
+	}
+
+	return &criteria, nil
 }
 
 func CreateModel(newModel interface{}) error {
