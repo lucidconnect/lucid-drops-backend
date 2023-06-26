@@ -47,7 +47,6 @@ type UserDetailsResponse struct {
 	}
 }
 
-
 type TweetResponse struct {
 	Data struct {
 		ThreadedConversationWithInjectionsV2 struct {
