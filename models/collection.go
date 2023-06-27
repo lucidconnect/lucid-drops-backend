@@ -41,7 +41,7 @@ type DeplyomenResponse struct {
 
 func (c *Collection) AfterCreate(tx *gorm.DB) (err error) {
 	go func() {
-		inverseNFTDeploymentServerURL := utils.UseEnvOrDefault("INVERSE_DEPLOYMENT_SERVER", "http://localhost:9090/deploy")
+		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "https://inverse-aa.onrender.com")
 
 		client := &http.Client{}
 
@@ -51,7 +51,7 @@ func (c *Collection) AfterCreate(tx *gorm.DB) (err error) {
 			return
 		}
 
-		req, err := http.NewRequest(http.MethodPost, inverseNFTDeploymentServerURL, bytes.NewBuffer(collectionData))
+		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/deploy", bytes.NewBuffer(collectionData))
 		if err != nil {
 			fmt.Println(err)
 			return

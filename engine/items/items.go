@@ -1,12 +1,18 @@
 package items
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
+	"net/http"
 
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/models"
+	"inverse.so/utils"
 )
 
 func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {
@@ -39,6 +45,43 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 	if err != nil {
 		return nil, errors.New("couldn't create new collection")
 	}
+
+	go func() {
+		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "http://localhost:9090")
+		inverseAPIBaseURL := utils.UseEnvOrDefault("INVERSE_API_BASEURL", "https://inverse-backend.onrender.com")
+
+		client := &http.Client{}
+
+		if collection.ContractAddress == nil {
+			log.Println("🪼TODO ADD SUPPORT FOR QUEING")
+			return
+		}
+
+		itemData, err := json.Marshal(map[string]string{
+			"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *collection.ContractAddress, newItem.ID.String()),
+			"contractAddress": *collection.ContractAddress,
+		})
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/additem", bytes.NewBuffer(itemData))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		req.Header.Add("Content-Type", "application/json")
+		res, err := client.Do(req)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		defer res.Body.Close()
+	}()
 
 	return newItem.ToGraphData(), nil
 }
