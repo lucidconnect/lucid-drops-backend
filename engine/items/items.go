@@ -47,7 +47,7 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 	}
 
 	go func() {
-		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "http://localhost:9090")
+		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "https://inverse-aa.onrender.com")
 		inverseAPIBaseURL := utils.UseEnvOrDefault("INVERSE_API_BASEURL", "https://inverse-backend.onrender.com")
 
 		client := &http.Client{}

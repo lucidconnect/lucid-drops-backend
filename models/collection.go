@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 	"inverse.so/graph/model"
@@ -25,14 +26,10 @@ type Collection struct {
 }
 
 type DeplyomenResponse struct {
-	Type    int    `json:"type"`
-	ChainID int    `json:"chainId"`
-	Nonce   int    `json:"nonce"`
-	To      string `json:"to"`
-	Value   struct {
-		Type string `json:"type"`
-		Hex  string `json:"hex"`
-	} `json:"value"`
+	Type          int    `json:"type"`
+	ChainID       int    `json:"chainId"`
+	Nonce         int    `json:"nonce"`
+	To            string `json:"to"`
 	Data          string `json:"data"`
 	Hash          string `json:"hash"`
 	From          string `json:"from"`
@@ -50,6 +47,8 @@ func (c *Collection) AfterCreate(tx *gorm.DB) (err error) {
 			fmt.Println(err)
 			return
 		}
+
+		log.Info().Msgf("🪼 Sending Request to AA server at %s and Data : %s", inverseAAServerURL, utils.AsJson(collectionData))
 
 		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/deploy", bytes.NewBuffer(collectionData))
 		if err != nil {
