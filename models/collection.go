@@ -10,10 +10,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 	"inverse.so/graph/model"
-)
-
-const (
-	inverseNFTDeploymentServerURL = "http://localhost:9090/deploy"
+	"inverse.so/utils"
 )
 
 type Collection struct {
@@ -44,6 +41,8 @@ type DeplyomenResponse struct {
 
 func (c *Collection) AfterCreate(tx *gorm.DB) (err error) {
 	go func() {
+		inverseNFTDeploymentServerURL := utils.UseEnvOrDefault("INVERSE_DEPLOYMENT_SERVER", "http://localhost:9090/deploy")
+
 		client := &http.Client{}
 
 		collectionData, err := json.Marshal(c)
