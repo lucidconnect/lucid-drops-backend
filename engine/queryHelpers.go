@@ -11,6 +11,28 @@ import (
 	"inverse.so/utils"
 )
 
+func AttachContractAddressForCreationHash(transactionHash, contractAddress string) error {
+	collection, err := GetCollectionByDeploymentHash(transactionHash)
+	if err != nil {
+		return err
+	}
+
+	collection.ContractAddress = utils.GetStrPtr(contractAddress)
+
+	return SaveModel(collection)
+}
+
+func GetCollectionByDeploymentHash(deploymentHash string) (*models.Collection, error) {
+	var collection models.Collection
+
+	err := utils.DB.Where("transaction_hash=?", deploymentHash).First(&collection).Error
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	return &collection, nil
+}
+
 func GetCreatorByID(creatorID string) (*models.Creator, error) {
 	var creator models.Creator
 
