@@ -69,7 +69,7 @@ func SubscribeToInverseContractDeployments() {
 			deployedContractAddress := creationEvent.NFTAddress
 
 			engine.AttachContractAddressForCreationHash(vLog.TxHash.String(), deployedContractAddress.String())
-			log.Printf("🔖 (%s) Contract Deployed %s", vLog.TxHash, deployedContractAddress)
+			log.Info().Msgf("🔖 (%s) Contract Deployed %s", vLog.TxHash, deployedContractAddress)
 		}
 	}
 }
