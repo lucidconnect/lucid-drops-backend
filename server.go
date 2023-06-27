@@ -66,7 +66,7 @@ func main() {
 		Handler: router,
 	}
 
-	go createTelegramBotInstance()
+	// go createTelegramBotInstance()
 	go addresswatcher.SubscribeToInverseContractDeployments()
 	log.Err(httpServer.ListenAndServe())
 }
