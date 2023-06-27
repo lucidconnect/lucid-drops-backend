@@ -12,6 +12,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/rs/zerolog/log"
 	"inverse.so/addresswatcher"
+	"inverse.so/dbutils"
 	"inverse.so/engine/whitelist"
 	"inverse.so/graph"
 	"inverse.so/internal"
@@ -39,7 +40,7 @@ func main() {
 		log.Fatal().Msg("DATABASE_URL not set")
 	}
 
-	utils.SetupDB(dsn)
+	dbutils.SetupDB(dsn)
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
 	srv.AddTransport(transport.GET{})
