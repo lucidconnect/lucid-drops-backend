@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/models"
@@ -19,7 +20,7 @@ func RegisterInverseUsername(address string, input *model.NewUsernameRegisgratio
 	cachedCreator, err := engine.GetCreatorByAddress(address)
 	if err != nil {
 		newCreator := models.Creator{WalletAddress: address, InverseUsername: utils.GetStringPtr(input.InverseUsername)}
-		creationErr := utils.DB.Create(&newCreator).Error
+		creationErr := dbutils.DB.Create(&newCreator).Error
 		if creationErr != nil {
 			return nil, creationErr
 		}
@@ -31,7 +32,7 @@ func RegisterInverseUsername(address string, input *model.NewUsernameRegisgratio
 	}
 
 	cachedCreator.InverseUsername = utils.GetStringPtr(input.InverseUsername)
-	creationErr := utils.DB.Save(&cachedCreator).Error
+	creationErr := dbutils.DB.Save(&cachedCreator).Error
 	if creationErr != nil {
 		return nil, creationErr
 	}
