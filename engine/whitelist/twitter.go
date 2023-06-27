@@ -61,6 +61,7 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 		TweetID:      *tweetID,
 		CriteriaType: input.CriteriaType,
 		Interactions: interactions,
+		AuthID:       input.TwitterAuthID,
 		CutOffDate:   date,
 	}
 

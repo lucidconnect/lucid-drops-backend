@@ -6864,7 +6864,7 @@ func (ec *executionContext) unmarshalInputNewTwitterCriteriaInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"itemID", "profileID", "tweetLink", "interaction", "criteriaType", "cutOffDate"}
+	fieldsInOrder := [...]string{"itemID", "profileID", "tweetLink", "interaction", "criteriaType", "twitterAuthID", "cutOffDate"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6916,6 +6916,15 @@ func (ec *executionContext) unmarshalInputNewTwitterCriteriaInput(ctx context.Co
 				return it, err
 			}
 			it.CriteriaType = data
+		case "twitterAuthID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("twitterAuthID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TwitterAuthID = data
 		case "cutOffDate":
 			var err error
 

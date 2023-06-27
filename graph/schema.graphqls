@@ -102,6 +102,7 @@ input NewTwitterCriteriaInput {
 	tweetLink: String
 	interaction: [InteractionType]
   criteriaType: ClaimCriteriaType!
+  twitterAuthID: String!
   """
   Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
   """

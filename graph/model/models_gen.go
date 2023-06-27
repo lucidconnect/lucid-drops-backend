@@ -105,11 +105,12 @@ type NewTelegramCriteriaInput struct {
 }
 
 type NewTwitterCriteriaInput struct {
-	ItemID       string             `json:"itemID"`
-	ProfileID    *string            `json:"profileID,omitempty"`
-	TweetLink    *string            `json:"tweetLink,omitempty"`
-	Interaction  []*InteractionType `json:"interaction,omitempty"`
-	CriteriaType ClaimCriteriaType  `json:"criteriaType"`
+	ItemID        string             `json:"itemID"`
+	ProfileID     *string            `json:"profileID,omitempty"`
+	TweetLink     *string            `json:"tweetLink,omitempty"`
+	Interaction   []*InteractionType `json:"interaction,omitempty"`
+	CriteriaType  ClaimCriteriaType  `json:"criteriaType"`
+	TwitterAuthID string             `json:"twitterAuthID"`
 	// Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
 	CutOffDate *string `json:"cutOffDate,omitempty"`
 }

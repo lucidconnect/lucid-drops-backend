@@ -10,6 +10,7 @@ type TwitterCriteria struct {
 	ProfileID    string                  `gorm:"column:profile_id"`
 	TweetLink    string                  `gorm:"column:tweet_link"`
 	TweetID      string                  `gorm:"column:tweet_id"`
+	AuthID       string                  `gorm:"column:auth_id"`
 	CriteriaType model.ClaimCriteriaType `gorm:"column:criteria_type"`
 	Interactions string                  `gorm:"column:interaction"`
 	CutOffDate   string                  `gorm:"column:cutoff_date"`
