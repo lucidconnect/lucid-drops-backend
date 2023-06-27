@@ -55,6 +55,7 @@ func main() {
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/health", http.HandlerFunc(route.HealthCheckHandler))
 	router.Handle("/query", srv)
+	router.Handle("/metadata/{contract}/{itemid}", http.HandlerFunc(route.MetadataHandler))
 	router.Handle("/twitter01/callback/", http.HandlerFunc(route.TwitterCallBack))
 	router.Handle("/telegram/callback/", http.HandlerFunc(route.TelegramCallBack))
 

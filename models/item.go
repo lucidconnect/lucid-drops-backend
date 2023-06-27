@@ -5,6 +5,7 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 	"inverse.so/graph/model"
+	"inverse.so/utils"
 )
 
 type Item struct {
@@ -17,6 +18,25 @@ type Item struct {
 	TwitterCriteria      *TwitterCriteria  `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	TelegramCriteria     *TelegramCriteria `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	ShowEmailDomainHints bool              `gorm:"default:false"`
+}
+
+// Ref : https://docs.opensea.io/docs/metadata-standards
+type OpenSeaMetaDataFormat struct {
+	Name        string `json:"name"`
+	Image       string `json:"image"`
+	Description string `json:"description"`
+	ExternalUrl string `json:"external_url"`
+}
+
+func (i *Item) ToOpenSeaMetadata() *OpenSeaMetaDataFormat {
+	openSeaMetadata := &OpenSeaMetaDataFormat{
+		Name:        i.Name,
+		Image:       i.Image,
+		Description: i.Description,
+		ExternalUrl: utils.UseEnvOrDefault("CURRENT_BASE_URL", "https://localhost:8090"),
+	}
+
+	return openSeaMetadata
 }
 
 func (i *Item) ToGraphData() *model.Item {
