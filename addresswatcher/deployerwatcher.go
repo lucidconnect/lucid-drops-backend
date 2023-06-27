@@ -40,7 +40,7 @@ func SubscribeToInverseContractDeployments() {
 		log.Error().Msg(err.Error())
 	}
 
-	log.Info().Msg("🪼 Started Watcher")
+	log.Info().Msgf("🪼 Started watcher for (%s) Contract", inveseNFTFactoryAddress)
 
 	contractDeploymentHash := crypto.Keccak256Hash([]byte("TokenDeployed(address)"))
 
