@@ -7,14 +7,37 @@ import (
 
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm/clause"
+	"inverse.so/dbutils"
 	"inverse.so/models"
 	"inverse.so/utils"
 )
 
+func AttachContractAddressForCreationHash(transactionHash, contractAddress string) error {
+	collection, err := GetCollectionByDeploymentHash(transactionHash)
+	if err != nil {
+		return err
+	}
+
+	collection.ContractAddress = utils.GetStrPtr(contractAddress)
+
+	return SaveModel(collection)
+}
+
+func GetCollectionByDeploymentHash(deploymentHash string) (*models.Collection, error) {
+	var collection models.Collection
+
+	err := dbutils.DB.Where("transaction_hash=?", deploymentHash).First(&collection).Error
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	return &collection, nil
+}
+
 func GetCreatorByID(creatorID string) (*models.Creator, error) {
 	var creator models.Creator
 
-	err := utils.DB.Where("id=?", creatorID).First(&creator).Error
+	err := dbutils.DB.Where("id=?", creatorID).First(&creator).Error
 	if err != nil {
 		return nil, errors.New("crator not found")
 	}
@@ -25,7 +48,7 @@ func GetCreatorByID(creatorID string) (*models.Creator, error) {
 func GetCreatorByAddress(address string) (*models.Creator, error) {
 	var creator models.Creator
 
-	err := utils.DB.Where(&models.Creator{WalletAddress: address}).First(&creator).Error
+	err := dbutils.DB.Where(&models.Creator{WalletAddress: address}).First(&creator).Error
 	if err != nil {
 		return nil, errors.New("address not found")
 	}
@@ -36,7 +59,7 @@ func GetCreatorByAddress(address string) (*models.Creator, error) {
 func GetCreatorByInverseUsername(inverseUsername string) (*models.Creator, error) {
 	var creator models.Creator
 
-	err := utils.DB.Where(&models.Creator{InverseUsername: &inverseUsername}).First(&creator).Error
+	err := dbutils.DB.Where(&models.Creator{InverseUsername: &inverseUsername}).First(&creator).Error
 	if err != nil {
 		return nil, errors.New("username isn't being used")
 	}
@@ -47,7 +70,7 @@ func GetCreatorByInverseUsername(inverseUsername string) (*models.Creator, error
 func GetCollectionByID(collectionID string) (*models.Collection, error) {
 	var collection models.Collection
 
-	err := utils.DB.Where("id=?", collectionID).First(&collection).Error
+	err := dbutils.DB.Where("id=?", collectionID).First(&collection).Error
 	if err != nil {
 		return nil, errors.New("collection not found")
 	}
@@ -58,7 +81,7 @@ func GetCollectionByID(collectionID string) (*models.Collection, error) {
 func GetItemByID(itemID string) (*models.Item, error) {
 	var item models.Item
 
-	err := utils.DB.Preload(clause.Associations).Where("id=?", itemID).First(&item).Error
+	err := dbutils.DB.Preload(clause.Associations).Where("id=?", itemID).First(&item).Error
 	if err != nil {
 		return nil, errors.New("item not found")
 	}
@@ -74,7 +97,7 @@ func GetEmailClaimIDByItemAndEmailSubDomain(itemID *uuid.UUID, emailAddress stri
 
 	var claim models.SingleEmailClaim
 
-	err := utils.DB.Where(&models.EmailDomainWhiteList{
+	err := dbutils.DB.Where(&models.EmailDomainWhiteList{
 		ItemID:     *itemID,
 		BaseDomain: emailParts[1],
 	}).First(&claim).Error
@@ -89,7 +112,7 @@ func GetEmailClaimIDByItemAndEmailSubDomain(itemID *uuid.UUID, emailAddress stri
 func GetEmailClaimIDByItemAndEmail(itemID *uuid.UUID, claimingEmail string) (*models.SingleEmailClaim, error) {
 	var claim models.SingleEmailClaim
 
-	err := utils.DB.Where(&models.SingleEmailClaim{
+	err := dbutils.DB.Where(&models.SingleEmailClaim{
 		ItemID:       *itemID,
 		EmailAddress: claimingEmail,
 	}).First(&claim).Error
@@ -104,7 +127,7 @@ func GetEmailClaimIDByItemAndEmail(itemID *uuid.UUID, claimingEmail string) (*mo
 func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {
 	var collections []*models.Collection
 
-	err := utils.DB.Where("creator_id=?", creatorID).Find(&collections).Error
+	err := dbutils.DB.Where("creator_id=?", creatorID).Find(&collections).Error
 	if err != nil {
 		return nil, errors.New("collections not found")
 	}
@@ -115,7 +138,7 @@ func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {
 func GetCollectionItems(collectionID string) ([]*models.Item, error) {
 	var items []*models.Item
 
-	err := utils.DB.Where("collection_id=?", collectionID).Find(&items).Error
+	err := dbutils.DB.Where("collection_id=?", collectionID).Find(&items).Error
 	if err != nil {
 		return nil, errors.New("items not found")
 	}
@@ -126,7 +149,7 @@ func GetCollectionItems(collectionID string) ([]*models.Item, error) {
 func GetAuthorizedSubdomainsForItem(itemID string) ([]*models.EmailDomainWhiteList, error) {
 	var subDomains []*models.EmailDomainWhiteList
 
-	err := utils.DB.Where("item_id=?", itemID).Find(&subDomains).Error
+	err := dbutils.DB.Where("item_id=?", itemID).Find(&subDomains).Error
 	if err != nil {
 		return nil, errors.New("subdomains not found")
 	}
@@ -137,7 +160,7 @@ func GetAuthorizedSubdomainsForItem(itemID string) ([]*models.EmailDomainWhiteLi
 func GetEmailOTPRecordByID(recordID string) (*models.EmailOTP, error) {
 	var emailOTP models.EmailOTP
 
-	err := utils.DB.Where("id=?", recordID).First(&emailOTP).Error
+	err := dbutils.DB.Where("id=?", recordID).First(&emailOTP).Error
 	if err != nil {
 		return nil, errors.New("email verification not found")
 	}
@@ -148,7 +171,7 @@ func GetEmailOTPRecordByID(recordID string) (*models.EmailOTP, error) {
 func FetchTwitterAuthByID(authID string) (*models.TwitterAuthDetails, error) {
 
 	var twitterAuth models.TwitterAuthDetails
-	err := utils.DB.Where("id=?", authID).First(&twitterAuth).Error
+	err := dbutils.DB.Where("id=?", authID).First(&twitterAuth).Error
 	if err != nil {
 		return nil, errors.New("twitter auth not found")
 	}
@@ -159,7 +182,7 @@ func FetchTwitterAuthByID(authID string) (*models.TwitterAuthDetails, error) {
 func FetchTelegramAuthByID(authID string) (*models.TelegramAuthDetails, error) {
 
 	var telegramAuth models.TelegramAuthDetails
-	err := utils.DB.Where("id=?", authID).First(&telegramAuth).Error
+	err := dbutils.DB.Where("id=?", authID).First(&telegramAuth).Error
 	if err != nil {
 		return nil, errors.New("twitter auth not found")
 	}
@@ -170,7 +193,7 @@ func FetchTelegramAuthByID(authID string) (*models.TelegramAuthDetails, error) {
 func FetchTelegramCriteriaByLink(channelLink string) (*models.TelegramCriteria, error) {
 	var criteria models.TelegramCriteria
 
-	err := utils.DB.Where("channel_link=?", channelLink).First(&criteria).Error
+	err := dbutils.DB.Where("channel_link=?", channelLink).First(&criteria).Error
 	if err != nil {
 		return nil, errors.New("telegram criteria not found")
 	}
@@ -179,9 +202,9 @@ func FetchTelegramCriteriaByLink(channelLink string) (*models.TelegramCriteria, 
 }
 
 func CreateModel(newModel interface{}) error {
-	return utils.DB.Create(newModel).Error
+	return dbutils.DB.Create(newModel).Error
 }
 
 func SaveModel(model interface{}) error {
-	return utils.DB.Save(model).Error
+	return dbutils.DB.Save(model).Error
 }

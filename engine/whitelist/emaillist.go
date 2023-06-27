@@ -4,11 +4,11 @@ import (
 	"errors"
 
 	"gorm.io/gorm/clause"
+	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/models"
-	"inverse.so/utils"
 )
 
 func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetails *internal.AuthDetails) (*model.Item, error) {
@@ -35,7 +35,7 @@ func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetail
 		}
 	}
 
-	insertionErr := utils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbEmails, 100).Error
+	insertionErr := dbutils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbEmails, 100).Error
 	if insertionErr != nil {
 		return nil, insertionErr
 	}

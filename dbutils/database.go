@@ -1,4 +1,4 @@
-package utils
+package dbutils
 
 import (
 	"time"
@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"inverse.so/models"
+	"inverse.so/utils"
 )
 
 var DB *gorm.DB
@@ -17,7 +18,7 @@ func initialiseDB(dsn string) {
 
 	log.Debug().Msgf("Initialising Database...")
 
-	isProd, _ := IsProduction()
+	isProd, _ := utils.IsProduction()
 	ormConfig := &gorm.Config{
 		PrepareStmt: false,
 	}
