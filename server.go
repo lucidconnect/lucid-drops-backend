@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog/log"
+	"inverse.so/addresswatcher"
 	"inverse.so/engine/whitelist"
 	"inverse.so/graph"
 	"inverse.so/internal"
@@ -64,6 +65,7 @@ func main() {
 	}
 
 	go createTelegramBotInstance()
+	go addresswatcher.SubscribeToInverseContractDeployments()
 	log.Err(httpServer.ListenAndServe())
 }
 
