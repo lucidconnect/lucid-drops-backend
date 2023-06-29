@@ -91,7 +91,7 @@ func isNewMember(update *telegrambot.Update) bool {
 
 func isGetID(update *telegrambot.Update, localBot *telegrambot.BotAPI) bool {
 	if update.Message != nil && update.Message.Chat != nil {
-		return update.Message.Text == fmt.Sprintf("@%s /id", localBot.Self.UserName)
+		return strings.EqualFold(update.Message.Text, fmt.Sprintf("@%s getid", localBot.Self.UserName))
 	}
 
 	return false
