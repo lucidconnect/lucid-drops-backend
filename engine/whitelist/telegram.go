@@ -55,7 +55,7 @@ func ValidateTelegramClaimCriteria(itemID, authID string) (bool, error) {
 		return false, errors.New("item does not have a telegram criteria")
 	}
 
-	auth, err := engine.FetchTwitterAuthByID(authID)
+	auth, err := engine.FetchTelegramAuthByID(authID)
 	if err != nil {
 		return false, errors.New("telegram account not authorized")
 	}
