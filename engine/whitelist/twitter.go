@@ -1,6 +1,7 @@
 package whitelist
 
 import (
+	"encoding/json"
 	"errors"
 	"strings"
 
@@ -28,18 +29,18 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 		return nil, errors.New("item already has a twitter criteria")
 	}
 
-	tweetID, err := services.StripTweetIDFromLink(*input.TweetLink)
-	if err != nil {
-		return nil, errors.New("invalid tweet link")
-	}
-
 	var interactions string
 	for i := range input.Interaction {
 		interactions += string(*input.Interaction[i]) + ","
 	}
 
 	var tweetLink string
+	var tweetID *string
 	if input.TweetLink != nil {
+		tweetID, err = services.StripTweetIDFromLink(*input.TweetLink)
+		if err != nil {
+			return nil, errors.New("invalid tweet link")
+		}
 		tweetLink = *input.TweetLink
 	}
 
@@ -95,6 +96,82 @@ func ProcessTwitterCallback(token, verifier *string) (*string, error) {
 
 	ID := tweetInfo.ID.String()
 	return &ID, nil
+}
+
+func indexTweetRetweets(criteria models.TwitterCriteria) error {
+
+	var retweeeterIDs []string
+	details, err := engine.FetchTwitterAuthByID(criteria.AuthID)
+	if err != nil {
+		return err
+	}
+
+	retweets, err := services.FetchTweetRetweetsWithUserAuth(details, criteria.TweetID, nil)
+	if err != nil {
+		return err
+	}
+
+	retweeeterIDs = append(retweeeterIDs, retweets.Ids...)
+	for retweets.NextCursorStr != "0" {
+
+		retweets, err = services.FetchTweetRetweetsWithUserAuth(details, criteria.TweetID, &retweets.NextCursorStr)
+		if err != nil {
+			return err
+		}
+
+		mergeSliceOfStrings(retweeeterIDs, retweets.Ids)
+	}
+
+	retweetsToBytes, err := json.Marshal(retweeeterIDs)
+	if err != nil {
+		return err
+	}
+
+	criteria.IndexedRetweets = string(retweetsToBytes)
+	err = engine.SaveModel(criteria)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func indexTwitterFollowers(criteria models.TwitterCriteria) error {
+
+	var followerIDs []string
+	details, err := engine.FetchTwitterAuthByID(criteria.AuthID)
+	if err != nil {
+		return err
+	}
+
+	followers, err := services.FetchTwitterFollowersWithUserAuth(details, criteria.ProfileID, nil)
+	if err != nil {
+		return err
+	}
+
+	followerIDs = append(followerIDs, followers.Ids...)
+	for followers.NextCursorStr != "0" {
+
+		followers, err = services.FetchTwitterFollowersWithUserAuth(details, criteria.ProfileID, &followers.NextCursorStr)
+		if err != nil {
+			return err
+		}
+
+		mergeSliceOfStrings(followerIDs, followers.Ids)
+	}
+
+	followersToBytes, err := json.Marshal(followers)
+	if err != nil {
+		return err
+	}
+
+	criteria.IndexedFollowers = string(followersToBytes)
+	err = engine.SaveModel(criteria)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func ValidateTwitterCriteriaForItem(itemID, authID string) (bool, error) {
@@ -271,4 +348,9 @@ func validateFollowerCriteria(auth *models.TwitterAuthDetails, criteria *models.
 	}
 
 	return false
+}
+
+func mergeSliceOfStrings(s1, s2 []string) []string {
+
+	return append(s1, s2...)
 }

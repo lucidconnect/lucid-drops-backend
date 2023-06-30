@@ -26,6 +26,14 @@ type TweetRetweetsResponse struct {
 	} `json:"meta"`
 }
 
+type TweetRetweetsResponseWithUserAuth struct {
+	PreviousCursor    int      `json:"previous_cursor"`
+	Ids               []string `json:"ids"`
+	PreviousCursorStr string   `json:"previous_cursor_str"`
+	NextCursor        int      `json:"next_cursor"`
+	NextCursorStr     string   `json:"next_cursor_str"`
+}
+
 type TwitterFollowersResponse struct {
 	Data []struct {
 		ID       string `json:"id"`
@@ -38,12 +46,19 @@ type TwitterFollowersResponse struct {
 	} `json:"meta"`
 }
 
+type TwitterFollowersResponseWithUserAuth struct {
+	Ids               []string `json:"ids"`
+	NextCursor        int64    `json:"next_cursor"`
+	NextCursorStr     string   `json:"next_cursor_str"`
+	PreviousCursor    int      `json:"previous_cursor"`
+	PreviousCursorStr string   `json:"previous_cursor_str"`
+}
 
 type UserDetailsResponse struct {
-	Data struct{
-		ID string `json:"id"`
+	Data struct {
+		ID       string `json:"id"`
 		Name     string `json:"name"`
-        Username string `json:"username"`
+		Username string `json:"username"`
 	}
 }
 

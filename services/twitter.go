@@ -2,6 +2,9 @@ package services
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,7 +14,9 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	"inverse.so/graph/model"
 	"inverse.so/models"
@@ -24,7 +29,7 @@ const (
 	twwitterAPIURL        = "https://api.twitter.com/2/"
 )
 
-func FetchTweetLikingUsers(tweetID string, nextToken *string) (*structure.TweetLikesResponse, error	) {
+func FetchTweetLikingUsers(tweetID string, nextToken *string) (*structure.TweetLikesResponse, error) {
 
 	endpoint := fmt.Sprintf("tweets/%s/liking_users", tweetID)
 	if nextToken != nil {
@@ -41,7 +46,7 @@ func FetchTweetLikingUsers(tweetID string, nextToken *string) (*structure.TweetL
 }
 
 func FetchTweetRetweets(tweetID string, nextToken *string) (*structure.TweetRetweetsResponse, error) {
-	endpoint := fmt.Sprintf("tweets/%s/retweeted_by",tweetID) 
+	endpoint := fmt.Sprintf("tweets/%s/retweeted_by", tweetID)
 	if nextToken != nil {
 		endpoint = fmt.Sprintf("%s?pagination_token=%s", endpoint, *nextToken)
 	}
@@ -69,6 +74,195 @@ func FetchTwitterFollowers(profileID string, nextToken *string) (*structure.Twit
 	}
 
 	return &response, nil
+}
+
+func FetchTweetRetweetsWithUserAuth(auth *models.TwitterAuthDetails, tweetID string, nextToken *string) (*structure.TweetRetweetsResponseWithUserAuth, error) {
+	url := "https://api.twitter.com/1.1/statuses/retweeters/ids.json"
+	paramsMap := map[string]string{
+		"id":            tweetID,
+		"stringify_ids": "true",
+	}
+	urlWithParams := fmt.Sprintf("%s?id=%s&stringify_ids=true", url, tweetID)
+	if nextToken != nil {
+		paramsMap["cursor"] = *nextToken
+		urlWithParams = fmt.Sprintf("%s&cursor=%s", urlWithParams, *nextToken)
+	}
+
+	var response structure.TweetRetweetsResponseWithUserAuth
+	err := executeTwtitterRequestWithUserOauth("GET", url, urlWithParams, auth.OAuthToken, auth.OAuthTokenSecret, nil, &response, paramsMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func FetchTwitterFollowersWithUserAuth(auth *models.TwitterAuthDetails, profileID string, nextToken *string) (*structure.TwitterFollowersResponseWithUserAuth, error) {
+	url := "https://api.twitter.com/1.1/followers/ids.json"
+	paramsMap := map[string]string{
+		"user_id":       profileID,
+		"stringify_ids": "true",
+		"count":         "5000",
+	}
+	urlWithParams := fmt.Sprintf("%s?user_id=%s&stringify_ids=true&count=5000", url, profileID)
+	if nextToken != nil {
+		paramsMap["cursor"] = *nextToken
+		urlWithParams = fmt.Sprintf("%s&cursor=%s", urlWithParams, *nextToken)
+	}
+
+	var response structure.TwitterFollowersResponseWithUserAuth
+	err := executeTwtitterRequestWithUserOauth("GET", url, urlWithParams, auth.OAuthToken, auth.OAuthTokenSecret, nil, &response, paramsMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response, nil
+}
+
+func executeTwitterRequest(method, endpoint string, requestData, destination interface{}) error {
+
+	url := fmt.Sprintf("%s%s", twwitterAPIURL, endpoint)
+	requestBody, err := json.Marshal(requestData)
+	if err != nil {
+		return err
+	}
+
+	var req *http.Request
+
+	if requestData == nil {
+		req, err = http.NewRequest(method, url, nil)
+		if err != nil {
+			return err
+		}
+	} else {
+		req, err = http.NewRequest(method, url, bytes.NewBuffer(requestBody))
+		if err != nil {
+			return err
+		}
+	}
+
+	req.Header.Set("Authorization", "Bearer "+utils.UseEnvOrDefault("TWITTER_BEARER_TOKEN", "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
+	req.Header.Set("Content-Type", "application/json")
+
+	var response *http.Response
+	response, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	responseCode := response.StatusCode
+	if responseCode != 200 && responseCode != 201 {
+		log.Print("error processing request: ", response)
+		return errors.New("error processing request")
+	}
+
+	defer response.Body.Close()
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(responseBody, destination)
+}
+
+func computeSignature(method, urlStr, baseString, oauthTokenSecret string) string {
+
+	key := fmt.Sprintf("%s&%s", url.QueryEscape(os.Getenv("TWITTER_CONSUMER_SECRET")), url.QueryEscape(oauthTokenSecret))
+
+	baseString = fmt.Sprintf("%s&%s&%s", method, url.QueryEscape(urlStr), url.QueryEscape(baseString))
+	hash := hmac.New(sha1.New, []byte(key))
+	hash.Write([]byte(baseString))
+
+	return base64.StdEncoding.EncodeToString(hash.Sum(nil))
+}
+
+func concatRequestParams(params map[string]string) string {
+	var buffer bytes.Buffer
+	for key, value := range params {
+		buffer.WriteString(fmt.Sprintf("%s=%s&", key, value))
+	}
+
+	return strings.TrimSuffix(buffer.String(), "&")
+}
+
+func geneateOAuthHeader(params map[string]string) string {
+	var buffer bytes.Buffer
+	buffer.WriteString("OAuth ")
+
+	for key, value := range params {
+		buffer.WriteString(fmt.Sprintf("%s=\"%s\",", key, value))
+	}
+
+	return strings.TrimSuffix(buffer.String(), ",")
+}
+
+func mergeStringMaps(map1, map2 map[string]string) map[string]string {
+	mergedMap := make(map[string]string)
+	for k, v := range map1 {
+		mergedMap[k] = v
+	}
+
+	for k, v := range map2 {
+		mergedMap[k] = v
+	}
+
+	return mergedMap
+}
+
+func executeTwtitterRequestWithUserOauth(method, url, urlWithParams, oauthToken, oauthTokenSecret string, requestData, destination interface{}, paramsMap map[string]string) error {
+
+	var params = map[string]string{}
+	var req *http.Request
+	var err error
+
+	if requestData == nil {
+		req, err = http.NewRequest(method, urlWithParams, nil)
+		if err != nil {
+			return err
+		}
+	} else {
+		requestBody, err := json.Marshal(requestData)
+		if err != nil {
+			return err
+		}
+
+		req, err = http.NewRequest(method, urlWithParams, bytes.NewBuffer(requestBody))
+		if err != nil {
+			return err
+		}
+	}
+
+	params["oauth_consumer_key"] = os.Getenv("TWITTER_CONSUMER_KEY")
+	params["oauth_nonce"] = utils.RandAlphaNumericRunes(32)
+	params["oauth_signature_method"] = "HMAC-SHA1"
+	params["oauth_timestamp"] = strconv.FormatInt(time.Now().Unix(), 10)
+	params["oauth_token"] = oauthToken
+	params["oauth_version"] = "1.0"
+	params = mergeStringMaps(params, paramsMap)
+	params["oauth_signature"] = computeSignature(method, url, concatRequestParams(params), oauthTokenSecret)
+
+	req.Header.Set("Authorization", geneateOAuthHeader(params))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	var response *http.Response
+	response, err = http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	responseCode := response.StatusCode
+	if responseCode != 200 && responseCode != 201 {
+		log.Print("error processing request: ", response)
+		return errors.New("error processing request")
+	}
+
+	defer response.Body.Close()
+	responseBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(responseBody, destination)
 }
 
 func FetchTweetDetails(link string) (*model.TweetDetails, error) {
@@ -103,17 +297,17 @@ func FetchTweetDetails(link string) (*model.TweetDetails, error) {
 	return nil, errors.New("tweet not found")
 }
 
-func FetchUserDetails(userName string) (*model.UserDetails,error) {
+func FetchUserDetails(userName string) (*model.UserDetails, error) {
 	details, err := fetchDetailsFromUserName(userName)
 	if err != nil {
 		return nil, err
 	}
 
 	return &model.UserDetails{
-		Name: details.Data.Name,
-		ID: details.Data.ID,
+		Name:     details.Data.Name,
+		ID:       details.Data.ID,
 		Username: details.Data.Username,
-	},nil
+	}, nil
 }
 
 func FetchTweetByID(id string) (*structure.TweetResponse, error) {
@@ -130,7 +324,6 @@ func FetchTweetByID(id string) (*structure.TweetResponse, error) {
 
 	return tweet, nil
 }
-
 
 func getGuestToken(url string) *string {
 
@@ -290,7 +483,7 @@ func fetchDetailsFromUserName(userName string) (*structure.UserDetailsResponse, 
 	}
 
 	return &response, nil
-	
+
 }
 
 func fetchPrelimPage(url string) (*string, error) {
@@ -338,51 +531,4 @@ func fetchPrelimPage(url string) (*string, error) {
 	}
 
 	return utils.GetStrPtr(string(respBody)), nil
-}
-
-func executeTwitterRequest(method, endpoint string, requestData, destination interface{}) error {
-
-	url := fmt.Sprintf("%s%s", twwitterAPIURL, endpoint)
-	requestBody, err := json.Marshal(requestData)
-	if err != nil {
-		return err
-	}
-
-	var req *http.Request
-
-	if requestData == nil {
-		req, err = http.NewRequest(method, url, nil)
-		if err != nil {
-			return err
-		}
-	} else {
-		req, err = http.NewRequest(method, url, bytes.NewBuffer(requestBody))
-		if err != nil {
-			return err
-		}
-	}
-
-	req.Header.Set("Authorization", "Bearer "+utils.UseEnvOrDefault("TWITTER_BEARER_TOKEN", "sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"))
-	req.Header.Set("Content-Type", "application/json")
-
-	log.Print("request: ", req)
-	var response *http.Response
-	response, err = http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	responseCode := response.StatusCode
-	if responseCode != 200 && responseCode != 201 {
-		log.Print("error processing request: ", response)
-		return errors.New("error processing request")
-	}
-
-	defer response.Body.Close()
-	responseBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return err
-	}
-
-	return json.Unmarshal(responseBody, destination)
 }
