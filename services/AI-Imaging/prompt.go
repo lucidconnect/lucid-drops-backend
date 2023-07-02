@@ -21,7 +21,7 @@ var promptSaltMap = map[model.AiImageStyle]string{
 }
 
 func saltPrompt(prompt string, style model.AiImageStyle) string {
-	return fmt.Sprintf("%s%s%s", baseSalt, promptSaltMap[style], prompt)
+	return fmt.Sprintf("%s%s", promptSaltMap[style], prompt)
 }
 
 //resources for suture ref
