@@ -14,7 +14,7 @@ import (
 	"inverse.so/utils"
 )
 
-const stabilityURL = "https://api.stability.ai/v1/generation/stable-diffusion-768-v2-1"
+const stabilityURL = "https://api.stability.ai/v1/generation/stable-diffusion-512-v2-1"
 
 type StabilityService struct{}
 
@@ -50,8 +50,8 @@ func GenerateStabilityImage(prompt string, style *model.AiImageStyle, number *in
 	}
 
 	requestData := &structure.StabilityImageRequest{
-		Height: 1024,
-		Width:  1024,
+		Height: 512,
+		Width:  512,
 		TextPrompts: []structure.StabilityTextPrompt{
 			{
 				Text:   baseSalt,
@@ -62,8 +62,9 @@ func GenerateStabilityImage(prompt string, style *model.AiImageStyle, number *in
 				Weight: 0.5,
 			},
 		},
-		Samples:     n,
-		StylePreset: stylePreset,
+		ClipGuidancePreset: "SIMPLE",
+		Samples:            n,
+		StylePreset:        stylePreset,
 	}
 
 	var response structure.StabilityImageResponse
