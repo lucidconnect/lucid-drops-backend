@@ -1,6 +1,12 @@
 package services
 
-import "inverse.so/graph/model"
+import (
+	"fmt"
+
+	"inverse.so/graph/model"
+)
+
+const baseSalt = "highly detailed, flat illustration, nft style, heavily dystopian, comic book style, cyberpunk, "
 
 var promptSaltMap = map[model.AiImageStyle]string{
 	model.AiImageStyleAnime:            "Concept art, pixiv-style, Sumi-e, portrait, ",
@@ -15,7 +21,7 @@ var promptSaltMap = map[model.AiImageStyle]string{
 }
 
 func saltPrompt(prompt string, style model.AiImageStyle) string {
-	return promptSaltMap[style] + prompt
+	return fmt.Sprintf("%s%s%s", baseSalt, promptSaltMap[style], prompt)
 }
 
 //resources for suture ref
