@@ -6,7 +6,7 @@ import (
 	"inverse.so/graph/model"
 )
 
-const baseSalt = "highly detailed, flat illustration, nft style, heavily dystopian, comic book style, cyberpunk, "
+const baseSalt = "single portrait, highly detailed, flat illustration, nft style, heavily dystopian, comic book style, cyberpunk, "
 
 var promptSaltMap = map[model.AiImageStyle]string{
 	model.AiImageStyleAnime:            "Concept art, pixiv-style, Sumi-e, portrait, ",

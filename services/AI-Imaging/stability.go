@@ -55,11 +55,11 @@ func GenerateStabilityImage(prompt string, style *model.AiImageStyle, number *in
 		TextPrompts: []structure.StabilityTextPrompt{
 			{
 				Text:   baseSalt,
-				Weight: 0.5,
+				Weight: 1,
 			},
 			{
 				Text:   prompt,
-				Weight: 1,
+				Weight: 0.5,
 			},
 		},
 		Samples:     n,
