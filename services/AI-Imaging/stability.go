@@ -14,7 +14,7 @@ import (
 	"inverse.so/utils"
 )
 
-const stabilityURL = "https://api.stability.ai/v1/generation/stable-diffusion-512-v2-1"
+const stabilityURL = "https://api.stability.ai/v1/generation/stable-diffusion-xl-beta-v2-2-2"
 
 type StabilityService struct{}
 
