@@ -38,7 +38,7 @@ func (s *StabilityService) GenerateImage(prompt string, style *model.AiImageStyl
 
 func GenerateStabilityImage(prompt string, style *model.AiImageStyle, number *int) (*structure.StabilityImageResponse, error) {
 
-	var stylePreset string = "fantasy-art"
+	var stylePreset string = ""
 	if style != nil {
 		stylePreset = structure.ImageStyleMap[*style]
 		prompt = saltPrompt(prompt, *style)
