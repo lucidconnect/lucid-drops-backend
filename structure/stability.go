@@ -3,11 +3,12 @@ package structure
 import "inverse.so/graph/model"
 
 type StabilityImageRequest struct {
-	Height      int                   `json:"height"`
-	Width       int                   `json:"width"`
-	TextPrompts []StabilityTextPrompt `json:"text_prompts"`
-	Samples     int                   `json:"samples"`
-	StylePreset string                `json:"style_preset,omitempty"`
+	Height             int                   `json:"height"`
+	Width              int                   `json:"width"`
+	ClipGuidancePreset string                `json:"clip_guidance_preset,omitempty"`
+	TextPrompts        []StabilityTextPrompt `json:"text_prompts"`
+	Samples            int                   `json:"samples"`
+	StylePreset        string                `json:"style_preset,omitempty"`
 }
 
 type StabilityImageResponse struct {
