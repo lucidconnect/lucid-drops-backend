@@ -95,7 +95,7 @@ func GetEmailClaimIDByItemAndEmailSubDomain(itemID *uuid.UUID, emailAddress stri
 		return nil, fmt.Errorf("(%s) is not a valid email", emailAddress)
 	}
 
-	var claim models.SingleEmailClaim
+	var claim models.EmailDomainWhiteList
 
 	err := dbutils.DB.Where(&models.EmailDomainWhiteList{
 		ItemID:     *itemID,
