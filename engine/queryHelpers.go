@@ -89,7 +89,7 @@ func GetItemByID(itemID string) (*models.Item, error) {
 	return &item, nil
 }
 
-func GetEmailClaimIDByItemAndEmailSubDomain(itemID *uuid.UUID, emailAddress string) (*models.SingleEmailClaim, error) {
+func GetEmailClaimIDByItemAndEmailSubDomain(itemID *uuid.UUID, emailAddress string) (*models.EmailDomainWhiteList, error) {
 	emailParts := strings.Split(emailAddress, "@")
 	if len(emailParts) != 2 {
 		return nil, fmt.Errorf("(%s) is not a valid email", emailAddress)
