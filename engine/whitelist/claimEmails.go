@@ -79,7 +79,7 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 	var ItemIdOnContract int64
 	for idx, collectionItem := range items {
 		if collectionItem.ID.String() == input.ItemID {
-			ItemIdOnContract = int64(len(items) - (idx + 1))
+			ItemIdOnContract = int64(len(items) - (idx))
 		}
 	}
 
