@@ -1,8 +1,12 @@
 package whitelist
 
 import (
+	"bytes"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -59,13 +63,40 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 		return nil, errors.New("an error occurred while sending the verification email, please try again")
 	}
 
+	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	if err != nil {
+		log.Err(err)
+		return nil, err
+	}
+
+	items, err := engine.GetCollectionItems(item.CollectionID.String())
+	if err != nil {
+		log.Err(err)
+		return nil, err
+	}
+
+	// TODO use DB order or smart contract deploys to persist this on the item level
+	var ItemIdOnContract int64
+	for idx, collectionItem := range items {
+		if collectionItem.ID.String() == input.ItemID {
+			ItemIdOnContract = int64(len(items) - (idx + 1))
+		}
+	}
+
+	var smartContractAddress string
+	if collection.ContractAddress != nil {
+		smartContractAddress = *collection.ContractAddress
+	}
+
 	newEmailOTP := &models.EmailOTP{
-		IssuedAt:    time.Now().Unix(),
-		ExpiresAt:   time.Now().Add(time.Minute * time.Duration(emailOTPttl)).Unix(),
-		ItemID:      item.ID,
-		UserEmail:   input.EmailAddress,
-		ExpectedOTP: generatedOTP,
-		Attempts:    0,
+		IssuedAt:                  time.Now().Unix(),
+		ExpiresAt:                 time.Now().Add(time.Minute * time.Duration(emailOTPttl)).Unix(),
+		ItemID:                    item.ID,
+		UserEmail:                 input.EmailAddress,
+		ExpectedOTP:               generatedOTP,
+		Attempts:                  0,
+		ItemIdOnContract:          ItemIdOnContract,
+		CollectionContractAddress: smartContractAddress,
 	}
 
 	err = engine.CreateModel(newEmailOTP)
@@ -143,6 +174,39 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model
 		return nil, errors.New("an error when verifying the Claim")
 	}
 
+	go func() {
+		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "https://inverse-aa.onrender.com")
+
+		client := &http.Client{}
+
+		itemData, err := json.Marshal(map[string]interface{}{
+			"receiptientAddresses": []string{input.ClaimingAddress},
+			"items":                []int64{otpDetails.ItemIdOnContract},
+			"contractAddress":      otpDetails.CollectionContractAddress,
+		})
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/sendnfts", bytes.NewBuffer(itemData))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		req.Header.Add("Content-Type", "application/json")
+		res, err := client.Do(req)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		defer res.Body.Close()
+	}()
+
+	// TODO add back signature flow
 	dataInPackedFormat := utils.EncodePacked(
 		// utils.EncodeAddress("0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160"),
 		utils.EncodeAddress(input.ClaimingAddress), // Some Addresss
