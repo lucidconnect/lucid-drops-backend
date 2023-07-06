@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 )
 
 type Collection struct {
@@ -72,6 +73,7 @@ type Item struct {
 	TwitterClaimCriteriaInteractions []*InteractionType `json:"twitterClaimCriteriaInteractions,omitempty"`
 	TweetLink                        *string            `json:"tweetLink,omitempty"`
 	ProfileLink                      *string            `json:"profileLink,omitempty"`
+	CreatedAt                        time.Time          `json:"createdAt"`
 }
 
 type ItemInput struct {

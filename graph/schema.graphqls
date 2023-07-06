@@ -152,6 +152,7 @@ type Item {
   twitterClaimCriteriaInteractions: [InteractionType]
   tweetLink: String
   profileLink: String
+  createdAt: Time!
 }
 
 type ImageResponse {

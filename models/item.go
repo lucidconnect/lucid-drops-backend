@@ -48,6 +48,7 @@ func (i *Item) ToGraphData() *model.Item {
 		Description:   i.Description,
 		CollectionID:  i.CollectionID.String(),
 		ClaimCriteria: i.Criteria,
+		CreatedAt:     i.CreatedAt,
 	}
 
 	if i.TwitterCriteria != nil {

@@ -14,6 +14,11 @@ func StoreUserAccountSignerAddress(input model.SignerInfo, authDetails *internal
 		return false, err
 	}
 
+	noSignature := "NONE" // TODO use aa wallet signatures to authorize third party signer
+	if input.Signature == nil {
+		input.Signature = &noSignature
+	}
+
 	userAccountSignerAddress := &models.SignerInfo{
 		CreatorID:     creator.ID.String(),
 		WalletAddress: input.Address,
