@@ -71,7 +71,7 @@ func SendEmail(object EmailData) (*EmailResponse, error) {
 	mg := mailgun.NewMailgun(domain, apiKey)
 
 	sender := object.EmailFrom
-	from := fmt.Sprintf("Abacus <%s>", sender)
+	from := fmt.Sprintf("Inverse <%s>", sender)
 	subject := object.Subject
 	recipient := object.EmailTo
 	body := fmt.Sprintf("%v", object.ContentData)

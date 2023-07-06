@@ -53,7 +53,7 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 
 	generatedOTP := utils.RandomNumericRunes(5)
 
-	action := "onboarding"
+	action := "verification"
 	expiry := "ten minutes"
 	from := "verify@getabacus.app"
 
