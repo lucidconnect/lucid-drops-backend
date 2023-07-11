@@ -24,6 +24,7 @@ func SubscribeToInverseContractDeployments() {
 	rpcProvider := utils.UseEnvOrDefault("RPC_PROVIDER", "wss://polygon-mumbai.g.alchemy.com/v2/SjkYprQJA0Dp-5l5XpafAmqj_uoJ_A5G")
 	inveseNFTFactoryAddress := utils.UseEnvOrDefault("INVERSE_FACTORY_ADDRESS", "0x021406A44658CAbcBc5540Ec2045123E5FDb0ca8")
 
+attemptReconnect:
 	client, err := ethclient.Dial(rpcProvider)
 	if err != nil {
 		log.Error().Msg(err.Error())
@@ -38,6 +39,7 @@ func SubscribeToInverseContractDeployments() {
 	sub, err := client.SubscribeFilterLogs(context.Background(), query, logs)
 	if err != nil {
 		log.Error().Msg(err.Error())
+		goto attemptReconnect
 	}
 
 	log.Info().Msgf("🪼 Started watcher for (%s) Contract", inveseNFTFactoryAddress)
@@ -48,6 +50,7 @@ func SubscribeToInverseContractDeployments() {
 		select {
 		case err := <-sub.Err():
 			log.Error().Msg(err.Error())
+			goto attemptReconnect
 		case vLog := <-logs:
 			eventType := vLog.Topics[0].Hex()
 			if eventType != contractDeploymentHash.Hex() {
