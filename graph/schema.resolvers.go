@@ -125,6 +125,11 @@ func (r *mutationResolver) CreateTelegramCriteriaForItem(ctx context.Context, in
 	return whitelist.CreateTelegramCriteria(input, authenticationDetails)
 }
 
+// CreatePatreonCriteriaForItem is the resolver for the createPatreonCriteriaForItem field.
+func (r *mutationResolver) CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error) {
+	panic(fmt.Errorf("not implemented: CreatePatreonCriteriaForItem - createPatreonCriteriaForItem"))
+}
+
 // ValidateTwitterCriteriaForItem is the resolver for the validateTwitterCriteriaForItem field.
 func (r *mutationResolver) ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error) {
 	if authID == nil {
@@ -141,6 +146,11 @@ func (r *mutationResolver) ValidateTelegramCriteriaForItem(ctx context.Context, 
 	}
 
 	return whitelist.ValidateTelegramClaimCriteria(itemID, *authID)
+}
+
+// ValidatePatreonCriteriaForItem is the resolver for the validatePatreonCriteriaForItem field.
+func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error) {
+	panic(fmt.Errorf("not implemented: ValidatePatreonCriteriaForItem - validatePatreonCriteriaForItem"))
 }
 
 // StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.

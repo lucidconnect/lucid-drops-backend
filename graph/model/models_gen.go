@@ -101,6 +101,11 @@ type NewEmailWhitelistInput struct {
 	AuthorizedEmails []string `json:"authorizedEmails"`
 }
 
+type NewPatreonCriteriaInput struct {
+	ItemID string `json:"itemID"`
+	AuthID string `json:"authID"`
+}
+
 type NewTelegramCriteriaInput struct {
 	ItemID  string `json:"itemID"`
 	GroupID string `json:"groupID"`

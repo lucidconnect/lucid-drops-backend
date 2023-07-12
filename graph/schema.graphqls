@@ -34,8 +34,10 @@ type Mutation {
   createEmailDomainWhitelist(input: NewEmailDomainWhitelistInput!): Item!
   createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
   createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
+  createPatreonCriteriaForItem(input: NewPatreonCriteriaInput!): Item!
   validateTwitterCriteriaForItem(itemID: String!, authID: String): Boolean!
   validateTelegramCriteriaForItem(itemID: String!, authID: String): Boolean!
+  validatePatreonCriteriaForItem(itemID: String!, authID: String): Boolean!
 
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
@@ -112,6 +114,11 @@ input NewTwitterCriteriaInput {
 input NewTelegramCriteriaInput {
 	itemID: String!
   groupID: String!
+}
+
+input NewPatreonCriteriaInput {
+  itemID: String!
+  authID: String!
 }
 
 input SignerInfo {
