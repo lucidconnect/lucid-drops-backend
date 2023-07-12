@@ -58,6 +58,7 @@ func main() {
 	router.Handle("/metadata/{contract}/{itemid}", http.HandlerFunc(route.MetadataHandler))
 	router.Handle("/twitter01/callback/", http.HandlerFunc(route.TwitterCallBack))
 	router.Handle("/telegram/callback/", http.HandlerFunc(route.TelegramCallBack))
+	router.Handle("/patreon/callback/", http.HandlerFunc(route.PatreonCallBack))
 
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
 
