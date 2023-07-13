@@ -120,6 +120,7 @@ input NewPatreonCriteriaInput {
   itemID: String!
   authID: String!
   campaignID: String
+  campaignName: String
 }
 
 input SignerInfo {

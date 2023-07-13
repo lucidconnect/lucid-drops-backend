@@ -7101,7 +7101,7 @@ func (ec *executionContext) unmarshalInputNewPatreonCriteriaInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"itemID", "authID", "campaignID"}
+	fieldsInOrder := [...]string{"itemID", "authID", "campaignID", "campaignName"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7135,6 +7135,15 @@ func (ec *executionContext) unmarshalInputNewPatreonCriteriaInput(ctx context.Co
 				return it, err
 			}
 			it.CampaignID = data
+		case "campaignName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("campaignName"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CampaignName = data
 		}
 	}
 

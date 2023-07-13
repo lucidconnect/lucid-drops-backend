@@ -2,7 +2,6 @@ package whitelist
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"inverse.so/engine"
@@ -83,12 +82,10 @@ func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *int
 		}
 	}
 
-	campaigns, err := services.FetchCampaigns(authdetails)
-	if err != nil {
-		return nil, err
+	if input.CampaignName != nil {
+		criteria.CampaignName = *input.CampaignName
 	}
 
-	criteria.CampaignName = campaigns[0].Name
 	criteriaUpdateErr := engine.SaveModel(criteria)
 	if criteriaUpdateErr != nil {
 		return nil, criteriaUpdateErr
