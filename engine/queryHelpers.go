@@ -182,13 +182,24 @@ func FetchTwitterAuthByID(authID string) (*models.TwitterAuthDetails, error) {
 func FetchTelegramAuthByID(authID string) (*models.TelegramAuthDetails, error) {
 
 	var telegramAuth models.TelegramAuthDetails
-	err := dbutils.DB.Where("id=?", authID).First(&telegramAuth).Error
+	err := dbutils.DB.Model(&models.TelegramAuthDetails{}).Where("id=?", authID).First(&telegramAuth).Error
 	if err != nil {
 		return nil, errors.New("twitter auth not found")
 	}
 
 	return &telegramAuth, nil
 }
+
+func FetchPatreonAuthByID(authID string) (*models.PatreonAuthDetails, error) {
+
+	var patreonAuth models.PatreonAuthDetails
+	err := dbutils.DB.Model(&models.PatreonAuthDetails{}).Where("id=?", authID).First(&patreonAuth).Error
+	if err != nil {
+		return nil, errors.New("twitter auth not found")
+	}
+
+	return &patreonAuth, nil
+} 
 
 func FetchTelegramCriteriaByLink(channelLink string) (*models.TelegramCriteria, error) {
 	var criteria models.TelegramCriteria
