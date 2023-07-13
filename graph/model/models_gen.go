@@ -221,6 +221,7 @@ const (
 	ClaimCriteriaTypeTwitterInteractions ClaimCriteriaType = "twitterInteractions"
 	ClaimCriteriaTypeTwitterFollowers    ClaimCriteriaType = "twitterFollowers"
 	ClaimCriteriaTypeTelegram            ClaimCriteriaType = "telegram"
+	ClaimCriteriaTypePatreon             ClaimCriteriaType = "patreon"
 )
 
 var AllClaimCriteriaType = []ClaimCriteriaType{
@@ -229,11 +230,12 @@ var AllClaimCriteriaType = []ClaimCriteriaType{
 	ClaimCriteriaTypeTwitterInteractions,
 	ClaimCriteriaTypeTwitterFollowers,
 	ClaimCriteriaTypeTelegram,
+	ClaimCriteriaTypePatreon,
 }
 
 func (e ClaimCriteriaType) IsValid() bool {
 	switch e {
-	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram:
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon:
 		return true
 	}
 	return false

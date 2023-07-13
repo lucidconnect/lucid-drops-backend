@@ -203,6 +203,7 @@ enum ClaimCriteriaType{
   twitterInteractions
   twitterFollowers
   telegram
+  patreon
 }
 
 enum AiImageStyle{
