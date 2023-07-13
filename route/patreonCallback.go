@@ -1,6 +1,7 @@
 package route
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
@@ -14,11 +15,16 @@ func PatreonCallBack(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 
 	// TODO: check if the token is valid
-	authID, err := whitelist.ProcessPatreonCallback(&code)
+	authID, campaigns, err := whitelist.ProcessPatreonCallback(&code)
 	if err != nil {
 		log.Error().Msgf("PatreonCallBack: %+v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
+	}
+
+	if campaigns != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(campaigns)
 	}
 
 	http.Redirect(w, r, "http://localhost:3000/whitelist/patreon/"+*authID, http.StatusFound)

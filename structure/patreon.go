@@ -8,3 +8,13 @@ type PatreonAccessTokenResponse struct {
 	RefreshToken string `json:"refresh_token"`
 	Version      string `json:"version"`
 }
+
+type PatreonUserResponse struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type PatreonCampaignInfo struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
