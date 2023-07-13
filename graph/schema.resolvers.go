@@ -22,7 +22,12 @@ import (
 
 // Items is the resolver for the items field.
 func (r *collectionResolver) Items(ctx context.Context, obj *model.Collection) ([]*model.Item, error) {
-	return items.FetchCollectionItems(obj.ID, nil)
+	items, err := items.FetchCollectionItems(obj.ID, nil)
+	if err != nil {
+		return []*model.Item{}, nil
+	}
+
+	return items, nil
 }
 
 // Creator is the resolver for the creator field.
