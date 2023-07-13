@@ -15,7 +15,7 @@ func PatreonCallBack(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 
 	// TODO: check if the token is valid
-	authID, campaigns, err := whitelist.ProcessPatreonCallback(&code)
+	authID, campaigns, err := whitelist.ProcessPatreonCallback(&code, true)
 	if err != nil {
 		log.Error().Msgf("PatreonCallBack: %+v", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -37,7 +37,7 @@ func PatreonWhitelistCallBack(w http.ResponseWriter, r *http.Request) {
 	code := r.URL.Query().Get("code")
 
 	// TODO: check if the token is valid
-	authID, campaigns, err := whitelist.ProcessPatreonCallback(&code)
+	authID, campaigns, err := whitelist.ProcessPatreonCallback(&code, false)
 	if err != nil {
 		log.Error().Msgf("PatreonCallBack: %+v", err)
 		w.WriteHeader(http.StatusInternalServerError)

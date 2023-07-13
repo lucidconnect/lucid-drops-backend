@@ -17,7 +17,7 @@ import (
 	"inverse.so/utils"
 )
 
-func FetchPatreonAccessToken(code *string) (*structure.PatreonAccessTokenResponse, error) {
+func FetchPatreonAccessToken(code *string, creator bool) (*structure.PatreonAccessTokenResponse, error) {
 
 	codeParams := url.Values{}
 	codeParams.Set("code", *code)
@@ -25,7 +25,12 @@ func FetchPatreonAccessToken(code *string) (*structure.PatreonAccessTokenRespons
 	params := url.Values{}
 	params.Set("client_id", utils.UseEnvOrDefault("PATREON_CLIENT_ID", ""))
 	params.Set("client_secret", utils.UseEnvOrDefault("PATREON_CLIENT_SECRET", ""))
-	params.Set("redirect_uri", utils.UseEnvOrDefault("PATREON_REDIRECT_URI", "https://5b62-102-216-201-35.ngrok-free.app/patreon/callback/"))
+	
+	if creator {
+		params.Set("redirect_uri", utils.UseEnvOrDefault("PATREON_CREATOR_REDIRECT_URI", "https://5b62-102-216-201-35.ngrok-free.app/patreon/callback/"))
+	} else {
+		params.Set("redirect_uri", utils.UseEnvOrDefault("PATREON_REDIRECT_URI", "https://5b62-102-216-201-35.ngrok-free.app/patreon/whitelist/callback/"))
+	}
 
 	url := fmt.Sprintf("https://www.patreon.com/api/oauth2/token?%s&grant_type=authorization_code&%s", codeParams.Encode(), params.Encode())
 	req, err := http.NewRequest(http.MethodPost, url, nil)
@@ -98,7 +103,7 @@ func FetchPatreonUser(auth *models.PatreonAuthDetails) (*structure.PatreonUserRe
 	if err != nil {
 		return nil, err
 	}
-	
+
 	ts := oauth2.StaticTokenSource(&oauth2.Token{
 		AccessToken: auth.AccessToken,
 	})

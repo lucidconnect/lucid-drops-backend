@@ -12,9 +12,9 @@ import (
 	"inverse.so/structure"
 )
 
-func ProcessPatreonCallback(code *string) (*string, []*structure.PatreonCampaignInfo, error) {
+func ProcessPatreonCallback(code *string, creator bool) (*string, []*structure.PatreonCampaignInfo, error) {
 
-	patreonToken, err := services.FetchPatreonAccessToken(code)
+	patreonToken, err := services.FetchPatreonAccessToken(code, creator)
 	if err != nil {
 		return nil, nil, err
 	}
