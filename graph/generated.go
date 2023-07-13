@@ -101,6 +101,7 @@ type ComplexityRoot struct {
 		CreateEmailDomainWhitelist        func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
 		CreateEmailWhitelistForItem       func(childComplexity int, input model.NewEmailWhitelistInput) int
 		CreateItem                        func(childComplexity int, input model.ItemInput) int
+		CreatePatreonCriteriaForItem      func(childComplexity int, input model.NewPatreonCriteriaInput) int
 		CreateTelegramCriteriaForItem     func(childComplexity int, input model.NewTelegramCriteriaInput) int
 		CreateTwitterCriteriaForItem      func(childComplexity int, input model.NewTwitterCriteriaInput) int
 		GenerateSignatureForClaim         func(childComplexity int, input model.GenerateClaimSignatureInput) int
@@ -109,6 +110,7 @@ type ComplexityRoot struct {
 		StoreSignerInfo                   func(childComplexity int, input model.SignerInfo) int
 		UpdateCollection                  func(childComplexity int, collectionID string, input model.CollectionInput) int
 		UpdateItem                        func(childComplexity int, itemID string, input model.ItemInput) int
+		ValidatePatreonCriteriaForItem    func(childComplexity int, itemID string, authID *string) int
 		ValidateTelegramCriteriaForItem   func(childComplexity int, itemID string, authID *string) int
 		ValidateTwitterCriteriaForItem    func(childComplexity int, itemID string, authID *string) int
 	}
@@ -165,8 +167,10 @@ type MutationResolver interface {
 	CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error)
 	CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error)
 	CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error)
+	CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error)
 	ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
 	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
+	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
 	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
 	CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error)
 	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
@@ -463,6 +467,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateItem(childComplexity, args["input"].(model.ItemInput)), true
 
+	case "Mutation.createPatreonCriteriaForItem":
+		if e.complexity.Mutation.CreatePatreonCriteriaForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createPatreonCriteriaForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreatePatreonCriteriaForItem(childComplexity, args["input"].(model.NewPatreonCriteriaInput)), true
+
 	case "Mutation.createTelegramCriteriaForItem":
 		if e.complexity.Mutation.CreateTelegramCriteriaForItem == nil {
 			break
@@ -558,6 +574,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateItem(childComplexity, args["itemID"].(string), args["input"].(model.ItemInput)), true
+
+	case "Mutation.validatePatreonCriteriaForItem":
+		if e.complexity.Mutation.ValidatePatreonCriteriaForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_validatePatreonCriteriaForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ValidatePatreonCriteriaForItem(childComplexity, args["itemID"].(string), args["authID"].(*string)), true
 
 	case "Mutation.validateTelegramCriteriaForItem":
 		if e.complexity.Mutation.ValidateTelegramCriteriaForItem == nil {
@@ -767,6 +795,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputItemInput,
 		ec.unmarshalInputNewEmailDomainWhitelistInput,
 		ec.unmarshalInputNewEmailWhitelistInput,
+		ec.unmarshalInputNewPatreonCriteriaInput,
 		ec.unmarshalInputNewTelegramCriteriaInput,
 		ec.unmarshalInputNewTwitterCriteriaInput,
 		ec.unmarshalInputNewUsernameRegisgration,
@@ -925,6 +954,21 @@ func (ec *executionContext) field_Mutation_createItem_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createPatreonCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewPatreonCriteriaInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewPatreonCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐNewPatreonCriteriaInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createTelegramCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1060,6 +1104,30 @@ func (ec *executionContext) field_Mutation_updateItem_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_validatePatreonCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["itemID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["itemID"] = arg0
+	var arg1 *string
+	if tmp, ok := rawArgs["authID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authID"))
+		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["authID"] = arg1
 	return args, nil
 }
 
@@ -3258,6 +3326,87 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createPatreonCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createPatreonCriteriaForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreatePatreonCriteriaForItem(rctx, fc.Args["input"].(model.NewPatreonCriteriaInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "tweetLink":
+				return ec.fieldContext_Item_tweetLink(ctx, field)
+			case "profileLink":
+				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Item_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createPatreonCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_validateTwitterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_validateTwitterCriteriaForItem(ctx, field)
 	if err != nil {
@@ -3362,6 +3511,61 @@ func (ec *executionContext) fieldContext_Mutation_validateTelegramCriteriaForIte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_validateTelegramCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_validatePatreonCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_validatePatreonCriteriaForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ValidatePatreonCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["authID"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_validatePatreonCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_validatePatreonCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -6890,6 +7094,53 @@ func (ec *executionContext) unmarshalInputNewEmailWhitelistInput(ctx context.Con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewPatreonCriteriaInput(ctx context.Context, obj interface{}) (model.NewPatreonCriteriaInput, error) {
+	var it model.NewPatreonCriteriaInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"itemID", "authID", "campaignID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "itemID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ItemID = data
+		case "authID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AuthID = data
+		case "campaignID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("campaignID"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CampaignID = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewTelegramCriteriaInput(ctx context.Context, obj interface{}) (model.NewTelegramCriteriaInput, error) {
 	var it model.NewTelegramCriteriaInput
 	asMap := map[string]interface{}{}
@@ -7542,6 +7793,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createPatreonCriteriaForItem":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createPatreonCriteriaForItem(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "validateTwitterCriteriaForItem":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -7555,6 +7815,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_validateTelegramCriteriaForItem(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "validatePatreonCriteriaForItem":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_validatePatreonCriteriaForItem(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -8622,6 +8891,11 @@ func (ec *executionContext) unmarshalNNewEmailDomainWhitelistInput2inverseᚗso�
 
 func (ec *executionContext) unmarshalNNewEmailWhitelistInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmailWhitelistInput(ctx context.Context, v interface{}) (model.NewEmailWhitelistInput, error) {
 	res, err := ec.unmarshalInputNewEmailWhitelistInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewPatreonCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐNewPatreonCriteriaInput(ctx context.Context, v interface{}) (model.NewPatreonCriteriaInput, error) {
+	res, err := ec.unmarshalInputNewPatreonCriteriaInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 

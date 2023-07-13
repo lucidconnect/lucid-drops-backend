@@ -101,6 +101,12 @@ type NewEmailWhitelistInput struct {
 	AuthorizedEmails []string `json:"authorizedEmails"`
 }
 
+type NewPatreonCriteriaInput struct {
+	ItemID     string  `json:"itemID"`
+	AuthID     string  `json:"authID"`
+	CampaignID *string `json:"campaignID,omitempty"`
+}
+
 type NewTelegramCriteriaInput struct {
 	ItemID  string `json:"itemID"`
 	GroupID string `json:"groupID"`
@@ -215,6 +221,7 @@ const (
 	ClaimCriteriaTypeTwitterInteractions ClaimCriteriaType = "twitterInteractions"
 	ClaimCriteriaTypeTwitterFollowers    ClaimCriteriaType = "twitterFollowers"
 	ClaimCriteriaTypeTelegram            ClaimCriteriaType = "telegram"
+	ClaimCriteriaTypePatreon             ClaimCriteriaType = "patreon"
 )
 
 var AllClaimCriteriaType = []ClaimCriteriaType{
@@ -223,11 +230,12 @@ var AllClaimCriteriaType = []ClaimCriteriaType{
 	ClaimCriteriaTypeTwitterInteractions,
 	ClaimCriteriaTypeTwitterFollowers,
 	ClaimCriteriaTypeTelegram,
+	ClaimCriteriaTypePatreon,
 }
 
 func (e ClaimCriteriaType) IsValid() bool {
 	switch e {
-	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram:
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon:
 		return true
 	}
 	return false
