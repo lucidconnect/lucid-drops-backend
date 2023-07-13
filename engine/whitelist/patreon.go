@@ -2,6 +2,7 @@ package whitelist
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"inverse.so/engine"
@@ -26,12 +27,12 @@ func ProcessPatreonCallback(code *string, creator bool) (*string, []*structure.P
 		RefreshToken: patreonToken.RefreshToken,
 	}
 
-	user, err := services.FetchPatreonUser(patreonDetails)
+	user, err := services.FetchPatreonUserLocal(patreonDetails)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	campaigns, err := services.FetchCampaigns(patreonDetails)
+	campaigns, err := services.FetchPatreonCampaignLocal(patreonDetails)
 	if err != nil {
 		return nil, nil, err
 	}
