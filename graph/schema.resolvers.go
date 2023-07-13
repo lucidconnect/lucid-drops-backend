@@ -37,7 +37,12 @@ func (r *itemResolver) Creator(ctx context.Context, obj *model.Item) (*model.Cre
 
 // AuthorizedSubdomains is the resolver for the authorizedSubdomains field.
 func (r *itemResolver) AuthorizedSubdomains(ctx context.Context, obj *model.Item) ([]string, error) {
-	return items.FetchAuthotizedSubdomainsForItem(obj.ID)
+	subdomains, err := items.FetchAuthotizedSubdomainsForItem(obj.ID)
+	if err != nil {
+		return []string{}, nil
+	}
+
+	return subdomains, nil
 }
 
 // RegisterInverseUsername is the resolver for the registerInverseUsername field.
