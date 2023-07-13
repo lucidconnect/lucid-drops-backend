@@ -102,8 +102,9 @@ type NewEmailWhitelistInput struct {
 }
 
 type NewPatreonCriteriaInput struct {
-	ItemID string `json:"itemID"`
-	AuthID string `json:"authID"`
+	ItemID     string  `json:"itemID"`
+	AuthID     string  `json:"authID"`
+	CampaignID *string `json:"campaignID,omitempty"`
 }
 
 type NewTelegramCriteriaInput struct {

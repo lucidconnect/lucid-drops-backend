@@ -119,6 +119,7 @@ input NewTelegramCriteriaInput {
 input NewPatreonCriteriaInput {
   itemID: String!
   authID: String!
+  campaignID: String
 }
 
 input SignerInfo {
