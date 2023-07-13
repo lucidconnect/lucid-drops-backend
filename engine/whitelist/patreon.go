@@ -68,23 +68,36 @@ func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *int
 		AuthID:    input.AuthID,
 	}
 
-	criteriaUpdateErr := engine.SaveModel(criteria)
-	if criteriaUpdateErr != nil {
-		return nil, criteriaUpdateErr
+	authdetails, err := engine.FetchPatreonAuthByID(input.AuthID)
+	if err != nil {
+		return nil, err
 	}
 
 	if input.CampaignID != nil {
-		authdetails, err := engine.FetchPatreonAuthByID(input.AuthID)
-		if err != nil {
-			return nil, err
-		}
 
 		authdetails.CampaignID = *input.CampaignID
 		err = engine.SaveModel(authdetails)
 		if err != nil {
 			return nil, err
 		}
+	}
 
+	campaigns, err := services.FetchCampaigns(authdetails)
+	if err != nil {
+		return nil, err
+	}
+
+	criteria.CampaignName = campaigns[0].Name
+	criteriaUpdateErr := engine.SaveModel(criteria)
+	if criteriaUpdateErr != nil {
+		return nil, criteriaUpdateErr
+	}
+
+	patreonCriteria := model.ClaimCriteriaTypePatreon
+	item.Criteria = &patreonCriteria
+	err = engine.SaveModel(item)
+	if err != nil {
+		return nil, err
 	}
 
 	return item.ToGraphData(), nil
