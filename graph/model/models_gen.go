@@ -73,6 +73,7 @@ type Item struct {
 	TwitterClaimCriteriaInteractions []*InteractionType `json:"twitterClaimCriteriaInteractions,omitempty"`
 	TweetLink                        *string            `json:"tweetLink,omitempty"`
 	ProfileLink                      *string            `json:"profileLink,omitempty"`
+	CampaignName                     *string            `json:"campaignName,omitempty"`
 	CreatedAt                        time.Time          `json:"createdAt"`
 }
 

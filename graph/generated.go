@@ -75,6 +75,7 @@ type ComplexityRoot struct {
 
 	Item struct {
 		AuthorizedSubdomains             func(childComplexity int) int
+		CampaignName                     func(childComplexity int) int
 		ClaimCriteria                    func(childComplexity int) int
 		CollectionID                     func(childComplexity int) int
 		CreatedAt                        func(childComplexity int) int
@@ -301,6 +302,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.AuthorizedSubdomains(childComplexity), true
+
+	case "Item.campaignName":
+		if e.complexity.Item.CampaignName == nil {
+			break
+		}
+
+		return e.complexity.Item.CampaignName(childComplexity), true
 
 	case "Item.claimCriteria":
 		if e.complexity.Item.ClaimCriteria == nil {
@@ -1668,6 +1676,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -2415,6 +2425,47 @@ func (ec *executionContext) fieldContext_Item_profileLink(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Item_campaignName(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_campaignName(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CampaignName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_campaignName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Item_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Item_createdAt(ctx, field)
 	if err != nil {
@@ -2901,6 +2952,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -2982,6 +3035,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -3063,6 +3118,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -3144,6 +3201,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -3225,6 +3284,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -3306,6 +3367,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -3387,6 +3450,8 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -4201,6 +4266,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -4282,6 +4349,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
 				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			}
@@ -7634,6 +7703,10 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 		case "profileLink":
 
 			out.Values[i] = ec._Item_profileLink(ctx, field, obj)
+
+		case "campaignName":
+
+			out.Values[i] = ec._Item_campaignName(ctx, field, obj)
 
 		case "createdAt":
 

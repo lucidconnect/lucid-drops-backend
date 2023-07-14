@@ -161,6 +161,7 @@ type Item {
   twitterClaimCriteriaInteractions: [InteractionType]
   tweetLink: String
   profileLink: String
+  campaignName: String
   createdAt: Time!
 }
 

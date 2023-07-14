@@ -58,6 +58,10 @@ func (i *Item) ToGraphData() *model.Item {
 		item.ProfileLink = &i.TwitterCriteria.ProfileLink
 	}
 
+	if i.PatreonCriteria != nil {
+		item.CampaignName = &i.PatreonCriteria.CampaignName
+	}
+
 	return item
 }
 
