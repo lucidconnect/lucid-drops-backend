@@ -301,21 +301,28 @@ func FetchPatreonPledgesLocal(auth *models.PatreonAuthDetails) (map[string]*patr
 	tc := oauth2.NewClient(context.Background(), ts)
 	url := fmt.Sprintf("%scampaigns/%s/members", patreonAPIBaseURL, auth.CampaignID)
 
-	var pledge *patreonAuth.PledgeResponse
-	err = executePatreonOAuthRequest(url, tc, &pledge)
-	if err != nil {
-		return nil, err
-	}
-
+	var pledge *structure.PatreonCampaignMembers
 	users := make(map[string]*patreonAuth.UserResponse)
-	for _, item := range pledge.Included.Items {
+	for {
 
-		u, ok := item.(*patreonAuth.UserResponse)
-		if !ok {
-			continue
+		err = executePatreonOAuthRequest(url, tc, &pledge)
+		if err != nil {
+			return nil, err
 		}
 
-		users[u.Data.ID] = u
+		// u, ok := item.(*patreonAuth.UserResponse)
+		// if !ok {
+		// 	continue
+		// }
+
+		// users[u.Data.ID] = u
+
+		if pledge.Meta.Pagination.Cursors.Next == "" {
+			break
+		}
+
+		url = fmt.Sprintf("%s&cursor=%s", url, pledge.Meta.Pagination.Cursors.Next)
+
 	}
 
 	return users, nil

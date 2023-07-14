@@ -85,3 +85,56 @@ type PatreonCampaign struct {
 		Type string `json:"type"`
 	} `json:"data"`
 }
+
+type PatreonCampaignMembers struct {
+	Data []struct {
+		Attributes struct {
+			FullName                     string    `json:"full_name"`
+			IsFollower                   bool      `json:"is_follower"`
+			LastChargeDate               time.Time `json:"last_charge_date"`
+			LastChargeStatus             string    `json:"last_charge_status"`
+			LifetimeSupportCents         int       `json:"lifetime_support_cents"`
+			CurrentlyEntitledAmountCents int       `json:"currently_entitled_amount_cents"`
+			PatronStatus                 string    `json:"patron_status"`
+		} `json:"attributes"`
+		ID            string `json:"id"`
+		Relationships struct {
+			Address struct {
+				Data struct {
+					ID   string `json:"id"`
+					Type string `json:"type"`
+				} `json:"data"`
+			} `json:"address"`
+			CurrentlyEntitledTiers struct {
+				Data []struct {
+					ID   string `json:"id"`
+					Type string `json:"type"`
+				} `json:"data"`
+			} `json:"currently_entitled_tiers"`
+		} `json:"relationships"`
+		Type string `json:"type"`
+	} `json:"data"`
+	Included []struct {
+		Attributes struct {
+			Addressee   string    `json:"addressee"`
+			City        string    `json:"city"`
+			Country     string    `json:"country"`
+			CreatedAt   time.Time `json:"created_at"`
+			Line1       string    `json:"line_1"`
+			Line2       string    `json:"line_2"`
+			PhoneNumber string    `json:"phone_number"`
+			PostalCode  string    `json:"postal_code"`
+			State       string    `json:"state"`
+		} `json:"attributes"`
+		ID   string `json:"id"`
+		Type string `json:"type"`
+	} `json:"included"`
+	Meta struct {
+		Pagination struct {
+			Cursors struct {
+				Next string `json:"next"`
+			} `json:"cursors"`
+			Total int `json:"total"`
+		} `json:"pagination"`
+	} `json:"meta"`
+}
