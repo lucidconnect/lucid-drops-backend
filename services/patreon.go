@@ -46,7 +46,7 @@ func FetchPatreonAccessToken(code *string, creator bool) (*structure.PatreonAcce
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	var res *http.Response
-	res, err = utils.GetDebugClient().Do(req)
+	res, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func RefreshPatreonAccessToken(refreshToken *string) (*structure.PatreonAccessTo
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	var res *http.Response
-	res, err = utils.GetDebugClient().Do(req)
+	res, err = http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
