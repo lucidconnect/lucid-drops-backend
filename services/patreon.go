@@ -34,7 +34,7 @@ func FetchPatreonAccessToken(code *string, creator bool) (*structure.PatreonAcce
 	if creator {
 		params.Set("redirect_uri", utils.UseEnvOrDefault("PATREON_CREATOR_REDIRECT_URI", "https://5b62-102-216-201-35.ngrok-free.app/patreon/callback/"))
 	} else {
-		params.Set("redirect_uri", utils.UseEnvOrDefault("PATREON_REDIRECT_URI", "https://5b62-102-216-201-35.ngrok-free.app/patreon/whitelist/callback/"))
+		params.Set("redirect_uri", utils.UseEnvOrDefault("PATREON_REDIRECT_URI", "https://5b62-102-216-201-35.ngrok-free.app/whitelist/patreon/callback/"))
 	}
 
 	url := fmt.Sprintf("https://www.patreon.com/api/oauth2/token?%s&grant_type=authorization_code&%s", codeParams.Encode(), params.Encode())
@@ -139,16 +139,27 @@ func FetchPatreonUserLocal(auth *models.PatreonAuthDetails) (*structure.PatreonU
 	tc := oauth2.NewClient(context.Background(), ts)
 	url := fmt.Sprintf("%sidentity?include=memberships&fields%%5Buser%%5D=full_name&fields%%5Btier%%5D=amount_cents", patreonAPIBaseURL)
 
-	var user *patreonAuth.UserResponse
+	var user *structure.PatreonUser
 	err = executePatreonOAuthRequest(url, tc, &user)
 	if err != nil {
 		return nil, err
 	}
 
-	return &structure.PatreonUserResponse{
+	log.Printf("Patreon user: %+v", user)
+	resp := &structure.PatreonUserResponse{
 		Id:   user.Data.ID,
 		Name: user.Data.Attributes.FullName,
-	}, nil
+	}
+
+	var memberships = make(map[string]string)
+	for _, included := range user.Included {
+		if included.Type == "member" {
+			memberships[included.ID] = included.ID
+		}
+	}
+
+	resp.MembershirUIDs = memberships
+	return resp, nil
 }
 
 func FetchCampaigns(auth *models.PatreonAuthDetails) ([]*structure.PatreonCampaignInfo, error) {
@@ -199,7 +210,6 @@ func FetchPatreonCampaignLocal(auth *models.PatreonAuthDetails) ([]*structure.Pa
 		return nil, err
 	}
 
-	log.Printf("campaign info 🚨 %+v", campaign)
 	var campaigns []*structure.PatreonCampaignInfo
 	for _, campaign := range campaign.Data {
 
@@ -238,7 +248,6 @@ func FetchCampaignLocal(auth *models.PatreonAuthDetails, campaignID string) (*st
 		return nil, err
 	}
 
-	log.Printf("single campaign info 🚨 %+v", campaign)
 	return &structure.PatreonCampaignInfo{
 		Id:   campaign.Data.ID,
 		Name: campaign.Data.Attributes.CreationName,
@@ -288,7 +297,7 @@ func FetchPledges(auth *models.PatreonAuthDetails) (map[string]*patreonAuth.User
 	return users, nil
 }
 
-func FetchPatreonPledgesLocal(auth *models.PatreonAuthDetails) (map[string]*patreonAuth.UserResponse, error) {
+func FetchPatreonPledgesLocal(auth *models.PatreonAuthDetails) (map[string]string, error) {
 
 	err := refreshAccessTokenIfExpired(auth)
 	if err != nil {
@@ -302,7 +311,7 @@ func FetchPatreonPledgesLocal(auth *models.PatreonAuthDetails) (map[string]*patr
 	url := fmt.Sprintf("%scampaigns/%s/members", patreonAPIBaseURL, auth.CampaignID)
 
 	var pledge *structure.PatreonCampaignMembers
-	users := make(map[string]*patreonAuth.UserResponse)
+	users := make(map[string]string)
 	for {
 
 		err = executePatreonOAuthRequest(url, tc, &pledge)
@@ -310,12 +319,9 @@ func FetchPatreonPledgesLocal(auth *models.PatreonAuthDetails) (map[string]*patr
 			return nil, err
 		}
 
-		// u, ok := item.(*patreonAuth.UserResponse)
-		// if !ok {
-		// 	continue
-		// }
-
-		// users[u.Data.ID] = u
+		for _, member := range pledge.Data {
+			users[member.ID] = member.ID
+		}
 
 		if pledge.Meta.Pagination.Cursors.Next == "" {
 			break
@@ -337,7 +343,6 @@ func executePatreonOAuthRequest(reqUrl string, client *http.Client, destination 
 	// 	},
 	// }
 
-	log.Print("🚨 executing patreon request 🚨", reqUrl)
 	resp, err := client.Get(reqUrl)
 	if err != nil {
 		return err

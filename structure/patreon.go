@@ -12,8 +12,9 @@ type PatreonAccessTokenResponse struct {
 }
 
 type PatreonUserResponse struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Id             string   `json:"id"`
+	MembershirUIDs map[string]string `json:"memberships"`
+	Name           string   `json:"name"`
 }
 
 type PatreonCampaignInfo struct {
@@ -89,13 +90,13 @@ type PatreonCampaign struct {
 type PatreonCampaignMembers struct {
 	Data []struct {
 		Attributes struct {
-			FullName                     string    `json:"full_name"`
-			IsFollower                   bool      `json:"is_follower"`
-			LastChargeDate               time.Time `json:"last_charge_date"`
-			LastChargeStatus             string    `json:"last_charge_status"`
-			LifetimeSupportCents         int       `json:"lifetime_support_cents"`
-			CurrentlyEntitledAmountCents int       `json:"currently_entitled_amount_cents"`
-			PatronStatus                 string    `json:"patron_status"`
+			FullName                     string `json:"full_name"`
+			IsFollower                   bool   `json:"is_follower"`
+			LastChargeDate               string `json:"last_charge_date"`
+			LastChargeStatus             string `json:"last_charge_status"`
+			LifetimeSupportCents         int    `json:"lifetime_support_cents"`
+			CurrentlyEntitledAmountCents int    `json:"currently_entitled_amount_cents"`
+			PatronStatus                 string `json:"patron_status"`
 		} `json:"attributes"`
 		ID            string `json:"id"`
 		Relationships struct {
@@ -137,4 +138,37 @@ type PatreonCampaignMembers struct {
 			Total int `json:"total"`
 		} `json:"pagination"`
 	} `json:"meta"`
+}
+
+type PatreonUser struct {
+	Data struct {
+		Attributes struct {
+			Email    string `json:"email"`
+			FullName string `json:"full_name"`
+		} `json:"attributes"`
+		ID            string `json:"id"`
+		Relationships struct {
+			Campaign struct {
+				Data struct {
+					ID   string `json:"id"`
+					Type string `json:"type"`
+				} `json:"data"`
+				Links struct {
+					Related string `json:"related"`
+				} `json:"links"`
+			} `json:"campaign"`
+		} `json:"relationships"`
+		Type string `json:"type"`
+	} `json:"data"`
+	Included []struct {
+		Attributes struct {
+			IsMonthly bool   `json:"is_monthly"`
+			Summary   string `json:"summary"`
+		} `json:"attributes"`
+		ID   string `json:"id"`
+		Type string `json:"type"`
+	} `json:"included"`
+	Links struct {
+		Self string `json:"self"`
+	} `json:"links"`
 }

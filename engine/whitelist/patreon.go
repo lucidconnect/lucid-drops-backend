@@ -1,7 +1,9 @@
 package whitelist
 
 import (
+	"encoding/json"
 	"errors"
+	"log"
 	"time"
 
 	"inverse.so/engine"
@@ -37,6 +39,9 @@ func ProcessPatreonCallback(code *string, creator bool) (*string, []*structure.P
 	}
 
 	patreonDetails.UserID = user.Id
+	jsonValues, _ := json.Marshal(user.MembershirUIDs)
+	patreonDetails.MembershipUIDs = string(jsonValues)
+
 	if len(campaigns) == 1 {
 		patreonDetails.CampaignID = campaigns[0].Id
 	}
@@ -52,9 +57,10 @@ func ProcessPatreonCallback(code *string, creator bool) (*string, []*structure.P
 
 func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 
+	log.Print(authDetails.Address)
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new collection")
 	}
 
 	item, err := engine.GetItemByID(input.ItemID)
@@ -126,21 +132,30 @@ func ValidatePatreonCriteriaForItem(itemID string, authID *string) (bool, error)
 		return false, errors.New("creator patreon account not authorized")
 	}
 
-	campaignPledges, err := services.FetchPledges(creatorAuth)
+	campaignPledges, err := services.FetchPatreonPledgesLocal(creatorAuth)
 	if err != nil {
 		return false, errors.New("error fetching pledges")
 	}
 
-	_, found := campaignPledges[patreonAuth.UserID]
-	if !found {
-		return false, errors.New("user not found in campaign pledges")
+	var membershipIDs = make(map[string]string)
+	_ = json.Unmarshal([]byte(patreonAuth.MembershipUIDs), &membershipIDs)
+	if membershipIDs == nil {
+		return false, errors.New("user is not a valid patron")
 	}
 
-	patreonAuth.WhiteListed = true
-	err = engine.SaveModel(patreonAuth)
-	if err != nil {
-		return false, errors.New("error saving patreon auth")
+	for _, membershipID := range membershipIDs {
+
+		_, ok := campaignPledges[membershipID]
+		if ok {
+			patreonAuth.WhiteListed = true
+			err = engine.SaveModel(patreonAuth)
+			if err != nil {
+				return false, errors.New("error saving patreon auth")
+			}
+
+			return true, nil
+		}
 	}
 
-	return true, nil
+	return false, errors.New("user is not a valid patron")
 }
