@@ -19,6 +19,8 @@ type Query {
   getImageSuggestions(prompt: String!, preset: AiImageStyle ): [ImageResponse]!
   getTweetDetails(tweetLink: String!): TweetDetails!
   getTwitterUserDetails(userName: String!): UserDetails!
+
+  fetchQuestionsByItemId(itemId: String!): [QuestionnaireType!]!
 }
 
 type Mutation {
@@ -30,6 +32,7 @@ type Mutation {
   createItem(input: ItemInput!): Item!
   updateItem(itemID: String!,input: ItemInput!): Item!
 
+  createQuestionnaireCriteriaForItem( input:QuestionnaireCriteriaInput!): Boolean!
   createEmailWhitelistForItem(input: NewEmailWhitelistInput!): Item!
   createEmailDomainWhitelist(input: NewEmailDomainWhitelistInput!): Item!
   createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
@@ -38,6 +41,7 @@ type Mutation {
   validateTwitterCriteriaForItem(itemID: String!, authID: String): Boolean!
   validateTelegramCriteriaForItem(itemID: String!, authID: String): Boolean!
   validatePatreonCriteriaForItem(itemID: String!, authID: String): Boolean!
+  validateQuestionnaireCriteriaForItem(itemID: String!, input: [QuestionnaireAnswerInput!]!): String!
 
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
@@ -52,6 +56,29 @@ scalar Time
 input NewEmailWhitelistInput {
   itemID: String!
   authorizedEmails: [String!]!
+}
+
+input QuestionnaireCriteriaInput {
+  itemID: String!
+  questionType: QuestionType!
+  openEndedInput: [OpenEndedInputType!]
+  multiChoiceInput: [MultiChoiceInputType!]
+}
+
+input MultiChoiceInputType {
+  question: String!
+  choices: [String!]!
+  correctChoice: String!
+}
+
+input OpenEndedInputType {
+  question: String!
+  answers: [String!]!
+}
+
+input QuestionnaireAnswerInput{
+  answer: String!
+  questionId: String!
 }
 
 input EmailClaimInput {
@@ -164,6 +191,13 @@ type Item {
   createdAt: Time!
 }
 
+type QuestionnaireType {
+  """ Choices will only contain a list of potential answers when the `questionType` is `multiChoice` """
+  choices: [String!]
+  questionId: String!
+  questionType: QuestionType!
+}
+
 type ImageResponse {
   image: String!
   format: ImageResolveFormaat!
@@ -198,6 +232,11 @@ type UserDetails {
 
 }
 
+enum QuestionType{
+  multiChoice
+  directAnswer
+}
+
 enum ClaimCriteriaType{
   emailWhiteList
   emailDomain
@@ -205,6 +244,8 @@ enum ClaimCriteriaType{
   twitterFollowers
   telegram
   patreon
+  directAnswerQuestionnaire
+  mutliChoiceQuestionnaire
 }
 
 enum AiImageStyle{
