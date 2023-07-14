@@ -8,6 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm/clause"
 	"inverse.so/dbutils"
+	"inverse.so/graph/model"
 	"inverse.so/models"
 	"inverse.so/utils"
 )
@@ -87,6 +88,48 @@ func GetItemByID(itemID string) (*models.Item, error) {
 	}
 
 	return &item, nil
+}
+
+func GetItemQuestionsByItem(item *models.Item) ([]*model.QuestionnaireType, error) {
+	if item.Criteria == nil {
+		return []*model.QuestionnaireType{}, nil
+	}
+
+	switch *item.Criteria {
+	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire:
+		var directQuestions []*models.DirectAnswerCriteria
+
+		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).First(&directQuestions).Error
+		if err != nil {
+			return nil, errors.New("seems item doesn't have any direct questions")
+		}
+
+		marshalledQuestion := make([]*model.QuestionnaireType, len(directQuestions))
+		for idx, q := range directQuestions {
+			marshalledQuestion[idx] = q.ToGraphData()
+		}
+
+		return marshalledQuestion, nil
+
+	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
+		var multiChoiceQuestions []*models.MultiChoiceCriteria
+
+		err := dbutils.DB.Where(&models.MultiChoiceCriteria{ItemID: item.ID}).First(&multiChoiceQuestions).Error
+		if err != nil {
+			return nil, errors.New("seems item doesn't have any multi choice questions")
+		}
+
+		marshalledQuestion := make([]*model.QuestionnaireType, len(multiChoiceQuestions))
+		for idx, q := range multiChoiceQuestions {
+			marshalledQuestion[idx] = q.ToGraphData()
+		}
+
+		return marshalledQuestion, nil
+
+	default:
+		return nil, fmt.Errorf("item has a claim criteria of (%s) which doesn't have emais", *item.Criteria)
+	}
+
 }
 
 func GetEmailClaimIDByItemAndEmailSubDomain(itemID *uuid.UUID, emailAddress string) (*models.EmailDomainWhiteList, error) {
@@ -199,7 +242,7 @@ func FetchPatreonAuthByID(authID string) (*models.PatreonAuthDetails, error) {
 	}
 
 	return &patreonAuth, nil
-} 
+}
 
 func FetchTelegramCriteriaByLink(channelLink string) (*models.TelegramCriteria, error) {
 	var criteria models.TelegramCriteria
