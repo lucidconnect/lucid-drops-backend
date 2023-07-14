@@ -195,7 +195,7 @@ func FetchPatreonAuthByID(authID string) (*models.PatreonAuthDetails, error) {
 	var patreonAuth models.PatreonAuthDetails
 	err := dbutils.DB.Model(&models.PatreonAuthDetails{}).Where("id=?", authID).First(&patreonAuth).Error
 	if err != nil {
-		return nil, errors.New("twitter auth not found")
+		return nil, errors.New("patreon auth not found")
 	}
 
 	return &patreonAuth, nil
