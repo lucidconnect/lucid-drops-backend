@@ -158,6 +158,7 @@ type QuestionnaireCriteriaInput struct {
 type QuestionnaireType struct {
 	//  Choices will only contain a list of potential answers when the `questionType` is `multiChoice`
 	Choices      []string     `json:"choices,omitempty"`
+	Question     string       `json:"question"`
 	QuestionID   string       `json:"questionId"`
 	QuestionType QuestionType `json:"questionType"`
 }

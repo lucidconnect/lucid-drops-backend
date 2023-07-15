@@ -19,6 +19,7 @@ type DirectAnswerCriteria struct {
 
 func (d *DirectAnswerCriteria) ToGraphData() *model.QuestionnaireType {
 	question := &model.QuestionnaireType{
+		Question:     d.Question,
 		QuestionID:   d.QuestionID.String(),
 		QuestionType: model.QuestionTypeDirectAnswer,
 	}
@@ -41,6 +42,7 @@ func (m *MultiChoiceCriteria) ToGraphData() *model.QuestionnaireType {
 	var questionsMapping map[string]bool
 
 	question := &model.QuestionnaireType{
+		Question:     m.Question,
 		QuestionID:   m.QuestionID.String(),
 		QuestionType: model.QuestionTypeMultiChoice,
 	}

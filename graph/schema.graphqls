@@ -194,6 +194,7 @@ type Item {
 type QuestionnaireType {
   """ Choices will only contain a list of potential answers when the `questionType` is `multiChoice` """
   choices: [String!]
+  question: String!
   questionId: String!
   questionType: QuestionType!
 }

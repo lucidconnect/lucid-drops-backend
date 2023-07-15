@@ -137,6 +137,7 @@ type ComplexityRoot struct {
 
 	QuestionnaireType struct {
 		Choices      func(childComplexity int) int
+		Question     func(childComplexity int) int
 		QuestionID   func(childComplexity int) int
 		QuestionType func(childComplexity int) int
 	}
@@ -777,6 +778,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.QuestionnaireType.Choices(childComplexity), true
+
+	case "QuestionnaireType.question":
+		if e.complexity.QuestionnaireType.Question == nil {
+			break
+		}
+
+		return e.complexity.QuestionnaireType.Question(childComplexity), true
 
 	case "QuestionnaireType.questionId":
 		if e.complexity.QuestionnaireType.QuestionID == nil {
@@ -4766,6 +4774,8 @@ func (ec *executionContext) fieldContext_Query_fetchQuestionsByItemId(ctx contex
 			switch field.Name {
 			case "choices":
 				return ec.fieldContext_QuestionnaireType_choices(ctx, field)
+			case "question":
+				return ec.fieldContext_QuestionnaireType_question(ctx, field)
 			case "questionId":
 				return ec.fieldContext_QuestionnaireType_questionId(ctx, field)
 			case "questionType":
@@ -4946,6 +4956,50 @@ func (ec *executionContext) _QuestionnaireType_choices(ctx context.Context, fiel
 }
 
 func (ec *executionContext) fieldContext_QuestionnaireType_choices(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuestionnaireType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuestionnaireType_question(ctx context.Context, field graphql.CollectedField, obj *model.QuestionnaireType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_QuestionnaireType_question(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Question, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_QuestionnaireType_question(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "QuestionnaireType",
 		Field:      field,
@@ -8842,6 +8896,13 @@ func (ec *executionContext) _QuestionnaireType(ctx context.Context, sel ast.Sele
 
 			out.Values[i] = ec._QuestionnaireType_choices(ctx, field, obj)
 
+		case "question":
+
+			out.Values[i] = ec._QuestionnaireType_question(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "questionId":
 
 			out.Values[i] = ec._QuestionnaireType_questionId(ctx, field, obj)
