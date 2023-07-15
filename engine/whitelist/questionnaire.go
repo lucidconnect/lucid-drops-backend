@@ -208,8 +208,8 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 				return nil, fmt.Errorf("(%s) is not part of the item claim", potentialAnswers.QuestionID)
 			}
 
-			if correctAnswer != potentialAnswers.Answer {
-				return nil, errors.New("wrong choice supplied for some of the questions")
+			if !strings.EqualFold(correctAnswer, potentialAnswers.Answer) {
+				return nil, fmt.Errorf("wrong choice %s supplied for some of the questions %s", potentialAnswers.Answer, correctAnswer)
 			}
 		}
 
