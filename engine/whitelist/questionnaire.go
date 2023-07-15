@@ -15,7 +15,7 @@ import (
 	"inverse.so/models"
 )
 
-func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input *model.QuestionnaireCriteriaInput) (*bool, error) {
+func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input *model.QuestionnaireCriteriaInput) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
 		return nil, errors.New("creator is has not been onboarded to create a new collection")
@@ -65,9 +65,7 @@ func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input
 			return nil, itemUpdateErr
 		}
 
-		localTrue := true
-
-		return &localTrue, nil
+		return item.ToGraphData(), nil
 
 	case model.QuestionTypeMultiChoice:
 		if input.MultiChoiceInput == nil || len(input.MultiChoiceInput) == 0 {
@@ -108,9 +106,7 @@ func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input
 			return nil, itemUpdateErr
 		}
 
-		localTrue := true
-
-		return &localTrue, nil
+		return item.ToGraphData(), nil
 	}
 
 	return nil, nil

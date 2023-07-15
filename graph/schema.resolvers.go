@@ -96,18 +96,18 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input 
 }
 
 // CreateQuestionnaireCriteriaForItem is the resolver for the createQuestionnaireCriteriaForItem field.
-func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (bool, error) {
+func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return false, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
 	created, err := whitelist.CreateQuestionnaireCriteriaForItem(authenticationDetails, &input)
 	if err != nil {
-		return false, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	return *created, nil
+	return created, nil
 }
 
 // CreateEmailWhitelistForItem is the resolver for the createEmailWhitelistForItem field.

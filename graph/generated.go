@@ -174,7 +174,7 @@ type MutationResolver interface {
 	UpdateCollection(ctx context.Context, collectionID string, input model.CollectionInput) (*model.Collection, error)
 	CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error)
 	UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error)
-	CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (bool, error)
+	CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (*model.Item, error)
 	CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error)
 	CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error)
 	CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error)
@@ -3218,9 +3218,9 @@ func (ec *executionContext) _Mutation_createQuestionnaireCriteriaForItem(ctx con
 		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.Item)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalNItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3230,7 +3230,35 @@ func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaFor
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "tweetLink":
+				return ec.fieldContext_Item_tweetLink(ctx, field)
+			case "profileLink":
+				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Item_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
 	}
 	defer func() {

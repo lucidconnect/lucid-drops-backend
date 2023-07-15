@@ -32,7 +32,7 @@ type Mutation {
   createItem(input: ItemInput!): Item!
   updateItem(itemID: String!,input: ItemInput!): Item!
 
-  createQuestionnaireCriteriaForItem( input:QuestionnaireCriteriaInput!): Boolean!
+  createQuestionnaireCriteriaForItem( input:QuestionnaireCriteriaInput!): Item!
   createEmailWhitelistForItem(input: NewEmailWhitelistInput!): Item!
   createEmailDomainWhitelist(input: NewEmailDomainWhitelistInput!): Item!
   createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
