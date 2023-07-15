@@ -99,7 +99,7 @@ func GetItemQuestionsByItem(item *models.Item) ([]*model.QuestionnaireType, erro
 	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire:
 		var directQuestions []*models.DirectAnswerCriteria
 
-		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).First(&directQuestions).Error
+		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).Find(&directQuestions).Error
 		if err != nil {
 			return nil, errors.New("seems item doesn't have any direct questions")
 		}
@@ -114,7 +114,7 @@ func GetItemQuestionsByItem(item *models.Item) ([]*model.QuestionnaireType, erro
 	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
 		var multiChoiceQuestions []*models.MultiChoiceCriteria
 
-		err := dbutils.DB.Where(&models.MultiChoiceCriteria{ItemID: item.ID}).First(&multiChoiceQuestions).Error
+		err := dbutils.DB.Where(&models.MultiChoiceCriteria{ItemID: item.ID}).Find(&multiChoiceQuestions).Error
 		if err != nil {
 			return nil, errors.New("seems item doesn't have any multi choice questions")
 		}

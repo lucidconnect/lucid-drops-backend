@@ -130,9 +130,13 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire:
 		var directQuestions []*models.DirectAnswerCriteria
 
-		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).First(&directQuestions).Error
+		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).Find(&directQuestions).Error
 		if err != nil {
 			return nil, errors.New("seems item doesn't have any direct questions")
+		}
+
+		if len(directQuestions) != len(input) {
+			return nil, fmt.Errorf("provide anwsers for all (%d) questions", len(directQuestions))
 		}
 
 		mappedQuestionsAndChoices := make(map[string]map[string]bool, len(directQuestions))
@@ -144,10 +148,14 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 			mappedQuestionsAndChoices[q.QuestionID.String()] = unmarshelledAnswers
 		}
 
+		answeredQuestions := make(map[string]bool)
+
 		for _, potentialAnswers := range input {
+			answeredQuestions[potentialAnswers.QuestionID] = true
+
 			correctAnswers, found := mappedQuestionsAndChoices[potentialAnswers.QuestionID]
 			if !found {
-				return nil, fmt.Errorf("(%s) is not part of the item claim", potentialAnswers.QuestionID)
+				return nil, fmt.Errorf("(%s) is not part of the item claim questions", potentialAnswers.QuestionID)
 			}
 
 			_, correct := correctAnswers[strings.ToLower(potentialAnswers.Answer)]
@@ -156,15 +164,23 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 			}
 		}
 
+		if len(answeredQuestions) != len(directQuestions) {
+			return nil, errors.New("submitted duplicate questions")
+		}
+
 		claimingID := "TODO HOW DO WE MAP OTHER CRITERIA"
 		return &claimingID, nil
 
 	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
 		var multiChoiceQuestions []*models.MultiChoiceCriteria
 
-		err := dbutils.DB.Where(&models.MultiChoiceCriteria{ItemID: item.ID}).First(&multiChoiceQuestions).Error
+		err := dbutils.DB.Where(&models.MultiChoiceCriteria{ItemID: item.ID}).Find(&multiChoiceQuestions).Error
 		if err != nil {
 			return nil, errors.New("seems item doesn't have any multi choice questions")
+		}
+
+		if len(multiChoiceQuestions) != len(input) {
+			return nil, fmt.Errorf("provide anwsers for all (%d) questions", len(multiChoiceQuestions))
 		}
 
 		mappedQuestionsAndAnswer := make(map[string]string, len(multiChoiceQuestions))
@@ -172,20 +188,27 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 			mappedQuestionsAndAnswer[q.QuestionID.String()] = q.CorrectChoice
 		}
 
+		answeredQuestions := make(map[string]bool)
+
 		for _, potentialAnswers := range input {
+			answeredQuestions[potentialAnswers.QuestionID] = true
+
 			correctAnswer, found := mappedQuestionsAndAnswer[potentialAnswers.QuestionID]
 			if !found {
 				return nil, fmt.Errorf("(%s) is not part of the item claim", potentialAnswers.QuestionID)
 			}
 
 			if correctAnswer != potentialAnswers.Answer {
-				return nil, errors.New("wrong choice supplied for one of the questions")
+				return nil, errors.New("wrong choice supplied for some of the questions")
 			}
+		}
+
+		if len(answeredQuestions) != len(multiChoiceQuestions) {
+			return nil, errors.New("submitted duplicate questions")
 		}
 
 		claimingID := "TODO HOW DO WE MAP OTHER CRITERIA"
 		return &claimingID, nil
-
 	}
 
 	return nil, errors.New("item cannot be claimed via this method")
