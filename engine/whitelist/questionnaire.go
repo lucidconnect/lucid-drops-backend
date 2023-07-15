@@ -168,7 +168,17 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 			return nil, errors.New("submitted duplicate questions")
 		}
 
-		claimingID := "TODO HOW DO WE MAP OTHER CRITERIA"
+		newMint := models.MintPass{
+			ItemId: itemID,
+		}
+
+		err = dbutils.DB.Create(&newMint).Error
+		if err != nil {
+			return nil, err
+		}
+
+		claimingID := newMint.ID.String()
+
 		return &claimingID, nil
 
 	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
@@ -207,7 +217,17 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 			return nil, errors.New("submitted duplicate questions")
 		}
 
-		claimingID := "TODO HOW DO WE MAP OTHER CRITERIA"
+		newMint := models.MintPass{
+			ItemId: itemID,
+		}
+
+		err = dbutils.DB.Create(&newMint).Error
+		if err != nil {
+			return nil, err
+		}
+
+		claimingID := newMint.ID.String()
+
 		return &claimingID, nil
 	}
 

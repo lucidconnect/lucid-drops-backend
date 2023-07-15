@@ -63,6 +63,7 @@ func SetupDB(dsn string) *gorm.DB {
 		&models.Creator{},
 		&models.Collection{},
 		&models.Item{},
+		&models.MintPass{},
 		&models.SingleEmailClaim{},
 		&models.EmailDomainWhiteList{},
 		&models.EmailOTP{},
