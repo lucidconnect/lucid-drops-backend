@@ -41,7 +41,7 @@ type Mutation {
   validateTwitterCriteriaForItem(itemID: String!, authID: String): Boolean!
   validateTelegramCriteriaForItem(itemID: String!, authID: String): Boolean!
   validatePatreonCriteriaForItem(itemID: String!, authID: String): Boolean!
-  validateQuestionnaireCriteriaForItem(itemID: String!, input: [QuestionnaireAnswerInput!]!): String!
+  validateQuestionnaireCriteriaForItem(itemID: String!, input: [QuestionnaireAnswerInput!]!): String
 
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!

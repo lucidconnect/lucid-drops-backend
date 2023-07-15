@@ -188,8 +188,8 @@ func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, i
 }
 
 // ValidateQuestionnaireCriteriaForItem is the resolver for the validateQuestionnaireCriteriaForItem field.
-func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (string, error) {
-	panic(fmt.Errorf("not implemented: ValidateQuestionnaireCriteriaForItem - validateQuestionnaireCriteriaForItem"))
+func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
+	return whitelist.ValidateQuestionnaireCriteriaForItem(itemID, input)
 }
 
 // StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.
