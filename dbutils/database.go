@@ -63,6 +63,7 @@ func SetupDB(dsn string) *gorm.DB {
 		&models.Creator{},
 		&models.Collection{},
 		&models.Item{},
+		&models.MintPass{},
 		&models.SingleEmailClaim{},
 		&models.EmailDomainWhiteList{},
 		&models.EmailOTP{},
@@ -73,6 +74,8 @@ func SetupDB(dsn string) *gorm.DB {
 		&models.TwitterAuthDetails{},
 		&models.TelegramAuthDetails{},
 		&models.PatreonAuthDetails{},
+		&models.MultiChoiceCriteria{},
+		&models.DirectAnswerCriteria{},
 	)
 
 	return DB

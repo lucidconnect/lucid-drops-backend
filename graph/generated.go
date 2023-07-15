@@ -97,23 +97,25 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CompleteEmailVerificationForClaim func(childComplexity int, input model.CompleteEmailVerificationInput) int
-		CreateCollection                  func(childComplexity int, input model.CollectionInput) int
-		CreateEmailDomainWhitelist        func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
-		CreateEmailWhitelistForItem       func(childComplexity int, input model.NewEmailWhitelistInput) int
-		CreateItem                        func(childComplexity int, input model.ItemInput) int
-		CreatePatreonCriteriaForItem      func(childComplexity int, input model.NewPatreonCriteriaInput) int
-		CreateTelegramCriteriaForItem     func(childComplexity int, input model.NewTelegramCriteriaInput) int
-		CreateTwitterCriteriaForItem      func(childComplexity int, input model.NewTwitterCriteriaInput) int
-		GenerateSignatureForClaim         func(childComplexity int, input model.GenerateClaimSignatureInput) int
-		RegisterInverseUsername           func(childComplexity int, input model.NewUsernameRegisgration) int
-		StartEmailVerificationForClaim    func(childComplexity int, input model.EmailClaimInput) int
-		StoreSignerInfo                   func(childComplexity int, input model.SignerInfo) int
-		UpdateCollection                  func(childComplexity int, collectionID string, input model.CollectionInput) int
-		UpdateItem                        func(childComplexity int, itemID string, input model.ItemInput) int
-		ValidatePatreonCriteriaForItem    func(childComplexity int, itemID string, authID *string) int
-		ValidateTelegramCriteriaForItem   func(childComplexity int, itemID string, authID *string) int
-		ValidateTwitterCriteriaForItem    func(childComplexity int, itemID string, authID *string) int
+		CompleteEmailVerificationForClaim    func(childComplexity int, input model.CompleteEmailVerificationInput) int
+		CreateCollection                     func(childComplexity int, input model.CollectionInput) int
+		CreateEmailDomainWhitelist           func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
+		CreateEmailWhitelistForItem          func(childComplexity int, input model.NewEmailWhitelistInput) int
+		CreateItem                           func(childComplexity int, input model.ItemInput) int
+		CreatePatreonCriteriaForItem         func(childComplexity int, input model.NewPatreonCriteriaInput) int
+		CreateQuestionnaireCriteriaForItem   func(childComplexity int, input model.QuestionnaireCriteriaInput) int
+		CreateTelegramCriteriaForItem        func(childComplexity int, input model.NewTelegramCriteriaInput) int
+		CreateTwitterCriteriaForItem         func(childComplexity int, input model.NewTwitterCriteriaInput) int
+		GenerateSignatureForClaim            func(childComplexity int, input model.GenerateClaimSignatureInput) int
+		RegisterInverseUsername              func(childComplexity int, input model.NewUsernameRegisgration) int
+		StartEmailVerificationForClaim       func(childComplexity int, input model.EmailClaimInput) int
+		StoreSignerInfo                      func(childComplexity int, input model.SignerInfo) int
+		UpdateCollection                     func(childComplexity int, collectionID string, input model.CollectionInput) int
+		UpdateItem                           func(childComplexity int, itemID string, input model.ItemInput) int
+		ValidatePatreonCriteriaForItem       func(childComplexity int, itemID string, authID *string) int
+		ValidateQuestionnaireCriteriaForItem func(childComplexity int, itemID string, input []*model.QuestionnaireAnswerInput) int
+		ValidateTelegramCriteriaForItem      func(childComplexity int, itemID string, authID *string) int
+		ValidateTwitterCriteriaForItem       func(childComplexity int, itemID string, authID *string) int
 	}
 
 	OnboardingProgress struct {
@@ -125,12 +127,20 @@ type ComplexityRoot struct {
 		FetchCreatorCollections  func(childComplexity int) int
 		FetchItemByID            func(childComplexity int, itemID string) int
 		FetchItemsInCollection   func(childComplexity int, collectionID string) int
+		FetchQuestionsByItemID   func(childComplexity int, itemID string) int
 		GetCreatorDetails        func(childComplexity int) int
 		GetImageSuggestions      func(childComplexity int, prompt string, preset *model.AiImageStyle) int
 		GetOnboardinProgress     func(childComplexity int) int
 		GetTweetDetails          func(childComplexity int, tweetLink string) int
 		GetTwitterUserDetails    func(childComplexity int, userName string) int
 		IsInverseNameIsAvailable func(childComplexity int, input model.NewUsernameRegisgration) int
+	}
+
+	QuestionnaireType struct {
+		Choices      func(childComplexity int) int
+		Question     func(childComplexity int) int
+		QuestionID   func(childComplexity int) int
+		QuestionType func(childComplexity int) int
 	}
 
 	StartEmailVerificationResponse struct {
@@ -164,6 +174,7 @@ type MutationResolver interface {
 	UpdateCollection(ctx context.Context, collectionID string, input model.CollectionInput) (*model.Collection, error)
 	CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error)
 	UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error)
+	CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (bool, error)
 	CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error)
 	CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error)
 	CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error)
@@ -172,6 +183,7 @@ type MutationResolver interface {
 	ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
 	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
 	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
+	ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error)
 	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
 	CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error)
 	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
@@ -188,6 +200,7 @@ type QueryResolver interface {
 	GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error)
 	GetTweetDetails(ctx context.Context, tweetLink string) (*model.TweetDetails, error)
 	GetTwitterUserDetails(ctx context.Context, userName string) (*model.UserDetails, error)
+	FetchQuestionsByItemID(ctx context.Context, itemID string) ([]*model.QuestionnaireType, error)
 }
 
 type executableSchema struct {
@@ -487,6 +500,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreatePatreonCriteriaForItem(childComplexity, args["input"].(model.NewPatreonCriteriaInput)), true
 
+	case "Mutation.createQuestionnaireCriteriaForItem":
+		if e.complexity.Mutation.CreateQuestionnaireCriteriaForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createQuestionnaireCriteriaForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateQuestionnaireCriteriaForItem(childComplexity, args["input"].(model.QuestionnaireCriteriaInput)), true
+
 	case "Mutation.createTelegramCriteriaForItem":
 		if e.complexity.Mutation.CreateTelegramCriteriaForItem == nil {
 			break
@@ -595,6 +620,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.ValidatePatreonCriteriaForItem(childComplexity, args["itemID"].(string), args["authID"].(*string)), true
 
+	case "Mutation.validateQuestionnaireCriteriaForItem":
+		if e.complexity.Mutation.ValidateQuestionnaireCriteriaForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_validateQuestionnaireCriteriaForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ValidateQuestionnaireCriteriaForItem(childComplexity, args["itemID"].(string), args["input"].([]*model.QuestionnaireAnswerInput)), true
+
 	case "Mutation.validateTelegramCriteriaForItem":
 		if e.complexity.Mutation.ValidateTelegramCriteriaForItem == nil {
 			break
@@ -669,6 +706,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.FetchItemsInCollection(childComplexity, args["collectionID"].(string)), true
 
+	case "Query.fetchQuestionsByItemId":
+		if e.complexity.Query.FetchQuestionsByItemID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_fetchQuestionsByItemId_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FetchQuestionsByItemID(childComplexity, args["itemId"].(string)), true
+
 	case "Query.getCreatorDetails":
 		if e.complexity.Query.GetCreatorDetails == nil {
 			break
@@ -730,6 +779,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.IsInverseNameIsAvailable(childComplexity, args["input"].(model.NewUsernameRegisgration)), true
+
+	case "QuestionnaireType.choices":
+		if e.complexity.QuestionnaireType.Choices == nil {
+			break
+		}
+
+		return e.complexity.QuestionnaireType.Choices(childComplexity), true
+
+	case "QuestionnaireType.question":
+		if e.complexity.QuestionnaireType.Question == nil {
+			break
+		}
+
+		return e.complexity.QuestionnaireType.Question(childComplexity), true
+
+	case "QuestionnaireType.questionId":
+		if e.complexity.QuestionnaireType.QuestionID == nil {
+			break
+		}
+
+		return e.complexity.QuestionnaireType.QuestionID(childComplexity), true
+
+	case "QuestionnaireType.questionType":
+		if e.complexity.QuestionnaireType.QuestionType == nil {
+			break
+		}
+
+		return e.complexity.QuestionnaireType.QuestionType(childComplexity), true
 
 	case "StartEmailVerificationResponse.otpRequestID":
 		if e.complexity.StartEmailVerificationResponse.OtpRequestID == nil {
@@ -801,12 +878,16 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputEmailClaimInput,
 		ec.unmarshalInputGenerateClaimSignatureInput,
 		ec.unmarshalInputItemInput,
+		ec.unmarshalInputMultiChoiceInputType,
 		ec.unmarshalInputNewEmailDomainWhitelistInput,
 		ec.unmarshalInputNewEmailWhitelistInput,
 		ec.unmarshalInputNewPatreonCriteriaInput,
 		ec.unmarshalInputNewTelegramCriteriaInput,
 		ec.unmarshalInputNewTwitterCriteriaInput,
 		ec.unmarshalInputNewUsernameRegisgration,
+		ec.unmarshalInputOpenEndedInputType,
+		ec.unmarshalInputQuestionnaireAnswerInput,
+		ec.unmarshalInputQuestionnaireCriteriaInput,
 		ec.unmarshalInputSignerInfo,
 	)
 	first := true
@@ -977,6 +1058,21 @@ func (ec *executionContext) field_Mutation_createPatreonCriteriaForItem_args(ctx
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createQuestionnaireCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.QuestionnaireCriteriaInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNQuestionnaireCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐQuestionnaireCriteriaInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createTelegramCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1139,6 +1235,30 @@ func (ec *executionContext) field_Mutation_validatePatreonCriteriaForItem_args(c
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_validateQuestionnaireCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["itemID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["itemID"] = arg0
+	var arg1 []*model.QuestionnaireAnswerInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg1, err = ec.unmarshalNQuestionnaireAnswerInput2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐQuestionnaireAnswerInputᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_validateTelegramCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1244,6 +1364,21 @@ func (ec *executionContext) field_Query_fetchItemsInCollection_args(ctx context.
 		}
 	}
 	args["collectionID"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_fetchQuestionsByItemId_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["itemId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["itemId"] = arg0
 	return args, nil
 }
 
@@ -3057,6 +3192,61 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createQuestionnaireCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createQuestionnaireCriteriaForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateQuestionnaireCriteriaForItem(rctx, fc.Args["input"].(model.QuestionnaireCriteriaInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createQuestionnaireCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createEmailWhitelistForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createEmailWhitelistForItem(ctx, field)
 	if err != nil {
@@ -3631,6 +3821,58 @@ func (ec *executionContext) fieldContext_Mutation_validatePatreonCriteriaForItem
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_validatePatreonCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_validateQuestionnaireCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_validateQuestionnaireCriteriaForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ValidateQuestionnaireCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["input"].([]*model.QuestionnaireAnswerInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_validateQuestionnaireCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_validateQuestionnaireCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -4560,6 +4802,71 @@ func (ec *executionContext) fieldContext_Query_getTwitterUserDetails(ctx context
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_fetchQuestionsByItemId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_fetchQuestionsByItemId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FetchQuestionsByItemID(rctx, fc.Args["itemId"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.QuestionnaireType)
+	fc.Result = res
+	return ec.marshalNQuestionnaireType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐQuestionnaireTypeᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_fetchQuestionsByItemId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "choices":
+				return ec.fieldContext_QuestionnaireType_choices(ctx, field)
+			case "question":
+				return ec.fieldContext_QuestionnaireType_question(ctx, field)
+			case "questionId":
+				return ec.fieldContext_QuestionnaireType_questionId(ctx, field)
+			case "questionType":
+				return ec.fieldContext_QuestionnaireType_questionType(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type QuestionnaireType", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_fetchQuestionsByItemId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -4684,6 +4991,179 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuestionnaireType_choices(ctx context.Context, field graphql.CollectedField, obj *model.QuestionnaireType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_QuestionnaireType_choices(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Choices, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_QuestionnaireType_choices(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuestionnaireType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuestionnaireType_question(ctx context.Context, field graphql.CollectedField, obj *model.QuestionnaireType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_QuestionnaireType_question(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Question, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_QuestionnaireType_question(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuestionnaireType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuestionnaireType_questionId(ctx context.Context, field graphql.CollectedField, obj *model.QuestionnaireType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_QuestionnaireType_questionId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.QuestionID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_QuestionnaireType_questionId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuestionnaireType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _QuestionnaireType_questionType(ctx context.Context, field graphql.CollectedField, obj *model.QuestionnaireType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_QuestionnaireType_questionType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.QuestionType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(model.QuestionType)
+	fc.Result = res
+	return ec.marshalNQuestionType2inverseᚗsoᚋgraphᚋmodelᚐQuestionType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_QuestionnaireType_questionType(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "QuestionnaireType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type QuestionType does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7078,6 +7558,53 @@ func (ec *executionContext) unmarshalInputItemInput(ctx context.Context, obj int
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputMultiChoiceInputType(ctx context.Context, obj interface{}) (model.MultiChoiceInputType, error) {
+	var it model.MultiChoiceInputType
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"question", "choices", "correctChoice"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "question":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("question"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Question = data
+		case "choices":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("choices"))
+			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Choices = data
+		case "correctChoice":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("correctChoice"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CorrectChoice = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewEmailDomainWhitelistInput(ctx context.Context, obj interface{}) (model.NewEmailDomainWhitelistInput, error) {
 	var it model.NewEmailDomainWhitelistInput
 	asMap := map[string]interface{}{}
@@ -7363,6 +7890,138 @@ func (ec *executionContext) unmarshalInputNewUsernameRegisgration(ctx context.Co
 				return it, err
 			}
 			it.InverseUsername = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputOpenEndedInputType(ctx context.Context, obj interface{}) (model.OpenEndedInputType, error) {
+	var it model.OpenEndedInputType
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"question", "answers"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "question":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("question"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Question = data
+		case "answers":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("answers"))
+			data, err := ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Answers = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputQuestionnaireAnswerInput(ctx context.Context, obj interface{}) (model.QuestionnaireAnswerInput, error) {
+	var it model.QuestionnaireAnswerInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"answer", "questionId"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "answer":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("answer"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Answer = data
+		case "questionId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("questionId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.QuestionID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputQuestionnaireCriteriaInput(ctx context.Context, obj interface{}) (model.QuestionnaireCriteriaInput, error) {
+	var it model.QuestionnaireCriteriaInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"itemID", "questionType", "openEndedInput", "multiChoiceInput"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "itemID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ItemID = data
+		case "questionType":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("questionType"))
+			data, err := ec.unmarshalNQuestionType2inverseᚗsoᚋgraphᚋmodelᚐQuestionType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.QuestionType = data
+		case "openEndedInput":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("openEndedInput"))
+			data, err := ec.unmarshalOOpenEndedInputType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐOpenEndedInputTypeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OpenEndedInput = data
+		case "multiChoiceInput":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("multiChoiceInput"))
+			data, err := ec.unmarshalOMultiChoiceInputType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐMultiChoiceInputTypeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MultiChoiceInput = data
 		}
 	}
 
@@ -7839,6 +8498,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createQuestionnaireCriteriaForItem":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createQuestionnaireCriteriaForItem(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createEmailWhitelistForItem":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -7911,6 +8579,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "validateQuestionnaireCriteriaForItem":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_validateQuestionnaireCriteriaForItem(ctx, field)
+			})
+
 		case "startEmailVerificationForClaim":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -8235,6 +8909,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "fetchQuestionsByItemId":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_fetchQuestionsByItemId(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -8247,6 +8944,52 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				return ec._Query___schema(ctx, field)
 			})
 
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var questionnaireTypeImplementors = []string{"QuestionnaireType"}
+
+func (ec *executionContext) _QuestionnaireType(ctx context.Context, sel ast.SelectionSet, obj *model.QuestionnaireType) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, questionnaireTypeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("QuestionnaireType")
+		case "choices":
+
+			out.Values[i] = ec._QuestionnaireType_choices(ctx, field, obj)
+
+		case "question":
+
+			out.Values[i] = ec._QuestionnaireType_question(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "questionId":
+
+			out.Values[i] = ec._QuestionnaireType_questionId(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "questionType":
+
+			out.Values[i] = ec._QuestionnaireType_questionType(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8966,6 +9709,11 @@ func (ec *executionContext) marshalNMintAuthorizationResponse2ᚖinverseᚗsoᚋ
 	return ec._MintAuthorizationResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNMultiChoiceInputType2ᚖinverseᚗsoᚋgraphᚋmodelᚐMultiChoiceInputType(ctx context.Context, v interface{}) (*model.MultiChoiceInputType, error) {
+	res, err := ec.unmarshalInputMultiChoiceInputType(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNNewEmailDomainWhitelistInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmailDomainWhitelistInput(ctx context.Context, v interface{}) (model.NewEmailDomainWhitelistInput, error) {
 	res, err := ec.unmarshalInputNewEmailDomainWhitelistInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -9008,6 +9756,102 @@ func (ec *executionContext) marshalNOnboardingProgress2ᚖinverseᚗsoᚋgraph�
 		return graphql.Null
 	}
 	return ec._OnboardingProgress(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNOpenEndedInputType2ᚖinverseᚗsoᚋgraphᚋmodelᚐOpenEndedInputType(ctx context.Context, v interface{}) (*model.OpenEndedInputType, error) {
+	res, err := ec.unmarshalInputOpenEndedInputType(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNQuestionType2inverseᚗsoᚋgraphᚋmodelᚐQuestionType(ctx context.Context, v interface{}) (model.QuestionType, error) {
+	var res model.QuestionType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNQuestionType2inverseᚗsoᚋgraphᚋmodelᚐQuestionType(ctx context.Context, sel ast.SelectionSet, v model.QuestionType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNQuestionnaireAnswerInput2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐQuestionnaireAnswerInputᚄ(ctx context.Context, v interface{}) ([]*model.QuestionnaireAnswerInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.QuestionnaireAnswerInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNQuestionnaireAnswerInput2ᚖinverseᚗsoᚋgraphᚋmodelᚐQuestionnaireAnswerInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNQuestionnaireAnswerInput2ᚖinverseᚗsoᚋgraphᚋmodelᚐQuestionnaireAnswerInput(ctx context.Context, v interface{}) (*model.QuestionnaireAnswerInput, error) {
+	res, err := ec.unmarshalInputQuestionnaireAnswerInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNQuestionnaireCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐQuestionnaireCriteriaInput(ctx context.Context, v interface{}) (model.QuestionnaireCriteriaInput, error) {
+	res, err := ec.unmarshalInputQuestionnaireCriteriaInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNQuestionnaireType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐQuestionnaireTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.QuestionnaireType) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNQuestionnaireType2ᚖinverseᚗsoᚋgraphᚋmodelᚐQuestionnaireType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNQuestionnaireType2ᚖinverseᚗsoᚋgraphᚋmodelᚐQuestionnaireType(ctx context.Context, sel ast.SelectionSet, v *model.QuestionnaireType) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._QuestionnaireType(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSignerInfo2inverseᚗsoᚋgraphᚋmodelᚐSignerInfo(ctx context.Context, v interface{}) (model.SignerInfo, error) {
@@ -9522,6 +10366,46 @@ func (ec *executionContext) marshalOInteractionType2ᚖinverseᚗsoᚋgraphᚋmo
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOMultiChoiceInputType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐMultiChoiceInputTypeᚄ(ctx context.Context, v interface{}) ([]*model.MultiChoiceInputType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.MultiChoiceInputType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNMultiChoiceInputType2ᚖinverseᚗsoᚋgraphᚋmodelᚐMultiChoiceInputType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOOpenEndedInputType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐOpenEndedInputTypeᚄ(ctx context.Context, v interface{}) ([]*model.OpenEndedInputType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.OpenEndedInputType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNOpenEndedInputType2ᚖinverseᚗsoᚋgraphᚋmodelᚐOpenEndedInputType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {

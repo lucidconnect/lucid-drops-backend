@@ -182,3 +182,17 @@ func FetchItemByID(itemID string) (*model.Item, error) {
 
 	return item.ToGraphData(), nil
 }
+
+func FetchQuestionsByItemID(itemID string) ([]*model.QuestionnaireType, error) {
+	item, err := engine.GetItemByID(itemID)
+	if err != nil {
+		return nil, errors.New("item not found")
+	}
+
+	questions, err := engine.GetItemQuestionsByItem(item)
+	if err != nil {
+		return nil, errors.New("questions not found")
+	}
+
+	return questions, nil
+}

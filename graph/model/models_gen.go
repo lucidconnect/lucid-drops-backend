@@ -91,6 +91,12 @@ type MintAuthorizationResponse struct {
 	SmartContractAddress string `json:"smartContractAddress"`
 }
 
+type MultiChoiceInputType struct {
+	Question      string   `json:"question"`
+	Choices       []string `json:"choices"`
+	CorrectChoice string   `json:"correctChoice"`
+}
+
 type NewEmailDomainWhitelistInput struct {
 	ItemID               string   `json:"itemID"`
 	Visible              bool     `json:"visible"`
@@ -131,6 +137,31 @@ type NewUsernameRegisgration struct {
 
 type OnboardingProgress struct {
 	RegisterdInverseUsername bool `json:"registerdInverseUsername"`
+}
+
+type OpenEndedInputType struct {
+	Question string   `json:"question"`
+	Answers  []string `json:"answers"`
+}
+
+type QuestionnaireAnswerInput struct {
+	Answer     string `json:"answer"`
+	QuestionID string `json:"questionId"`
+}
+
+type QuestionnaireCriteriaInput struct {
+	ItemID           string                  `json:"itemID"`
+	QuestionType     QuestionType            `json:"questionType"`
+	OpenEndedInput   []*OpenEndedInputType   `json:"openEndedInput,omitempty"`
+	MultiChoiceInput []*MultiChoiceInputType `json:"multiChoiceInput,omitempty"`
+}
+
+type QuestionnaireType struct {
+	//  Choices will only contain a list of potential answers when the `questionType` is `multiChoice`
+	Choices      []string     `json:"choices,omitempty"`
+	Question     string       `json:"question"`
+	QuestionID   string       `json:"questionId"`
+	QuestionType QuestionType `json:"questionType"`
 }
 
 type SignerInfo struct {
@@ -218,12 +249,14 @@ func (e AiImageStyle) MarshalGQL(w io.Writer) {
 type ClaimCriteriaType string
 
 const (
-	ClaimCriteriaTypeEmailWhiteList      ClaimCriteriaType = "emailWhiteList"
-	ClaimCriteriaTypeEmailDomain         ClaimCriteriaType = "emailDomain"
-	ClaimCriteriaTypeTwitterInteractions ClaimCriteriaType = "twitterInteractions"
-	ClaimCriteriaTypeTwitterFollowers    ClaimCriteriaType = "twitterFollowers"
-	ClaimCriteriaTypeTelegram            ClaimCriteriaType = "telegram"
-	ClaimCriteriaTypePatreon             ClaimCriteriaType = "patreon"
+	ClaimCriteriaTypeEmailWhiteList            ClaimCriteriaType = "emailWhiteList"
+	ClaimCriteriaTypeEmailDomain               ClaimCriteriaType = "emailDomain"
+	ClaimCriteriaTypeTwitterInteractions       ClaimCriteriaType = "twitterInteractions"
+	ClaimCriteriaTypeTwitterFollowers          ClaimCriteriaType = "twitterFollowers"
+	ClaimCriteriaTypeTelegram                  ClaimCriteriaType = "telegram"
+	ClaimCriteriaTypePatreon                   ClaimCriteriaType = "patreon"
+	ClaimCriteriaTypeDirectAnswerQuestionnaire ClaimCriteriaType = "directAnswerQuestionnaire"
+	ClaimCriteriaTypeMutliChoiceQuestionnaire  ClaimCriteriaType = "mutliChoiceQuestionnaire"
 )
 
 var AllClaimCriteriaType = []ClaimCriteriaType{
@@ -233,11 +266,13 @@ var AllClaimCriteriaType = []ClaimCriteriaType{
 	ClaimCriteriaTypeTwitterFollowers,
 	ClaimCriteriaTypeTelegram,
 	ClaimCriteriaTypePatreon,
+	ClaimCriteriaTypeDirectAnswerQuestionnaire,
+	ClaimCriteriaTypeMutliChoiceQuestionnaire,
 }
 
 func (e ClaimCriteriaType) IsValid() bool {
 	switch e {
-	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon:
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire:
 		return true
 	}
 	return false
@@ -345,6 +380,47 @@ func (e *InteractionType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e InteractionType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type QuestionType string
+
+const (
+	QuestionTypeMultiChoice  QuestionType = "multiChoice"
+	QuestionTypeDirectAnswer QuestionType = "directAnswer"
+)
+
+var AllQuestionType = []QuestionType{
+	QuestionTypeMultiChoice,
+	QuestionTypeDirectAnswer,
+}
+
+func (e QuestionType) IsValid() bool {
+	switch e {
+	case QuestionTypeMultiChoice, QuestionTypeDirectAnswer:
+		return true
+	}
+	return false
+}
+
+func (e QuestionType) String() string {
+	return string(e)
+}
+
+func (e *QuestionType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = QuestionType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid QuestionType", str)
+	}
+	return nil
+}
+
+func (e QuestionType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

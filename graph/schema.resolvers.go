@@ -95,6 +95,21 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input 
 	return items.UpdateItem(itemID, &input, authenticationDetails)
 }
 
+// CreateQuestionnaireCriteriaForItem is the resolver for the createQuestionnaireCriteriaForItem field.
+func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (bool, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return false, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	created, err := whitelist.CreateQuestionnaireCriteriaForItem(authenticationDetails, &input)
+	if err != nil {
+		return false, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return *created, nil
+}
+
 // CreateEmailWhitelistForItem is the resolver for the createEmailWhitelistForItem field.
 func (r *mutationResolver) CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
@@ -170,6 +185,11 @@ func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, i
 	}
 
 	return whitelist.ValidatePatreonCriteriaForItem(itemID, authID)
+}
+
+// ValidateQuestionnaireCriteriaForItem is the resolver for the validateQuestionnaireCriteriaForItem field.
+func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
+	return whitelist.ValidateQuestionnaireCriteriaForItem(itemID, input)
 }
 
 // StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.
@@ -282,6 +302,11 @@ func (r *queryResolver) GetTweetDetails(ctx context.Context, tweetLink string) (
 // GetTwitterUserDetails is the resolver for the getTwitterUserDetails field.
 func (r *queryResolver) GetTwitterUserDetails(ctx context.Context, userName string) (*model.UserDetails, error) {
 	return services.FetchUserDetails(userName)
+}
+
+// FetchQuestionsByItemID is the resolver for the fetchQuestionsByItemId field.
+func (r *queryResolver) FetchQuestionsByItemID(ctx context.Context, itemID string) ([]*model.QuestionnaireType, error) {
+	return items.FetchQuestionsByItemID(itemID)
 }
 
 // Collection returns CollectionResolver implementation.
