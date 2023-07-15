@@ -42,7 +42,7 @@ func (m *MultiChoiceCriteria) ToGraphData() *model.QuestionnaireType {
 
 	question := &model.QuestionnaireType{
 		QuestionID:   m.QuestionID.String(),
-		QuestionType: model.QuestionTypeDirectAnswer,
+		QuestionType: model.QuestionTypeMultiChoice,
 	}
 
 	err := json.Unmarshal([]byte(m.Choices), &questionsMapping)
