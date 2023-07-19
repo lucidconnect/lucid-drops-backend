@@ -24,5 +24,5 @@ func TwitterCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf(utils.UseEnvOrDefault("FE_BASE_URL", "https://1c5f-89-39-106-222.ngrok-free.app/%s/%s"), "whitelist/twitter", *authID), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf(utils.UseEnvOrDefault("FE_BASE_URL", "https://1c5f-89-39-106-222.ngrok-free.app") + "/%s/%s", "whitelist/twitter", *authID), http.StatusFound)
 }

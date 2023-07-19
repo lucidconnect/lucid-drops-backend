@@ -22,7 +22,7 @@ func PatreonCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf(utils.UseEnvOrDefault("FE_BASE_URL", "https://1c5f-89-39-106-222.ngrok-free.app/%s/%s"), "item/criteria/patreon", *authID), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf(utils.UseEnvOrDefault("FE_BASE_URL", "https://1c5f-89-39-106-222.ngrok-free.app") + "/%s/%s", "item/criteria/patreon", *authID), http.StatusFound)
 }
 
 func PatreonWhitelistCallBack(w http.ResponseWriter, r *http.Request) {
@@ -38,5 +38,5 @@ func PatreonWhitelistCallBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, fmt.Sprintf(utils.UseEnvOrDefault("FE_BASE_URL", "https://1c5f-89-39-106-222.ngrok-free.app/%s/%s"), "whitelist/patreon", *authID), http.StatusFound)
+	http.Redirect(w, r, fmt.Sprintf(utils.UseEnvOrDefault("FE_BASE_URL", "https://1c5f-89-39-106-222.ngrok-free.app") + "/%s/%s", "whitelist/patreon", *authID), http.StatusFound)
 }
