@@ -41,6 +41,13 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 		return nil, criteriaUpdateErr
 	}
 
+	telegramCriteria := model.ClaimCriteriaTypeTelegram
+	item.Criteria = &telegramCriteria
+	err = engine.SaveModel(item)
+	if err != nil {
+		return nil, err
+	}
+
 	return item.ToGraphData(), nil
 }
 
