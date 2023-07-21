@@ -2,7 +2,6 @@ package whitelist
 
 import (
 	"errors"
-	"log"
 	"strconv"
 
 	"inverse.so/engine"
