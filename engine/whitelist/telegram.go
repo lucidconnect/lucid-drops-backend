@@ -65,7 +65,7 @@ func ValidateTelegramClaimCriteria(itemID, authID string) (bool, error) {
 	IdToInt, _ := strconv.Atoi(authID)
 	member, err := InverseBot.GetTelegramGroupUser(item.TelegramCriteria.GroupID, int64(IdToInt))
 	if err != nil {
-		return false, errors.New("telegram account not authorized")
+		return false, errors.New("telegram account not authorized by group admin")
 	}
 
 	if member.User.IsBot {
