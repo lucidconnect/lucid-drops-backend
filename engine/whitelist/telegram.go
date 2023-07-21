@@ -69,7 +69,7 @@ func ValidateTelegramClaimCriteria(itemID, authID string) (bool, error) {
 		return false, errors.New("telegram account not authorized by group admin")
 	}
 
-	log.Printf("😭 %+V", member)
+	log.Printf("😭 %+v", member)
 	if member.User.IsBot {
 		return false, errors.New("telegram account cannot be a bot")
 	}
