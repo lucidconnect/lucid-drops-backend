@@ -58,7 +58,7 @@ func ValidateTelegramClaimCriteria(itemID, authID string) (bool, error) {
 		return false, errors.New("item not found")
 	}
 
-	if item.TelegramCriteria != nil {
+	if item.TelegramCriteria == nil {
 		return false, errors.New("item does not have a telegram criteria")
 	}
 
