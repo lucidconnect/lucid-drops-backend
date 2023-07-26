@@ -46,6 +46,17 @@ func GetCreatorByID(creatorID string) (*models.Creator, error) {
 	return &creator, nil
 }
 
+func GetMintPassById(passId string) (*models.MintPass, error) {
+	var pass models.MintPass
+
+	err := dbutils.DB.Where("id=?", passId).First(&pass).Error
+	if err != nil {
+		return nil, errors.New("mint pass not found")
+	}
+
+	return &pass, nil
+}
+
 func GetCreatorByAddress(address string) (*models.Creator, error) {
 	var creator models.Creator
 
@@ -77,6 +88,29 @@ func GetCollectionByID(collectionID string) (*models.Collection, error) {
 	}
 
 	return &collection, nil
+}
+
+func GetClaimedItemByAddress(address string) ([]*models.Item, error) {
+	var mintPasses []models.MintPass
+
+	err := dbutils.DB.Where("minter_address=?", address).Find(&mintPasses).Error
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	itemsIds := make([]string, len(mintPasses))
+
+	for idx, pass := range mintPasses {
+		itemsIds[idx] = pass.ItemId
+	}
+
+	var claimedItems []*models.Item
+	err = dbutils.DB.Where("id IN (?)", itemsIds).Find(&claimedItems).Error
+	if err != nil {
+		return nil, errors.New("claimed items no longer exists")
+	}
+
+	return claimedItems, nil
 }
 
 func GetItemByID(itemID string) (*models.Item, error) {
