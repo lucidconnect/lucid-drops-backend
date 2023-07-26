@@ -71,6 +71,7 @@ type Item struct {
 	Creator                          *CreatorDetails    `json:"creator"`
 	AuthorizedSubdomains             []string           `json:"authorizedSubdomains,omitempty"`
 	TwitterClaimCriteriaInteractions []*InteractionType `json:"twitterClaimCriteriaInteractions,omitempty"`
+	TelegramGroupTitle               *string            `json:"telegramGroupTitle,omitempty"`
 	TweetLink                        *string            `json:"tweetLink,omitempty"`
 	ProfileLink                      *string            `json:"profileLink,omitempty"`
 	CampaignName                     *string            `json:"campaignName,omitempty"`

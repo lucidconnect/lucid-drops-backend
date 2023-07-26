@@ -30,10 +30,16 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 	}
 
 	groupIDToInt, _ := strconv.Atoi(input.GroupID)
+
 	criteria := &models.TelegramCriteria{
 		ItemID:    item.ID.String(),
 		CreatorID: creator.ID.String(),
 		GroupID:   int64(groupIDToInt),
+	}
+
+	groupTitle, err := InverseBot.GetTelegramGroupTitle(int64(groupIDToInt))
+	if err == nil {
+		criteria.GroupTitle = groupTitle
 	}
 
 	criteriaUpdateErr := engine.SaveModel(criteria)

@@ -62,6 +62,10 @@ func (i *Item) ToGraphData() *model.Item {
 		item.CampaignName = &i.PatreonCriteria.CampaignName
 	}
 
+	if i.TelegramCriteria != nil {
+		item.TelegramGroupTitle = &i.TelegramCriteria.GroupTitle
+	}
+
 	return item
 }
 

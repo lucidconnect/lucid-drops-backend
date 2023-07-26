@@ -186,6 +186,7 @@ type Item {
   creator: CreatorDetails! @goField(forceResolver: true)
   authorizedSubdomains: [String!] @goField(forceResolver: true)
   twitterClaimCriteriaInteractions: [InteractionType]
+  telegramGroupTitle: String
   tweetLink: String
   profileLink: String
   campaignName: String

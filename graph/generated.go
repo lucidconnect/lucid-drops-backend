@@ -85,6 +85,7 @@ type ComplexityRoot struct {
 		Image                            func(childComplexity int) int
 		Name                             func(childComplexity int) int
 		ProfileLink                      func(childComplexity int) int
+		TelegramGroupTitle               func(childComplexity int) int
 		TweetLink                        func(childComplexity int) int
 		TwitterClaimCriteriaInteractions func(childComplexity int) int
 	}
@@ -385,6 +386,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.ProfileLink(childComplexity), true
+
+	case "Item.telegramGroupTitle":
+		if e.complexity.Item.TelegramGroupTitle == nil {
+			break
+		}
+
+		return e.complexity.Item.TelegramGroupTitle(childComplexity), true
 
 	case "Item.tweetLink":
 		if e.complexity.Item.TweetLink == nil {
@@ -1807,6 +1815,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -2478,6 +2488,47 @@ func (ec *executionContext) fieldContext_Item_twitterClaimCriteriaInteractions(c
 	return fc, nil
 }
 
+func (ec *executionContext) _Item_telegramGroupTitle(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_telegramGroupTitle(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TelegramGroupTitle, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_telegramGroupTitle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Item_tweetLink(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Item_tweetLink(ctx, field)
 	if err != nil {
@@ -3083,6 +3134,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -3166,6 +3219,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -3249,6 +3304,8 @@ func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaFor
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -3332,6 +3389,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -3415,6 +3474,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -3498,6 +3559,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -3581,6 +3644,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -3664,6 +3729,8 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -4532,6 +4599,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -4615,6 +4684,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
 				return ec.fieldContext_Item_tweetLink(ctx, field)
 			case "profileLink":
@@ -8382,6 +8453,10 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 		case "twitterClaimCriteriaInteractions":
 
 			out.Values[i] = ec._Item_twitterClaimCriteriaInteractions(ctx, field, obj)
+
+		case "telegramGroupTitle":
+
+			out.Values[i] = ec._Item_telegramGroupTitle(ctx, field, obj)
 
 		case "tweetLink":
 

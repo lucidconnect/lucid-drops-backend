@@ -139,6 +139,22 @@ func (bot *BotImplementation) GetTelegramGroupUser(chatID, userID int64) (*teleg
 	return &member, nil
 }
 
+func (bot *BotImplementation) GetTelegramGroupTitle(chatID int64) (string, error) {
+	
+	chatConfig := telegrambot.ChatInfoConfig{
+		ChatConfig: telegrambot.ChatConfig{
+			ChatID: chatID,
+		},
+	}
+
+	chat, err := bot.localBot.GetChat(chatConfig)
+	if err != nil {
+		return "", err
+	}
+
+	return chat.Title, nil
+}
+
 func getChatID(m *telegrambot.Message) int64 {
 	return int64(m.Chat.ID)
 }
