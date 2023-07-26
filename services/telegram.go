@@ -21,7 +21,7 @@ func InitTelegramBot() *BotImplementation {
 		log.Print(err)
 	}
 
-	bot.Debug = true
+	bot.Debug = false
 	loc := &BotImplementation{
 		localBot: bot,
 	}
@@ -140,7 +140,7 @@ func (bot *BotImplementation) GetTelegramGroupUser(chatID, userID int64) (*teleg
 }
 
 func (bot *BotImplementation) GetTelegramGroupTitle(chatID int64) (string, error) {
-	
+
 	chatConfig := telegrambot.ChatInfoConfig{
 		ChatConfig: telegrambot.ChatConfig{
 			ChatID: chatID,
