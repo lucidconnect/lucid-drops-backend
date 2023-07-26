@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"inverse.so/engine/aiimages"
+	"inverse.so/engine/claimers"
 	"inverse.so/engine/collections"
 	"inverse.so/engine/items"
 	"inverse.so/engine/onboarding"
@@ -253,6 +254,11 @@ func (r *queryResolver) GetOnboardinProgress(ctx context.Context) (*model.Onboar
 // IsInverseNameIsAvailable is the resolver for the isInverseNameIsAvailable field.
 func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input model.NewUsernameRegisgration) (bool, error) {
 	return onboarding.CheckIfInverseNameIsAvailable(&input)
+}
+
+// FetchClaimedItems is the resolver for the fetchClaimedItems field.
+func (r *queryResolver) FetchClaimedItems(ctx context.Context, address string) ([]*model.Item, error) {
+	return claimers.FetchClaimedItems(address)
 }
 
 // FetchCollectionByID is the resolver for the fetchCollectionById field.
