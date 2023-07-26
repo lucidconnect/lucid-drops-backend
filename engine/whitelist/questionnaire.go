@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm/clause"
 	"inverse.so/dbutils"
@@ -164,19 +165,6 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 			return nil, errors.New("submitted duplicate questions")
 		}
 
-		newMint := models.MintPass{
-			ItemId: itemID,
-		}
-
-		err = dbutils.DB.Create(&newMint).Error
-		if err != nil {
-			return nil, err
-		}
-
-		claimingID := newMint.ID.String()
-
-		return &claimingID, nil
-
 	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
 		var multiChoiceQuestions []*models.MultiChoiceCriteria
 
@@ -212,20 +200,47 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 		if len(answeredQuestions) != len(multiChoiceQuestions) {
 			return nil, errors.New("submitted duplicate questions")
 		}
-
-		newMint := models.MintPass{
-			ItemId: itemID,
-		}
-
-		err = dbutils.DB.Create(&newMint).Error
-		if err != nil {
-			return nil, err
-		}
-
-		claimingID := newMint.ID.String()
-
-		return &claimingID, nil
+	default:
+		return nil, errors.New("item cannot be claimed via this method")
 	}
 
-	return nil, errors.New("item cannot be claimed via this method")
+	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	if err != nil {
+		log.Err(err)
+		return nil, err
+	}
+
+	items, err := engine.GetCollectionItems(item.CollectionID.String())
+	if err != nil {
+		log.Err(err)
+		return nil, err
+	}
+
+	// TODO use DB order or smart contract deploys to persist this on the item level
+	var ItemIdOnContract int64
+	for idx, collectionItem := range items {
+		if collectionItem.ID.String() == itemID {
+			ItemIdOnContract = int64(len(items) - (idx))
+		}
+	}
+
+	var smartContractAddress string
+	if collection.ContractAddress != nil {
+		smartContractAddress = *collection.ContractAddress
+	}
+
+	newMint := models.MintPass{
+		ItemId:                    itemID,
+		ItemIdOnContract:          ItemIdOnContract,
+		CollectionContractAddress: smartContractAddress,
+	}
+
+	err = dbutils.DB.Create(&newMint).Error
+	if err != nil {
+		return nil, err
+	}
+
+	claimingID := newMint.ID.String()
+
+	return &claimingID, nil
 }
