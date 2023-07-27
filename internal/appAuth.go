@@ -5,6 +5,8 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -45,16 +47,12 @@ func UserAuthMiddleWare() func(http.Handler) http.Handler {
 			switch authHeader[:1] {
 			case "e":
 				jwtToken := authHeader
-				jwtParts := strings.Split(jwtToken, ".")
-				rawDecodedText, err := base64.RawStdEncoding.DecodeString(jwtParts[1])
-				if err == nil {
-					contextMap["authHeader"] = rawDecodedText
-					contextMap["provider"] = "dynamic"
-					ctx := context.WithValue(r.Context(), userAuthToken, contextMap)
-					next.ServeHTTP(w, r.WithContext(ctx))
-				} else {
-					w.WriteHeader(http.StatusUnauthorized)
-				}
+
+				contextMap["authHeader"] = jwtToken
+				contextMap["provider"] = "web3Auth"
+				ctx := context.WithValue(r.Context(), userAuthToken, contextMap)
+				next.ServeHTTP(w, r.WithContext(ctx))
+
 			case "W":
 				contextMap["authHeader"] = authHeader
 				contextMap["provider"] = "magic"
@@ -79,19 +77,29 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 
 	var info AuthDetails
 	switch provider {
-	case "dynamic":
-		jwtClaims, ok := claims["authHeader"].([]byte)
-		if !ok {
-			return nil, errors.New("jwt claims not found in context")
-		}
-		var jwtInfo DynamicJWTMetadata
-		err = json.Unmarshal(jwtClaims, &jwtInfo)
+	case "web3Auth":
+		log.Print(claims["authHeader"])
+		jwtParts := strings.Split(claims["authHeader"].(string), ".")
+		rawDecodedText, err := base64.RawStdEncoding.DecodeString(jwtParts[1])
+		// jwtClaims, ok := rawDecodedText.([]byte)
+		// if !ok {
+		// 	return nil, errors.New("jwt claims not found in context")
+		// }
+		var jwtInfo Web3AuthMetadata
+		err = json.Unmarshal(rawDecodedText, &jwtInfo)
 		if err != nil {
 			return nil, err
 		}
 
 		// TODO add JWT verification and assert address is present before proceeding
-		info.Address = jwtInfo.VerifiedCredentials[0].Address
+		// var deriv = jwtInfo.Wallets[0].Address
+		info.Address = jwtInfo.Wallets[0].Address
+		if info.Address == "" {
+			// verify that there's a way to get the address from the public key
+			// deriv = jwtInfo.Wallets[0].PublicKey
+			info.Address = fmt.Sprintf("0x%s", jwtInfo.Wallets[0].PublicKey)
+		}
+
 	case "magic":
 		jwtClaims, ok := claims["authHeader"].(string)
 		if !ok {
