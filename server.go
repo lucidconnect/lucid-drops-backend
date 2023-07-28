@@ -74,20 +74,16 @@ func main() {
 }
 
 func loadCORS(router *chi.Mux) {
-	switch os.Getenv("APP_ENV") {
-	// TODO - add proper CORS support for production & staging
-	default:
-		router.Use(cors.New(cors.Options{
-			AllowedOrigins: []string{"https://*", "http://*", "ws://*", "wss://*"},
-			AllowedMethods: []string{
-				http.MethodOptions,
-				http.MethodGet,
-				http.MethodPost,
-			},
-			AllowedHeaders:   []string{"*"},
-			AllowCredentials: false,
-		}).Handler)
-	}
+	router.Use(cors.New(cors.Options{
+		AllowedOrigins: []string{"https://*", "http://*", "ws://*", "wss://*", "*"},
+		AllowedMethods: []string{
+			http.MethodOptions,
+			http.MethodGet,
+			http.MethodPost,
+		},
+		AllowedHeaders:   []string{"*"},
+		AllowCredentials: false,
+	}).Handler)
 }
 
 func createTelegramBotInstance() {
