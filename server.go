@@ -49,9 +49,9 @@ func main() {
 	srv.Use(extension.Introspection{})
 
 	router := chi.NewRouter()
-	router.Use(internal.UserAuthMiddleWare())
-
 	loadCORS(router)
+
+	router.Use(internal.UserAuthMiddleWare())
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/health", http.HandlerFunc(route.HealthCheckHandler))
 	router.Handle("/query", srv)
