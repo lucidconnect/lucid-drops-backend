@@ -23,8 +23,6 @@ type AuthDetails struct {
 
 var (
 	userAuthToken       = &contextKey{"userAuthToken"}
-	provider            = &contextKey{"provider"}
-	errJWTCreationError = errors.New("authentication Failed")
 )
 
 func UserAuthMiddleWare() func(http.Handler) http.Handler {
@@ -80,24 +78,27 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 	case "web3Auth":
 		log.Print(claims["authHeader"])
 		jwtParts := strings.Split(claims["authHeader"].(string), ".")
-		rawDecodedText, err := base64.RawStdEncoding.DecodeString(jwtParts[1])
-		// jwtClaims, ok := rawDecodedText.([]byte)
-		// if !ok {
-		// 	return nil, errors.New("jwt claims not found in context")
-		// }
+		rawDecodedText, _ := base64.RawStdEncoding.DecodeString(jwtParts[1])
+
 		var jwtInfo Web3AuthMetadata
 		err = json.Unmarshal(rawDecodedText, &jwtInfo)
 		if err != nil {
 			return nil, err
 		}
 
-		// TODO add JWT verification and assert address is present before proceeding
-		// var deriv = jwtInfo.Wallets[0].Address
+		isExt := true
 		info.Address = jwtInfo.Wallets[0].Address
 		if info.Address == "" {
 			// verify that there's a way to get the address from the public key
 			// deriv = jwtInfo.Wallets[0].PublicKey
+			isExt = false
 			info.Address = fmt.Sprintf("0x%s", jwtInfo.Wallets[0].PublicKey)
+		}
+
+		// TODO add JWT verification and assert address is present before proceeding
+		_, err = services.VerifyWeb3AuthKey(claims["authHeader"].(string), isExt)
+		if err != nil {
+			return nil, err
 		}
 
 	case "magic":
