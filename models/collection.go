@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/rs/zerolog/log"
@@ -17,6 +17,7 @@ import (
 type Collection struct {
 	Base
 	CreatorID       uuid.UUID
+	CreatorAddress  string
 	Name            string
 	Image           string `json:"image"`
 	Thumbnail       string `json:"thumbnail"`
@@ -65,7 +66,7 @@ func (c *Collection) AfterCreate(tx *gorm.DB) (err error) {
 
 		defer res.Body.Close()
 
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			fmt.Println(err)
 			return
