@@ -92,6 +92,11 @@ type MintAuthorizationResponse struct {
 	SmartContractAddress string `json:"smartContractAddress"`
 }
 
+type MobileWalletConfig struct {
+	PublicKey  string `json:"publicKey"`
+	PrivateKey string `json:"privateKey"`
+}
+
 type MultiChoiceInputType struct {
 	Question      string   `json:"question"`
 	Choices       []string `json:"choices"`

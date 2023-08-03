@@ -12,6 +12,7 @@ import (
 	"inverse.so/engine/claimers"
 	"inverse.so/engine/collections"
 	"inverse.so/engine/items"
+	"inverse.so/engine/mobile"
 	"inverse.so/engine/onboarding"
 	"inverse.so/engine/whitelist"
 	"inverse.so/graph/model"
@@ -216,6 +217,16 @@ func (r *mutationResolver) StoreSignerInfo(ctx context.Context, input model.Sign
 	}
 
 	return onboarding.StoreUserAccountSignerAddress(input, authenticationDetails)
+}
+
+// GenerateMobileWalletConfigs is the resolver for the generateMobileWalletConfigs field.
+func (r *mutationResolver) GenerateMobileWalletConfigs(ctx context.Context) (*model.MobileWalletConfig, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return mobile.GenerateMobileWalletConfigs(authenticationDetails)
 }
 
 // GetCreatorDetails is the resolver for the getCreatorDetails field.

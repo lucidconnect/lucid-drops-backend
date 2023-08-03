@@ -97,6 +97,11 @@ type ComplexityRoot struct {
 		SmartContractAddress func(childComplexity int) int
 	}
 
+	MobileWalletConfig struct {
+		PrivateKey func(childComplexity int) int
+		PublicKey  func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CompleteEmailVerificationForClaim    func(childComplexity int, input model.CompleteEmailVerificationInput) int
 		CreateCollection                     func(childComplexity int, input model.CollectionInput) int
@@ -107,6 +112,7 @@ type ComplexityRoot struct {
 		CreateQuestionnaireCriteriaForItem   func(childComplexity int, input model.QuestionnaireCriteriaInput) int
 		CreateTelegramCriteriaForItem        func(childComplexity int, input model.NewTelegramCriteriaInput) int
 		CreateTwitterCriteriaForItem         func(childComplexity int, input model.NewTwitterCriteriaInput) int
+		GenerateMobileWalletConfigs          func(childComplexity int) int
 		GenerateSignatureForClaim            func(childComplexity int, input model.GenerateClaimSignatureInput) int
 		RegisterInverseUsername              func(childComplexity int, input model.NewUsernameRegisgration) int
 		StartEmailVerificationForClaim       func(childComplexity int, input model.EmailClaimInput) int
@@ -190,6 +196,7 @@ type MutationResolver interface {
 	CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error)
 	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
 	StoreSignerInfo(ctx context.Context, input model.SignerInfo) (bool, error)
+	GenerateMobileWalletConfigs(ctx context.Context) (*model.MobileWalletConfig, error)
 }
 type QueryResolver interface {
 	GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error)
@@ -438,6 +445,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MintAuthorizationResponse.SmartContractAddress(childComplexity), true
 
+	case "MobileWalletConfig.privateKey":
+		if e.complexity.MobileWalletConfig.PrivateKey == nil {
+			break
+		}
+
+		return e.complexity.MobileWalletConfig.PrivateKey(childComplexity), true
+
+	case "MobileWalletConfig.publicKey":
+		if e.complexity.MobileWalletConfig.PublicKey == nil {
+			break
+		}
+
+		return e.complexity.MobileWalletConfig.PublicKey(childComplexity), true
+
 	case "Mutation.completeEmailVerificationForClaim":
 		if e.complexity.Mutation.CompleteEmailVerificationForClaim == nil {
 			break
@@ -545,6 +566,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateTwitterCriteriaForItem(childComplexity, args["input"].(model.NewTwitterCriteriaInput)), true
+
+	case "Mutation.generateMobileWalletConfigs":
+		if e.complexity.Mutation.GenerateMobileWalletConfigs == nil {
+			break
+		}
+
+		return e.complexity.Mutation.GenerateMobileWalletConfigs(childComplexity), true
 
 	case "Mutation.generateSignatureForClaim":
 		if e.complexity.Mutation.GenerateSignatureForClaim == nil {
@@ -2901,6 +2929,94 @@ func (ec *executionContext) fieldContext_MintAuthorizationResponse_smartContract
 	return fc, nil
 }
 
+func (ec *executionContext) _MobileWalletConfig_publicKey(ctx context.Context, field graphql.CollectedField, obj *model.MobileWalletConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MobileWalletConfig_publicKey(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PublicKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MobileWalletConfig_publicKey(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MobileWalletConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MobileWalletConfig_privateKey(ctx context.Context, field graphql.CollectedField, obj *model.MobileWalletConfig) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MobileWalletConfig_privateKey(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PrivateKey, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MobileWalletConfig_privateKey(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MobileWalletConfig",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_registerInverseUsername(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_registerInverseUsername(ctx, field)
 	if err != nil {
@@ -4237,6 +4353,56 @@ func (ec *executionContext) fieldContext_Mutation_storeSignerInfo(ctx context.Co
 	if fc.Args, err = ec.field_Mutation_storeSignerInfo_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_generateMobileWalletConfigs(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_generateMobileWalletConfigs(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().GenerateMobileWalletConfigs(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.MobileWalletConfig)
+	fc.Result = res
+	return ec.marshalNMobileWalletConfig2ᚖinverseᚗsoᚋgraphᚋmodelᚐMobileWalletConfig(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_generateMobileWalletConfigs(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "publicKey":
+				return ec.fieldContext_MobileWalletConfig_publicKey(ctx, field)
+			case "privateKey":
+				return ec.fieldContext_MobileWalletConfig_privateKey(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type MobileWalletConfig", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -8651,6 +8817,41 @@ func (ec *executionContext) _MintAuthorizationResponse(ctx context.Context, sel 
 	return out
 }
 
+var mobileWalletConfigImplementors = []string{"MobileWalletConfig"}
+
+func (ec *executionContext) _MobileWalletConfig(ctx context.Context, sel ast.SelectionSet, obj *model.MobileWalletConfig) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, mobileWalletConfigImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MobileWalletConfig")
+		case "publicKey":
+
+			out.Values[i] = ec._MobileWalletConfig_publicKey(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "privateKey":
+
+			out.Values[i] = ec._MobileWalletConfig_privateKey(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -8833,6 +9034,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_storeSignerInfo(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "generateMobileWalletConfigs":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_generateMobileWalletConfigs(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -9947,6 +10157,20 @@ func (ec *executionContext) marshalNMintAuthorizationResponse2ᚖinverseᚗsoᚋ
 		return graphql.Null
 	}
 	return ec._MintAuthorizationResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMobileWalletConfig2inverseᚗsoᚋgraphᚋmodelᚐMobileWalletConfig(ctx context.Context, sel ast.SelectionSet, v model.MobileWalletConfig) graphql.Marshaler {
+	return ec._MobileWalletConfig(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNMobileWalletConfig2ᚖinverseᚗsoᚋgraphᚋmodelᚐMobileWalletConfig(ctx context.Context, sel ast.SelectionSet, v *model.MobileWalletConfig) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MobileWalletConfig(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNMultiChoiceInputType2ᚖinverseᚗsoᚋgraphᚋmodelᚐMultiChoiceInputType(ctx context.Context, v interface{}) (*model.MultiChoiceInputType, error) {

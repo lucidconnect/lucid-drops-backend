@@ -4,10 +4,12 @@ go 1.18
 
 require (
 	github.com/99designs/gqlgen v0.17.31
+	github.com/MicahParks/keyfunc v1.9.0
 	github.com/agnivade/levenshtein v1.1.1
 	github.com/ethereum/go-ethereum v1.12.0
 	github.com/go-chi/chi v1.5.4
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/imroc/req/v3 v3.37.0
 	github.com/joho/godotenv v1.5.1
 	github.com/machinebox/graphql v0.2.2
@@ -17,7 +19,7 @@ require (
 	github.com/rs/zerolog v1.29.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/vektah/gqlparser/v2 v2.5.1
-	go.step.sm/crypto v0.32.5
+	go.step.sm/crypto v0.33.0
 	golang.org/x/crypto v0.11.0
 	golang.org/x/oauth2 v0.10.0
 	golang.org/x/text v0.11.0
@@ -28,7 +30,6 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.0.0 // indirect
-	github.com/MicahParks/keyfunc v1.9.0 // indirect
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
@@ -45,7 +46,6 @@ require (
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/gobuffalo/envy v1.10.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/pprof v0.0.0-20230602150820-91b7bce49751 // indirect

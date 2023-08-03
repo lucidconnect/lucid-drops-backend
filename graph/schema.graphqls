@@ -50,8 +50,8 @@ type Mutation {
   generateSignatureForClaim(input: GenerateClaimSignatureInput!): MintAuthorizationResponse!
 
   storeSignerInfo(input: SignerInfo!): Boolean!
+  generateMobileWalletConfigs: MobileWalletConfig!
 }
-
 """ Time formated in the time.RFC3339Nano Format """
 scalar Time
 
@@ -235,6 +235,11 @@ type UserDetails {
   name: String!
   username: String!
 
+}
+
+type MobileWalletConfig {
+  publicKey: String!
+  privateKey: String!
 }
 
 enum QuestionType{
