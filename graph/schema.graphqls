@@ -286,6 +286,7 @@ enum InteractionType {
 enum SignerProvider {
   dynamic
   magic
+  web3Auth
 }
 
 

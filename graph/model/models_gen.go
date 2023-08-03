@@ -433,18 +433,20 @@ func (e QuestionType) MarshalGQL(w io.Writer) {
 type SignerProvider string
 
 const (
-	SignerProviderDynamic SignerProvider = "dynamic"
-	SignerProviderMagic   SignerProvider = "magic"
+	SignerProviderDynamic  SignerProvider = "dynamic"
+	SignerProviderMagic    SignerProvider = "magic"
+	SignerProviderWeb3Auth SignerProvider = "web3Auth"
 )
 
 var AllSignerProvider = []SignerProvider{
 	SignerProviderDynamic,
 	SignerProviderMagic,
+	SignerProviderWeb3Auth,
 }
 
 func (e SignerProvider) IsValid() bool {
 	switch e {
-	case SignerProviderDynamic, SignerProviderMagic:
+	case SignerProviderDynamic, SignerProviderMagic, SignerProviderWeb3Auth:
 		return true
 	}
 	return false
