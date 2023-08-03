@@ -19,7 +19,7 @@ func CreateCollection(input *model.CollectionInput, authDetails *internal.AuthDe
 		return nil, errors.New("pass in all Fields inorder to create a new collection")
 	}
 
-	aaSigerInfo, err := engine.GetAltSignerByAddress(authDetails.Address)
+	aaSigerInfo, err := engine.GetAltSignerByAddress(creator.ID.String())
 	if err != nil {
 		return nil, errors.New("creator is has not been onboarded to create a new collection ( They lack an AA wallet )")
 	}

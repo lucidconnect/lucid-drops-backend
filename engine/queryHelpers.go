@@ -79,6 +79,17 @@ func GetAltSignerByAddress(address string) (*models.SignerInfo, error) {
 	return &altSigner, nil
 }
 
+func GetAltSignerByCreatorID(id string) (*models.SignerInfo, error) {
+	var altSigner models.SignerInfo
+
+	err := dbutils.DB.Where(&models.SignerInfo{CreatorID: id}).First(&altSigner).Error
+	if err != nil {
+		return nil, errors.New("address not found")
+	}
+
+	return &altSigner, nil
+}
+
 func GetCreatorByInverseUsername(inverseUsername string) (*models.Creator, error) {
 	var creator models.Creator
 
