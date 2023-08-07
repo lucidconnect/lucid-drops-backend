@@ -19,15 +19,22 @@ func StoreUserAccountSignerAddress(input model.SignerInfo, authDetails *internal
 		input.Signature = &noSignature
 	}
 
-	userAccountSignerAddress := &models.SignerInfo{
-		CreatorID:     creator.ID.String(),
-		WalletAddress: input.Address,
-		Signature:     input.Signature,
-		Provider:      input.Provider,
+	altSigner, err := engine.GetAltSignerByCreatorID(creator.ID.String())
+	if err != nil {
+		altSigner = &models.SignerInfo{
+			CreatorID:     creator.ID.String(),
+			WalletAddress: input.Address,
+			Signature:     input.Signature,
+			Provider:      input.Provider,
+		}
+	} else {
+		altSigner.WalletAddress = input.Address
+		altSigner.Provider = input.Provider
+		altSigner.Signature = input.Signature
 	}
 
-	err = engine.SaveModel(userAccountSignerAddress)
-	if err != nil {
+	alterr := engine.SaveModel(altSigner)
+	if alterr != nil {
 		return false, err
 	}
 
