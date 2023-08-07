@@ -2,14 +2,34 @@ package whitelist
 
 import (
 	"errors"
+	"time"
 
 	"gorm.io/gorm/clause"
 	"inverse.so/dbutils"
+	"inverse.so/emails"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/models"
+	"inverse.so/utils"
 )
+
+func sendEmailOnCreate(dbEmail *models.SingleEmailClaim) error {
+	from := "noreply@getabacus.app"
+
+	item, err := engine.GetItemByID(dbEmail.ItemID.String())
+	if err != nil {
+		return err
+	}
+
+	claimLink := utils.UseEnvOrDefault("FE_BASE_URL", "https://inverse.so") + "/claim/" + item.ID.String()
+
+	err = emails.SendClaimNudgeEmail(dbEmail.EmailAddress, from, item.Name, claimLink)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
@@ -38,6 +58,22 @@ func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetail
 	insertionErr := dbutils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbEmails, 100).Error
 	if insertionErr != nil {
 		return nil, insertionErr
+	}
+
+	for _, dbEmail := range dbEmails {
+		if err = sendEmailOnCreate(dbEmail); err != nil {
+			continue
+		}
+
+		timeNow := time.Now()
+
+		dbEmail.SentOutAt = &timeNow
+
+		insertionErr := dbutils.DB.Save(dbEmail).Error
+
+		if insertionErr != nil {
+			continue
+		}
 	}
 
 	emailCriteria := model.ClaimCriteriaTypeEmailWhiteList

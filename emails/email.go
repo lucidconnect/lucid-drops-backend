@@ -90,3 +90,30 @@ func SendEmail(object EmailData) (*EmailResponse, error) {
 		Response:  response,
 	}, nil
 }
+
+func SendClaimNudgeEmail(emailAddress, fromEmailAdress, itemName, claimLink string) error {
+	templatePath := "emails/templates/inverse-email-criteria.html"
+	dynamicData := map[string]interface{}{
+		"itemName":  itemName,
+		"claimLink": claimLink,
+	}
+
+	body, err := processTemplate(templatePath, dynamicData)
+	if err != nil {
+		return err
+	}
+
+	data := EmailData{
+		Subject:     "Verify your email address",
+		ContentData: body,
+		EmailTo:     emailAddress,
+		EmailFrom:   fromEmailAdress,
+		Template:    templatePath,
+	}
+	_, err = SendEmail(data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
