@@ -95,6 +95,7 @@ type MintAuthorizationResponse struct {
 type MobileWalletConfig struct {
 	PublicKey  string `json:"publicKey"`
 	PrivateKey string `json:"privateKey"`
+	AaWallet   string `json:"aaWallet"`
 }
 
 type MultiChoiceInputType struct {

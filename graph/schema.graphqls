@@ -240,6 +240,7 @@ type UserDetails {
 type MobileWalletConfig {
   publicKey: String!
   privateKey: String!
+  aaWallet: String!
 }
 
 enum QuestionType{
