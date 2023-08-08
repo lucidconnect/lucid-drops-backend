@@ -46,6 +46,11 @@ type CreatorDetails struct {
 	InverseUsername *string `json:"inverseUsername,omitempty"`
 }
 
+type DeploymentInfo struct {
+	CollectionID   string `json:"collectionId"`
+	DeploymentHash string `json:"deploymentHash"`
+}
+
 type EmailClaimInput struct {
 	ItemID       string `json:"itemID"`
 	EmailAddress string `json:"emailAddress"`

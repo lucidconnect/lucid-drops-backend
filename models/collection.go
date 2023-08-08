@@ -16,14 +16,15 @@ import (
 
 type Collection struct {
 	Base
-	CreatorID       uuid.UUID
-	CreatorAddress  string
-	Name            string
-	Image           string `json:"image"`
-	Thumbnail       string `json:"thumbnail"`
-	Description     string `json:"description"`
-	ContractAddress *string
-	TransactionHash *string
+	CreatorID              uuid.UUID
+	CreatorAddress         string
+	Name                   string
+	Image                  string `json:"image"`
+	Thumbnail              string `json:"thumbnail"`
+	Description            string `json:"description"`
+	ContractAddress        *string
+	TransactionHash        *string
+	AAWalletDeploymentHash *string
 }
 
 type DeplyomenResponse struct {

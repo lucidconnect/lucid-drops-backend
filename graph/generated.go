@@ -117,6 +117,7 @@ type ComplexityRoot struct {
 		GenerateSignatureForClaim            func(childComplexity int, input model.GenerateClaimSignatureInput) int
 		RegisterInverseUsername              func(childComplexity int, input model.NewUsernameRegisgration) int
 		StartEmailVerificationForClaim       func(childComplexity int, input model.EmailClaimInput) int
+		StoreHashForDeployment               func(childComplexity int, input model.DeploymentInfo) int
 		StoreSignerInfo                      func(childComplexity int, input model.SignerInfo) int
 		UpdateCollection                     func(childComplexity int, collectionID string, input model.CollectionInput) int
 		UpdateItem                           func(childComplexity int, itemID string, input model.ItemInput) int
@@ -198,6 +199,7 @@ type MutationResolver interface {
 	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
 	StoreSignerInfo(ctx context.Context, input model.SignerInfo) (bool, error)
 	GenerateMobileWalletConfigs(ctx context.Context) (*model.MobileWalletConfig, error)
+	StoreHashForDeployment(ctx context.Context, input model.DeploymentInfo) (*bool, error)
 }
 type QueryResolver interface {
 	GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error)
@@ -618,6 +620,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.StartEmailVerificationForClaim(childComplexity, args["input"].(model.EmailClaimInput)), true
 
+	case "Mutation.storeHashForDeployment":
+		if e.complexity.Mutation.StoreHashForDeployment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_storeHashForDeployment_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.StoreHashForDeployment(childComplexity, args["input"].(model.DeploymentInfo)), true
+
 	case "Mutation.storeSignerInfo":
 		if e.complexity.Mutation.StoreSignerInfo == nil {
 			break
@@ -933,6 +947,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCollectionInput,
 		ec.unmarshalInputCompleteEmailClaimInput,
 		ec.unmarshalInputCompleteEmailVerificationInput,
+		ec.unmarshalInputDeploymentInfo,
 		ec.unmarshalInputEmailClaimInput,
 		ec.unmarshalInputGenerateClaimSignatureInput,
 		ec.unmarshalInputItemInput,
@@ -1198,6 +1213,21 @@ func (ec *executionContext) field_Mutation_startEmailVerificationForClaim_args(c
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNEmailClaimInput2inverseᚗsoᚋgraphᚋmodelᚐEmailClaimInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_storeHashForDeployment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.DeploymentInfo
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNDeploymentInfo2inverseᚗsoᚋgraphᚋmodelᚐDeploymentInfo(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4457,6 +4487,58 @@ func (ec *executionContext) fieldContext_Mutation_generateMobileWalletConfigs(ct
 			}
 			return nil, fmt.Errorf("no field named %q was found under type MobileWalletConfig", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_storeHashForDeployment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_storeHashForDeployment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().StoreHashForDeployment(rctx, fc.Args["input"].(model.DeploymentInfo))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*bool)
+	fc.Result = res
+	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_storeHashForDeployment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_storeHashForDeployment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -7859,6 +7941,44 @@ func (ec *executionContext) unmarshalInputCompleteEmailVerificationInput(ctx con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputDeploymentInfo(ctx context.Context, obj interface{}) (model.DeploymentInfo, error) {
+	var it model.DeploymentInfo
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"collectionId", "deploymentHash"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "collectionId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("collectionId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CollectionID = data
+		case "deploymentHash":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deploymentHash"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeploymentHash = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputEmailClaimInput(ctx context.Context, obj interface{}) (model.EmailClaimInput, error) {
 	var it model.EmailClaimInput
 	asMap := map[string]interface{}{}
@@ -9109,6 +9229,12 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "storeHashForDeployment":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_storeHashForDeployment(ctx, field)
+			})
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -10068,6 +10194,11 @@ func (ec *executionContext) marshalNCreatorDetails2ᚖinverseᚗsoᚋgraphᚋmod
 		return graphql.Null
 	}
 	return ec._CreatorDetails(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNDeploymentInfo2inverseᚗsoᚋgraphᚋmodelᚐDeploymentInfo(ctx context.Context, v interface{}) (model.DeploymentInfo, error) {
+	res, err := ec.unmarshalInputDeploymentInfo(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNEmailClaimInput2inverseᚗsoᚋgraphᚋmodelᚐEmailClaimInput(ctx context.Context, v interface{}) (model.EmailClaimInput, error) {

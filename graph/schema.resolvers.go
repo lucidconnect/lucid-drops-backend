@@ -229,6 +229,16 @@ func (r *mutationResolver) GenerateMobileWalletConfigs(ctx context.Context) (*mo
 	return mobile.GenerateMobileWalletConfigs(authenticationDetails)
 }
 
+// StoreHashForDeployment is the resolver for the storeHashForDeployment field.
+func (r *mutationResolver) StoreHashForDeployment(ctx context.Context, input model.DeploymentInfo) (*bool, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return collections.StoreHashForDeployment(authenticationDetails, &input)
+}
+
 // GetCreatorDetails is the resolver for the getCreatorDetails field.
 func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)

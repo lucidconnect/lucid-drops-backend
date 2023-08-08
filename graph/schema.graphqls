@@ -51,9 +51,11 @@ type Mutation {
 
   storeSignerInfo(input: SignerInfo!): Boolean!
   generateMobileWalletConfigs: MobileWalletConfig!
+  storeHashForDeployment(input: DeploymentInfo!): Boolean
 }
 """ Time formated in the time.RFC3339Nano Format """
 scalar Time
+
 
 input NewEmailWhitelistInput {
   itemID: String!
@@ -156,6 +158,11 @@ input SignerInfo {
   address: String!
   signature: String
   provider: SignerProvider!
+}
+
+input DeploymentInfo{
+  collectionId: String!
+  deploymentHash: String!
 }
 
 type Collection {
