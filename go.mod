@@ -18,6 +18,7 @@ require (
 	github.com/rs/cors v1.9.0
 	github.com/rs/zerolog v1.29.1
 	github.com/satori/go.uuid v1.2.0
+	github.com/status-im/keycard-go v0.2.0
 	github.com/vektah/gqlparser/v2 v2.5.1
 	go.step.sm/crypto v0.33.0
 	golang.org/x/crypto v0.11.0
@@ -78,6 +79,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/tklauser/numcpus v0.2.2 // indirect
 	github.com/urfave/cli/v2 v2.25.3 // indirect
+	github.com/wealdtech/go-merkletree v1.0.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1 // indirect
 	golang.org/x/mod v0.11.0 // indirect
