@@ -322,6 +322,17 @@ func GetFeaturedItems() ([]*models.Item, error) {
 	return items, nil
 }
 
+func GetFeaturedCollections() ([]*models.Collection, error) {
+	var collections []*models.Collection
+
+	err := dbutils.DB.Where("featured=?", true).Find(&collections).Error
+	if err != nil {
+		return nil, errors.New("collections not found")
+	}
+
+	return collections, nil
+}
+
 func CreateModel(newModel interface{}) error {
 	return dbutils.DB.Create(newModel).Error
 }

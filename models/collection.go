@@ -25,6 +25,7 @@ type Collection struct {
 	ContractAddress        *string
 	TransactionHash        *string
 	AAWalletDeploymentHash *string
+	Featured               bool `gorm:"default:false"`
 }
 
 type DeplyomenResponse struct {

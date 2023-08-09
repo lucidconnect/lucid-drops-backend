@@ -108,3 +108,18 @@ func FetchCollectionByID(collectionID string) (*model.Collection, error) {
 
 	return collection.ToGraphData(), nil
 }
+
+func FetchFeaturedCollections() ([]*model.Collection, error) {
+	collections, err := engine.GetFeaturedCollections()
+	if err != nil {
+		return nil, errors.New("collections not found")
+	}
+
+	mappedCollections := make([]*model.Collection, len(collections))
+
+	for idx, collection := range collections {
+		mappedCollections[idx] = collection.ToGraphData()
+	}
+
+	return mappedCollections, nil
+}

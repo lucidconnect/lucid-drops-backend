@@ -135,6 +135,7 @@ type ComplexityRoot struct {
 		FetchClaimedItems        func(childComplexity int, address string) int
 		FetchCollectionByID      func(childComplexity int, collectionID string) int
 		FetchCreatorCollections  func(childComplexity int) int
+		FetchFeaturedCollections func(childComplexity int) int
 		FetchFeaturedItems       func(childComplexity int) int
 		FetchItemByID            func(childComplexity int, itemID string) int
 		FetchItemsInCollection   func(childComplexity int, collectionID string) int
@@ -216,6 +217,7 @@ type QueryResolver interface {
 	GetTwitterUserDetails(ctx context.Context, userName string) (*model.UserDetails, error)
 	FetchQuestionsByItemID(ctx context.Context, itemID string) ([]*model.QuestionnaireType, error)
 	FetchFeaturedItems(ctx context.Context) ([]*model.Item, error)
+	FetchFeaturedCollections(ctx context.Context) ([]*model.Collection, error)
 }
 
 type executableSchema struct {
@@ -755,6 +757,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.FetchCreatorCollections(childComplexity), true
+
+	case "Query.fetchFeaturedCollections":
+		if e.complexity.Query.FetchFeaturedCollections == nil {
+			break
+		}
+
+		return e.complexity.Query.FetchFeaturedCollections(childComplexity), true
 
 	case "Query.fetchFeaturedItems":
 		if e.complexity.Query.FetchFeaturedItems == nil {
@@ -5465,6 +5474,66 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_fetchFeaturedCollections(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_fetchFeaturedCollections(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FetchFeaturedCollections(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Collection)
+	fc.Result = res
+	return ec.marshalNCollection2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐCollectionᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_fetchFeaturedCollections(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Collection_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Collection_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Collection_description(ctx, field)
+			case "image":
+				return ec.fieldContext_Collection_image(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "contractAddress":
+				return ec.fieldContext_Collection_contractAddress(ctx, field)
+			case "items":
+				return ec.fieldContext_Collection_items(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query___type(ctx, field)
 	if err != nil {
@@ -9662,6 +9731,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_fetchFeaturedItems(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "fetchFeaturedCollections":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_fetchFeaturedCollections(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

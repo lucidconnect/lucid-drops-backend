@@ -24,6 +24,7 @@ type Query {
 
   fetchQuestionsByItemId(itemId: String!): [QuestionnaireType!]!
   fetchFeaturedItems: [Item!]!
+  fetchFeaturedCollections: [Collection!]!
 }
 
 type Mutation {
