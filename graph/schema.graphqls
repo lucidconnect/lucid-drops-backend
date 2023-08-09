@@ -23,6 +23,7 @@ type Query {
   getTwitterUserDetails(userName: String!): UserDetails!
 
   fetchQuestionsByItemId(itemId: String!): [QuestionnaireType!]!
+  fetchFeaturedItems: [Item!]!
 }
 
 type Mutation {

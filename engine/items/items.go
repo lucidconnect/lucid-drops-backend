@@ -196,3 +196,18 @@ func FetchQuestionsByItemID(itemID string) ([]*model.QuestionnaireType, error) {
 
 	return questions, nil
 }
+
+func FetchFeaturedItems() ([]*model.Item, error) {
+	items, err := engine.GetFeaturedItems()
+	if err != nil {
+		return nil, errors.New("items not found")
+	}
+
+	mappedItems := make([]*model.Item, len(items))
+
+	for idx, item := range items {
+		mappedItems[idx] = item.ToGraphData()
+	}
+
+	return mappedItems, nil
+}

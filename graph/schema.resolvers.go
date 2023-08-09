@@ -336,6 +336,11 @@ func (r *queryResolver) FetchQuestionsByItemID(ctx context.Context, itemID strin
 	return items.FetchQuestionsByItemID(itemID)
 }
 
+// FetchFeaturedItems is the resolver for the fetchFeaturedItems field.
+func (r *queryResolver) FetchFeaturedItems(ctx context.Context) ([]*model.Item, error) {
+	return items.FetchFeaturedItems()
+}
+
 // Collection returns CollectionResolver implementation.
 func (r *Resolver) Collection() CollectionResolver { return &collectionResolver{r} }
 

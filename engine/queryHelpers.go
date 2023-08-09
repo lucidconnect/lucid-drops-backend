@@ -311,6 +311,17 @@ func FetchTelegramCriteriaByLink(channelLink string) (*models.TelegramCriteria, 
 	return &criteria, nil
 }
 
+func GetFeaturedItems() ([]*models.Item, error) {
+	var items []*models.Item
+
+	err := dbutils.DB.Where("featured=?", true).Find(&items).Error
+	if err != nil {
+		return nil, errors.New("items not found")
+	}
+
+	return items, nil
+}
+
 func CreateModel(newModel interface{}) error {
 	return dbutils.DB.Create(newModel).Error
 }
