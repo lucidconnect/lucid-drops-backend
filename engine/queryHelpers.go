@@ -60,7 +60,7 @@ func GetMintPassById(passId string) (*models.MintPass, error) {
 func GetCreatorByAddress(address string) (*models.Creator, error) {
 	var creator models.Creator
 
-	err := dbutils.DB.Where(&models.Creator{WalletAddress: address}).First(&creator).Error
+	err := dbutils.DB.Where("wallet_address=?", address).First(&creator).Error
 	if err != nil {
 		return nil, fmt.Errorf("address (%s) not found", address)
 	}
@@ -82,9 +82,9 @@ func GetAltSignerByAddress(address string) (*models.SignerInfo, error) {
 func GetAltSignerByCreatorID(id string) (*models.SignerInfo, error) {
 	var altSigner models.SignerInfo
 
-	err := dbutils.DB.Where(&models.SignerInfo{CreatorID: id}).First(&altSigner).Error
+	err := dbutils.DB.Where("creator_id=?", id).First(&altSigner).Error
 	if err != nil {
-		return nil, fmt.Errorf("creator (%s) not found", id)
+		return nil, fmt.Errorf("creator signer (%s) not found", id)
 	}
 
 	return &altSigner, nil
@@ -93,7 +93,7 @@ func GetAltSignerByCreatorID(id string) (*models.SignerInfo, error) {
 func GetCreatorByInverseUsername(inverseUsername string) (*models.Creator, error) {
 	var creator models.Creator
 
-	err := dbutils.DB.Where(&models.Creator{InverseUsername: &inverseUsername}).First(&creator).Error
+	err := dbutils.DB.Where("inverse_username=?", inverseUsername).First(&creator).Error
 	if err != nil {
 		return nil, errors.New("username isn't being used")
 	}
