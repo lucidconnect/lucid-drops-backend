@@ -215,6 +215,7 @@ type QuestionnaireType {
 type ImageResponse {
   image: String!
   format: ImageResolveFormaat!
+  taskID: String
 }
 
 type StartEmailVerificationResponse {

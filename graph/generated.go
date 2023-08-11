@@ -71,6 +71,7 @@ type ComplexityRoot struct {
 	ImageResponse struct {
 		Format func(childComplexity int) int
 		Image  func(childComplexity int) int
+		TaskID func(childComplexity int) int
 	}
 
 	Item struct {
@@ -325,6 +326,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ImageResponse.Image(childComplexity), true
+
+	case "ImageResponse.taskID":
+		if e.complexity.ImageResponse.TaskID == nil {
+			break
+		}
+
+		return e.complexity.ImageResponse.TaskID(childComplexity), true
 
 	case "Item.authorizedSubdomains":
 		if e.complexity.Item.AuthorizedSubdomains == nil {
@@ -2201,6 +2209,47 @@ func (ec *executionContext) fieldContext_ImageResponse_format(ctx context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ImageResolveFormaat does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageResponse_taskID(ctx context.Context, field graphql.CollectedField, obj *model.ImageResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageResponse_taskID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TaskID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageResponse_taskID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5189,6 +5238,8 @@ func (ec *executionContext) fieldContext_Query_getImageSuggestions(ctx context.C
 				return ec.fieldContext_ImageResponse_image(ctx, field)
 			case "format":
 				return ec.fieldContext_ImageResponse_format(ctx, field)
+			case "taskID":
+				return ec.fieldContext_ImageResponse_taskID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ImageResponse", field.Name)
 		},
@@ -8959,6 +9010,10 @@ func (ec *executionContext) _ImageResponse(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "taskID":
+
+			out.Values[i] = ec._ImageResponse_taskID(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

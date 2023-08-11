@@ -64,6 +64,7 @@ type GenerateClaimSignatureInput struct {
 type ImageResponse struct {
 	Image  string              `json:"image"`
 	Format ImageResolveFormaat `json:"format"`
+	TaskID *string             `json:"taskID,omitempty"`
 }
 
 type Item struct {
