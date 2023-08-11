@@ -17,8 +17,8 @@ func RegisterInverseUsername(address string, input *model.NewUsernameRegisgratio
 		return nil, errors.New("inverse name isn't available")
 	}
 
-	cachedCreator, err := engine.GetCreatorByAddress(address)
-	if err != nil {
+	cachedCreator, storedCreatorErr := engine.GetCreatorByAddress(address)
+	if storedCreatorErr != nil {
 		newCreator := models.Creator{WalletAddress: address, InverseUsername: utils.GetStringPtr(input.InverseUsername)}
 		creationErr := dbutils.DB.Create(&newCreator).Error
 		if creationErr != nil {
