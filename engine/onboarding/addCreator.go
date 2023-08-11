@@ -1,6 +1,9 @@
 package onboarding
 
 import (
+	"errors"
+
+	"gorm.io/gorm"
 	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/models"
@@ -8,7 +11,7 @@ import (
 
 func CreateCreatorProfileIfAddressIsMissing(address string) (*models.Creator, error) {
 	cachedCreator, err := engine.GetCreatorByAddress(address)
-	if err != nil {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		newCreator := models.Creator{WalletAddress: address}
 		creationErr := dbutils.DB.Create(&newCreator).Error
 		if creationErr != nil {
