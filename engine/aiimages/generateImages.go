@@ -13,7 +13,7 @@ type LLMProvider interface {
 
 func GetImageSuggestions(prompt string, presets *model.AiImageStyle) ([]*model.ImageResponse, error) {
 	
-	provider := services.StabilityService{}
+	provider := services.MidJourneyService{}
 	return provider.GenerateImage(prompt, presets, &numberOfImagesToGenerate)
 
 }
