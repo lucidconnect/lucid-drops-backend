@@ -40,7 +40,7 @@ func GetCreatorByID(creatorID string) (*models.Creator, error) {
 
 	err := dbutils.DB.Where("id=?", creatorID).First(&creator).Error
 	if err != nil {
-		return nil, errors.New("crator not found")
+		return nil, fmt.Errorf("creator (%s) not found", creatorID)
 	}
 
 	return &creator, nil
@@ -62,7 +62,7 @@ func GetCreatorByAddress(address string) (*models.Creator, error) {
 
 	err := dbutils.DB.Where(&models.Creator{WalletAddress: address}).First(&creator).Error
 	if err != nil {
-		return nil, errors.New("address not found")
+		return nil, fmt.Errorf("address (%s) not found", address)
 	}
 
 	return &creator, nil
@@ -73,7 +73,7 @@ func GetAltSignerByAddress(address string) (*models.SignerInfo, error) {
 
 	err := dbutils.DB.Where(&models.SignerInfo{WalletAddress: address}).First(&altSigner).Error
 	if err != nil {
-		return nil, errors.New("address not found")
+		return nil, fmt.Errorf("address (%s) not found", address)
 	}
 
 	return &altSigner, nil
@@ -84,7 +84,7 @@ func GetAltSignerByCreatorID(id string) (*models.SignerInfo, error) {
 
 	err := dbutils.DB.Where(&models.SignerInfo{CreatorID: id}).First(&altSigner).Error
 	if err != nil {
-		return nil, errors.New("address not found")
+		return nil, fmt.Errorf("creator (%s) not found", id)
 	}
 
 	return &altSigner, nil
