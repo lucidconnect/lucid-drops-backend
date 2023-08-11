@@ -2,7 +2,6 @@ package aiimages
 
 import (
 	"inverse.so/graph/model"
-	services "inverse.so/services/AI-Imaging"
 )
 
 var numberOfImagesToGenerate int = 4
@@ -12,8 +11,8 @@ type LLMProvider interface {
 }
 
 func GetImageSuggestions(prompt string, presets *model.AiImageStyle) ([]*model.ImageResponse, error) {
-	
-	provider := services.MidJourneyService{}
+
+	provider := MidJourneyService{}
 	return provider.GenerateImage(prompt, presets, &numberOfImagesToGenerate)
 
 }

@@ -1,4 +1,4 @@
-package services
+package aiimages
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"inverse.so/graph/model"
 )
 
-const baseSalt = "highly detailed, flat illustration, nft style, cyberpunk, "
+// const baseSalt = "highly detailed, flat illustration, nft style, cyberpunk, "
 
 var promptSaltMap = map[model.AiImageStyle]string{
 	model.AiImageStyleAnime:            "Concept art, pixiv-style, Sumi-e, portrait, ",

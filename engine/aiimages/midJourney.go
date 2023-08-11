@@ -1,11 +1,11 @@
-package services
+package aiimages
 
 import (
 	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -121,7 +121,7 @@ func executeMidjourneyRequest(method, endpoint string, requestData, destination 
 	}
 
 	defer response.Body.Close()
-	responseBody, err := ioutil.ReadAll(response.Body)
+	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
 		return err
 	}
