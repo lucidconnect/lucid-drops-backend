@@ -346,6 +346,11 @@ func (r *queryResolver) FetchFeaturedCollections(ctx context.Context) ([]*model.
 	return collections.FetchFeaturedCollections()
 }
 
+// QueryImageStatus is the resolver for the queryImageStatus field.
+func (r *queryResolver) QueryImageStatus(ctx context.Context, taskID string, position *int) (*model.ImageStatusResponse, error) {
+	return services.QueryMidJourneyTaskID(taskID, position)
+}
+
 // Collection returns CollectionResolver implementation.
 func (r *Resolver) Collection() CollectionResolver { return &collectionResolver{r} }
 

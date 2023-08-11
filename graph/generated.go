@@ -74,6 +74,12 @@ type ComplexityRoot struct {
 		TaskID func(childComplexity int) int
 	}
 
+	ImageStatusResponse struct {
+		Image      func(childComplexity int) int
+		Percentage func(childComplexity int) int
+		Status     func(childComplexity int) int
+	}
+
 	Item struct {
 		AuthorizedSubdomains             func(childComplexity int) int
 		CampaignName                     func(childComplexity int) int
@@ -147,6 +153,7 @@ type ComplexityRoot struct {
 		GetTweetDetails          func(childComplexity int, tweetLink string) int
 		GetTwitterUserDetails    func(childComplexity int, userName string) int
 		IsInverseNameIsAvailable func(childComplexity int, input model.NewUsernameRegisgration) int
+		QueryImageStatus         func(childComplexity int, taskID string, position *int) int
 	}
 
 	QuestionnaireType struct {
@@ -219,6 +226,7 @@ type QueryResolver interface {
 	FetchQuestionsByItemID(ctx context.Context, itemID string) ([]*model.QuestionnaireType, error)
 	FetchFeaturedItems(ctx context.Context) ([]*model.Item, error)
 	FetchFeaturedCollections(ctx context.Context) ([]*model.Collection, error)
+	QueryImageStatus(ctx context.Context, taskID string, position *int) (*model.ImageStatusResponse, error)
 }
 
 type executableSchema struct {
@@ -333,6 +341,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ImageResponse.TaskID(childComplexity), true
+
+	case "ImageStatusResponse.image":
+		if e.complexity.ImageStatusResponse.Image == nil {
+			break
+		}
+
+		return e.complexity.ImageStatusResponse.Image(childComplexity), true
+
+	case "ImageStatusResponse.percentage":
+		if e.complexity.ImageStatusResponse.Percentage == nil {
+			break
+		}
+
+		return e.complexity.ImageStatusResponse.Percentage(childComplexity), true
+
+	case "ImageStatusResponse.status":
+		if e.complexity.ImageStatusResponse.Status == nil {
+			break
+		}
+
+		return e.complexity.ImageStatusResponse.Status(childComplexity), true
 
 	case "Item.authorizedSubdomains":
 		if e.complexity.Item.AuthorizedSubdomains == nil {
@@ -877,6 +906,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.IsInverseNameIsAvailable(childComplexity, args["input"].(model.NewUsernameRegisgration)), true
+
+	case "Query.queryImageStatus":
+		if e.complexity.Query.QueryImageStatus == nil {
+			break
+		}
+
+		args, err := ec.field_Query_queryImageStatus_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.QueryImageStatus(childComplexity, args["taskID"].(string), args["position"].(*int)), true
 
 	case "QuestionnaireType.choices":
 		if e.complexity.QuestionnaireType.Choices == nil {
@@ -1580,6 +1621,30 @@ func (ec *executionContext) field_Query_isInverseNameIsAvailable_args(ctx contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_queryImageStatus_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["taskID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("taskID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["taskID"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["position"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("position"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["position"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2250,6 +2315,129 @@ func (ec *executionContext) fieldContext_ImageResponse_taskID(ctx context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageStatusResponse_status(ctx context.Context, field graphql.CollectedField, obj *model.ImageStatusResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageStatusResponse_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageStatusResponse_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageStatusResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageStatusResponse_image(ctx context.Context, field graphql.CollectedField, obj *model.ImageStatusResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageStatusResponse_image(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Image, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageStatusResponse_image(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageStatusResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImageStatusResponse_percentage(ctx context.Context, field graphql.CollectedField, obj *model.ImageStatusResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ImageStatusResponse_percentage(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Percentage, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ImageStatusResponse_percentage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImageStatusResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5581,6 +5769,69 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedCollections(ctx cont
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_queryImageStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_queryImageStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().QueryImageStatus(rctx, fc.Args["taskID"].(string), fc.Args["position"].(*int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ImageStatusResponse)
+	fc.Result = res
+	return ec.marshalNImageStatusResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐImageStatusResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_queryImageStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "status":
+				return ec.fieldContext_ImageStatusResponse_status(ctx, field)
+			case "image":
+				return ec.fieldContext_ImageStatusResponse_image(ctx, field)
+			case "percentage":
+				return ec.fieldContext_ImageStatusResponse_percentage(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ImageStatusResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_queryImageStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -9025,6 +9276,39 @@ func (ec *executionContext) _ImageResponse(ctx context.Context, sel ast.Selectio
 	return out
 }
 
+var imageStatusResponseImplementors = []string{"ImageStatusResponse"}
+
+func (ec *executionContext) _ImageStatusResponse(ctx context.Context, sel ast.SelectionSet, obj *model.ImageStatusResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, imageStatusResponseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ImageStatusResponse")
+		case "status":
+
+			out.Values[i] = ec._ImageStatusResponse_status(ctx, field, obj)
+
+		case "image":
+
+			out.Values[i] = ec._ImageStatusResponse_image(ctx, field, obj)
+
+		case "percentage":
+
+			out.Values[i] = ec._ImageStatusResponse_percentage(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var itemImplementors = []string{"Item"}
 
 func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj *model.Item) graphql.Marshaler {
@@ -9822,6 +10106,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "queryImageStatus":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_queryImageStatus(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -10527,6 +10834,20 @@ func (ec *executionContext) marshalNImageResponse2ᚕᚖinverseᚗsoᚋgraphᚋm
 	return ret
 }
 
+func (ec *executionContext) marshalNImageStatusResponse2inverseᚗsoᚋgraphᚋmodelᚐImageStatusResponse(ctx context.Context, sel ast.SelectionSet, v model.ImageStatusResponse) graphql.Marshaler {
+	return ec._ImageStatusResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNImageStatusResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐImageStatusResponse(ctx context.Context, sel ast.SelectionSet, v *model.ImageStatusResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ImageStatusResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNItem2inverseᚗsoᚋgraphᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v model.Item) graphql.Marshaler {
 	return ec._Item(ctx, sel, &v)
 }
@@ -11198,6 +11519,22 @@ func (ec *executionContext) marshalOImageResponse2ᚖinverseᚗsoᚋgraphᚋmode
 		return graphql.Null
 	}
 	return ec._ImageResponse(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
 }
 
 func (ec *executionContext) unmarshalOInteractionType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐInteractionType(ctx context.Context, v interface{}) ([]*model.InteractionType, error) {

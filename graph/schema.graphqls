@@ -25,6 +25,8 @@ type Query {
   fetchQuestionsByItemId(itemId: String!): [QuestionnaireType!]!
   fetchFeaturedItems: [Item!]!
   fetchFeaturedCollections: [Collection!]!
+
+  queryImageStatus(taskID: String!, position: Int): ImageStatusResponse!
 }
 
 type Mutation {
@@ -251,6 +253,12 @@ type MobileWalletConfig {
   publicKey: String!
   privateKey: String!
   aaWallet: String!
+}
+
+type ImageStatusResponse {
+  status: String
+  image: String
+  percentage: Int
 }
 
 enum QuestionType{

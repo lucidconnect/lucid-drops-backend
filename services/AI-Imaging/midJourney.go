@@ -61,6 +61,27 @@ func GenerateMidJourneyImage(prompt string, style *model.AiImageStyle, number *i
 	return &response, nil
 }
 
+func QueryMidJourneyTaskID(taskID string, position *int) (*model.ImageStatusResponse, error) {
+
+	requestData := &structure.MidJourneyImageStatusRequest{
+		TaskID: taskID,
+	}
+
+	endpoint := "/result"
+	if position != nil {
+		requestData.Position = *position
+		endpoint = "/upscale"
+	}
+
+	var response structure.MidJourneyImageStatusResponse
+	err := executeMidjourneyRequest("POST", endpoint, requestData, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.ToMidJourneyGraph(), nil
+}
+
 func executeMidjourneyRequest(method, endpoint string, requestData, destination interface{}) error {
 
 	url := fmt.Sprintf("%s%s", midJourneyURLURL, endpoint)

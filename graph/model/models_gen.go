@@ -67,6 +67,12 @@ type ImageResponse struct {
 	TaskID *string             `json:"taskID,omitempty"`
 }
 
+type ImageStatusResponse struct {
+	Status     *string `json:"status,omitempty"`
+	Image      *string `json:"image,omitempty"`
+	Percentage *int    `json:"percentage,omitempty"`
+}
+
 type Item struct {
 	ID                               string             `json:"ID"`
 	Name                             string             `json:"name"`
