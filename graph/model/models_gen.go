@@ -40,6 +40,12 @@ type CompleteEmailVerificationResponse struct {
 	OtpRequestID string `json:"otpRequestID"`
 }
 
+type CreateJWTTokenInput struct {
+	Address   string `json:"address"`
+	AaWallet  string `json:"aaWallet"`
+	Signature string `json:"signature"`
+}
+
 type CreatorDetails struct {
 	CreatorID       string  `json:"creatorID"`
 	Address         string  `json:"address"`
@@ -97,6 +103,10 @@ type ItemInput struct {
 	CollectionID *string `json:"collectionID,omitempty"`
 }
 
+type JWTCreationResponse struct {
+	Token string `json:"token"`
+}
+
 type MintAuthorizationResponse struct {
 	PackedData           string `json:"packedData"`
 	MintingAbi           string `json:"mintingABI"`
@@ -151,11 +161,13 @@ type NewTwitterCriteriaInput struct {
 }
 
 type NewUsernameRegisgration struct {
+	AaWallet        string `json:"aaWallet"`
 	InverseUsername string `json:"inverseUsername"`
 }
 
 type OnboardingProgress struct {
-	RegisterdInverseUsername bool `json:"registerdInverseUsername"`
+	Creator                  *CreatorDetails `json:"creator,omitempty"`
+	RegisterdInverseUsername bool            `json:"registerdInverseUsername"`
 }
 
 type OpenEndedInputType struct {
@@ -446,20 +458,22 @@ func (e QuestionType) MarshalGQL(w io.Writer) {
 type SignerProvider string
 
 const (
-	SignerProviderDynamic  SignerProvider = "dynamic"
-	SignerProviderMagic    SignerProvider = "magic"
-	SignerProviderWeb3Auth SignerProvider = "web3Auth"
+	SignerProviderDynamic    SignerProvider = "dynamic"
+	SignerProviderMagic      SignerProvider = "magic"
+	SignerProviderWeb3Auth   SignerProvider = "web3Auth"
+	SignerProviderConnectKit SignerProvider = "connectKit"
 )
 
 var AllSignerProvider = []SignerProvider{
 	SignerProviderDynamic,
 	SignerProviderMagic,
 	SignerProviderWeb3Auth,
+	SignerProviderConnectKit,
 }
 
 func (e SignerProvider) IsValid() bool {
 	switch e {
-	case SignerProviderDynamic, SignerProviderMagic, SignerProviderWeb3Auth:
+	case SignerProviderDynamic, SignerProviderMagic, SignerProviderWeb3Auth, SignerProviderConnectKit:
 		return true
 	}
 	return false

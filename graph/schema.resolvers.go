@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"inverse.so/engine/aiimages"
+	"inverse.so/engine/auth"
 	"inverse.so/engine/claimers"
 	"inverse.so/engine/collections"
 	"inverse.so/engine/items"
@@ -192,6 +193,11 @@ func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, i
 // ValidateQuestionnaireCriteriaForItem is the resolver for the validateQuestionnaireCriteriaForItem field.
 func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
 	return whitelist.ValidateQuestionnaireCriteriaForItem(itemID, input)
+}
+
+// CreateJWTToken is the resolver for the createJWTToken field.
+func (r *mutationResolver) CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error) {
+	return auth.CreateJWTToken(input)
 }
 
 // StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.

@@ -6,6 +6,7 @@ import (
 
 	"inverse.so/dbutils"
 	"inverse.so/engine"
+	"inverse.so/engine/mobile"
 	"inverse.so/graph/model"
 	"inverse.so/models"
 	"inverse.so/utils"
@@ -24,6 +25,25 @@ func RegisterInverseUsername(address string, input *model.NewUsernameRegisgratio
 		if creationErr != nil {
 			return nil, creationErr
 		}
+
+		accountDetails, generationErr := mobile.GenerateRandomEthAddress()
+		if generationErr != nil {
+			return nil, generationErr
+		}
+
+		newAltSigner := models.SignerInfo{
+			CreatorID:     newCreator.ID.String(),
+			WalletAddress: input.AaWallet,
+			Provider:      model.SignerProviderConnectKit,
+			AltPublicKey:  accountDetails.PublicKey,
+			AltPrivateKey: accountDetails.PrivateKey,
+		}
+
+		altSignerErr := dbutils.DB.Create(&newAltSigner).Error
+		if altSignerErr != nil {
+			return nil, altSignerErr
+		}
+
 		return newCreator.ToGraphData(), nil
 	}
 
@@ -35,6 +55,23 @@ func RegisterInverseUsername(address string, input *model.NewUsernameRegisgratio
 	creationErr := dbutils.DB.Save(&cachedCreator).Error
 	if creationErr != nil {
 		return nil, creationErr
+	}
+
+	altSigner, err := engine.GetAltSignerByCreatorID(cachedCreator.ID.String())
+	if err != nil {
+		altSigner = &models.SignerInfo{
+			CreatorID:     cachedCreator.ID.String(),
+			WalletAddress: input.AaWallet,
+			Provider:      model.SignerProviderConnectKit,
+		}
+	} else {
+		altSigner.WalletAddress = input.AaWallet
+		altSigner.Provider = model.SignerProviderConnectKit
+	}
+
+	err = engine.SaveModel(altSigner)
+	if err != nil {
+		return nil, err
 	}
 
 	return cachedCreator.ToGraphData(), nil

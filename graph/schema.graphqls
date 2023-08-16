@@ -49,6 +49,8 @@ type Mutation {
   validatePatreonCriteriaForItem(itemID: String!, authID: String): Boolean!
   validateQuestionnaireCriteriaForItem(itemID: String!, input: [QuestionnaireAnswerInput!]!): String
 
+  createJWTToken(input: CreateJWTTokenInput): JWTCreationResponse!
+
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
   generateSignatureForClaim(input: GenerateClaimSignatureInput!): MintAuthorizationResponse!
@@ -60,6 +62,11 @@ type Mutation {
 """ Time formated in the time.RFC3339Nano Format """
 scalar Time
 
+input CreateJWTTokenInput{
+  address:   String!
+  aaWallet:  String!
+  signature: String!
+}
 
 input NewEmailWhitelistInput {
   itemID: String!
@@ -116,6 +123,7 @@ input NewEmailDomainWhitelistInput {
 }
 
 input NewUsernameRegisgration {
+  aaWallet: String!
   inverseUsername: String!
 }
 
@@ -169,6 +177,10 @@ input DeploymentInfo{
   deploymentHash: String!
 }
 
+type JWTCreationResponse{
+  token: String!
+}
+
 type Collection {
   ID: ID!
 	name: String!
@@ -180,6 +192,7 @@ type Collection {
 }
 
 type OnboardingProgress{
+  creator: CreatorDetails
   registerdInverseUsername: Boolean!
 }
 
@@ -306,6 +319,7 @@ enum SignerProvider {
   dynamic
   magic
   web3Auth
+  connectKit
 }
 
 

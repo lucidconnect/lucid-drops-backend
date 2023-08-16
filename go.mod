@@ -6,10 +6,10 @@ require (
 	github.com/99designs/gqlgen v0.17.31
 	github.com/MicahParks/keyfunc v1.9.0
 	github.com/agnivade/levenshtein v1.1.1
-	github.com/blocktree/go-owcrypt v1.1.14
 	github.com/ethereum/go-ethereum v1.12.0
 	github.com/go-chi/chi v1.5.4
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/imroc/req/v3 v3.37.0
 	github.com/joho/godotenv v1.5.1

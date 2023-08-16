@@ -97,6 +97,10 @@ type ComplexityRoot struct {
 		TwitterClaimCriteriaInteractions func(childComplexity int) int
 	}
 
+	JWTCreationResponse struct {
+		Token func(childComplexity int) int
+	}
+
 	MintAuthorizationResponse struct {
 		MintingAbi           func(childComplexity int) int
 		MintingSignature     func(childComplexity int) int
@@ -116,6 +120,7 @@ type ComplexityRoot struct {
 		CreateEmailDomainWhitelist           func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
 		CreateEmailWhitelistForItem          func(childComplexity int, input model.NewEmailWhitelistInput) int
 		CreateItem                           func(childComplexity int, input model.ItemInput) int
+		CreateJWTToken                       func(childComplexity int, input *model.CreateJWTTokenInput) int
 		CreatePatreonCriteriaForItem         func(childComplexity int, input model.NewPatreonCriteriaInput) int
 		CreateQuestionnaireCriteriaForItem   func(childComplexity int, input model.QuestionnaireCriteriaInput) int
 		CreateTelegramCriteriaForItem        func(childComplexity int, input model.NewTelegramCriteriaInput) int
@@ -135,6 +140,7 @@ type ComplexityRoot struct {
 	}
 
 	OnboardingProgress struct {
+		Creator                  func(childComplexity int) int
 		RegisterdInverseUsername func(childComplexity int) int
 	}
 
@@ -204,6 +210,7 @@ type MutationResolver interface {
 	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
 	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
 	ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error)
+	CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error)
 	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
 	CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error)
 	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
@@ -461,6 +468,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.TwitterClaimCriteriaInteractions(childComplexity), true
 
+	case "JWTCreationResponse.token":
+		if e.complexity.JWTCreationResponse.Token == nil {
+			break
+		}
+
+		return e.complexity.JWTCreationResponse.Token(childComplexity), true
+
 	case "MintAuthorizationResponse.mintingABI":
 		if e.complexity.MintAuthorizationResponse.MintingAbi == nil {
 			break
@@ -569,6 +583,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateItem(childComplexity, args["input"].(model.ItemInput)), true
+
+	case "Mutation.createJWTToken":
+		if e.complexity.Mutation.CreateJWTToken == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createJWTToken_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateJWTToken(childComplexity, args["input"].(*model.CreateJWTTokenInput)), true
 
 	case "Mutation.createPatreonCriteriaForItem":
 		if e.complexity.Mutation.CreatePatreonCriteriaForItem == nil {
@@ -756,6 +782,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ValidateTwitterCriteriaForItem(childComplexity, args["itemID"].(string), args["authID"].(*string)), true
+
+	case "OnboardingProgress.creator":
+		if e.complexity.OnboardingProgress.Creator == nil {
+			break
+		}
+
+		return e.complexity.OnboardingProgress.Creator(childComplexity), true
 
 	case "OnboardingProgress.registerdInverseUsername":
 		if e.complexity.OnboardingProgress.RegisterdInverseUsername == nil {
@@ -1014,6 +1047,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCollectionInput,
 		ec.unmarshalInputCompleteEmailClaimInput,
 		ec.unmarshalInputCompleteEmailVerificationInput,
+		ec.unmarshalInputCreateJWTTokenInput,
 		ec.unmarshalInputDeploymentInfo,
 		ec.unmarshalInputEmailClaimInput,
 		ec.unmarshalInputGenerateClaimSignatureInput,
@@ -1175,6 +1209,21 @@ func (ec *executionContext) field_Mutation_createItem_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNItemInput2inverseᚗsoᚋgraphᚋmodelᚐItemInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createJWTToken_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.CreateJWTTokenInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalOCreateJWTTokenInput2ᚖinverseᚗsoᚋgraphᚋmodelᚐCreateJWTTokenInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3046,6 +3095,50 @@ func (ec *executionContext) fieldContext_Item_createdAt(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _JWTCreationResponse_token(ctx context.Context, field graphql.CollectedField, obj *model.JWTCreationResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_JWTCreationResponse_token(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_JWTCreationResponse_token(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "JWTCreationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MintAuthorizationResponse_packedData(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MintAuthorizationResponse_packedData(ctx, field)
 	if err != nil {
@@ -4456,6 +4549,65 @@ func (ec *executionContext) fieldContext_Mutation_validateQuestionnaireCriteriaF
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createJWTToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createJWTToken(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateJWTToken(rctx, fc.Args["input"].(*model.CreateJWTTokenInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.JWTCreationResponse)
+	fc.Result = res
+	return ec.marshalNJWTCreationResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐJWTCreationResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createJWTToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "token":
+				return ec.fieldContext_JWTCreationResponse_token(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type JWTCreationResponse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createJWTToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_startEmailVerificationForClaim(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_startEmailVerificationForClaim(ctx, field)
 	if err != nil {
@@ -4798,6 +4950,55 @@ func (ec *executionContext) fieldContext_Mutation_storeHashForDeployment(ctx con
 	return fc, nil
 }
 
+func (ec *executionContext) _OnboardingProgress_creator(ctx context.Context, field graphql.CollectedField, obj *model.OnboardingProgress) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_OnboardingProgress_creator(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Creator, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.CreatorDetails)
+	fc.Result = res
+	return ec.marshalOCreatorDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐCreatorDetails(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_OnboardingProgress_creator(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "OnboardingProgress",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "creatorID":
+				return ec.fieldContext_CreatorDetails_creatorID(ctx, field)
+			case "address":
+				return ec.fieldContext_CreatorDetails_address(ctx, field)
+			case "inverseUsername":
+				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _OnboardingProgress_registerdInverseUsername(ctx context.Context, field graphql.CollectedField, obj *model.OnboardingProgress) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_OnboardingProgress_registerdInverseUsername(ctx, field)
 	if err != nil {
@@ -4933,6 +5134,8 @@ func (ec *executionContext) fieldContext_Query_getOnboardinProgress(ctx context.
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "creator":
+				return ec.fieldContext_OnboardingProgress_creator(ctx, field)
 			case "registerdInverseUsername":
 				return ec.fieldContext_OnboardingProgress_registerdInverseUsername(ctx, field)
 			}
@@ -8395,6 +8598,53 @@ func (ec *executionContext) unmarshalInputCompleteEmailVerificationInput(ctx con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateJWTTokenInput(ctx context.Context, obj interface{}) (model.CreateJWTTokenInput, error) {
+	var it model.CreateJWTTokenInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"address", "aaWallet", "signature"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "address":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Address = data
+		case "aaWallet":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("aaWallet"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AaWallet = data
+		case "signature":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("signature"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Signature = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputDeploymentInfo(ctx context.Context, obj interface{}) (model.DeploymentInfo, error) {
 	var it model.DeploymentInfo
 	asMap := map[string]interface{}{}
@@ -8881,13 +9131,22 @@ func (ec *executionContext) unmarshalInputNewUsernameRegisgration(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"inverseUsername"}
+	fieldsInOrder := [...]string{"aaWallet", "inverseUsername"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "aaWallet":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("aaWallet"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AaWallet = data
 		case "inverseUsername":
 			var err error
 
@@ -9433,6 +9692,34 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
+var jWTCreationResponseImplementors = []string{"JWTCreationResponse"}
+
+func (ec *executionContext) _JWTCreationResponse(ctx context.Context, sel ast.SelectionSet, obj *model.JWTCreationResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, jWTCreationResponseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("JWTCreationResponse")
+		case "token":
+
+			out.Values[i] = ec._JWTCreationResponse_token(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mintAuthorizationResponseImplementors = []string{"MintAuthorizationResponse"}
 
 func (ec *executionContext) _MintAuthorizationResponse(ctx context.Context, sel ast.SelectionSet, obj *model.MintAuthorizationResponse) graphql.Marshaler {
@@ -9675,6 +9962,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_validateQuestionnaireCriteriaForItem(ctx, field)
 			})
 
+		case "createJWTToken":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createJWTToken(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "startEmailVerificationForClaim":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -9747,6 +10043,10 @@ func (ec *executionContext) _OnboardingProgress(ctx context.Context, sel ast.Sel
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("OnboardingProgress")
+		case "creator":
+
+			out.Values[i] = ec._OnboardingProgress_creator(ctx, field, obj)
+
 		case "registerdInverseUsername":
 
 			out.Values[i] = ec._OnboardingProgress_registerdInverseUsername(ctx, field, obj)
@@ -10911,6 +11211,20 @@ func (ec *executionContext) unmarshalNItemInput2inverseᚗsoᚋgraphᚋmodelᚐI
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNJWTCreationResponse2inverseᚗsoᚋgraphᚋmodelᚐJWTCreationResponse(ctx context.Context, sel ast.SelectionSet, v model.JWTCreationResponse) graphql.Marshaler {
+	return ec._JWTCreationResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNJWTCreationResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐJWTCreationResponse(ctx context.Context, sel ast.SelectionSet, v *model.JWTCreationResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._JWTCreationResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNMintAuthorizationResponse2inverseᚗsoᚋgraphᚋmodelᚐMintAuthorizationResponse(ctx context.Context, sel ast.SelectionSet, v model.MintAuthorizationResponse) graphql.Marshaler {
 	return ec._MintAuthorizationResponse(ctx, sel, &v)
 }
@@ -11512,6 +11826,21 @@ func (ec *executionContext) marshalOClaimCriteriaType2ᚖinverseᚗsoᚋgraphᚋ
 		return graphql.Null
 	}
 	return v
+}
+
+func (ec *executionContext) unmarshalOCreateJWTTokenInput2ᚖinverseᚗsoᚋgraphᚋmodelᚐCreateJWTTokenInput(ctx context.Context, v interface{}) (*model.CreateJWTTokenInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCreateJWTTokenInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOCreatorDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐCreatorDetails(ctx context.Context, sel ast.SelectionSet, v *model.CreatorDetails) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CreatorDetails(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOImageResponse2ᚖinverseᚗsoᚋgraphᚋmodelᚐImageResponse(ctx context.Context, sel ast.SelectionSet, v *model.ImageResponse) graphql.Marshaler {
