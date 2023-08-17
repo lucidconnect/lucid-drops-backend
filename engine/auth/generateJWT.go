@@ -46,7 +46,9 @@ func CreateJWTToken(input *model.CreateJWTTokenInput) (*model.JWTCreationRespons
 			WalletAddress: input.AaWallet,
 			Provider:      model.SignerProviderConnectKit,
 		}
-	} else {
+	}
+
+	if altSigner.WalletAddress != "" {
 		altSigner.WalletAddress = input.AaWallet
 		altSigner.Provider = model.SignerProviderConnectKit
 	}

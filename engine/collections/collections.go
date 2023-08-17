@@ -83,7 +83,7 @@ func UpdateCollection(collectionID string, input *model.CollectionInput, authDet
 func FetchCreatorCollections(authDetails *internal.AuthDetails) ([]*model.Collection, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded")
+		return nil, errors.New("creator has not been onboarded")
 	}
 
 	collections, err := engine.GetCreatorCollections(creator.ID.String())
