@@ -26,6 +26,7 @@ const (
 )
 
 func main() {
+	os.Setenv("APP_ENV", "development")
 	utils.SetUpDefaultLogger()
 	utils.LoadEnvironmentVariables()
 	utils.SetUpLoggerFromConfig()

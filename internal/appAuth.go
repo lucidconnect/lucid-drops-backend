@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 
@@ -22,7 +21,7 @@ type AuthDetails struct {
 }
 
 var (
-	userAuthToken       = &contextKey{"userAuthToken"}
+	userAuthToken = &contextKey{"userAuthToken"}
 )
 
 func UserAuthMiddleWare() func(http.Handler) http.Handler {
@@ -76,29 +75,34 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 	var info AuthDetails
 	switch provider {
 	case "web3Auth":
-		log.Print(claims["authHeader"])
 		jwtParts := strings.Split(claims["authHeader"].(string), ".")
 		rawDecodedText, _ := base64.RawStdEncoding.DecodeString(jwtParts[1])
 
-		var jwtInfo Web3AuthMetadata
-		err = json.Unmarshal(rawDecodedText, &jwtInfo)
-		if err != nil {
-			return nil, err
-		}
+		var interalJWT CustomJWTMetadata
+		err = json.Unmarshal(rawDecodedText, &interalJWT)
+		if interalJWT.Address == "" || err != nil {
+			var jwtInfo Web3AuthMetadata
+			err = json.Unmarshal(rawDecodedText, &jwtInfo)
+			if err != nil {
+				return nil, err
+			}
 
-		isExt := true
-		info.Address = jwtInfo.Wallets[0].Address
-		if info.Address == "" {
-			// verify that there's a way to get the address from the public key
-			// deriv = jwtInfo.Wallets[0].PublicKey
-			isExt = false
-			info.Address = fmt.Sprintf("0x%s", jwtInfo.Wallets[0].PublicKey)
-		}
+			isExt := true
+			info.Address = jwtInfo.Wallets[0].Address
+			if info.Address == "" {
+				// verify that there's a way to get the address from the public key
+				// deriv = jwtInfo.Wallets[0].PublicKey
+				isExt = false
+				info.Address = fmt.Sprintf("0x%s", jwtInfo.Wallets[0].PublicKey)
+			}
 
-		// TODO add JWT verification and assert address is present before proceeding
-		_, err = services.VerifyWeb3AuthKey(claims["authHeader"].(string), isExt)
-		if err != nil {
-			return nil, err
+			// TODO add JWT verification and assert address is present before proceeding
+			_, err = services.VerifyWeb3AuthKey(claims["authHeader"].(string), isExt)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			info.Address = interalJWT.Address
 		}
 
 	case "magic":
