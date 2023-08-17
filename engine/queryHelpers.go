@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm/clause"
 	"inverse.so/dbutils"
@@ -57,7 +58,7 @@ func GetMintPassById(passId string) (*models.MintPass, error) {
 	return &pass, nil
 }
 
-func GetCreatorByAddress(address string) (*models.Creator, error) {
+func GetCreatorByAddress(address common.Address) (*models.Creator, error) {
 	var creator models.Creator
 
 	err := dbutils.DB.Where("wallet_address=?", address).First(&creator).Error
@@ -68,7 +69,7 @@ func GetCreatorByAddress(address string) (*models.Creator, error) {
 	return &creator, nil
 }
 
-func GetAltSignerByAddress(address string) (*models.SignerInfo, error) {
+func GetAltSignerByAddress(address common.Address) (*models.SignerInfo, error) {
 	var altSigner models.SignerInfo
 
 	err := dbutils.DB.Where(&models.SignerInfo{WalletAddress: address}).First(&altSigner).Error

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/ethereum/go-ethereum/common"
 	"inverse.so/services"
 )
 
@@ -17,7 +18,7 @@ type contextKey struct {
 }
 
 type AuthDetails struct {
-	Address string
+	Address common.Address
 }
 
 var (
@@ -88,12 +89,13 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 			}
 
 			isExt := true
-			info.Address = jwtInfo.Wallets[0].Address
-			if info.Address == "" {
+			if jwtInfo.Wallets[0].Address == "" {
 				// verify that there's a way to get the address from the public key
 				// deriv = jwtInfo.Wallets[0].PublicKey
 				isExt = false
-				info.Address = fmt.Sprintf("0x%s", jwtInfo.Wallets[0].PublicKey)
+				info.Address = common.HexToAddress(fmt.Sprintf("0x%s", jwtInfo.Wallets[0].PublicKey))
+			} else {
+				info.Address = common.HexToAddress(jwtInfo.Wallets[0].Address)
 			}
 
 			// TODO add JWT verification and assert address is present before proceeding
@@ -102,7 +104,8 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 				return nil, err
 			}
 		} else {
-			info.Address = interalJWT.Address
+			parsedAddres := common.HexToAddress(interalJWT.Address)
+			info.Address = parsedAddres
 		}
 
 	case "magic":
@@ -120,7 +123,8 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 			return nil, err
 		}
 
-		info.Address = *publicAddress
+		parsedAddress := common.HexToAddress(*publicAddress)
+		info.Address = parsedAddress
 	}
 
 	return &info, nil

@@ -1,6 +1,7 @@
 package onboarding
 
 import (
+	"github.com/ethereum/go-ethereum/common"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -8,7 +9,6 @@ import (
 )
 
 func StoreUserAccountSignerAddress(input model.SignerInfo, authDetails *internal.AuthDetails) (bool, error) {
-
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
 		return false, err
@@ -19,16 +19,17 @@ func StoreUserAccountSignerAddress(input model.SignerInfo, authDetails *internal
 		input.Signature = &noSignature
 	}
 
+	aaWallet := common.HexToAddress(input.Address)
 	altSigner, err := engine.GetAltSignerByCreatorID(creator.ID.String())
 	if err != nil {
 		altSigner = &models.SignerInfo{
 			CreatorID:     creator.ID.String(),
-			WalletAddress: input.Address,
+			WalletAddress: aaWallet,
 			Signature:     input.Signature,
 			Provider:      input.Provider,
 		}
 	} else {
-		altSigner.WalletAddress = input.Address
+		altSigner.WalletAddress = aaWallet
 		altSigner.Provider = input.Provider
 		altSigner.Signature = input.Signature
 	}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/common"
 	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/engine/mobile"
@@ -12,12 +13,11 @@ import (
 	"inverse.so/utils"
 )
 
-func RegisterInverseUsername(address string, input *model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
+func RegisterInverseUsername(address common.Address, input *model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
 	_, err := engine.GetCreatorByInverseUsername(input.InverseUsername)
 	if err == nil {
 		return nil, errors.New("inverse name isn't available")
 	}
-
 	cachedCreator, storedCreatorErr := engine.GetCreatorByAddress(address)
 	if storedCreatorErr != nil {
 		newCreator := models.Creator{WalletAddress: address, InverseUsername: utils.GetStringPtr(input.InverseUsername)}
@@ -31,9 +31,10 @@ func RegisterInverseUsername(address string, input *model.NewUsernameRegisgratio
 			return nil, generationErr
 		}
 
+		aaWallet := common.HexToAddress(input.AaWallet)
 		newAltSigner := models.SignerInfo{
 			CreatorID:     newCreator.ID.String(),
-			WalletAddress: input.AaWallet,
+			WalletAddress: aaWallet,
 			Provider:      model.SignerProviderConnectKit,
 			AltPublicKey:  accountDetails.PublicKey,
 			AltPrivateKey: accountDetails.PrivateKey,
@@ -59,13 +60,16 @@ func RegisterInverseUsername(address string, input *model.NewUsernameRegisgratio
 
 	altSigner, err := engine.GetAltSignerByCreatorID(cachedCreator.ID.String())
 	if err != nil {
+		aaWallet := common.HexToAddress(input.AaWallet)
+
 		altSigner = &models.SignerInfo{
 			CreatorID:     cachedCreator.ID.String(),
-			WalletAddress: input.AaWallet,
+			WalletAddress: aaWallet,
 			Provider:      model.SignerProviderConnectKit,
 		}
 	} else {
-		altSigner.WalletAddress = input.AaWallet
+		aaWallet := common.HexToAddress(input.AaWallet)
+		altSigner.WalletAddress = aaWallet
 		altSigner.Provider = model.SignerProviderConnectKit
 	}
 

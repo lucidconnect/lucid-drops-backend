@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
@@ -17,7 +18,7 @@ import (
 type Collection struct {
 	Base
 	CreatorID              uuid.UUID
-	CreatorAddress         string
+	CreatorAddress         common.Address
 	Name                   string
 	Image                  string `json:"image"`
 	Thumbnail              string `json:"thumbnail"`

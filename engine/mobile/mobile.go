@@ -61,10 +61,11 @@ func GenerateMobileWalletConfigs(authDetails *internal.AuthDetails) (*model.Mobi
 	}
 
 	if altSigner.AltPrivateKey != "" {
+
 		return &model.MobileWalletConfig{
 			PublicKey:  altSigner.AltPublicKey,
 			PrivateKey: altSigner.AltPrivateKey,
-			AaWallet:   altSigner.WalletAddress,
+			AaWallet:   altSigner.WalletAddress.String(),
 		}, err
 	}
 
@@ -84,6 +85,6 @@ func GenerateMobileWalletConfigs(authDetails *internal.AuthDetails) (*model.Mobi
 	return &model.MobileWalletConfig{
 		PublicKey:  accountDetails.PublicKey,
 		PrivateKey: accountDetails.PrivateKey,
-		AaWallet:   altSigner.WalletAddress,
+		AaWallet:   altSigner.WalletAddress.String(),
 	}, nil
 }

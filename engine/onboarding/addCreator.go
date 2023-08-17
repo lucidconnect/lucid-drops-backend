@@ -3,13 +3,14 @@ package onboarding
 import (
 	"errors"
 
+	"github.com/ethereum/go-ethereum/common"
 	"gorm.io/gorm"
 	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/models"
 )
 
-func CreateCreatorProfileIfAddressIsMissing(address string) (*models.Creator, error) {
+func CreateCreatorProfileIfAddressIsMissing(address common.Address) (*models.Creator, error) {
 	cachedCreator, err := engine.GetCreatorByAddress(address)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		newCreator := models.Creator{WalletAddress: address}

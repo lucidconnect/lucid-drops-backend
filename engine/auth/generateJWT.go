@@ -34,16 +34,18 @@ func CreateJWTToken(input *model.CreateJWTTokenInput) (*model.JWTCreationRespons
 		return nil, errors.New("jwt creation has failed")
 	}
 
-	creatorInfo, err := onboarding.CreateCreatorProfileIfAddressIsMissing(input.Address)
+	parsedAddress := common.HexToAddress(input.Address)
+	creatorInfo, err := onboarding.CreateCreatorProfileIfAddressIsMissing(parsedAddress)
 	if err != nil {
 		return nil, err
 	}
 
 	_, err = engine.GetAltSignerByCreatorID(creatorInfo.ID.String())
 	if err != nil {
+		aaWallet := common.HexToAddress(input.AaWallet)
 		altSigner := &models.SignerInfo{
 			CreatorID:     creatorInfo.ID.String(),
-			WalletAddress: input.AaWallet,
+			WalletAddress: aaWallet,
 			Provider:      model.SignerProviderConnectKit,
 		}
 
