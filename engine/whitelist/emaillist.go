@@ -34,7 +34,7 @@ func sendEmailOnCreate(dbEmail *models.SingleEmailClaim) error {
 func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new collection")
 	}
 
 	item, err := engine.GetItemByID(input.ItemID)

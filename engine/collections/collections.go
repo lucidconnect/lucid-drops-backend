@@ -12,7 +12,7 @@ import (
 func CreateCollection(input *model.CollectionInput, authDetails *internal.AuthDetails) (*model.Collection, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new collection")
 	}
 
 	if input.Name == nil || input.Image == nil || input.Thumbnail == nil || input.Description == nil {
@@ -21,7 +21,7 @@ func CreateCollection(input *model.CollectionInput, authDetails *internal.AuthDe
 
 	aaSigerInfo, err := engine.GetAltSignerByCreatorID(creator.ID.String())
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded to create a new collection ( They lack an AA wallet )")
+		return nil, errors.New("creator has not been onboarded to create a new collection ( They lack an AA wallet )")
 	}
 
 	newCollection := &models.Collection{
@@ -44,7 +44,7 @@ func CreateCollection(input *model.CollectionInput, authDetails *internal.AuthDe
 func UpdateCollection(collectionID string, input *model.CollectionInput, authDetails *internal.AuthDetails) (*model.Collection, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new collection")
 	}
 
 	collection, err := engine.GetCollectionByID(collectionID)

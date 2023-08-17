@@ -52,7 +52,7 @@ func GenerateRandomEthAddress() (*KeyPair, error) {
 func GenerateMobileWalletConfigs(authDetails *internal.AuthDetails) (*model.MobileWalletConfig, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new collection")
 	}
 
 	altSigner, err := engine.GetAltSignerByCreatorID(creator.ID.String())

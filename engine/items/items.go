@@ -18,7 +18,7 @@ import (
 func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new collection")
 	}
 
 	if input.Name == nil || input.Image == nil || input.CollectionID == nil || input.Description == nil {
@@ -89,7 +89,7 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 func UpdateItem(itemID string, input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator is has not been onboarded to create a new item")
+		return nil, errors.New("creator has not been onboarded to create a new item")
 	}
 
 	item, err := engine.GetItemByID(itemID)
