@@ -45,7 +45,7 @@ func CreateJWTToken(input *model.CreateJWTTokenInput) (*model.JWTCreationRespons
 		aaWallet := common.HexToAddress(input.AaWallet)
 		altSigner := &models.SignerInfo{
 			CreatorID:     creatorInfo.ID.String(),
-			WalletAddress: aaWallet,
+			WalletAddress: aaWallet.String(),
 			Provider:      model.SignerProviderConnectKit,
 		}
 

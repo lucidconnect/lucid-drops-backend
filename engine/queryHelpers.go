@@ -72,7 +72,7 @@ func GetCreatorByAddress(address common.Address) (*models.Creator, error) {
 func GetAltSignerByAddress(address common.Address) (*models.SignerInfo, error) {
 	var altSigner models.SignerInfo
 
-	err := dbutils.DB.Where(&models.SignerInfo{WalletAddress: address}).First(&altSigner).Error
+	err := dbutils.DB.Where(&models.SignerInfo{WalletAddress: address.String()}).First(&altSigner).Error
 	if err != nil {
 		return nil, fmt.Errorf("address (%s) not found", address)
 	}

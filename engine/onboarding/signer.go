@@ -24,12 +24,12 @@ func StoreUserAccountSignerAddress(input model.SignerInfo, authDetails *internal
 	if err != nil {
 		altSigner = &models.SignerInfo{
 			CreatorID:     creator.ID.String(),
-			WalletAddress: aaWallet,
+			WalletAddress: aaWallet.String(),
 			Signature:     input.Signature,
 			Provider:      input.Provider,
 		}
 	} else {
-		altSigner.WalletAddress = aaWallet
+		altSigner.WalletAddress = aaWallet.String()
 		altSigner.Provider = input.Provider
 		altSigner.Signature = input.Signature
 	}

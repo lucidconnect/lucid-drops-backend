@@ -34,7 +34,7 @@ func RegisterInverseUsername(address common.Address, input *model.NewUsernameReg
 		aaWallet := common.HexToAddress(input.AaWallet)
 		newAltSigner := models.SignerInfo{
 			CreatorID:     newCreator.ID.String(),
-			WalletAddress: aaWallet,
+			WalletAddress: aaWallet.String(),
 			Provider:      model.SignerProviderConnectKit,
 			AltPublicKey:  accountDetails.PublicKey,
 			AltPrivateKey: accountDetails.PrivateKey,
@@ -64,12 +64,12 @@ func RegisterInverseUsername(address common.Address, input *model.NewUsernameReg
 
 		altSigner = &models.SignerInfo{
 			CreatorID:     cachedCreator.ID.String(),
-			WalletAddress: aaWallet,
+			WalletAddress: aaWallet.String(),
 			Provider:      model.SignerProviderConnectKit,
 		}
 	} else {
 		aaWallet := common.HexToAddress(input.AaWallet)
-		altSigner.WalletAddress = aaWallet
+		altSigner.WalletAddress = aaWallet.String()
 		altSigner.Provider = model.SignerProviderConnectKit
 	}
 
