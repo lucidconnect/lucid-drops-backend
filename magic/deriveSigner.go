@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
-func GetMeTheapitypesOfThisMessage(originalPackedMessage string, signatureOfTheMessageShaInHex string) common.Address {
+func GetMeTheSignerOfThisMessage(originalPackedMessage string, signatureOfTheMessageShaInHex string) (*common.Address, error) {
 	sigInHex := hexutil.MustDecode(signatureOfTheMessageShaInHex)
 
 	shaOfTheMessage := crypto.Keccak256([]byte(originalPackedMessage))
@@ -22,16 +22,16 @@ func GetMeTheapitypesOfThisMessage(originalPackedMessage string, signatureOfTheM
 	recoveredPub, err := crypto.Ecrecover(shaOfTheMessage, sigInHex)
 	if err != nil {
 		log.Printf("ECRecover error: %s", err)
+		return nil, err
 	}
 
 	pubKey, err := crypto.UnmarshalPubkey(recoveredPub)
 	if err != nil {
 		log.Printf("Unmarshall error: %s", err)
+		return nil, err
 	}
 
 	recoveredAddr := crypto.PubkeyToAddress(*pubKey)
 
-	log.Printf("Message Signer has been recoverd and its %s", recoveredAddr)
-
-	return recoveredAddr
+	return &recoveredAddr, nil
 }

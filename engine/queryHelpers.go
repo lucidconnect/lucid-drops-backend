@@ -62,7 +62,7 @@ func GetCreatorByAddress(address string) (*models.Creator, error) {
 
 	err := dbutils.DB.Where("wallet_address=?", address).First(&creator).Error
 	if err != nil {
-		return nil, fmt.Errorf("address (%s) not found", address)
+		return nil, err
 	}
 
 	return &creator, nil
