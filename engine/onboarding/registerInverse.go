@@ -20,7 +20,7 @@ func RegisterInverseUsername(address common.Address, input *model.NewUsernameReg
 	}
 	cachedCreator, storedCreatorErr := engine.GetCreatorByAddress(address)
 	if storedCreatorErr != nil {
-		newCreator := models.Creator{WalletAddress: address, InverseUsername: utils.GetStringPtr(input.InverseUsername)}
+		newCreator := models.Creator{WalletAddress: address.String(), InverseUsername: utils.GetStringPtr(input.InverseUsername)}
 		creationErr := dbutils.DB.Create(&newCreator).Error
 		if creationErr != nil {
 			return nil, creationErr

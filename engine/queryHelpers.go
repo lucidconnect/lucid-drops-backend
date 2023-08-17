@@ -61,7 +61,7 @@ func GetMintPassById(passId string) (*models.MintPass, error) {
 func GetCreatorByAddress(address common.Address) (*models.Creator, error) {
 	var creator models.Creator
 
-	err := dbutils.DB.Where("wallet_address=?", address).First(&creator).Error
+	err := dbutils.DB.Where("wallet_address=?", address.String()).First(&creator).Error
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func GetCreatorByAddress(address common.Address) (*models.Creator, error) {
 func GetAltSignerByAddress(address common.Address) (*models.SignerInfo, error) {
 	var altSigner models.SignerInfo
 
-	err := dbutils.DB.Where(&models.SignerInfo{WalletAddress: address.String()}).First(&altSigner).Error
+	err := dbutils.DB.Where("wallet_address=?", address.String()).First(&altSigner).Error
 	if err != nil {
 		return nil, fmt.Errorf("address (%s) not found", address)
 	}

@@ -24,7 +24,6 @@ func CreateJWTToken(input *model.CreateJWTTokenInput) (*model.JWTCreationRespons
 	}
 
 	castedAddress := common.HexToAddress(input.Address)
-
 	if *signer != castedAddress {
 		return nil, errors.New("the signature provided is invalid")
 	}
@@ -51,7 +50,9 @@ func CreateJWTToken(input *model.CreateJWTTokenInput) (*model.JWTCreationRespons
 
 		err = engine.SaveModel(altSigner)
 		if err != nil {
-			return nil, err
+			return &model.JWTCreationResponse{
+				Token: jwt,
+			}, nil
 		}
 	}
 
