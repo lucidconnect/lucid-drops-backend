@@ -39,23 +39,18 @@ func CreateJWTToken(input *model.CreateJWTTokenInput) (*model.JWTCreationRespons
 		return nil, err
 	}
 
-	altSigner, err := engine.GetAltSignerByCreatorID(creatorInfo.ID.String())
+	_, err = engine.GetAltSignerByCreatorID(creatorInfo.ID.String())
 	if err != nil {
-		altSigner = &models.SignerInfo{
+		altSigner := &models.SignerInfo{
 			CreatorID:     creatorInfo.ID.String(),
 			WalletAddress: input.AaWallet,
 			Provider:      model.SignerProviderConnectKit,
 		}
-	}
 
-	if altSigner.WalletAddress != "" {
-		altSigner.WalletAddress = input.AaWallet
-		altSigner.Provider = model.SignerProviderConnectKit
-	}
-
-	err = engine.SaveModel(altSigner)
-	if err != nil {
-		return nil, err
+		err = engine.SaveModel(altSigner)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &model.JWTCreationResponse{
