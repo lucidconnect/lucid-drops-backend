@@ -104,7 +104,7 @@ func SendClaimNudgeEmail(emailAddress, fromEmailAdress, itemName, claimLink stri
 	}
 
 	data := EmailData{
-		Subject:     "Verify your email address",
+		Subject:     "You've got an item",
 		ContentData: body,
 		EmailTo:     emailAddress,
 		EmailFrom:   fromEmailAdress,
