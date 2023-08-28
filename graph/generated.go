@@ -9079,7 +9079,7 @@ func (ec *executionContext) unmarshalInputDeploymentInfo(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"collectionId", "deploymentHash"}
+	fieldsInOrder := [...]string{"collectionId", "deploymentHash", "contractAddress"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9104,6 +9104,15 @@ func (ec *executionContext) unmarshalInputDeploymentInfo(ctx context.Context, ob
 				return it, err
 			}
 			it.DeploymentHash = data
+		case "contractAddress":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractAddress"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContractAddress = data
 		}
 	}
 

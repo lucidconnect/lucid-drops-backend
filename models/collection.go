@@ -22,6 +22,7 @@ type Collection struct {
 	Image                  string `json:"image"`
 	Thumbnail              string `json:"thumbnail"`
 	Description            string `json:"description"`
+	AAContractAddress      *string
 	ContractAddress        *string
 	TransactionHash        *string
 	AAWalletDeploymentHash *string

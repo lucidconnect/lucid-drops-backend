@@ -59,8 +59,9 @@ type CreatorDetails struct {
 }
 
 type DeploymentInfo struct {
-	CollectionID   string `json:"collectionId"`
-	DeploymentHash string `json:"deploymentHash"`
+	CollectionID    string  `json:"collectionId"`
+	DeploymentHash  string  `json:"deploymentHash"`
+	ContractAddress *string `json:"contractAddress,omitempty"`
 }
 
 type EmailClaimInput struct {

@@ -176,6 +176,7 @@ input SignerInfo {
 input DeploymentInfo{
   collectionId: String!
   deploymentHash: String!
+  contractAddress: String
 }
 
 type JWTCreationResponse{

@@ -15,6 +15,7 @@ func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.Depl
 	}
 
 	collection.AAWalletDeploymentHash = &input.DeploymentHash
+	collection.AAContractAddress = input.ContractAddress
 
 	err = engine.SaveModel(collection)
 	if err != nil {
