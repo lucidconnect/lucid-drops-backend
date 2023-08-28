@@ -220,7 +220,7 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 	var ItemIdOnContract int64
 	for idx, collectionItem := range items {
 		if collectionItem.ID.String() == itemID {
-			ItemIdOnContract = int64(len(items) - (idx))
+			ItemIdOnContract = int64((idx) + 1)
 		}
 	}
 
