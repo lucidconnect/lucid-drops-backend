@@ -42,6 +42,14 @@ func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetail
 		return nil, errors.New("item not found")
 	}
 
+	if item.Criteria != nil {
+		//Delete Existing criteria
+		err := engine.DeleteCriteriaIfExists(item)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	if len(input.AuthorizedEmails) == 0 {
 		return nil, errors.New("please passing in email list")
 	}

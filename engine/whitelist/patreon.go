@@ -69,11 +69,11 @@ func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *int
 		return nil, errors.New("item not found")
 	}
 
-	if item.PatreonCriteria != nil {
-		//Delete existing patreon criteria
-		err = dbutils.DB.Delete(&models.PatreonCriteria{}, "item_id = ?", item.ID).Error
+	if item.Criteria != nil {
+		//Delete Existing criteria
+		err := engine.DeleteCriteriaIfExists(item)
 		if err != nil {
-			return nil, errors.New("an error occured while updating updating patreon criteria")
+			return nil, err
 		}
 	}
 

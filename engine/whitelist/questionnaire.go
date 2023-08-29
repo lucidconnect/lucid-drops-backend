@@ -28,15 +28,10 @@ func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input
 	}
 
 	if item.Criteria != nil {
-		//Delete existing questionnaire criteria
-		err = dbutils.DB.Delete(&models.DirectAnswerCriteria{}, "item_id = ?", item.ID).Error
+		//Delete Existing criteria
+		err := engine.DeleteCriteriaIfExists(item)
 		if err != nil {
-			return nil, errors.New("an error occured while updating updating questionnaire criteria")
-		}
-
-		err = dbutils.DB.Delete(&models.MultiChoiceCriteria{}, "item_id = ?", item.ID).Error
-		if err != nil {
-			return nil, errors.New("an error occured while updating updating questionnaire criteria")
+			return nil, err
 		}
 	}
 

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"strings"
 
-	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -26,11 +25,11 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 		return nil, errors.New("item not found")
 	}
 
-	if item.TwitterCriteria != nil {
-		//Delete existing twitter criteria
-		err = dbutils.DB.Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
+	if item.Criteria != nil {
+		//Delete Existing criteria
+		err := engine.DeleteCriteriaIfExists(item)
 		if err != nil {
-			return nil, errors.New("an error occured while updating updating twitter criteria")
+			return nil, err
 		}
 	}
 
