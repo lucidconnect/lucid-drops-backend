@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"

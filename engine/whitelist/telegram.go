@@ -4,7 +4,6 @@ import (
 	"errors"
 	"strconv"
 
-	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -33,7 +32,7 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 			return nil, err
 		}
 	}
-	
+
 	if input.GroupID[0] != '-' {
 		input.GroupID = "-" + input.GroupID
 	}
