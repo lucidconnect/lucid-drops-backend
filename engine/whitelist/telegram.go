@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 
+	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -23,6 +24,14 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 	item, err := engine.GetItemByID(input.ItemID)
 	if err != nil {
 		return nil, errors.New("item not found")
+	}
+
+	if item.TelegramCriteria != nil {
+		//Delete existing telegram criteria
+		err = dbutils.DB.Delete(&models.TelegramCriteria{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return nil, errors.New("an error occured while updating updating telegram criteria")
+		}
 	}
 
 	if input.GroupID[0] != '-' {
