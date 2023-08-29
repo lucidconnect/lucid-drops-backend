@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -66,6 +67,14 @@ func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *int
 	item, err := engine.GetItemByID(input.ItemID)
 	if err != nil {
 		return nil, errors.New("item not found")
+	}
+
+	if item.PatreonCriteria != nil {
+		//Delete existing patreon criteria
+		err = dbutils.DB.Delete(&models.PatreonCriteria{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return nil, errors.New("an error occured while updating updating patreon criteria")
+		}
 	}
 
 	criteria := &models.PatreonCriteria{
