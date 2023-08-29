@@ -164,27 +164,29 @@ func (r *mutationResolver) CreatePatreonCriteriaForItem(ctx context.Context, inp
 }
 
 // ValidateTwitterCriteriaForItem is the resolver for the validateTwitterCriteriaForItem field.
-func (r *mutationResolver) ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error) {
+func (r *mutationResolver) ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
 	if authID == nil {
-		return false, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
 	}
+
+	return nil, nil
 
 	return whitelist.ValidateTwitterCriteriaForItem(itemID, *authID)
 }
 
 // ValidateTelegramCriteriaForItem is the resolver for the validateTelegramCriteriaForItem field.
-func (r *mutationResolver) ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error) {
+func (r *mutationResolver) ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
 	if authID == nil {
-		return false, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
 	}
 
 	return whitelist.ValidateTelegramClaimCriteria(itemID, *authID)
 }
 
 // ValidatePatreonCriteriaForItem is the resolver for the validatePatreonCriteriaForItem field.
-func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error) {
+func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
 	if authID == nil {
-		return false, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
 	}
 
 	return whitelist.ValidatePatreonCriteriaForItem(itemID, authID)

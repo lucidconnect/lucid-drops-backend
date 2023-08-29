@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -178,26 +179,30 @@ func indexTwitterFollowers(criteria models.TwitterCriteria) error {
 	return nil
 }
 
-func ValidateTwitterCriteriaForItem(itemID, authID string) (bool, error) {
+func ValidateTwitterCriteriaForItem(itemID, authID string) (*model.ValidationRespoonse, error) {
 
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
-		return false, errors.New("item not found")
+		return nil, errors.New("item not found")
 	}
 
 	if item.TwitterCriteria == nil {
-		return false, errors.New("item does not have a twitter criteria")
+		return nil, errors.New("item does not have a twitter criteria")
 	}
 
 	auth, err := engine.FetchTwitterAuthByID(authID)
 	if err != nil {
-		return false, errors.New("twitter account not authorized")
+		return nil, errors.New("twitter account not authorized")
 	}
 
-	return validateTwitterAuthWithCriteria(auth, item.TwitterCriteria)
+	return validateTwitterAuthWithCriteria(auth, item.TwitterCriteria, item)
 }
 
-func validateTwitterAuthWithCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) (bool, error) {
+func validateTwitterAuthWithCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria, Item *models.Item) (*model.ValidationRespoonse, error) {
+
+	resp := &model.ValidationRespoonse{
+		Valid: false,
+	}
 
 	// check reply criteria
 	if criteria.CriteriaType == model.ClaimCriteriaTypeTwitterInteractions {
@@ -206,15 +211,15 @@ func validateTwitterAuthWithCriteria(auth *models.TwitterAuthDetails, criteria *
 			switch *x {
 			case model.InteractionTypeReplies:
 				if !validateReplyCriteria(auth, criteria) {
-					return false, errors.New("twitter account does not meet the reply criteria")
+					return resp, errors.New("twitter account does not meet the reply criteria")
 				}
 			case model.InteractionTypeRetweets:
 				if !validateRetweetCriteria(auth, criteria) {
-					return false, errors.New("twitter account does not meet the retweet criteria")
+					return resp, errors.New("twitter account does not meet the retweet criteria")
 				}
 			case model.InteractionTypeLikes:
 				if !validateLikeCriteria(auth, criteria) {
-					return false, errors.New("twitter account does not meet the like criteria")
+					return resp, errors.New("twitter account does not meet the like criteria")
 				}
 			}
 		}
@@ -223,18 +228,26 @@ func validateTwitterAuthWithCriteria(auth *models.TwitterAuthDetails, criteria *
 
 	if criteria.CriteriaType == model.ClaimCriteriaTypeTwitterFollowers {
 		if !validateFollowerCriteria(auth, criteria) {
-			return false, errors.New("twitter account does not meet the follower criteria")
+			return nil, errors.New("twitter account does not meet the follower criteria")
 		}
 	}
 
-	auth.WhiteListed = true
-	auth.ItemID = &criteria.ItemID
-	err := engine.SaveModel(auth)
+	PassID, err := createMintPassForTwitterMint(Item)
 	if err != nil {
-		return false, err
+		return nil, errors.New("error creating mint pass")
 	}
 
-	return true, nil
+	resp.Valid = true
+	resp.PassID = PassID
+	
+	auth.WhiteListed = true
+	auth.ItemID = &criteria.ItemID
+	err = engine.SaveModel(auth)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, nil
 }
 
 func validateReplyCriteria(auth *models.TwitterAuthDetails, criteria *models.TwitterCriteria) bool {
@@ -352,6 +365,31 @@ func validateFollowerCriteria(auth *models.TwitterAuthDetails, criteria *models.
 	}
 
 	return false
+}
+
+func createMintPassForTwitterMint(item *models.Item) (*string, error) {
+	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	if collection.ContractAddress == nil {
+		return nil, errors.New("collection contract address not found")
+	}
+
+	newMint := models.MintPass{
+		ItemId:                    item.ID.String(),
+		ItemIdOnContract:          *item.TokenID,
+		CollectionContractAddress: *collection.ContractAddress,
+	}
+
+	err = dbutils.DB.Create(&newMint).Error
+	if err != nil {
+		return nil, err
+	}
+
+	passId := newMint.ID.String()
+	return &passId, nil
 }
 
 func mergeSliceOfStrings(s1, s2 []string) []string {

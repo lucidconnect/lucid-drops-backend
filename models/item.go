@@ -12,6 +12,7 @@ type Item struct {
 	Base
 	Name                 string
 	CollectionID         uuid.UUID `gorm:"index"`
+	TokenID              *int64     `gorm:"index;default:null"`
 	Image                string    `json:"image"`
 	Description          string    `json:"description"`
 	Criteria             *model.ClaimCriteriaType

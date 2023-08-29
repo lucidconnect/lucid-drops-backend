@@ -44,9 +44,9 @@ type Mutation {
   createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
   createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
   createPatreonCriteriaForItem(input: NewPatreonCriteriaInput!): Item!
-  validateTwitterCriteriaForItem(itemID: String!, authID: String): Boolean!
-  validateTelegramCriteriaForItem(itemID: String!, authID: String): Boolean!
-  validatePatreonCriteriaForItem(itemID: String!, authID: String): Boolean!
+  validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
+  validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
+  validatePatreonCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validateQuestionnaireCriteriaForItem(itemID: String!, input: [QuestionnaireAnswerInput!]!): String
 
   createJWTToken(input: CreateJWTTokenInput): JWTCreationResponse!
@@ -272,6 +272,11 @@ type ImageStatusResponse {
   status: String
   image: String
   percentage: Int
+}
+
+type ValidationRespoonse {
+  valid: Boolean!
+  passID: String
 }
 
 enum QuestionType{
