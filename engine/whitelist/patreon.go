@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -115,40 +116,44 @@ func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *int
 	return item.ToGraphData(), nil
 }
 
-func ValidatePatreonCriteriaForItem(itemID string, authID *string) (bool, error) {
+func ValidatePatreonCriteriaForItem(itemID string, authID *string) (*model.ValidationRespoonse, error) {
+
+	resp := &model.ValidationRespoonse{
+		Valid: false,
+	}
 
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
-		return false, errors.New("item not found")
+		return resp, errors.New("item not found")
 	}
 
 	if item.PatreonCriteria == nil {
-		return false, errors.New("item does not have a patreon criteria")
+		return resp, errors.New("item does not have a patreon criteria")
 	}
 
 	if authID == nil {
-		return false, errors.New("no patreon auth id provided")
+		return resp, errors.New("no patreon auth id provided")
 	}
 
 	patreonAuth, err := engine.FetchPatreonAuthByID(*authID)
 	if err != nil {
-		return false, errors.New("patreon account not authorized")
+		return resp, errors.New("patreon account not authorized")
 	}
 
 	creatorAuth, err := engine.FetchPatreonAuthByID(item.PatreonCriteria.AuthID)
 	if err != nil {
-		return false, errors.New("creator patreon account not authorized")
+		return resp, errors.New("creator patreon account not authorized")
 	}
 
 	campaignPledges, err := services.FetchPatreonPledgesLocal(creatorAuth)
 	if err != nil {
-		return false, errors.New("error fetching pledges")
+		return resp, errors.New("error fetching pledges")
 	}
 
 	var membershipIDs = make(map[string]string)
 	_ = json.Unmarshal([]byte(patreonAuth.MembershipUIDs), &membershipIDs)
 	if membershipIDs == nil {
-		return false, errors.New("user is not a valid patron")
+		return resp, errors.New("user is not a valid patron")
 	}
 
 	for _, membershipID := range membershipIDs {
@@ -158,12 +163,44 @@ func ValidatePatreonCriteriaForItem(itemID string, authID *string) (bool, error)
 			patreonAuth.WhiteListed = true
 			err = engine.SaveModel(patreonAuth)
 			if err != nil {
-				return false, errors.New("error saving patreon auth")
+				return resp, errors.New("error saving patreon auth")
 			}
 
-			return true, nil
+			PassID, err := createMintPassForPatreonMint(item)
+			if err != nil {
+				return resp, errors.New("error creating mint pass")
+			}
+
+			resp.Valid = true
+			resp.PassID = PassID
+			return resp, nil
 		}
 	}
 
-	return false, errors.New("user is not a valid patron")
+	return nil, errors.New("user is not a valid patron")
+}
+
+func createMintPassForPatreonMint(item *models.Item) (*string, error) {
+	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	if collection.ContractAddress == nil {
+		return nil, errors.New("collection contract address not found")
+	}
+
+	newMint := models.MintPass{
+		ItemId:                    item.ID.String(),
+		ItemIdOnContract:          *item.TokenID,
+		CollectionContractAddress: *collection.ContractAddress,
+	}
+
+	err = dbutils.DB.Create(&newMint).Error
+	if err != nil {
+		return nil, err
+	}
+
+	passId := newMint.ID.String()
+	return &passId, nil
 }

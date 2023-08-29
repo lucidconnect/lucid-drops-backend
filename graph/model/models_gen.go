@@ -218,6 +218,11 @@ type UserDetails struct {
 	Username string `json:"username"`
 }
 
+type ValidationRespoonse struct {
+	Valid  bool    `json:"valid"`
+	PassID *string `json:"passID,omitempty"`
+}
+
 type AiImageStyle string
 
 const (

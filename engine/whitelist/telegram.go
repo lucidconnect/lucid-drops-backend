@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 
+	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -65,32 +66,69 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 	return item.ToGraphData(), nil
 }
 
-func ValidateTelegramClaimCriteria(itemID, authID string) (bool, error) {
+func ValidateTelegramClaimCriteria(itemID, authID string) (*model.ValidationRespoonse, error) {
+
+	resp := &model.ValidationRespoonse{
+		Valid: false,
+	}
 
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
-		return false, errors.New("item not found")
+		return resp, errors.New("item not found")
 	}
 
 	if item.TelegramCriteria == nil {
-		return false, errors.New("item does not have a telegram criteria")
+		return resp, errors.New("item does not have a telegram criteria")
 	}
 
 	IdToInt, _ := strconv.Atoi(authID)
 	member, err := InverseBot.GetTelegramGroupUser(item.TelegramCriteria.GroupID, int64(IdToInt))
 	if err != nil {
-		return false, errors.New("telegram account not authorized by group admin")
+		return resp, errors.New("telegram account not authorized by group admin")
 	}
 
 	if member.User.IsBot {
-		return false, errors.New("telegram account cannot be a bot")
+		return resp, errors.New("telegram account cannot be a bot")
 	}
 
 	if member.Status == "member" || member.Status == "creator" || member.Status == "administrator" {
-		return true, nil
+
+		PassID, err := createMintPassForTelegramMint(item)
+		if err != nil {
+			return resp, errors.New("error creating mint pass")
+		}
+
+		resp.Valid = true
+		resp.PassID = PassID
+		return resp, nil
 	}
 
-	return false, errors.New("telegram account not authorized by group admin")
+	return nil, errors.New("telegram account not authorized by group admin")
+}
+
+func createMintPassForTelegramMint(item *models.Item) (*string, error) {
+	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	if collection.ContractAddress == nil {
+		return nil, errors.New("collection contract address not found")
+	}
+
+	newMint := models.MintPass{
+		ItemId:                    item.ID.String(),
+		ItemIdOnContract:          *item.TokenID,
+		CollectionContractAddress: *collection.ContractAddress,
+	}
+
+	err = dbutils.DB.Create(&newMint).Error
+	if err != nil {
+		return nil, err
+	}
+
+	passId := newMint.ID.String()
+	return &passId, nil
 }
 
 func ProcessTelegramCallBack(id, username, hash, photoURL string) (*string, error) {

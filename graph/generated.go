@@ -185,6 +185,11 @@ type ComplexityRoot struct {
 		Name     func(childComplexity int) int
 		Username func(childComplexity int) int
 	}
+
+	ValidationRespoonse struct {
+		PassID func(childComplexity int) int
+		Valid  func(childComplexity int) int
+	}
 }
 
 type CollectionResolver interface {
@@ -206,9 +211,9 @@ type MutationResolver interface {
 	CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error)
 	CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error)
 	CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error)
-	ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
-	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
-	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (bool, error)
+	ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
+	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
+	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
 	ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error)
 	CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error)
 	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
@@ -1035,6 +1040,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserDetails.Username(childComplexity), true
+
+	case "ValidationRespoonse.passID":
+		if e.complexity.ValidationRespoonse.PassID == nil {
+			break
+		}
+
+		return e.complexity.ValidationRespoonse.PassID(childComplexity), true
+
+	case "ValidationRespoonse.valid":
+		if e.complexity.ValidationRespoonse.Valid == nil {
+			break
+		}
+
+		return e.complexity.ValidationRespoonse.Valid(childComplexity), true
 
 	}
 	return 0, false
@@ -4353,14 +4372,11 @@ func (ec *executionContext) _Mutation_validateTwitterCriteriaForItem(ctx context
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.ValidationRespoonse)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalOValidationRespoonse2ᚖinverseᚗsoᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_validateTwitterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4370,7 +4386,13 @@ func (ec *executionContext) fieldContext_Mutation_validateTwitterCriteriaForItem
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "valid":
+				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
+			case "passID":
+				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
 		},
 	}
 	defer func() {
@@ -4408,14 +4430,11 @@ func (ec *executionContext) _Mutation_validateTelegramCriteriaForItem(ctx contex
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.ValidationRespoonse)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalOValidationRespoonse2ᚖinverseᚗsoᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_validateTelegramCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4425,7 +4444,13 @@ func (ec *executionContext) fieldContext_Mutation_validateTelegramCriteriaForIte
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "valid":
+				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
+			case "passID":
+				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
 		},
 	}
 	defer func() {
@@ -4463,14 +4488,11 @@ func (ec *executionContext) _Mutation_validatePatreonCriteriaForItem(ctx context
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*model.ValidationRespoonse)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalOValidationRespoonse2ᚖinverseᚗsoᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_validatePatreonCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4480,7 +4502,13 @@ func (ec *executionContext) fieldContext_Mutation_validatePatreonCriteriaForItem
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			switch field.Name {
+			case "valid":
+				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
+			case "passID":
+				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
 		},
 	}
 	defer func() {
@@ -6683,6 +6711,91 @@ func (ec *executionContext) _UserDetails_username(ctx context.Context, field gra
 func (ec *executionContext) fieldContext_UserDetails_username(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "UserDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ValidationRespoonse_valid(ctx context.Context, field graphql.CollectedField, obj *model.ValidationRespoonse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ValidationRespoonse_valid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Valid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ValidationRespoonse_valid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ValidationRespoonse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ValidationRespoonse_passID(ctx context.Context, field graphql.CollectedField, obj *model.ValidationRespoonse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ValidationRespoonse_passID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PassID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ValidationRespoonse_passID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ValidationRespoonse",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -9935,27 +10048,18 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_validateTwitterCriteriaForItem(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "validateTelegramCriteriaForItem":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_validateTelegramCriteriaForItem(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "validatePatreonCriteriaForItem":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_validatePatreonCriteriaForItem(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "validateQuestionnaireCriteriaForItem":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -10606,6 +10710,38 @@ func (ec *executionContext) _UserDetails(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var validationRespoonseImplementors = []string{"ValidationRespoonse"}
+
+func (ec *executionContext) _ValidationRespoonse(ctx context.Context, sel ast.SelectionSet, obj *model.ValidationRespoonse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, validationRespoonseImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ValidationRespoonse")
+		case "valid":
+
+			out.Values[i] = ec._ValidationRespoonse_valid(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "passID":
+
+			out.Values[i] = ec._ValidationRespoonse_passID(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12035,6 +12171,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOValidationRespoonse2ᚖinverseᚗsoᚋgraphᚋmodelᚐValidationRespoonse(ctx context.Context, sel ast.SelectionSet, v *model.ValidationRespoonse) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ValidationRespoonse(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {
