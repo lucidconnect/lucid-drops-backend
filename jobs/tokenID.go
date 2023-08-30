@@ -30,7 +30,11 @@ func VerifyItemTokenIDs() {
 			continue
 		}
 
-		tokenID, err := FetchTokenUri(*collection.ContractAddress, item.ID.String())
+		if collection.ContractAddress == nil {
+			continue
+		}
+
+		tokenID, err := fetchTokenUri(*collection.ContractAddress, item.ID.String())
 		if err != nil {
 			log.Error().Msg(err.Error())
 			continue
@@ -60,7 +64,7 @@ func fetchItemsWithUnresolvedTokenIDs() (*[]models.Item, error) {
 	return &items, nil
 }
 
-func FetchTokenUri(contractAddress, itemID string) (*int, error) {
+func fetchTokenUri(contractAddress, itemID string) (*int, error) {
 
 	inverseAPIBaseURL := "https://inverse-prod.onrender.com"
 	rpcProvider := "https://polygon-mainnet.infura.io/v3/022bed77e57c4bcfae626a7f8bcf44de"
