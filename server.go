@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
+	"github.com/robfig/cron/v3"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog/log"
 	"inverse.so/addresswatcher"
@@ -16,6 +17,7 @@ import (
 	"inverse.so/engine/whitelist"
 	"inverse.so/graph"
 	"inverse.so/internal"
+	"inverse.so/jobs"
 	"inverse.so/route"
 	"inverse.so/services"
 	"inverse.so/utils"
@@ -40,6 +42,7 @@ func main() {
 		log.Fatal().Msg("DATABASE_URL not set")
 	}
 
+	SetupCronJobs()
 	dbutils.SetupDB(dsn)
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
@@ -71,6 +74,24 @@ func main() {
 	go createTelegramBotInstance()
 	go addresswatcher.SubscribeToInverseContractDeployments()
 	log.Err(httpServer.ListenAndServe())
+}
+
+func SetupCronJobs() {
+
+	isProd, _ := utils.IsProduction()
+	if !isProd {
+		log.Print("Not in production, skipping cron jobs 🦕")
+		return
+	}
+
+	c := cron.New(
+		cron.WithChain(
+			cron.SkipIfStillRunning(cron.DefaultLogger),
+		),
+	)
+
+	c.AddFunc("@every 0h1m00s", func() { jobs.VerifyItemTokenIDs() })
+	c.Start()
 }
 
 func loadCORS(router *chi.Mux) {
