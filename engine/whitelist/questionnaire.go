@@ -218,20 +218,6 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 		return nil, err
 	}
 
-	items, err := engine.GetCollectionItems(item.CollectionID.String())
-	if err != nil {
-		log.Err(err)
-		return nil, err
-	}
-
-	// TODO use DB order or smart contract deploys to persist this on the item level
-	var ItemIdOnContract int64
-	for idx, collectionItem := range items {
-		if collectionItem.ID.String() == itemID {
-			ItemIdOnContract = int64((idx) + 1)
-		}
-	}
-
 	var smartContractAddress string
 	if collection.ContractAddress != nil {
 		smartContractAddress = *collection.ContractAddress
@@ -239,7 +225,7 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 
 	newMint := models.MintPass{
 		ItemId:                    itemID,
-		ItemIdOnContract:          ItemIdOnContract,
+		ItemIdOnContract:          *item.TokenID,
 		CollectionContractAddress: smartContractAddress,
 	}
 

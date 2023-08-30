@@ -133,6 +133,11 @@ func CompleteEmailVerificationForClaim(input *model.CompleteEmailVerificationInp
 		return nil, errors.New("otp is invalid try again")
 	}
 
+	item, err := engine.GetItemByID(otpDetails.ItemID.String())
+	if err != nil {
+		return nil, errors.New("item not found")
+	}
+
 	now := time.Now().Unix()
 	otpDetails.VerifiedAt = &now
 	otpSaveError := engine.SaveModel(otpDetails)
@@ -143,7 +148,7 @@ func CompleteEmailVerificationForClaim(input *model.CompleteEmailVerificationInp
 
 	newMint := models.MintPass{
 		ItemId:                    otpDetails.ItemID.String(),
-		ItemIdOnContract:          otpDetails.ItemIdOnContract,
+		ItemIdOnContract:          *item.TokenID,
 		CollectionContractAddress: otpDetails.CollectionContractAddress,
 	}
 
