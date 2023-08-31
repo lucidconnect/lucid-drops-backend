@@ -75,8 +75,8 @@
                         <img
                           src="https://res.cloudinary.com/getabacus/image/upload/v1689156795/inverse/icon/android-chrome-512x512_ovjue4.png"
                           alt="Inverse logo"
-                          width="125px"
-                          style="height: auto; display: block"
+                          width="56px"
+                          style="height: auto; display: block; border-radius: 8px;"
                         />
                       </td>
 
@@ -93,7 +93,7 @@
                           <tbody>
                             <tr>
                               <td style="padding: 0 0 0 16px; width: 24px">
-                               
+                            
                               </td>
                             </tr>
                           </tbody>
@@ -138,21 +138,34 @@
                     font-weight: bold;
                   "
                 >
-                  We are excited to inform you that a special digital
+                  We are excited to inform you that a digital
                   collectible has been created for you on the Inverse!<br /><br />
 
-                  <span style="font-size: 14px">
-                    🎁 Collectible Name: {{.itemName}} </span
-                  ><br /><br />
+                  <p>
+                    <img
+                      src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                      width="100%"
+                      height="100%"
+                      style="object-fit: cover; border-radius: 12px"
+                    />
+                  </p>
+
+                  <p style="font-size: 16px; color: #fff; font-weight: bold;">
+                    <span style="opacity: 0.6;">Collectible Name</span>: {{.itemName}} </p
+                  >
+                  <p style="font-size: 16px; color: #fff; font-weight: bold;">
+                    <span style="opacity: 0.6;">Creator</span>: {{.creatorUsername}} </p
+                  ><br />
 
                   <a
                     style="
                       display: block;
-                      width: 200px;
+                      width: 100%;
                       text-align: center;
                       padding: 12px 0;
                       text-decoration: none;
                       border-radius: 8px;
+                      font-weight: bold;
                       background-color: #226df4;
                       color: #ffffff;
                     "
@@ -165,11 +178,13 @@
 
                 <p
                   style="
+                    border-top: 1px solid #1d1d1d;
                     font-size: 14px;
                     line-height: 24px;
                     font-family: system-ui, arial, sans-serif;
                     color: #d9d9d9;
                     margin: 24px 0;
+                    padding-top: 20px;
                   "
                 >
                   Please note that this collectible is exclusively reserved for
@@ -179,7 +194,7 @@
                   Thank you for being a part of the Inverse community. We hope
                   you treasure your new digital collectible!<br /><br />
 
-                  If you have any questions or need assistance, feel free to
+                  If you have any questions or need assistance, please
                   contact our support team at
                   <a
                     href="mailto:hello@inverse.wtf"

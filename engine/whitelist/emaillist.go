@@ -22,9 +22,13 @@ func sendEmailOnCreate(dbEmail *models.SingleEmailClaim) error {
 		return err
 	}
 
-	claimLink := utils.UseEnvOrDefault("FE_BASE_URL", "https://inverse.so") + "/claim/" + item.ID.String()
+	creator, err := engine.GetCreatorByID(dbEmail.CreatorID.String())
+	if err != nil {
+		return err
+	}
 
-	err = emails.SendClaimNudgeEmail(dbEmail.EmailAddress, from, item.Name, claimLink)
+	claimLink := utils.UseEnvOrDefault("FE_BASE_URL", "https://inverse.so") + "/claim/" + item.ID.String()
+	err = emails.SendClaimNudgeEmail(dbEmail.EmailAddress, from, item.Name, claimLink, *creator.InverseUsername)
 	if err != nil {
 		return err
 	}

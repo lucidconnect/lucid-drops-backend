@@ -91,11 +91,12 @@ func SendEmail(object EmailData) (*EmailResponse, error) {
 	}, nil
 }
 
-func SendClaimNudgeEmail(emailAddress, fromEmailAdress, itemName, claimLink string) error {
+func SendClaimNudgeEmail(emailAddress, fromEmailAdress, itemName, claimLink, creatorUsername string) error {
 	templatePath := "emails/templates/inverse-email-criteria.html"
 	dynamicData := map[string]interface{}{
-		"itemName":  itemName,
-		"claimLink": claimLink,
+		"itemName":        itemName,
+		"creatorUsername": creatorUsername,
+		"claimLink":       claimLink,
 	}
 
 	body, err := processTemplate(templatePath, dynamicData)
