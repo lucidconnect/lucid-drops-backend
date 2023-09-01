@@ -48,6 +48,12 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	ClaimDetails struct {
+		ClaimTime       func(childComplexity int) int
+		ClaimerAddress  func(childComplexity int) int
+		ClaimerUsername func(childComplexity int) int
+	}
+
 	Collection struct {
 		ContractAddress func(childComplexity int) int
 		Description     func(childComplexity int) int
@@ -84,6 +90,7 @@ type ComplexityRoot struct {
 		AuthorizedSubdomains             func(childComplexity int) int
 		CampaignName                     func(childComplexity int) int
 		ClaimCriteria                    func(childComplexity int) int
+		ClaimDetails                     func(childComplexity int) int
 		CollectionID                     func(childComplexity int) int
 		CreatedAt                        func(childComplexity int) int
 		Creator                          func(childComplexity int) int
@@ -256,6 +263,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "ClaimDetails.claimTime":
+		if e.complexity.ClaimDetails.ClaimTime == nil {
+			break
+		}
+
+		return e.complexity.ClaimDetails.ClaimTime(childComplexity), true
+
+	case "ClaimDetails.claimerAddress":
+		if e.complexity.ClaimDetails.ClaimerAddress == nil {
+			break
+		}
+
+		return e.complexity.ClaimDetails.ClaimerAddress(childComplexity), true
+
+	case "ClaimDetails.claimerUsername":
+		if e.complexity.ClaimDetails.ClaimerUsername == nil {
+			break
+		}
+
+		return e.complexity.ClaimDetails.ClaimerUsername(childComplexity), true
+
 	case "Collection.contractAddress":
 		if e.complexity.Collection.ContractAddress == nil {
 			break
@@ -395,6 +423,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.ClaimCriteria(childComplexity), true
+
+	case "Item.claimDetails":
+		if e.complexity.Item.ClaimDetails == nil {
+			break
+		}
+
+		return e.complexity.Item.ClaimDetails(childComplexity), true
 
 	case "Item.collectionId":
 		if e.complexity.Item.CollectionID == nil {
@@ -1751,6 +1786,129 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _ClaimDetails_claimTime(ctx context.Context, field graphql.CollectedField, obj *model.ClaimDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClaimDetails_claimTime(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClaimTime, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClaimDetails_claimTime(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClaimDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClaimDetails_claimerUsername(ctx context.Context, field graphql.CollectedField, obj *model.ClaimDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClaimDetails_claimerUsername(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClaimerUsername, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClaimDetails_claimerUsername(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClaimDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ClaimDetails_claimerAddress(ctx context.Context, field graphql.CollectedField, obj *model.ClaimDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ClaimDetails_claimerAddress(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClaimerAddress, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ClaimDetails_claimerAddress(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ClaimDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Collection_ID(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Collection_ID(ctx, field)
 	if err != nil {
@@ -2079,6 +2237,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -3114,6 +3274,55 @@ func (ec *executionContext) fieldContext_Item_createdAt(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Item_claimDetails(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_claimDetails(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClaimDetails, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ClaimDetails)
+	fc.Result = res
+	return ec.marshalOClaimDetails2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐClaimDetails(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_claimDetails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "claimTime":
+				return ec.fieldContext_ClaimDetails_claimTime(ctx, field)
+			case "claimerUsername":
+				return ec.fieldContext_ClaimDetails_claimerUsername(ctx, field)
+			case "claimerAddress":
+				return ec.fieldContext_ClaimDetails_claimerAddress(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ClaimDetails", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _JWTCreationResponse_token(ctx context.Context, field graphql.CollectedField, obj *model.JWTCreationResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_JWTCreationResponse_token(ctx, field)
 	if err != nil {
@@ -3738,6 +3947,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -3823,6 +4034,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -3908,6 +4121,8 @@ func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaFor
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -3993,6 +4208,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -4078,6 +4295,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -4163,6 +4382,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -4248,6 +4469,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -4333,6 +4556,8 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5295,6 +5520,8 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5511,6 +5738,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5596,6 +5825,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5937,6 +6168,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -9462,6 +9695,39 @@ func (ec *executionContext) unmarshalInputSignerInfo(ctx context.Context, obj in
 
 // region    **************************** object.gotpl ****************************
 
+var claimDetailsImplementors = []string{"ClaimDetails"}
+
+func (ec *executionContext) _ClaimDetails(ctx context.Context, sel ast.SelectionSet, obj *model.ClaimDetails) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, claimDetailsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ClaimDetails")
+		case "claimTime":
+
+			out.Values[i] = ec._ClaimDetails_claimTime(ctx, field, obj)
+
+		case "claimerUsername":
+
+			out.Values[i] = ec._ClaimDetails_claimerUsername(ctx, field, obj)
+
+		case "claimerAddress":
+
+			out.Values[i] = ec._ClaimDetails_claimerAddress(ctx, field, obj)
+
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var collectionImplementors = []string{"Collection"}
 
 func (ec *executionContext) _Collection(ctx context.Context, sel ast.SelectionSet, obj *model.Collection) graphql.Marshaler {
@@ -9794,6 +10060,10 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "claimDetails":
+
+			out.Values[i] = ec._Item_claimDetails(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -11964,6 +12234,54 @@ func (ec *executionContext) marshalOClaimCriteriaType2ᚖinverseᚗsoᚋgraphᚋ
 	return v
 }
 
+func (ec *executionContext) marshalOClaimDetails2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐClaimDetails(ctx context.Context, sel ast.SelectionSet, v []*model.ClaimDetails) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOClaimDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐClaimDetails(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOClaimDetails2ᚖinverseᚗsoᚋgraphᚋmodelᚐClaimDetails(ctx context.Context, sel ast.SelectionSet, v *model.ClaimDetails) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ClaimDetails(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOCreateJWTTokenInput2ᚖinverseᚗsoᚋgraphᚋmodelᚐCreateJWTTokenInput(ctx context.Context, v interface{}) (*model.CreateJWTTokenInput, error) {
 	if v == nil {
 		return nil, nil
@@ -12170,6 +12488,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalTime(*v)
 	return res
 }
 

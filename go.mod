@@ -16,6 +16,7 @@ require (
 	github.com/machinebox/graphql v0.2.2
 	github.com/magiclabs/magic-admin-go v0.2.0
 	github.com/mailgun/mailgun-go v2.0.0+incompatible
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/cors v1.9.0
 	github.com/rs/zerolog v1.29.1
 	github.com/satori/go.uuid v1.2.0
@@ -73,7 +74,6 @@ require (
 	github.com/quic-go/qtls-go1-20 v0.2.2 // indirect
 	github.com/quic-go/quic-go v0.35.1 // indirect
 	github.com/refraction-networking/utls v1.3.2 // indirect
-	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible // indirect

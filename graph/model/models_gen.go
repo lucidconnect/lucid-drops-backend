@@ -9,6 +9,12 @@ import (
 	"time"
 )
 
+type ClaimDetails struct {
+	ClaimTime       *time.Time `json:"claimTime,omitempty"`
+	ClaimerUsername *string    `json:"claimerUsername,omitempty"`
+	ClaimerAddress  *string    `json:"claimerAddress,omitempty"`
+}
+
 type Collection struct {
 	ID              string  `json:"ID"`
 	Name            string  `json:"name"`
@@ -94,6 +100,7 @@ type Item struct {
 	ProfileLink                      *string            `json:"profileLink,omitempty"`
 	CampaignName                     *string            `json:"campaignName,omitempty"`
 	CreatedAt                        time.Time          `json:"createdAt"`
+	ClaimDetails                     []*ClaimDetails    `json:"claimDetails,omitempty"`
 }
 
 type ItemInput struct {
