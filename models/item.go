@@ -21,6 +21,7 @@ type Item struct {
 	PatreonCriteria      *PatreonCriteria  `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	ShowEmailDomainHints bool              `gorm:"default:false"`
 	Featured             bool              `gorm:"default:false"`
+	MintPasses           []MintPass        `gorm:"foreignKey:ItemId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 // Ref : https://docs.opensea.io/docs/metadata-standards
@@ -68,6 +69,12 @@ func (i *Item) ToGraphData() *model.Item {
 		item.TelegramGroupTitle = &i.TelegramCriteria.GroupTitle
 	}
 
+	var mintPasses []*model.ClaimDetails
+	for j := range i.MintPasses {
+		mintPasses = append(mintPasses, i.MintPasses[j].ToGraphData())
+	}
+
+	item.ClaimDetails = mintPasses
 	return item
 }
 
