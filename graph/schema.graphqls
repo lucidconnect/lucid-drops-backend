@@ -217,6 +217,7 @@ type Item {
   profileLink: String
   campaignName: String
   createdAt: Time!
+  claimDetails: [ClaimDetails]
 }
 
 type QuestionnaireType {
@@ -277,6 +278,12 @@ type ImageStatusResponse {
 type ValidationRespoonse {
   valid: Boolean!
   passID: String
+}
+
+type ClaimDetails {
+	claimTime: Time
+	claimerUsername: String
+	claimerAddress: String
 }
 
 enum QuestionType{
