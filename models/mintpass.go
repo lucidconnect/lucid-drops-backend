@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"inverse.so/graph/model"
+)
 
 type MintPass struct {
 	Base
@@ -11,4 +15,11 @@ type MintPass struct {
 
 	ItemIdOnContract          int64
 	CollectionContractAddress string
+}
+
+func (m *MintPass) ToGraphData() *model.ClaimDetails {
+	return &model.ClaimDetails{
+		ClaimerAddress: &m.MinterAddress,
+		ClaimTime:      &m.CreatedAt,
+	}
 }
