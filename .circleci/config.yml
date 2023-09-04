@@ -1,0 +1,35 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.16
+      - image: circleci/postgres:13.1
+        environment:
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: circleci
+          POSTGRES_DB: inverse_test
+
+    working_directory: ~/app 
+    steps:
+      - checkout
+      - run:
+          name: Early build attempt
+          command: go build -o inverse-backend
+      - run:
+          name: Waiting for Postgres to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
+      - run:
+          name: Run unit tests
+          environment:
+            APP_ENV: test
+          command: go test -v 
