@@ -16,6 +16,8 @@ import (
 	"github.com/ethereum/go-ethereum/event"
 )
 
+var LocalTestWatcher = &Mintwatcher{}
+
 // Reference imports to suppress errors if they are not otherwise used.
 var (
 	_ = errors.New
