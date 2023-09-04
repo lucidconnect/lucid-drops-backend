@@ -61,7 +61,8 @@ func GetMintPassById(passId string) (*models.MintPass, error) {
 func GetCreatorByAddress(address common.Address) (*models.Creator, error) {
 	var creator models.Creator
 
-	err := dbutils.DB.Where("wallet_address=?", address.String()).First(&creator).Error
+	query := fmt.Sprintf("SELECT * FROM creators WHERE LOWER(wallet_address)='%s'", strings.ToLower(address.String()))
+	err := dbutils.DB.Raw(query).First(&creator).Error
 	if err != nil {
 		return nil, err
 	}
