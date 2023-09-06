@@ -152,21 +152,22 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		FetchClaimedItems        func(childComplexity int, address string) int
-		FetchCollectionByID      func(childComplexity int, collectionID string) int
-		FetchCreatorCollections  func(childComplexity int) int
-		FetchFeaturedCollections func(childComplexity int) int
-		FetchFeaturedItems       func(childComplexity int) int
-		FetchItemByID            func(childComplexity int, itemID string) int
-		FetchItemsInCollection   func(childComplexity int, collectionID string) int
-		FetchQuestionsByItemID   func(childComplexity int, itemID string) int
-		GetCreatorDetails        func(childComplexity int) int
-		GetImageSuggestions      func(childComplexity int, prompt string, preset *model.AiImageStyle) int
-		GetOnboardinProgress     func(childComplexity int) int
-		GetTweetDetails          func(childComplexity int, tweetLink string) int
-		GetTwitterUserDetails    func(childComplexity int, userName string) int
-		IsInverseNameIsAvailable func(childComplexity int, input model.NewUsernameRegisgration) int
-		QueryImageStatus         func(childComplexity int, taskID string, position *int) int
+		FetchClaimedItems            func(childComplexity int, address string) int
+		FetchCollectionByID          func(childComplexity int, collectionID string) int
+		FetchCreatorCollections      func(childComplexity int) int
+		FetchFeaturedCollections     func(childComplexity int) int
+		FetchFeaturedItems           func(childComplexity int) int
+		FetchItemByID                func(childComplexity int, itemID string) int
+		FetchItemsInCollection       func(childComplexity int, collectionID string) int
+		FetchQuestionsByItemID       func(childComplexity int, itemID string) int
+		FethCtiretiaAuthorizedEmails func(childComplexity int, itemID string) int
+		GetCreatorDetails            func(childComplexity int) int
+		GetImageSuggestions          func(childComplexity int, prompt string, preset *model.AiImageStyle) int
+		GetOnboardinProgress         func(childComplexity int) int
+		GetTweetDetails              func(childComplexity int, tweetLink string) int
+		GetTwitterUserDetails        func(childComplexity int, userName string) int
+		IsInverseNameIsAvailable     func(childComplexity int, input model.NewUsernameRegisgration) int
+		QueryImageStatus             func(childComplexity int, taskID string, position *int) int
 	}
 
 	QuestionnaireType struct {
@@ -239,6 +240,7 @@ type QueryResolver interface {
 	FetchCreatorCollections(ctx context.Context) ([]*model.Collection, error)
 	FetchItemsInCollection(ctx context.Context, collectionID string) ([]*model.Item, error)
 	FetchItemByID(ctx context.Context, itemID string) (*model.Item, error)
+	FethCtiretiaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error)
 	GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error)
 	GetTweetDetails(ctx context.Context, tweetLink string) (*model.TweetDetails, error)
 	GetTwitterUserDetails(ctx context.Context, userName string) (*model.UserDetails, error)
@@ -917,6 +919,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.FetchQuestionsByItemID(childComplexity, args["itemId"].(string)), true
+
+	case "Query.fethCtiretiaAuthorizedEmails":
+		if e.complexity.Query.FethCtiretiaAuthorizedEmails == nil {
+			break
+		}
+
+		args, err := ec.field_Query_fethCtiretiaAuthorizedEmails_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FethCtiretiaAuthorizedEmails(childComplexity, args["itemID"].(string)), true
 
 	case "Query.getCreatorDetails":
 		if e.complexity.Query.GetCreatorDetails == nil {
@@ -1652,6 +1666,21 @@ func (ec *executionContext) field_Query_fetchQuestionsByItemId_args(ctx context.
 		}
 	}
 	args["itemId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_fethCtiretiaAuthorizedEmails_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["itemID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["itemID"] = arg0
 	return args, nil
 }
 
@@ -5839,6 +5868,58 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_fetchItemById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_fethCtiretiaAuthorizedEmails(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_fethCtiretiaAuthorizedEmails(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FethCtiretiaAuthorizedEmails(rctx, fc.Args["itemID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_fethCtiretiaAuthorizedEmails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_fethCtiretiaAuthorizedEmails_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -10632,6 +10713,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "fethCtiretiaAuthorizedEmails":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_fethCtiretiaAuthorizedEmails(ctx, field)
 				return res
 			}
 

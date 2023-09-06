@@ -17,6 +17,7 @@ type Query {
 
   fetchItemsInCollection(collectionID: String!): [Item!]!
   fetchItemById(itemID: String!): Item!
+  fethCtiretiaAuthorizedEmails(itemID: String!): [String!]
 
   getImageSuggestions(prompt: String!, preset: AiImageStyle ): [ImageResponse]!
   getTweetDetails(tweetLink: String!): TweetDetails!

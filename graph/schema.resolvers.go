@@ -317,6 +317,11 @@ func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*mode
 	return items.FetchItemByID(itemID)
 }
 
+// FethCtiretiaAuthorizedEmails is the resolver for the fethCtiretiaAuthorizedEmails field.
+func (r *queryResolver) FethCtiretiaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error) {
+	panic(fmt.Errorf("not implemented: FethCtiretiaAuthorizedEmails - fethCtiretiaAuthorizedEmails"))
+}
+
 // GetImageSuggestions is the resolver for the getImageSuggestions field.
 func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error) {
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
