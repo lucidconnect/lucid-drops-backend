@@ -97,3 +97,18 @@ func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetail
 
 	return item.ToGraphData(), nil
 }
+
+func FetchCriteriaAuthorizedEmails(itemID string) ([]string, error) {
+	var dbEmails []*models.SingleEmailClaim
+	err := dbutils.DB.Where("item_id = ?", itemID).Find(&dbEmails).Error
+	if err != nil {
+		return nil, err
+	}
+
+	emails := make([]string, len(dbEmails))
+	for idx, dbEmail := range dbEmails {
+		emails[idx] = dbEmail.EmailAddress
+	}
+
+	return emails, nil
+}

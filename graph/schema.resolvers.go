@@ -319,7 +319,8 @@ func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*mode
 
 // FethCtiretiaAuthorizedEmails is the resolver for the fethCtiretiaAuthorizedEmails field.
 func (r *queryResolver) FethCtiretiaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error) {
-	panic(fmt.Errorf("not implemented: FethCtiretiaAuthorizedEmails - fethCtiretiaAuthorizedEmails"))
+	
+	return whitelist.FetchCriteriaAuthorizedEmails(itemID)
 }
 
 // GetImageSuggestions is the resolver for the getImageSuggestions field.
