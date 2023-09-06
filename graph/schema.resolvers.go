@@ -317,8 +317,8 @@ func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*mode
 	return items.FetchItemByID(itemID)
 }
 
-// FethCtiretiaAuthorizedEmails is the resolver for the fethCtiretiaAuthorizedEmails field.
-func (r *queryResolver) FethCtiretiaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error) {
+// FetchCriteriaAuthorizedEmails is the resolver for the fetchCriteriaAuthorizedEmails field.
+func (r *queryResolver) FetchCriteriaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error) {
 	
 	return whitelist.FetchCriteriaAuthorizedEmails(itemID)
 }
@@ -385,6 +385,13 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) FetchCtiretiaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error) {
+	panic(fmt.Errorf("not implemented: FetchCtiretiaAuthorizedEmails - fetchCtiretiaAuthorizedEmails"))
+}
+func (r *queryResolver) FethCtiretiaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error) {
+
+	return whitelist.FetchCriteriaAuthorizedEmails(itemID)
+}
 func (r *queryResolver) GetUserDetails(ctx context.Context, userName string) (*model.UserDetails, error) {
 	return services.FetchUserDetails(userName)
 }
