@@ -37,6 +37,12 @@ func main() {
 		port = defaultPort
 	}
 
+	defer func() {
+		if err := recover(); err != nil {
+			log.Print("panic occured:", err)
+		}
+	}()
+
 	dsn, present := os.LookupEnv("DATABASE_URL")
 	if !present {
 		log.Fatal().Msg("DATABASE_URL not set")
