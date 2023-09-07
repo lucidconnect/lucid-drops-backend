@@ -146,6 +146,10 @@ func CompleteEmailVerificationForClaim(input *model.CompleteEmailVerificationInp
 		return nil, errors.New("an error when verifying the OTP")
 	}
 
+	if item.TokenID == nil {
+		return nil, errors.New("The requested item is not ready to be claimed, please try agan n a few minutes")
+	}
+
 	newMint := models.MintPass{
 		ItemId:                    otpDetails.ItemID.String(),
 		ItemIdOnContract:          *item.TokenID,

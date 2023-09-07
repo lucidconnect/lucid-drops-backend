@@ -223,6 +223,10 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 		smartContractAddress = *collection.ContractAddress
 	}
 
+	if item.TokenID == nil {
+		return nil, errors.New("The requested item is not ready to be claimed, please try agan n a few minutes")
+	}
+
 	newMint := models.MintPass{
 		ItemId:                    itemID,
 		ItemIdOnContract:          *item.TokenID,
