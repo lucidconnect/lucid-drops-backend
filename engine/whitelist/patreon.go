@@ -191,7 +191,7 @@ func createMintPassForPatreonMint(item *models.Item) (*string, error) {
 	}
 
 	if item.TokenID == nil {
-		return nil, errors.New("The requested item is not ready to be claimed, please try agan n a few minutes")
+		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
 	}
 
 	newMint := models.MintPass{
