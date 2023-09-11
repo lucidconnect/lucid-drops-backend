@@ -98,6 +98,16 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input 
 	return items.UpdateItem(itemID, &input, authenticationDetails)
 }
 
+// DeleteItem is the resolver for the deleteItem field.
+func (r *mutationResolver) DeleteItem(ctx context.Context, itemID string) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return items.DeleteItem(itemID, authenticationDetails)
+}
+
 // CreateQuestionnaireCriteriaForItem is the resolver for the createQuestionnaireCriteriaForItem field.
 func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
@@ -319,7 +329,6 @@ func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*mode
 
 // FetchCriteriaAuthorizedEmails is the resolver for the fetchCriteriaAuthorizedEmails field.
 func (r *queryResolver) FetchCriteriaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error) {
-	
 	return whitelist.FetchCriteriaAuthorizedEmails(itemID)
 }
 

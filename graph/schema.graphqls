@@ -38,6 +38,7 @@ type Mutation {
 
   createItem(input: ItemInput!): Item!
   updateItem(itemID: String!,input: ItemInput!): Item!
+  deleteItem(itemID: String!): Item!
 
   createQuestionnaireCriteriaForItem( input:QuestionnaireCriteriaInput!): Item!
   createEmailWhitelistForItem(input: NewEmailWhitelistInput!): Item!

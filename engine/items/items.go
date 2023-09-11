@@ -86,6 +86,34 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 	return newItem.ToGraphData(), nil
 }
 
+func DeleteItem(itemID string, authDetails *internal.AuthDetails) (*model.Item, error) {
+	creator, err := engine.GetCreatorByAddress(authDetails.Address)
+	if err != nil {
+		return nil, errors.New("creator has not been onboarded to create a new item")
+	}
+
+	item, err := engine.GetItemByID(itemID)
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	if creator.ID != collection.CreatorID {
+		return nil, errors.New("the collection doesn't belong to this creator")
+	}
+
+	err = engine.SoftDeleteModel(item)
+	if err != nil {
+		return nil, errors.New("couldn't delete the item")
+	}
+
+	return item.ToGraphData(), nil
+}
+
 func UpdateItem(itemID string, input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {

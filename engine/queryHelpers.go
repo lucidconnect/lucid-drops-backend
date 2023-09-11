@@ -399,3 +399,7 @@ func CreateModel(newModel interface{}) error {
 func SaveModel(model interface{}) error {
 	return dbutils.DB.Save(model).Error
 }
+
+func SoftDeleteModel(model interface{}) error {
+	return dbutils.DB.Delete(model).Error
+}
