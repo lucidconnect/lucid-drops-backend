@@ -41,6 +41,29 @@ func CreateCollection(input *model.CollectionInput, authDetails *internal.AuthDe
 	return newCollection.ToGraphData(), nil
 }
 
+func DeleteCollection(collectionID string, authDetails *internal.AuthDetails) (*model.Collection, error) {
+	creator, err := engine.GetCreatorByAddress(authDetails.Address)
+	if err != nil {
+		return nil, errors.New("creator has not been onboarded to create a new collection")
+	}
+
+	collection, err := engine.GetCollectionByID(collectionID)
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	if creator.ID != collection.CreatorID {
+		return nil, errors.New("the collection doesn't belong to this creator")
+	}
+
+	err = engine.SoftDeleteModel(collection)
+	if err != nil {
+		return nil, errors.New("couldn't delete collection")
+	}
+
+	return collection.ToGraphData(), nil
+}
+
 func UpdateCollection(collectionID string, input *model.CollectionInput, authDetails *internal.AuthDetails) (*model.Collection, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {

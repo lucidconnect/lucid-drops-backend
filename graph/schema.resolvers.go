@@ -78,6 +78,16 @@ func (r *mutationResolver) UpdateCollection(ctx context.Context, collectionID st
 	return collections.UpdateCollection(collectionID, &input, authenticationDetails)
 }
 
+// DeleteCollection is the resolver for the deleteCollection field.
+func (r *mutationResolver) DeleteCollection(ctx context.Context, collectionID string) (*model.Collection, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return collections.DeleteCollection(collectionID, authenticationDetails)
+}
+
 // CreateItem is the resolver for the createItem field.
 func (r *mutationResolver) CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
