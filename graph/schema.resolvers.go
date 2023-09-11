@@ -189,8 +189,6 @@ func (r *mutationResolver) ValidateTwitterCriteriaForItem(ctx context.Context, i
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
 	}
 
-	return nil, nil
-
 	return whitelist.ValidateTwitterCriteriaForItem(itemID, *authID)
 }
 
