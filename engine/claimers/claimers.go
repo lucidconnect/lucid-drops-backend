@@ -38,7 +38,7 @@ func fetchAAAddressFromSignerInfo(address string) (*string, error) {
 	}
 
 	var signerInfo models.SignerInfo
-	err = dbutils.DB.Where("creator_id = ?", creator.ID).First(&signerInfo).Error
+	err = dbutils.DB.Model(&models.SignerInfo{}).Where("creator_id = ?", creator.ID).First(&signerInfo).Error
 	if err != gorm.ErrRecordNotFound {
 		return nil, err
 	}
