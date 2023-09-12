@@ -1,6 +1,7 @@
 package claimers
 
 import (
+	"github.com/ethereum/go-ethereum/common"
 	"gorm.io/gorm"
 	"inverse.so/dbutils"
 	"inverse.so/engine"
@@ -31,8 +32,13 @@ func FetchClaimedItems(address string) ([]*model.Item, error) {
 
 func fetchAAAddressFromSignerInfo(address string) (*string, error) {
 
+	creator, err := engine.GetCreatorByAddress(common.HexToAddress(address)) 
+	if err != nil {
+		return nil, err
+	}
+
 	var signerInfo models.SignerInfo
-	err := dbutils.DB.Where("wallet_address = ?", address).First(&signerInfo).Error
+	err = dbutils.DB.Where("creator_id = ?", creator.ID).First(&signerInfo).Error
 	if err != gorm.ErrRecordNotFound {
 		return nil, err
 	}
