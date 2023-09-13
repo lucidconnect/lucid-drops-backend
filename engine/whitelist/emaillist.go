@@ -28,7 +28,7 @@ func sendEmailOnCreate(dbEmail *models.SingleEmailClaim) error {
 	}
 
 	claimLink := utils.UseEnvOrDefault("FE_BASE_URL", "https://inverse.so") + "/claim/" + item.ID.String()
-	err = emails.SendClaimNudgeEmail(dbEmail.EmailAddress, from, item.Name, claimLink, *creator.InverseUsername)
+	err = emails.SendClaimNudgeEmail(dbEmail.EmailAddress, from, item.Name, claimLink, *creator.InverseUsername, item.Image)
 	if err != nil {
 		return err
 	}
