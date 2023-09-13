@@ -304,6 +304,7 @@ enum ClaimCriteriaType{
   patreon
   directAnswerQuestionnaire
   mutliChoiceQuestionnaire
+  emptyCriteria
 }
 
 enum AiImageStyle{

@@ -301,6 +301,7 @@ const (
 	ClaimCriteriaTypePatreon                   ClaimCriteriaType = "patreon"
 	ClaimCriteriaTypeDirectAnswerQuestionnaire ClaimCriteriaType = "directAnswerQuestionnaire"
 	ClaimCriteriaTypeMutliChoiceQuestionnaire  ClaimCriteriaType = "mutliChoiceQuestionnaire"
+	ClaimCriteriaTypeEmptyCriteria             ClaimCriteriaType = "emptyCriteria"
 )
 
 var AllClaimCriteriaType = []ClaimCriteriaType{
@@ -312,11 +313,12 @@ var AllClaimCriteriaType = []ClaimCriteriaType{
 	ClaimCriteriaTypePatreon,
 	ClaimCriteriaTypeDirectAnswerQuestionnaire,
 	ClaimCriteriaTypeMutliChoiceQuestionnaire,
+	ClaimCriteriaTypeEmptyCriteria,
 }
 
 func (e ClaimCriteriaType) IsValid() bool {
 	switch e {
-	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire:
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire, ClaimCriteriaTypeEmptyCriteria:
 		return true
 	}
 	return false
