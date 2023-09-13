@@ -2,6 +2,8 @@ package addresswatcher
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -16,6 +18,8 @@ import (
 	"inverse.so/utils"
 )
 
+var globalRPCClient *ethclient.Client
+
 type LogContractCreation struct {
 	NFTAddress common.Address
 }
@@ -25,7 +29,8 @@ func SubscribeToInverseContractDeployments() {
 	inveseNFTFactoryAddress := utils.UseEnvOrDefault("INVERSE_FACTORY_ADDRESS", "0x021406A44658CAbcBc5540Ec2045123E5FDb0ca8")
 
 attemptReconnect:
-	client, err := ethclient.Dial(rpcProvider)
+	var err error
+	globalRPCClient, err = ethclient.Dial(rpcProvider)
 	if err != nil {
 		log.Error().Msg(err.Error())
 	}
@@ -36,7 +41,7 @@ attemptReconnect:
 	}
 
 	logs := make(chan types.Log)
-	sub, err := client.SubscribeFilterLogs(context.Background(), query, logs)
+	sub, err := globalRPCClient.SubscribeFilterLogs(context.Background(), query, logs)
 	if err != nil {
 		log.Error().Msg(err.Error())
 		goto attemptReconnect
@@ -75,4 +80,54 @@ attemptReconnect:
 			log.Info().Msgf("🔖 (%s) Contract Deployed %s", vLog.TxHash, deployedContractAddress)
 		}
 	}
+}
+func GetContractAddressFromParentHash(onchainHash string) (*string, error) {
+	if globalRPCClient == nil {
+		rpcProvider := utils.UseEnvOrDefault("RPC_PROVIDER", "wss://polygon-mainnet.g.alchemy.com/v2/98DqwUXmmWt8TZc7sbDSwHGdBAY0PeuF")
+
+		var err error
+		globalRPCClient, err = ethclient.Dial(rpcProvider)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Replace this with your transaction hash
+	txHash := common.HexToHash(onchainHash)
+
+	// Get the transaction receipt
+	receipt, err := globalRPCClient.TransactionReceipt(context.Background(), txHash)
+	if err != nil {
+		fmt.Println("Error fetching transaction receipt:", err)
+		return nil, err
+	}
+
+	contractDeploymentHash := crypto.Keccak256Hash([]byte("TokenDeployed(address)"))
+
+	if len(receipt.Logs) == 0 {
+		return nil, errors.New("transaction has no logs")
+	}
+
+	for _, vLog := range receipt.Logs {
+		eventType := vLog.Topics[0].Hex()
+		if eventType != contractDeploymentHash.Hex() {
+			continue
+		}
+		contractAbi, err := abi.JSON(strings.NewReader(string(AddresswatcherABI)))
+		if err != nil {
+			log.Error().Msg(err.Error())
+		}
+
+		var creationEvent LogContractCreation
+		err = contractAbi.UnpackIntoInterface(&creationEvent, "TokenDeployed", vLog.Data)
+		if err != nil {
+			log.Error().Msg(err.Error())
+		}
+
+		deployedContractAddress := creationEvent.NFTAddress.String()
+
+		return &deployedContractAddress, nil
+	}
+
+	return nil, errors.New("transaction has no logs")
 }
