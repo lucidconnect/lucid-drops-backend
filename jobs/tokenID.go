@@ -30,11 +30,11 @@ func VerifyItemTokenIDs() {
 			continue
 		}
 
-		if collection.ContractAddress == nil {
+		if collection.AAContractAddress == nil {
 			continue
 		}
 
-		tokenID, err := fetchTokenUri(*collection.ContractAddress, item.ID.String())
+		tokenID, err := fetchTokenUri(*collection.AAContractAddress, item.ID.String())
 		if err != nil {
 			log.Error().Msg(err.Error())
 			continue

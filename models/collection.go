@@ -14,7 +14,6 @@ type Collection struct {
 	Thumbnail              string `json:"thumbnail"`
 	Description            string `json:"description"`
 	AAContractAddress      *string
-	ContractAddress        *string
 	TransactionHash        *string
 	AAWalletDeploymentHash *string
 	Featured               bool `gorm:"default:false"`
@@ -92,7 +91,7 @@ func (c *Collection) ToGraphData() *model.Collection {
 		Description:     c.Description,
 		Image:           c.Image,
 		Thumbnail:       c.Thumbnail,
-		ContractAddress: c.ContractAddress,
+		ContractAddress: c.AAContractAddress,
 	}
 
 	if c.AAContractAddress != nil {

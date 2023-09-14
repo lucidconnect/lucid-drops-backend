@@ -112,7 +112,7 @@ func createMintPassForTelegramMint(item *models.Item) (*string, error) {
 		return nil, errors.New("collection not found")
 	}
 
-	if collection.ContractAddress == nil {
+	if collection.AAContractAddress == nil {
 		return nil, errors.New("collection contract address not found")
 	}
 
@@ -123,7 +123,7 @@ func createMintPassForTelegramMint(item *models.Item) (*string, error) {
 	newMint := models.MintPass{
 		ItemId:                    item.ID.String(),
 		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: *collection.ContractAddress,
+		CollectionContractAddress: *collection.AAContractAddress,
 	}
 
 	err = dbutils.DB.Create(&newMint).Error

@@ -20,7 +20,7 @@ func AttachContractAddressForCreationHash(transactionHash, contractAddress strin
 		return err
 	}
 
-	collection.ContractAddress = utils.GetStrPtr(contractAddress)
+	collection.AAContractAddress = utils.GetStrPtr(contractAddress)
 
 	return SaveModel(collection)
 }

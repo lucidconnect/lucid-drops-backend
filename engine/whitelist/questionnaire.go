@@ -219,8 +219,8 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 	}
 
 	var smartContractAddress string
-	if collection.ContractAddress != nil {
-		smartContractAddress = *collection.ContractAddress
+	if collection.AAContractAddress != nil {
+		smartContractAddress = *collection.AAContractAddress
 	}
 
 	if item.TokenID == nil {

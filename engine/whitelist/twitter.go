@@ -239,7 +239,7 @@ func validateTwitterAuthWithCriteria(auth *models.TwitterAuthDetails, criteria *
 
 	resp.Valid = true
 	resp.PassID = PassID
-	
+
 	auth.WhiteListed = true
 	auth.ItemID = &criteria.ItemID
 	err = engine.SaveModel(auth)
@@ -373,7 +373,7 @@ func createMintPassForTwitterMint(item *models.Item) (*string, error) {
 		return nil, errors.New("collection not found")
 	}
 
-	if collection.ContractAddress == nil {
+	if collection.AAContractAddress == nil {
 		return nil, errors.New("collection contract address not found")
 	}
 
@@ -384,7 +384,7 @@ func createMintPassForTwitterMint(item *models.Item) (*string, error) {
 	newMint := models.MintPass{
 		ItemId:                    item.ID.String(),
 		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: *collection.ContractAddress,
+		CollectionContractAddress: *collection.AAContractAddress,
 	}
 
 	err = dbutils.DB.Create(&newMint).Error

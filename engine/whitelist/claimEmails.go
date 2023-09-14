@@ -77,8 +77,8 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 	}
 
 	var smartContractAddress string
-	if collection.ContractAddress != nil {
-		smartContractAddress = *collection.ContractAddress
+	if collection.AAContractAddress != nil {
+		smartContractAddress = *collection.AAContractAddress
 	}
 
 	newEmailOTP := &models.EmailOTP{

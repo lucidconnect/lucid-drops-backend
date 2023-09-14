@@ -52,14 +52,14 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 
 		client := &http.Client{}
 
-		if collection.ContractAddress == nil {
+		if collection.AAContractAddress == nil {
 			log.Println("🪼TODO ADD SUPPORT FOR QUEING")
 			return
 		}
 
 		itemData, err := json.Marshal(map[string]string{
-			"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *collection.ContractAddress, newItem.ID.String()),
-			"contractAddress": *collection.ContractAddress,
+			"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *collection.AAContractAddress, newItem.ID.String()),
+			"contractAddress": *collection.AAContractAddress,
 		})
 
 		if err != nil {
