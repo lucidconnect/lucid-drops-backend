@@ -37,14 +37,14 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		return nil, errors.New("collection not found")
 	}
 
-	if collection.ContractAddress == nil {
+	if collection.AAContractAddress == nil {
 		return nil, errors.New("collection contract address not found")
 	}
 
 	newMint := models.MintPass{
 		ItemId:                    item.ID.String(),
 		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: *collection.ContractAddress,
+		CollectionContractAddress: *collection.AAContractAddress,
 	}
 
 	err = dbutils.DB.Create(&newMint).Error
