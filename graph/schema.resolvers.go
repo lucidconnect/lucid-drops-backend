@@ -183,6 +183,11 @@ func (r *mutationResolver) CreatePatreonCriteriaForItem(ctx context.Context, inp
 	return whitelist.CreatePatreonCriteria(input, authenticationDetails)
 }
 
+// CreateMintPassForNoCriteriaItem is the resolver for the createMintPassForNoCriteriaItem field.
+func (r *mutationResolver) CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string) (*model.ValidationRespoonse, error) {
+	return whitelist.CreateMintPassForNoCriteriaItem(itemID)
+}
+
 // ValidateTwitterCriteriaForItem is the resolver for the validateTwitterCriteriaForItem field.
 func (r *mutationResolver) ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
 	if authID == nil {

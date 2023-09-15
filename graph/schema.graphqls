@@ -47,6 +47,7 @@ type Mutation {
   createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
   createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
   createPatreonCriteriaForItem(input: NewPatreonCriteriaInput!): Item!
+  createMintPassForNoCriteriaItem(itemID: String!): ValidationRespoonse
   validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validatePatreonCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
