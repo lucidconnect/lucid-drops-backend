@@ -1165,6 +1165,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputMultiChoiceInputType,
 		ec.unmarshalInputNewEmailDomainWhitelistInput,
 		ec.unmarshalInputNewEmailWhitelistInput,
+		ec.unmarshalInputNewEmptyCriteriaInput,
 		ec.unmarshalInputNewPatreonCriteriaInput,
 		ec.unmarshalInputNewTelegramCriteriaInput,
 		ec.unmarshalInputNewTwitterCriteriaInput,
@@ -9680,6 +9681,35 @@ func (ec *executionContext) unmarshalInputNewEmailWhitelistInput(ctx context.Con
 				return it, err
 			}
 			it.AuthorizedEmails = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewEmptyCriteriaInput(ctx context.Context, obj interface{}) (model.NewEmptyCriteriaInput, error) {
+	var it model.NewEmptyCriteriaInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"itemID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "itemID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ItemID = data
 		}
 	}
 

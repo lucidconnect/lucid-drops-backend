@@ -163,6 +163,11 @@ input NewTelegramCriteriaInput {
   groupID: String!
 }
 
+input NewEmptyCriteriaInput {
+	itemID: String!
+
+}
+
 input NewPatreonCriteriaInput {
   itemID: String!
   authID: String!
