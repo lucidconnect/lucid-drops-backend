@@ -126,6 +126,7 @@ type ComplexityRoot struct {
 		CreateCollection                     func(childComplexity int, input model.CollectionInput) int
 		CreateEmailDomainWhitelist           func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
 		CreateEmailWhitelistForItem          func(childComplexity int, input model.NewEmailWhitelistInput) int
+		CreateEmptyCriteriaForItem           func(childComplexity int, input model.NewEmptyCriteriaInput) int
 		CreateItem                           func(childComplexity int, input model.ItemInput) int
 		CreateJWTToken                       func(childComplexity int, input *model.CreateJWTTokenInput) int
 		CreateMintPassForNoCriteriaItem      func(childComplexity int, itemID string) int
@@ -224,6 +225,7 @@ type MutationResolver interface {
 	CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error)
 	CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error)
 	CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error)
+	CreateEmptyCriteriaForItem(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Item, error)
 	CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string) (*model.ValidationRespoonse, error)
 	ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
 	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
@@ -619,6 +621,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateEmailWhitelistForItem(childComplexity, args["input"].(model.NewEmailWhitelistInput)), true
+
+	case "Mutation.createEmptyCriteriaForItem":
+		if e.complexity.Mutation.CreateEmptyCriteriaForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createEmptyCriteriaForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateEmptyCriteriaForItem(childComplexity, args["input"].(model.NewEmptyCriteriaInput)), true
 
 	case "Mutation.createItem":
 		if e.complexity.Mutation.CreateItem == nil {
@@ -1305,6 +1319,21 @@ func (ec *executionContext) field_Mutation_createEmailWhitelistForItem_args(ctx 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewEmailWhitelistInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmailWhitelistInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createEmptyCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.NewEmptyCriteriaInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNNewEmptyCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmptyCriteriaInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4845,6 +4874,93 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createPatreonCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createEmptyCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createEmptyCriteriaForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateEmptyCriteriaForItem(rctx, fc.Args["input"].(model.NewEmptyCriteriaInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
+			case "tweetLink":
+				return ec.fieldContext_Item_tweetLink(ctx, field)
+			case "profileLink":
+				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createEmptyCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -10753,6 +10869,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createEmptyCriteriaForItem":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createEmptyCriteriaForItem(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "createMintPassForNoCriteriaItem":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -12138,6 +12263,11 @@ func (ec *executionContext) unmarshalNNewEmailDomainWhitelistInput2inverseᚗso�
 
 func (ec *executionContext) unmarshalNNewEmailWhitelistInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmailWhitelistInput(ctx context.Context, v interface{}) (model.NewEmailWhitelistInput, error) {
 	res, err := ec.unmarshalInputNewEmailWhitelistInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNNewEmptyCriteriaInput2inverseᚗsoᚋgraphᚋmodelᚐNewEmptyCriteriaInput(ctx context.Context, v interface{}) (model.NewEmptyCriteriaInput, error) {
+	res, err := ec.unmarshalInputNewEmptyCriteriaInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
