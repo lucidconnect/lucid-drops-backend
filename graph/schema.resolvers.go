@@ -183,6 +183,11 @@ func (r *mutationResolver) CreatePatreonCriteriaForItem(ctx context.Context, inp
 	return whitelist.CreatePatreonCriteria(input, authenticationDetails)
 }
 
+// CreateEmptyCriteriaForItem is the resolver for the createEmptyCriteriaForItem field.
+func (r *mutationResolver) CreateEmptyCriteriaForItem(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Item, error) {
+	panic(fmt.Errorf("not implemented: CreateEmptyCriteriaForItem - createEmptyCriteriaForItem"))
+}
+
 // CreateMintPassForNoCriteriaItem is the resolver for the createMintPassForNoCriteriaItem field.
 func (r *mutationResolver) CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string) (*model.ValidationRespoonse, error) {
 	return whitelist.CreateMintPassForNoCriteriaItem(itemID)

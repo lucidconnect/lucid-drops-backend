@@ -145,6 +145,10 @@ type NewEmailWhitelistInput struct {
 	AuthorizedEmails []string `json:"authorizedEmails"`
 }
 
+type NewEmptyCriteriaInput struct {
+	ItemID string `json:"itemID"`
+}
+
 type NewPatreonCriteriaInput struct {
 	ItemID       string  `json:"itemID"`
 	AuthID       string  `json:"authID"`

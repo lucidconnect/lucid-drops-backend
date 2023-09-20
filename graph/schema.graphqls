@@ -47,6 +47,7 @@ type Mutation {
   createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
   createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
   createPatreonCriteriaForItem(input: NewPatreonCriteriaInput!): Item!
+  createEmptyCriteriaForItem(input: NewEmptyCriteriaInput!): Item!
   createMintPassForNoCriteriaItem(itemID: String!): ValidationRespoonse
   validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
@@ -161,6 +162,11 @@ input NewTwitterCriteriaInput {
 input NewTelegramCriteriaInput {
 	itemID: String!
   groupID: String!
+}
+
+input NewEmptyCriteriaInput {
+	itemID: String!
+
 }
 
 input NewPatreonCriteriaInput {
