@@ -10,10 +10,13 @@ import (
 )
 
 func GetMagicClient() *client.API {
-
 	cl := magic.NewClientWithRetry(5, time.Second, 10*time.Second)
-	return client.New(utils.UseEnvOrDefault("MAGIC_SECRET_KEY", "_default string"), cl)
 
+	c, er := client.New(utils.UseEnvOrDefault("MAGIC_SECRET_KEY", "_default string"), cl)
+	if er != nil {
+		return nil
+	}
+	return c
 }
 
 func GenerateMagicJWT(didToken string) (*token.Token, error) {
@@ -27,8 +30,7 @@ func GenerateMagicJWT(didToken string) (*token.Token, error) {
 }
 
 func GetMagicAddress(resolvedToken *token.Token) (*string, error) {
-
-	err := resolvedToken.Validate()
+	err := resolvedToken.Validate("")
 	if err != nil {
 		return nil, err
 	}
@@ -40,4 +42,3 @@ func GetMagicAddress(resolvedToken *token.Token) (*string, error) {
 
 	return &publicAddress, nil
 }
-

@@ -16,20 +16,22 @@ type ClaimDetails struct {
 }
 
 type Collection struct {
-	ID              string  `json:"ID"`
-	Name            string  `json:"name"`
-	Description     string  `json:"description"`
-	Image           string  `json:"image"`
-	Thumbnail       string  `json:"thumbnail"`
-	ContractAddress *string `json:"contractAddress,omitempty"`
-	Items           []*Item `json:"items"`
+	ID              string             `json:"ID"`
+	Name            string             `json:"name"`
+	Description     string             `json:"description"`
+	Image           string             `json:"image"`
+	Thumbnail       string             `json:"thumbnail"`
+	ContractAddress *string            `json:"contractAddress,omitempty"`
+	Network         *BlockchainNetwork `json:"network,omitempty"`
+	Items           []*Item            `json:"items"`
 }
 
 type CollectionInput struct {
-	Name        *string `json:"name,omitempty"`
-	Description *string `json:"description,omitempty"`
-	Image       *string `json:"image,omitempty"`
-	Thumbnail   *string `json:"thumbnail,omitempty"`
+	Name        *string            `json:"name,omitempty"`
+	Description *string            `json:"description,omitempty"`
+	Image       *string            `json:"image,omitempty"`
+	Thumbnail   *string            `json:"thumbnail,omitempty"`
+	Network     *BlockchainNetwork `json:"network,omitempty"`
 }
 
 type CompleteEmailClaimInput struct {
@@ -291,6 +293,47 @@ func (e *AiImageStyle) UnmarshalGQL(v interface{}) error {
 }
 
 func (e AiImageStyle) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type BlockchainNetwork string
+
+const (
+	BlockchainNetworkBase    BlockchainNetwork = "base"
+	BlockchainNetworkPolygon BlockchainNetwork = "polygon"
+)
+
+var AllBlockchainNetwork = []BlockchainNetwork{
+	BlockchainNetworkBase,
+	BlockchainNetworkPolygon,
+}
+
+func (e BlockchainNetwork) IsValid() bool {
+	switch e {
+	case BlockchainNetworkBase, BlockchainNetworkPolygon:
+		return true
+	}
+	return false
+}
+
+func (e BlockchainNetwork) String() string {
+	return string(e)
+}
+
+func (e *BlockchainNetwork) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = BlockchainNetwork(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid BlockchainNetwork", str)
+	}
+	return nil
+}
+
+func (e BlockchainNetwork) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
