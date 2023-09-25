@@ -41,6 +41,10 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		return nil, errors.New("collection contract address not found")
 	}
 
+	if item.TokenID == nil {
+		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
+	}
+
 	newMint := models.MintPass{
 		ItemId:                    item.ID.String(),
 		ItemIdOnContract:          *item.TokenID,
