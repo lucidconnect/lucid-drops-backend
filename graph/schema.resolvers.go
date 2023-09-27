@@ -120,7 +120,7 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, itemID string) (*mode
 
 // AddItemDeadline is the resolver for the addItemDeadline field.
 func (r *mutationResolver) AddItemDeadline(ctx context.Context, itemID string, deadline string) (*model.Item, error) {
-	panic(fmt.Errorf("not implemented: AddItemDeadline - addItemDeadline"))
+	return items.SetItemClaimDeadline(itemID, deadline)
 }
 
 // CreateQuestionnaireCriteriaForItem is the resolver for the createQuestionnaireCriteriaForItem field.
