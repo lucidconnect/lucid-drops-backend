@@ -3,6 +3,7 @@ package whitelist
 import (
 	"errors"
 	"strconv"
+	"time"
 
 	"inverse.so/dbutils"
 	"inverse.so/engine"
@@ -75,6 +76,10 @@ func ValidateTelegramClaimCriteria(itemID, authID string) (*model.ValidationResp
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
 		return resp, errors.New("item not found")
+	}
+
+	if time.Now().After(*item.ClaimDeadline) {
+		return nil, errors.New("the item is no longer available to be claimed")
 	}
 
 	if item.TelegramCriteria == nil {

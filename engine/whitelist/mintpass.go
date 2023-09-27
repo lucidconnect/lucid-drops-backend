@@ -3,6 +3,7 @@ package whitelist
 import (
 	"errors"
 	"regexp"
+	"time"
 
 	"inverse.so/dbutils"
 	"inverse.so/engine"
@@ -26,6 +27,10 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
 		return nil, err
+	}
+
+	if time.Now().After(*item.ClaimDeadline) {
+		return nil, errors.New("the item is no longer available to be claimed")
 	}
 
 	if item.Criteria == nil || *item.Criteria != model.ClaimCriteriaTypeEmptyCriteria {

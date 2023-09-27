@@ -127,6 +127,10 @@ func ValidatePatreonCriteriaForItem(itemID string, authID *string) (*model.Valid
 		return resp, errors.New("item not found")
 	}
 
+	if time.Now().After(*item.ClaimDeadline) {
+		return nil, errors.New("the item is no longer available to be claimed")
+	}
+
 	if item.PatreonCriteria == nil {
 		return resp, errors.New("item does not have a patreon criteria")
 	}

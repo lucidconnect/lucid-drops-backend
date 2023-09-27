@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
@@ -125,6 +126,10 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
 		return nil, errors.New("item not found")
+	}
+
+	if time.Now().After(*item.ClaimDeadline) {
+		return nil, errors.New("the item is no longer available to be claimed")
 	}
 
 	if item.Criteria == nil {
