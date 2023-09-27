@@ -40,6 +40,7 @@ type Mutation {
   createItem(input: ItemInput!): Item!
   updateItem(itemID: String!,input: ItemInput!): Item!
   deleteItem(itemID: String!): Item!
+  addItemDeadline(itemID: String!, deadline: String!): Item!
 
   createQuestionnaireCriteriaForItem( input:QuestionnaireCriteriaInput!): Item!
   createEmailWhitelistForItem(input: NewEmailWhitelistInput!): Item!
@@ -230,6 +231,7 @@ type Item {
   profileLink: String
   campaignName: String
   createdAt: Time!
+  deadline: Time
   claimDetails: [ClaimDetails]
 }
 

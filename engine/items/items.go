@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"inverse.so/engine"
 	"inverse.so/graph/model"
@@ -238,4 +239,25 @@ func FetchFeaturedItems() ([]*model.Item, error) {
 	}
 
 	return mappedItems, nil
+}
+
+func SetItemClaimDeadline(itemID string, deadline string) (*model.Item, error) {
+	item, err := engine.GetItemByID(itemID)
+	if err != nil {
+		return nil, errors.New("item not found")
+	}
+
+	defaultTimeFormat := "2006-01-02"
+	dateForrmatted, err := time.Parse(defaultTimeFormat, deadline)
+	if err != nil {
+		return nil, err
+	}
+	
+	item.ClaimDeadline = &dateForrmatted
+	err = engine.SaveModel(item)
+	if err != nil {
+		return nil, errors.New("couldn't save item")
+	}
+
+	return item.ToGraphData(), nil
 }

@@ -2,6 +2,7 @@ package models
 
 import (
 	"strings"
+	"time"
 
 	uuid "github.com/satori/go.uuid"
 	"inverse.so/graph/model"
@@ -16,6 +17,7 @@ type Item struct {
 	Image                string    `json:"image"`
 	Description          string    `json:"description"`
 	Criteria             *model.ClaimCriteriaType
+	ClaimDeadline        *time.Time        `gorm:"default:null"`
 	TwitterCriteria      *TwitterCriteria  `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	TelegramCriteria     *TelegramCriteria `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	PatreonCriteria      *PatreonCriteria  `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
@@ -53,6 +55,7 @@ func (i *Item) ToGraphData() *model.Item {
 		CollectionID:  i.CollectionID.String(),
 		ClaimCriteria: i.Criteria,
 		CreatedAt:     i.CreatedAt,
+		Deadline:      i.ClaimDeadline,
 	}
 
 	if i.TwitterCriteria != nil {

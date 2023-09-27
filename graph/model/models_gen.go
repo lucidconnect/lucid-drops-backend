@@ -103,6 +103,7 @@ type Item struct {
 	ProfileLink                      *string            `json:"profileLink,omitempty"`
 	CampaignName                     *string            `json:"campaignName,omitempty"`
 	CreatedAt                        time.Time          `json:"createdAt"`
+	Deadline                         *time.Time         `json:"deadline,omitempty"`
 	ClaimDetails                     []*ClaimDetails    `json:"claimDetails,omitempty"`
 }
 

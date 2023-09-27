@@ -95,6 +95,7 @@ type ComplexityRoot struct {
 		CollectionID                     func(childComplexity int) int
 		CreatedAt                        func(childComplexity int) int
 		Creator                          func(childComplexity int) int
+		Deadline                         func(childComplexity int) int
 		Description                      func(childComplexity int) int
 		ID                               func(childComplexity int) int
 		Image                            func(childComplexity int) int
@@ -123,6 +124,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AddItemDeadline                      func(childComplexity int, itemID string, deadline string) int
 		CompleteEmailVerificationForClaim    func(childComplexity int, input model.CompleteEmailVerificationInput) int
 		CreateCollection                     func(childComplexity int, input model.CollectionInput) int
 		CreateEmailDomainWhitelist           func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
@@ -220,6 +222,7 @@ type MutationResolver interface {
 	CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error)
 	UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error)
 	DeleteItem(ctx context.Context, itemID string) (*model.Item, error)
+	AddItemDeadline(ctx context.Context, itemID string, deadline string) (*model.Item, error)
 	CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (*model.Item, error)
 	CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error)
 	CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error)
@@ -470,6 +473,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.Creator(childComplexity), true
 
+	case "Item.deadline":
+		if e.complexity.Item.Deadline == nil {
+			break
+		}
+
+		return e.complexity.Item.Deadline(childComplexity), true
+
 	case "Item.description":
 		if e.complexity.Item.Description == nil {
 			break
@@ -581,6 +591,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MobileWalletConfig.PublicKey(childComplexity), true
+
+	case "Mutation.addItemDeadline":
+		if e.complexity.Mutation.AddItemDeadline == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addItemDeadline_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddItemDeadline(childComplexity, args["itemID"].(string), args["deadline"].(string)), true
 
 	case "Mutation.completeEmailVerificationForClaim":
 		if e.complexity.Mutation.CompleteEmailVerificationForClaim == nil {
@@ -1311,6 +1333,30 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_addItemDeadline_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["itemID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["itemID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["deadline"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadline"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["deadline"] = arg1
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_completeEmailVerificationForClaim_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -2469,6 +2515,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -3506,6 +3554,47 @@ func (ec *executionContext) fieldContext_Item_createdAt(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Item_deadline(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_deadline(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Deadline, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_deadline(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Item_claimDetails(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Item_claimDetails(ctx, field)
 	if err != nil {
@@ -4256,6 +4345,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -4343,6 +4434,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -4430,6 +4523,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -4444,6 +4539,95 @@ func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_addItemDeadline(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addItemDeadline(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddItemDeadline(rctx, fc.Args["itemID"].(string), fc.Args["deadline"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Item)
+	fc.Result = res
+	return ec.marshalNItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addItemDeadline(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
+			case "tweetLink":
+				return ec.fieldContext_Item_tweetLink(ctx, field)
+			case "profileLink":
+				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addItemDeadline_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4517,6 +4701,8 @@ func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaFor
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -4604,6 +4790,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -4691,6 +4879,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -4778,6 +4968,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -4865,6 +5057,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -4952,6 +5146,8 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -5039,6 +5235,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -6061,6 +6259,8 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -6283,6 +6483,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -6370,6 +6572,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -6765,6 +6969,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
 			}
@@ -10773,6 +10979,8 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "deadline":
+			out.Values[i] = ec._Item_deadline(ctx, field, obj)
 		case "claimDetails":
 			out.Values[i] = ec._Item_claimDetails(ctx, field, obj)
 		default:
@@ -11004,6 +11212,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteItem":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteItem(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "addItemDeadline":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addItemDeadline(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

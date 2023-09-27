@@ -118,6 +118,11 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, itemID string) (*mode
 	return items.DeleteItem(itemID, authenticationDetails)
 }
 
+// AddItemDeadline is the resolver for the addItemDeadline field.
+func (r *mutationResolver) AddItemDeadline(ctx context.Context, itemID string, deadline string) (*model.Item, error) {
+	panic(fmt.Errorf("not implemented: AddItemDeadline - addItemDeadline"))
+}
+
 // CreateQuestionnaireCriteriaForItem is the resolver for the createQuestionnaireCriteriaForItem field.
 func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
