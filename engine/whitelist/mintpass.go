@@ -29,8 +29,10 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		return nil, err
 	}
 
-	if time.Now().After(*item.ClaimDeadline) {
-		return nil, errors.New("the item is no longer available to be claimed")
+	if item.ClaimDeadline != nil {
+		if time.Now().After(*item.ClaimDeadline) {
+			return nil, errors.New("the item is no longer available to be claimed")
+		}
 	}
 
 	if item.Criteria == nil || *item.Criteria != model.ClaimCriteriaTypeEmptyCriteria {

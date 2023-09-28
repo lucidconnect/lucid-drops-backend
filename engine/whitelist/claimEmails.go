@@ -25,8 +25,10 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 		return nil, errors.New("items not found")
 	}
 
-	if time.Now().After(*item.ClaimDeadline) {
-		return nil, errors.New("the item is no longer available to be claimed")
+	if item.ClaimDeadline != nil {
+		if time.Now().After(*item.ClaimDeadline) {
+			return nil, errors.New("the item is no longer available to be claimed")
+		}
 	}
 
 	if item.Criteria == nil {
