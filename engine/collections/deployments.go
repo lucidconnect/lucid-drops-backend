@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/rs/zerolog/log"
 	"inverse.so/addresswatcher"
@@ -122,6 +123,9 @@ func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.Depl
 	}
 
 	collection.AAWalletDeploymentHash = &input.DeploymentHash
+
+	// Introduce an artificial delay for before fethcing the actual contract address
+	time.Sleep(time.Second * 3)
 
 	contractAdddress, err := GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
 	if err != nil {
