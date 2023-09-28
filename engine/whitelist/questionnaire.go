@@ -128,8 +128,10 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 		return nil, errors.New("item not found")
 	}
 
-	if time.Now().After(*item.ClaimDeadline) {
-		return nil, errors.New("the item is no longer available to be claimed")
+	if item.ClaimDeadline != nil {
+		if time.Now().After(*item.ClaimDeadline) {
+			return nil, errors.New("the item is no longer available to be claimed")
+		}
 	}
 
 	if item.Criteria == nil {
