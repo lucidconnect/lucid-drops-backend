@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 
+	"inverse.so/engine"
 	"inverse.so/engine/aiimages"
 	"inverse.so/engine/auth"
 	"inverse.so/engine/claimers"
@@ -56,6 +57,11 @@ func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input mo
 	}
 
 	return onboarding.RegisterInverseUsername(authenticationDetails.Address, &input)
+}
+
+// EditUserProfile is the resolver for the editUserProfile field.
+func (r *mutationResolver) EditUserProfile(ctx context.Context, input model.EditUserProfileInputType) (*model.UserProfileType, error) {
+	panic(fmt.Errorf("not implemented: EditUserProfile - editUserProfile"))
 }
 
 // CreateCollection is the resolver for the createCollection field.
@@ -318,6 +324,48 @@ func (r *queryResolver) GetOnboardinProgress(ctx context.Context) (*model.Onboar
 // IsInverseNameIsAvailable is the resolver for the isInverseNameIsAvailable field.
 func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input model.NewUsernameRegisgration) (bool, error) {
 	return onboarding.CheckIfInverseNameIsAvailable(&input)
+}
+
+// GetUserProfileDetails is the resolver for the getUserProfileDetails field.
+func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName string) (*model.UserProfileType, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	profileData, err := engine.GetUserProfileDetails(userName)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	collections, err := engine.GetCreatorCollections(*profileData.CreatorID)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+	mappedCollections := make([]*model.Collection, len(collections))
+	for idx, collection := range collections {
+		mappedCollections[idx] = collection.ToGraphData()
+	}
+	profileData.Collections = mappedCollections
+
+	var allItems []*model.Item
+	for _, collection := range mappedCollections {
+		items, err := items.FetchCollectionItems(collection.ID, nil)
+		if err != nil {
+			continue
+		}
+
+		allItems = append(allItems, items...)
+	}
+
+	claimedItems, err := claimers.FetchClaimedItems(authenticationDetails.Address.String())
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+	profileData.ClaimedItems = claimedItems
+	profileData.Items = allItems
+
+	return profileData, nil
 }
 
 // FetchClaimedItems is the resolver for the fetchClaimedItems field.

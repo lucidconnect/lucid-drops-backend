@@ -9,6 +9,7 @@ type Query {
   getCreatorDetails: CreatorDetails!
   getOnboardinProgress: OnboardingProgress!
   isInverseNameIsAvailable(input: NewUsernameRegisgration!): Boolean!
+  getUserProfileDetails (userName: String!): userProfileType
 
   fetchClaimedItems(address: String!): [Item!]!
 
@@ -32,6 +33,7 @@ type Query {
 
 type Mutation {
   registerInverseUsername(input: NewUsernameRegisgration!): CreatorDetails!
+  editUserProfile (input: EditUserProfileInputType!):userProfileType
 
   createCollection(input: CollectionInput!): Collection!
   updateCollection(collectionID: String!,input: CollectionInput!): Collection!
@@ -189,6 +191,39 @@ input DeploymentInfo{
   deploymentHash: String!
   contractAddress: String
 }
+
+input EditUserProfileInputType{
+	thumbnail: String
+	image: String
+	inverseUsername: String
+	bio: String
+	socials: SocialsInput
+}
+
+input SocialsInput {
+  twitter: String
+  instagram: String
+  github: String
+}
+
+type Socials {
+  twitter: String
+  instagram: String
+  github: String
+}
+
+type userProfileType{
+	creatorID: String
+	thumbnail: String
+	image: String
+	inverseUsername: String
+	bio: String
+	socials: Socials
+	collections: [Collection]
+	items: [Item]
+	claimedItems: [Item]
+}
+
 
 type JWTCreationResponse{
   token: String!

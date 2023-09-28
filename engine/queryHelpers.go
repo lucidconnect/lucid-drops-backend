@@ -392,6 +392,17 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 	return nil
 }
 
+func GetUserProfileDetails(userName string) (*model.UserProfileType, error) {
+	var profile models.Creator
+	err := dbutils.DB.Model(&models.Creator{}).Where("inverse_username=?", userName).First(&profile).Error
+	if err != nil {
+		return nil, errors.New("user profile not found")
+	}
+
+	profileGraphData := profile.CreatorToProfileData()
+	return profileGraphData, nil
+}
+
 func CreateModel(newModel interface{}) error {
 	return dbutils.DB.Create(newModel).Error
 }

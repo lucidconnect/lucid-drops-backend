@@ -139,6 +139,7 @@ type ComplexityRoot struct {
 		CreateTwitterCriteriaForItem         func(childComplexity int, input model.NewTwitterCriteriaInput) int
 		DeleteCollection                     func(childComplexity int, collectionID string) int
 		DeleteItem                           func(childComplexity int, itemID string) int
+		EditUserProfile                      func(childComplexity int, input model.EditUserProfileInputType) int
 		GenerateMobileWalletConfigs          func(childComplexity int) int
 		GenerateSignatureForClaim            func(childComplexity int, input model.GenerateClaimSignatureInput) int
 		RegisterInverseUsername              func(childComplexity int, input model.NewUsernameRegisgration) int
@@ -173,6 +174,7 @@ type ComplexityRoot struct {
 		GetOnboardinProgress          func(childComplexity int) int
 		GetTweetDetails               func(childComplexity int, tweetLink string) int
 		GetTwitterUserDetails         func(childComplexity int, userName string) int
+		GetUserProfileDetails         func(childComplexity int, userName string) int
 		IsInverseNameIsAvailable      func(childComplexity int, input model.NewUsernameRegisgration) int
 		QueryImageStatus              func(childComplexity int, taskID string, position *int) int
 	}
@@ -182,6 +184,12 @@ type ComplexityRoot struct {
 		Question     func(childComplexity int) int
 		QuestionID   func(childComplexity int) int
 		QuestionType func(childComplexity int) int
+	}
+
+	Socials struct {
+		Github    func(childComplexity int) int
+		Instagram func(childComplexity int) int
+		Twitter   func(childComplexity int) int
 	}
 
 	StartEmailVerificationResponse struct {
@@ -205,6 +213,18 @@ type ComplexityRoot struct {
 		PassID func(childComplexity int) int
 		Valid  func(childComplexity int) int
 	}
+
+	UserProfileType struct {
+		Bio             func(childComplexity int) int
+		ClaimedItems    func(childComplexity int) int
+		Collections     func(childComplexity int) int
+		CreatorID       func(childComplexity int) int
+		Image           func(childComplexity int) int
+		InverseUsername func(childComplexity int) int
+		Items           func(childComplexity int) int
+		Socials         func(childComplexity int) int
+		Thumbnail       func(childComplexity int) int
+	}
 }
 
 type CollectionResolver interface {
@@ -216,6 +236,7 @@ type ItemResolver interface {
 }
 type MutationResolver interface {
 	RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error)
+	EditUserProfile(ctx context.Context, input model.EditUserProfileInputType) (*model.UserProfileType, error)
 	CreateCollection(ctx context.Context, input model.CollectionInput) (*model.Collection, error)
 	UpdateCollection(ctx context.Context, collectionID string, input model.CollectionInput) (*model.Collection, error)
 	DeleteCollection(ctx context.Context, collectionID string) (*model.Collection, error)
@@ -247,6 +268,7 @@ type QueryResolver interface {
 	GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error)
 	GetOnboardinProgress(ctx context.Context) (*model.OnboardingProgress, error)
 	IsInverseNameIsAvailable(ctx context.Context, input model.NewUsernameRegisgration) (bool, error)
+	GetUserProfileDetails(ctx context.Context, userName string) (*model.UserProfileType, error)
 	FetchClaimedItems(ctx context.Context, address string) ([]*model.Item, error)
 	FetchCollectionByID(ctx context.Context, collectionID string) (*model.Collection, error)
 	FetchCreatorCollections(ctx context.Context) ([]*model.Collection, error)
@@ -772,6 +794,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteItem(childComplexity, args["itemID"].(string)), true
 
+	case "Mutation.editUserProfile":
+		if e.complexity.Mutation.EditUserProfile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_editUserProfile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.EditUserProfile(childComplexity, args["input"].(model.EditUserProfileInputType)), true
+
 	case "Mutation.generateMobileWalletConfigs":
 		if e.complexity.Mutation.GenerateMobileWalletConfigs == nil {
 			break
@@ -1068,6 +1102,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetTwitterUserDetails(childComplexity, args["userName"].(string)), true
 
+	case "Query.getUserProfileDetails":
+		if e.complexity.Query.GetUserProfileDetails == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getUserProfileDetails_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetUserProfileDetails(childComplexity, args["userName"].(string)), true
+
 	case "Query.isInverseNameIsAvailable":
 		if e.complexity.Query.IsInverseNameIsAvailable == nil {
 			break
@@ -1119,6 +1165,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.QuestionnaireType.QuestionType(childComplexity), true
+
+	case "Socials.github":
+		if e.complexity.Socials.Github == nil {
+			break
+		}
+
+		return e.complexity.Socials.Github(childComplexity), true
+
+	case "Socials.instagram":
+		if e.complexity.Socials.Instagram == nil {
+			break
+		}
+
+		return e.complexity.Socials.Instagram(childComplexity), true
+
+	case "Socials.twitter":
+		if e.complexity.Socials.Twitter == nil {
+			break
+		}
+
+		return e.complexity.Socials.Twitter(childComplexity), true
 
 	case "StartEmailVerificationResponse.otpRequestID":
 		if e.complexity.StartEmailVerificationResponse.OtpRequestID == nil {
@@ -1190,6 +1257,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ValidationRespoonse.Valid(childComplexity), true
 
+	case "userProfileType.bio":
+		if e.complexity.UserProfileType.Bio == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.Bio(childComplexity), true
+
+	case "userProfileType.claimedItems":
+		if e.complexity.UserProfileType.ClaimedItems == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.ClaimedItems(childComplexity), true
+
+	case "userProfileType.collections":
+		if e.complexity.UserProfileType.Collections == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.Collections(childComplexity), true
+
+	case "userProfileType.creatorID":
+		if e.complexity.UserProfileType.CreatorID == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.CreatorID(childComplexity), true
+
+	case "userProfileType.image":
+		if e.complexity.UserProfileType.Image == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.Image(childComplexity), true
+
+	case "userProfileType.inverseUsername":
+		if e.complexity.UserProfileType.InverseUsername == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.InverseUsername(childComplexity), true
+
+	case "userProfileType.items":
+		if e.complexity.UserProfileType.Items == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.Items(childComplexity), true
+
+	case "userProfileType.socials":
+		if e.complexity.UserProfileType.Socials == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.Socials(childComplexity), true
+
+	case "userProfileType.thumbnail":
+		if e.complexity.UserProfileType.Thumbnail == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.Thumbnail(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -1203,6 +1333,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCompleteEmailVerificationInput,
 		ec.unmarshalInputCreateJWTTokenInput,
 		ec.unmarshalInputDeploymentInfo,
+		ec.unmarshalInputEditUserProfileInputType,
 		ec.unmarshalInputEmailClaimInput,
 		ec.unmarshalInputGenerateClaimSignatureInput,
 		ec.unmarshalInputItemInput,
@@ -1218,6 +1349,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputQuestionnaireAnswerInput,
 		ec.unmarshalInputQuestionnaireCriteriaInput,
 		ec.unmarshalInputSignerInfo,
+		ec.unmarshalInputSocialsInput,
 	)
 	first := true
 
@@ -1565,6 +1697,21 @@ func (ec *executionContext) field_Mutation_deleteItem_args(ctx context.Context, 
 		}
 	}
 	args["itemID"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_editUserProfile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.EditUserProfileInputType
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNEditUserProfileInputType2inverseᚗsoᚋgraphᚋmodelᚐEditUserProfileInputType(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1932,6 +2079,21 @@ func (ec *executionContext) field_Query_getTweetDetails_args(ctx context.Context
 }
 
 func (ec *executionContext) field_Query_getTwitterUserDetails_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["userName"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userName"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["userName"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getUserProfileDetails_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -4053,6 +4215,78 @@ func (ec *executionContext) fieldContext_Mutation_registerInverseUsername(ctx co
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_registerInverseUsername_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_editUserProfile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_editUserProfile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().EditUserProfile(rctx, fc.Args["input"].(model.EditUserProfileInputType))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserProfileType)
+	fc.Result = res
+	return ec.marshalOuserProfileType2ᚖinverseᚗsoᚋgraphᚋmodelᚐUserProfileType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_editUserProfile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "creatorID":
+				return ec.fieldContext_userProfileType_creatorID(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_userProfileType_thumbnail(ctx, field)
+			case "image":
+				return ec.fieldContext_userProfileType_image(ctx, field)
+			case "inverseUsername":
+				return ec.fieldContext_userProfileType_inverseUsername(ctx, field)
+			case "bio":
+				return ec.fieldContext_userProfileType_bio(ctx, field)
+			case "socials":
+				return ec.fieldContext_userProfileType_socials(ctx, field)
+			case "collections":
+				return ec.fieldContext_userProfileType_collections(ctx, field)
+			case "items":
+				return ec.fieldContext_userProfileType_items(ctx, field)
+			case "claimedItems":
+				return ec.fieldContext_userProfileType_claimedItems(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type userProfileType", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_editUserProfile_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6192,6 +6426,78 @@ func (ec *executionContext) fieldContext_Query_isInverseNameIsAvailable(ctx cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_getUserProfileDetails(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getUserProfileDetails(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetUserProfileDetails(rctx, fc.Args["userName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.UserProfileType)
+	fc.Result = res
+	return ec.marshalOuserProfileType2ᚖinverseᚗsoᚋgraphᚋmodelᚐUserProfileType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getUserProfileDetails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "creatorID":
+				return ec.fieldContext_userProfileType_creatorID(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_userProfileType_thumbnail(ctx, field)
+			case "image":
+				return ec.fieldContext_userProfileType_image(ctx, field)
+			case "inverseUsername":
+				return ec.fieldContext_userProfileType_inverseUsername(ctx, field)
+			case "bio":
+				return ec.fieldContext_userProfileType_bio(ctx, field)
+			case "socials":
+				return ec.fieldContext_userProfileType_socials(ctx, field)
+			case "collections":
+				return ec.fieldContext_userProfileType_collections(ctx, field)
+			case "items":
+				return ec.fieldContext_userProfileType_items(ctx, field)
+			case "claimedItems":
+				return ec.fieldContext_userProfileType_claimedItems(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type userProfileType", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getUserProfileDetails_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_fetchClaimedItems(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_fetchClaimedItems(ctx, field)
 	if err != nil {
@@ -7402,6 +7708,129 @@ func (ec *executionContext) fieldContext_QuestionnaireType_questionType(ctx cont
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type QuestionType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Socials_twitter(ctx context.Context, field graphql.CollectedField, obj *model.Socials) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Socials_twitter(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Twitter, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Socials_twitter(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Socials",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Socials_instagram(ctx context.Context, field graphql.CollectedField, obj *model.Socials) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Socials_instagram(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Instagram, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Socials_instagram(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Socials",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Socials_github(ctx context.Context, field graphql.CollectedField, obj *model.Socials) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Socials_github(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Github, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Socials_github(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Socials",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9613,6 +10042,469 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _userProfileType_creatorID(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_creatorID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatorID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_creatorID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _userProfileType_thumbnail(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_thumbnail(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Thumbnail, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_thumbnail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _userProfileType_image(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_image(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Image, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_image(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _userProfileType_inverseUsername(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_inverseUsername(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.InverseUsername, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_inverseUsername(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _userProfileType_bio(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_bio(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Bio, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_bio(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _userProfileType_socials(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_socials(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Socials, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Socials)
+	fc.Result = res
+	return ec.marshalOSocials2ᚖinverseᚗsoᚋgraphᚋmodelᚐSocials(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_socials(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "twitter":
+				return ec.fieldContext_Socials_twitter(ctx, field)
+			case "instagram":
+				return ec.fieldContext_Socials_instagram(ctx, field)
+			case "github":
+				return ec.fieldContext_Socials_github(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Socials", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _userProfileType_collections(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_collections(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Collections, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Collection)
+	fc.Result = res
+	return ec.marshalOCollection2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐCollection(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_collections(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Collection_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Collection_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Collection_description(ctx, field)
+			case "image":
+				return ec.fieldContext_Collection_image(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Collection_thumbnail(ctx, field)
+			case "contractAddress":
+				return ec.fieldContext_Collection_contractAddress(ctx, field)
+			case "network":
+				return ec.fieldContext_Collection_network(ctx, field)
+			case "items":
+				return ec.fieldContext_Collection_items(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Collection", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _userProfileType_items(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_items(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Item)
+	fc.Result = res
+	return ec.marshalOItem2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
+			case "tweetLink":
+				return ec.fieldContext_Item_tweetLink(ctx, field)
+			case "profileLink":
+				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _userProfileType_claimedItems(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_claimedItems(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClaimedItems, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Item)
+	fc.Result = res
+	return ec.marshalOItem2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Item_ID(ctx, field)
+			case "name":
+				return ec.fieldContext_Item_name(ctx, field)
+			case "image":
+				return ec.fieldContext_Item_image(ctx, field)
+			case "description":
+				return ec.fieldContext_Item_description(ctx, field)
+			case "collectionId":
+				return ec.fieldContext_Item_collectionId(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "creator":
+				return ec.fieldContext_Item_creator(ctx, field)
+			case "authorizedSubdomains":
+				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
+			case "twitterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "telegramGroupTitle":
+				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
+			case "tweetLink":
+				return ec.fieldContext_Item_tweetLink(ctx, field)
+			case "profileLink":
+				return ec.fieldContext_Item_profileLink(ctx, field)
+			case "campaignName":
+				return ec.fieldContext_Item_campaignName(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Item_createdAt(ctx, field)
+			case "deadline":
+				return ec.fieldContext_Item_deadline(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Item_claimDetails(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
@@ -9846,6 +10738,71 @@ func (ec *executionContext) unmarshalInputDeploymentInfo(ctx context.Context, ob
 				return it, err
 			}
 			it.ContractAddress = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputEditUserProfileInputType(ctx context.Context, obj interface{}) (model.EditUserProfileInputType, error) {
+	var it model.EditUserProfileInputType
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"thumbnail", "image", "inverseUsername", "bio", "socials"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "thumbnail":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("thumbnail"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Thumbnail = data
+		case "image":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("image"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Image = data
+		case "inverseUsername":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("inverseUsername"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.InverseUsername = data
+		case "bio":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("bio"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Bio = data
+		case "socials":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("socials"))
+			data, err := ec.unmarshalOSocialsInput2ᚖinverseᚗsoᚋgraphᚋmodelᚐSocialsInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Socials = data
 		}
 	}
 
@@ -10539,6 +11496,53 @@ func (ec *executionContext) unmarshalInputSignerInfo(ctx context.Context, obj in
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSocialsInput(ctx context.Context, obj interface{}) (model.SocialsInput, error) {
+	var it model.SocialsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"twitter", "instagram", "github"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "twitter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("twitter"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Twitter = data
+		case "instagram":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("instagram"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Instagram = data
+		case "github":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("github"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Github = data
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -11174,6 +12178,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "editUserProfile":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_editUserProfile(ctx, field)
+			})
 		case "createCollection":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createCollection(ctx, field)
@@ -11478,6 +12486,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "getUserProfileDetails":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getUserProfileDetails(ctx, field)
 				return res
 			}
 
@@ -11829,6 +12856,46 @@ func (ec *executionContext) _QuestionnaireType(ctx context.Context, sel ast.Sele
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var socialsImplementors = []string{"Socials"}
+
+func (ec *executionContext) _Socials(ctx context.Context, sel ast.SelectionSet, obj *model.Socials) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, socialsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Socials")
+		case "twitter":
+			out.Values[i] = ec._Socials_twitter(ctx, field, obj)
+		case "instagram":
+			out.Values[i] = ec._Socials_instagram(ctx, field, obj)
+		case "github":
+			out.Values[i] = ec._Socials_github(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12357,6 +13424,58 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 	return out
 }
 
+var userProfileTypeImplementors = []string{"userProfileType"}
+
+func (ec *executionContext) _userProfileType(ctx context.Context, sel ast.SelectionSet, obj *model.UserProfileType) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, userProfileTypeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("userProfileType")
+		case "creatorID":
+			out.Values[i] = ec._userProfileType_creatorID(ctx, field, obj)
+		case "thumbnail":
+			out.Values[i] = ec._userProfileType_thumbnail(ctx, field, obj)
+		case "image":
+			out.Values[i] = ec._userProfileType_image(ctx, field, obj)
+		case "inverseUsername":
+			out.Values[i] = ec._userProfileType_inverseUsername(ctx, field, obj)
+		case "bio":
+			out.Values[i] = ec._userProfileType_bio(ctx, field, obj)
+		case "socials":
+			out.Values[i] = ec._userProfileType_socials(ctx, field, obj)
+		case "collections":
+			out.Values[i] = ec._userProfileType_collections(ctx, field, obj)
+		case "items":
+			out.Values[i] = ec._userProfileType_items(ctx, field, obj)
+		case "claimedItems":
+			out.Values[i] = ec._userProfileType_claimedItems(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
@@ -12484,6 +13603,11 @@ func (ec *executionContext) marshalNCreatorDetails2ᚖinverseᚗsoᚋgraphᚋmod
 
 func (ec *executionContext) unmarshalNDeploymentInfo2inverseᚗsoᚋgraphᚋmodelᚐDeploymentInfo(ctx context.Context, v interface{}) (model.DeploymentInfo, error) {
 	res, err := ec.unmarshalInputDeploymentInfo(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNEditUserProfileInputType2inverseᚗsoᚋgraphᚋmodelᚐEditUserProfileInputType(ctx context.Context, v interface{}) (model.EditUserProfileInputType, error) {
+	res, err := ec.unmarshalInputEditUserProfileInputType(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -13323,6 +14447,54 @@ func (ec *executionContext) marshalOClaimDetails2ᚖinverseᚗsoᚋgraphᚋmodel
 	return ec._ClaimDetails(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalOCollection2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐCollection(ctx context.Context, sel ast.SelectionSet, v []*model.Collection) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCollection2ᚖinverseᚗsoᚋgraphᚋmodelᚐCollection(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOCollection2ᚖinverseᚗsoᚋgraphᚋmodelᚐCollection(ctx context.Context, sel ast.SelectionSet, v *model.Collection) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Collection(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOCreateJWTTokenInput2ᚖinverseᚗsoᚋgraphᚋmodelᚐCreateJWTTokenInput(ctx context.Context, v interface{}) (*model.CreateJWTTokenInput, error) {
 	if v == nil {
 		return nil, nil
@@ -13438,6 +14610,54 @@ func (ec *executionContext) marshalOInteractionType2ᚖinverseᚗsoᚋgraphᚋmo
 	return v
 }
 
+func (ec *executionContext) marshalOItem2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v []*model.Item) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOItem2ᚖinverseᚗsoᚋgraphᚋmodelᚐItem(ctx context.Context, sel ast.SelectionSet, v *model.Item) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Item(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOMultiChoiceInputType2ᚕᚖinverseᚗsoᚋgraphᚋmodelᚐMultiChoiceInputTypeᚄ(ctx context.Context, v interface{}) ([]*model.MultiChoiceInputType, error) {
 	if v == nil {
 		return nil, nil
@@ -13476,6 +14696,21 @@ func (ec *executionContext) unmarshalOOpenEndedInputType2ᚕᚖinverseᚗsoᚋgr
 		}
 	}
 	return res, nil
+}
+
+func (ec *executionContext) marshalOSocials2ᚖinverseᚗsoᚋgraphᚋmodelᚐSocials(ctx context.Context, sel ast.SelectionSet, v *model.Socials) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Socials(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOSocialsInput2ᚖinverseᚗsoᚋgraphᚋmodelᚐSocialsInput(ctx context.Context, v interface{}) (*model.SocialsInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputSocialsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
@@ -13755,6 +14990,13 @@ func (ec *executionContext) marshalO__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 		return graphql.Null
 	}
 	return ec.___Type(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOuserProfileType2ᚖinverseᚗsoᚋgraphᚋmodelᚐUserProfileType(ctx context.Context, sel ast.SelectionSet, v *model.UserProfileType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._userProfileType(ctx, sel, v)
 }
 
 // endregion ***************************** type.gotpl *****************************

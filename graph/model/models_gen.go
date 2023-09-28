@@ -66,6 +66,14 @@ type DeploymentInfo struct {
 	ContractAddress *string `json:"contractAddress,omitempty"`
 }
 
+type EditUserProfileInputType struct {
+	Thumbnail       *string       `json:"thumbnail,omitempty"`
+	Image           *string       `json:"image,omitempty"`
+	InverseUsername *string       `json:"inverseUsername,omitempty"`
+	Bio             *string       `json:"bio,omitempty"`
+	Socials         *SocialsInput `json:"socials,omitempty"`
+}
+
 type EmailClaimInput struct {
 	ItemID       string `json:"itemID"`
 	EmailAddress string `json:"emailAddress"`
@@ -216,6 +224,18 @@ type SignerInfo struct {
 	Provider  SignerProvider `json:"provider"`
 }
 
+type Socials struct {
+	Twitter   *string `json:"twitter,omitempty"`
+	Instagram *string `json:"instagram,omitempty"`
+	Github    *string `json:"github,omitempty"`
+}
+
+type SocialsInput struct {
+	Twitter   *string `json:"twitter,omitempty"`
+	Instagram *string `json:"instagram,omitempty"`
+	Github    *string `json:"github,omitempty"`
+}
+
 type StartEmailVerificationResponse struct {
 	OtpRequestID string `json:"otpRequestID"`
 }
@@ -236,6 +256,18 @@ type UserDetails struct {
 type ValidationRespoonse struct {
 	Valid  bool    `json:"valid"`
 	PassID *string `json:"passID,omitempty"`
+}
+
+type UserProfileType struct {
+	CreatorID       *string       `json:"creatorID,omitempty"`
+	Thumbnail       *string       `json:"thumbnail,omitempty"`
+	Image           *string       `json:"image,omitempty"`
+	InverseUsername *string       `json:"inverseUsername,omitempty"`
+	Bio             *string       `json:"bio,omitempty"`
+	Socials         *Socials      `json:"socials,omitempty"`
+	Collections     []*Collection `json:"collections,omitempty"`
+	Items           []*Item       `json:"items,omitempty"`
+	ClaimedItems    []*Item       `json:"claimedItems,omitempty"`
 }
 
 type AiImageStyle string
