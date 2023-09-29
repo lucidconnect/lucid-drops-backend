@@ -3,6 +3,7 @@ package onboarding
 import (
 	"inverse.so/engine"
 	"inverse.so/graph/model"
+	"inverse.so/internal"
 )
 
 func FetchItemCreatorByCollectionId(collectionID string) (*model.CreatorDetails, error) {
@@ -17,4 +18,48 @@ func FetchItemCreatorByCollectionId(collectionID string) (*model.CreatorDetails,
 		return nil, err
 	}
 	return creator.ToGraphData(), nil
+}
+
+func EditUserProfile(input model.EditUserProfileInputType, authDetails *internal.AuthDetails) (*model.UserProfileType, error) {
+	creator, err := engine.GetCreatorByAddress(authDetails.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	if input.InverseUsername != nil {
+		creator.InverseUsername = input.InverseUsername
+	}
+
+	if input.Bio != nil {
+		creator.Bio = input.Bio
+	}
+
+	if input.Image != nil {
+		creator.Image = input.Image
+	}
+
+	if input.Thumbnail != nil {
+		creator.Thumbnail = input.Thumbnail
+	}
+
+	if input.Socials != nil {
+		if input.Socials.Twitter != nil {
+			creator.Twitter = input.Socials.Twitter
+		}
+
+		if input.Socials.Instagram != nil {
+			creator.Instagram = input.Socials.Instagram
+		}
+
+		if input.Socials.Github != nil {
+			creator.Github = input.Socials.Github
+		}
+	}
+
+	err = engine.SaveModel(creator)
+	if err != nil {
+		return nil, err
+	}
+
+	return creator.CreatorToProfileData(), nil
 }

@@ -61,7 +61,13 @@ func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input mo
 
 // EditUserProfile is the resolver for the editUserProfile field.
 func (r *mutationResolver) EditUserProfile(ctx context.Context, input model.EditUserProfileInputType) (*model.UserProfileType, error) {
-	panic(fmt.Errorf("not implemented: EditUserProfile - editUserProfile"))
+
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return onboarding.EditUserProfile(input, authenticationDetails)
 }
 
 // CreateCollection is the resolver for the createCollection field.
