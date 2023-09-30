@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -53,7 +52,6 @@ func keyFunc(token *jwt.Token) (interface{}, error) {
 
 	// https://pkg.go.dev/github.com/dgrijalva/jwt-go#ParseECPublicKeyFromPEM
 	verificationKey := fmt.Sprint(os.Getenv("PRIVY_VERIFICATION_KEY"))
-	log.Println(verificationKey)
 	// 	verificationKey := `-----BEGIN PUBLIC KEY-----
 	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHNoGaXIavvTyGZjULmXXD2TZnxnR5qJI/U0vodti4LmOdX9kNg1+ioQp1MGtEJUww/FD10RaV+NFqCtp77kHHw==
 	// -----END PUBLIC KEY-----`
@@ -92,7 +90,31 @@ func UserAuthMiddleWare() func(http.Handler) http.Handler {
 				jwtToken := authHeader
 
 				contextMap["authHeader"] = jwtToken
-				contextMap["provider"] = "privy"
+
+				jwtParts := strings.Split(contextMap["authHeader"].(string), ".")
+				if len(jwtParts) != 3 {
+					next.ServeHTTP(w, r)
+					return
+				}
+
+				type MiniInfo struct {
+					Iss string `json:"iss"`
+				}
+				metadata := &MiniInfo{}
+
+				rawDecodedText, _ := base64.RawStdEncoding.DecodeString(jwtParts[1])
+				err := json.Unmarshal([]byte(rawDecodedText), metadata)
+				if err != nil {
+					next.ServeHTTP(w, r)
+					return
+				}
+
+				if metadata.Iss == "https://api-auth.web3auth.io" {
+					contextMap["provider"] = "web3Auth"
+				} else {
+					contextMap["provider"] = "privy"
+				}
+
 				ctx := context.WithValue(r.Context(), userAuthToken, contextMap)
 				next.ServeHTTP(w, r.WithContext(ctx))
 
