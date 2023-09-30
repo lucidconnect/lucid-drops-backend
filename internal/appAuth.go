@@ -6,10 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/golang-jwt/jwt"
 	"inverse.so/services"
 )
 
@@ -19,6 +22,48 @@ type contextKey struct {
 
 type AuthDetails struct {
 	Address common.Address
+}
+
+type PrivyClaims struct {
+	AppId      string `json:"aud,omitempty"`
+	Expiration uint64 `json:"exp,omitempty"`
+	Issuer     string `json:"iss,omitempty"`
+	UserId     string `json:"sub,omitempty"`
+}
+
+func (c *PrivyClaims) Valid() error {
+	if c.AppId != os.Getenv("PRIVY_APP_ID") {
+		return errors.New("aud claim must be your Privy App ID")
+	}
+	if c.Issuer != "privy.io" {
+		return errors.New("iss claim must be 'privy.io'")
+	}
+	// 🤡 TODO add token expires after testing
+	// if c.Expiration < uint64(time.Now().Unix()) {
+	// 	return errors.New("token is expired")
+	// }
+
+	return nil
+}
+
+func keyFunc(token *jwt.Token) (interface{}, error) {
+	if token.Method.Alg() != "ES256" {
+		return nil, fmt.Errorf("unexpected JWT signing method=%v", token.Header["alg"])
+	}
+
+	// https://pkg.go.dev/github.com/dgrijalva/jwt-go#ParseECPublicKeyFromPEM
+	verificationKey := fmt.Sprint(os.Getenv("PRIVY_VERIFICATION_KEY"))
+	log.Println(verificationKey)
+	// 	verificationKey := `-----BEGIN PUBLIC KEY-----
+	// MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEHNoGaXIavvTyGZjULmXXD2TZnxnR5qJI/U0vodti4LmOdX9kNg1+ioQp1MGtEJUww/FD10RaV+NFqCtp77kHHw==
+	// -----END PUBLIC KEY-----`
+
+	pk, err := jwt.ParseECPublicKeyFromPEM([]byte(verificationKey))
+	if err != nil {
+		return err, nil
+	}
+
+	return pk, nil
 }
 
 var (
@@ -47,7 +92,7 @@ func UserAuthMiddleWare() func(http.Handler) http.Handler {
 				jwtToken := authHeader
 
 				contextMap["authHeader"] = jwtToken
-				contextMap["provider"] = "web3Auth"
+				contextMap["provider"] = "privy"
 				ctx := context.WithValue(r.Context(), userAuthToken, contextMap)
 				next.ServeHTTP(w, r.WithContext(ctx))
 
@@ -62,7 +107,6 @@ func UserAuthMiddleWare() func(http.Handler) http.Handler {
 }
 
 func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, err error) {
-
 	claims, ok := ctx.Value(userAuthToken).(map[string]interface{})
 	if !ok {
 		return nil, errors.New("jwt claims not found in context")
@@ -75,6 +119,33 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 
 	var info AuthDetails
 	switch provider {
+	case "privy":
+		var c PrivyClaims
+
+		token, err := jwt.ParseWithClaims(claims["authHeader"].(string), &c, keyFunc)
+		if err != nil {
+			return nil, err
+		}
+
+		// Parse the JWT claims into our custom struct
+		privyClaim, ok := token.Claims.(*PrivyClaims)
+		if !ok {
+			fmt.Println("JWT does not have all the necessary claims.")
+		}
+
+		// Check the JWT claims
+		err = c.Valid()
+		if err != nil {
+			return nil, err
+		}
+
+		privyWallet, err := GetPrivyWalletsFromSubKey(privyClaim.UserId)
+		if err != nil {
+			return nil, err
+		}
+
+		info.Address = *privyWallet
+
 	case "web3Auth":
 		jwtParts := strings.Split(claims["authHeader"].(string), ".")
 		rawDecodedText, _ := base64.RawStdEncoding.DecodeString(jwtParts[1])
