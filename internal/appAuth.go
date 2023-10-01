@@ -32,8 +32,9 @@ type PrivyClaims struct {
 
 func (c *PrivyClaims) Valid() error {
 	if c.AppId != os.Getenv("PRIVY_APP_ID") {
-		return errors.New("aud claim must be your Privy App ID")
+		return fmt.Errorf("aud claim must be your Privy App ID its currently (%s)", os.Getenv("PRIVY_APP_ID"))
 	}
+
 	if c.Issuer != "privy.io" {
 		return errors.New("iss claim must be 'privy.io'")
 	}
