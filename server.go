@@ -97,7 +97,7 @@ func SetupCronJobs() {
 	)
 
 	c.AddFunc("@every 0h0m15s", func() { jobs.VerifyItemTokenIDs() })
-	c.AddFunc("@every 0h0m10s", func() { jobs.FillOutContractAddresses() })
+	c.AddFunc("@every 0h0m3s", func() { jobs.FillOutContractAddresses() })
 	c.Start()
 }
 
