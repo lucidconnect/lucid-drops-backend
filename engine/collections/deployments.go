@@ -124,15 +124,19 @@ func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.Depl
 
 	collection.AAWalletDeploymentHash = &input.DeploymentHash
 
-	// Introduce an artificial delay for before fethcing the actual contract address
-	time.Sleep(time.Second * 3)
+	if input.ContractAddress == nil {
+		// Introduce an artificial delay for before fethcing the actual contract address
+		time.Sleep(time.Second * 3)
 
-	contractAdddress, err := GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
-	if err != nil {
-		log.Err(err)
+		contractAdddress, err := GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
+		if err != nil {
+			log.Err(err)
+		}
+
+		collection.AAContractAddress = contractAdddress
+	} else {
+		collection.AAContractAddress = input.ContractAddress
 	}
-
-	collection.AAContractAddress = contractAdddress
 
 	err = engine.SaveModel(collection)
 	if err != nil {
