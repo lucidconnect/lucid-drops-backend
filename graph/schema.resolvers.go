@@ -334,12 +334,8 @@ func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input mode
 
 // GetUserProfileDetails is the resolver for the getUserProfileDetails field.
 func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName string) (*model.UserProfileType, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
 
-	profileData, err := engine.GetUserProfileDetails(userName)
+	profileData, address,  err := engine.GetUserProfileDetails(userName)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
@@ -364,7 +360,7 @@ func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName stri
 		allItems = append(allItems, items...)
 	}
 
-	claimedItems, err := claimers.FetchClaimedItems(authenticationDetails.Address.String())
+	claimedItems, err := claimers.FetchClaimedItems(*address)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
