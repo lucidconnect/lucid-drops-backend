@@ -61,7 +61,6 @@ func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input mo
 
 // EditUserProfile is the resolver for the editUserProfile field.
 func (r *mutationResolver) EditUserProfile(ctx context.Context, input model.EditUserProfileInputType) (*model.UserProfileType, error) {
-
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
@@ -334,8 +333,7 @@ func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input mode
 
 // GetUserProfileDetails is the resolver for the getUserProfileDetails field.
 func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName string) (*model.UserProfileType, error) {
-
-	profileData, address,  err := engine.GetUserProfileDetails(userName)
+	profileData, address, err := engine.GetUserProfileDetails(userName)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}

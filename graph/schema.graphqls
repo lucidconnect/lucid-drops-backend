@@ -231,6 +231,7 @@ type JWTCreationResponse{
 
 type Collection {
   ID: ID!
+  creatorID: String!
 	name: String!
 	description: String!
 	image: String!

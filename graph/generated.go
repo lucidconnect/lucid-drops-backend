@@ -56,6 +56,7 @@ type ComplexityRoot struct {
 
 	Collection struct {
 		ContractAddress func(childComplexity int) int
+		CreatorID       func(childComplexity int) int
 		Description     func(childComplexity int) int
 		ID              func(childComplexity int) int
 		Image           func(childComplexity int) int
@@ -326,6 +327,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Collection.ContractAddress(childComplexity), true
+
+	case "Collection.creatorID":
+		if e.complexity.Collection.CreatorID == nil {
+			break
+		}
+
+		return e.complexity.Collection.CreatorID(childComplexity), true
 
 	case "Collection.description":
 		if e.complexity.Collection.Description == nil {
@@ -2352,6 +2360,50 @@ func (ec *executionContext) fieldContext_Collection_ID(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Collection_creatorID(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Collection_creatorID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatorID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Collection_creatorID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Collection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Collection_name(ctx context.Context, field graphql.CollectedField, obj *model.Collection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Collection_name(ctx, field)
 	if err != nil {
@@ -4334,6 +4386,8 @@ func (ec *executionContext) fieldContext_Mutation_createCollection(ctx context.C
 			switch field.Name {
 			case "ID":
 				return ec.fieldContext_Collection_ID(ctx, field)
+			case "creatorID":
+				return ec.fieldContext_Collection_creatorID(ctx, field)
 			case "name":
 				return ec.fieldContext_Collection_name(ctx, field)
 			case "description":
@@ -4407,6 +4461,8 @@ func (ec *executionContext) fieldContext_Mutation_updateCollection(ctx context.C
 			switch field.Name {
 			case "ID":
 				return ec.fieldContext_Collection_ID(ctx, field)
+			case "creatorID":
+				return ec.fieldContext_Collection_creatorID(ctx, field)
 			case "name":
 				return ec.fieldContext_Collection_name(ctx, field)
 			case "description":
@@ -4480,6 +4536,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteCollection(ctx context.C
 			switch field.Name {
 			case "ID":
 				return ec.fieldContext_Collection_ID(ctx, field)
+			case "creatorID":
+				return ec.fieldContext_Collection_creatorID(ctx, field)
 			case "name":
 				return ec.fieldContext_Collection_name(ctx, field)
 			case "description":
@@ -6628,6 +6686,8 @@ func (ec *executionContext) fieldContext_Query_fetchCollectionById(ctx context.C
 			switch field.Name {
 			case "ID":
 				return ec.fieldContext_Collection_ID(ctx, field)
+			case "creatorID":
+				return ec.fieldContext_Collection_creatorID(ctx, field)
 			case "name":
 				return ec.fieldContext_Collection_name(ctx, field)
 			case "description":
@@ -6701,6 +6761,8 @@ func (ec *executionContext) fieldContext_Query_fetchCreatorCollections(ctx conte
 			switch field.Name {
 			case "ID":
 				return ec.fieldContext_Collection_ID(ctx, field)
+			case "creatorID":
+				return ec.fieldContext_Collection_creatorID(ctx, field)
 			case "name":
 				return ec.fieldContext_Collection_name(ctx, field)
 			case "description":
@@ -7327,6 +7389,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedCollections(ctx cont
 			switch field.Name {
 			case "ID":
 				return ec.fieldContext_Collection_ID(ctx, field)
+			case "creatorID":
+				return ec.fieldContext_Collection_creatorID(ctx, field)
 			case "name":
 				return ec.fieldContext_Collection_name(ctx, field)
 			case "description":
@@ -10334,6 +10398,8 @@ func (ec *executionContext) fieldContext_userProfileType_collections(ctx context
 			switch field.Name {
 			case "ID":
 				return ec.fieldContext_Collection_ID(ctx, field)
+			case "creatorID":
+				return ec.fieldContext_Collection_creatorID(ctx, field)
 			case "name":
 				return ec.fieldContext_Collection_name(ctx, field)
 			case "description":
@@ -11604,6 +11670,11 @@ func (ec *executionContext) _Collection(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = graphql.MarshalString("Collection")
 		case "ID":
 			out.Values[i] = ec._Collection_ID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "creatorID":
+			out.Values[i] = ec._Collection_creatorID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

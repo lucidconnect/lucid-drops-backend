@@ -87,6 +87,7 @@ type DeplyomenResponse struct {
 func (c *Collection) ToGraphData() *model.Collection {
 	mappedCollection := &model.Collection{
 		ID:              c.ID.String(),
+		CreatorID:       c.CreatorID.String(),
 		Name:            c.Name,
 		Description:     c.Description,
 		Image:           c.Image,
