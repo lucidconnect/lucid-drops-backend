@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
+	"inverse.so/jobs"
 	"inverse.so/models"
 	"inverse.so/utils"
 )
@@ -54,7 +55,7 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 		client := &http.Client{}
 
 		if collection.AAContractAddress == nil {
-			log.Println("🪼TODO ADD SUPPORT FOR QUEING")
+			log.Info().Msg("🪼TODO ADD SUPPORT FOR QUEING")
 			return
 		}
 
@@ -79,6 +80,27 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 		if err != nil {
 			fmt.Println(err)
 			return
+		}
+
+		if res.StatusCode == http.StatusOK {
+			go func() {
+				tokenID, err := jobs.FetchTokenUri(*collection.AAContractAddress, newItem.ID.String())
+				if err != nil {
+					return
+				}
+
+				if tokenID == nil {
+					log.Info().Msgf("🚨 Token ID not found for Item %s", newItem.ID)
+					return
+				}
+
+				tokenIDint64 := int64(*tokenID)
+				newItem.TokenID = &tokenIDint64
+				err = engine.SaveModel(&newItem)
+				if err != nil {
+					log.Error().Msg(err.Error())
+				}
+			}()
 		}
 
 		defer res.Body.Close()
@@ -252,7 +274,7 @@ func SetItemClaimDeadline(itemID string, deadline string) (*model.Item, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	item.ClaimDeadline = &dateForrmatted
 	err = engine.SaveModel(item)
 	if err != nil {

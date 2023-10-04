@@ -34,7 +34,7 @@ func VerifyItemTokenIDs() {
 			continue
 		}
 
-		tokenID, err := fetchTokenUri(*collection.AAContractAddress, item.ID.String())
+		tokenID, err := FetchTokenUri(*collection.AAContractAddress, item.ID.String())
 		if err != nil {
 			log.Error().Msg(err.Error())
 			continue
@@ -64,7 +64,7 @@ func fetchItemsWithUnresolvedTokenIDs() (*[]models.Item, error) {
 	return &items, nil
 }
 
-func fetchTokenUri(contractAddress, itemID string) (*int, error) {
+func FetchTokenUri(contractAddress, itemID string) (*int, error) {
 
 	inverseAPIBaseURL := "https://inverse-prod.onrender.com"
 	rpcProvider := "https://polygon-mainnet.infura.io/v3/022bed77e57c4bcfae626a7f8bcf44de"
@@ -82,8 +82,8 @@ func fetchTokenUri(contractAddress, itemID string) (*int, error) {
 	}
 
 	opts := &bind.CallOpts{}
+	// TODO make counter more dynamic
 	for i := 1; i <= 10; i++ {
-
 		expectedURI := fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, contractAddress, itemID)
 		integer := big.NewInt(int64(i))
 		uri, err := x.Uri(opts, integer)
