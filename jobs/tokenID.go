@@ -67,7 +67,7 @@ func fetchItemsWithUnresolvedTokenIDs() (*[]models.Item, error) {
 func FetchTokenUri(contractAddress, itemID string) (*int, error) {
 
 	inverseAPIBaseURL := "https://inverse-prod.onrender.com"
-	rpcProvider := "https://polygon-mainnet.infura.io/v3/022bed77e57c4bcfae626a7f8bcf44de"
+	rpcProvider := "https://polygon-mainnet.g.alchemy.com/v2/ay1nWdnN3kgnXSKHAdJxUq8-qElvSngM"
 	client, err := ethclient.Dial(rpcProvider)
 	if err != nil {
 		log.Error().Msg(err.Error())
