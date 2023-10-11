@@ -82,9 +82,14 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 			return
 		}
 
+		var isBase bool
+		if collection.BlockchainNetwork != nil {
+			isBase = *collection.BlockchainNetwork == model.BlockchainNetworkBase
+		}
+
 		if res.StatusCode == http.StatusOK {
 			go func() {
-				tokenID, err := jobs.FetchTokenUri(*collection.AAContractAddress, newItem.ID.String())
+				tokenID, err := jobs.FetchTokenUri(*collection.AAContractAddress, newItem.ID.String(), isBase)
 				if err != nil {
 					return
 				}
