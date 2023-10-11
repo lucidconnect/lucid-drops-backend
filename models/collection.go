@@ -16,6 +16,7 @@ type Collection struct {
 	AAContractAddress      *string
 	TransactionHash        *string
 	AAWalletDeploymentHash *string
+	BlockchainNetwork      *model.BlockchainNetwork
 	Featured               bool `gorm:"default:false"`
 }
 
@@ -88,11 +89,13 @@ func (c *Collection) ToGraphData() *model.Collection {
 	mappedCollection := &model.Collection{
 		ID:              c.ID.String(),
 		CreatorID:       c.CreatorID.String(),
+		CreatedAt:       c.CreatedAt,
 		Name:            c.Name,
 		Description:     c.Description,
 		Image:           c.Image,
 		Thumbnail:       c.Thumbnail,
 		ContractAddress: c.AAContractAddress,
+		Network:         c.BlockchainNetwork,
 	}
 
 	if c.AAContractAddress != nil {

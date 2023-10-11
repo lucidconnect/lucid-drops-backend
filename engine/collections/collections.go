@@ -25,12 +25,13 @@ func CreateCollection(input *model.CollectionInput, authDetails *internal.AuthDe
 	}
 
 	newCollection := &models.Collection{
-		CreatorID:      creator.ID,
-		CreatorAddress: aaSigerInfo.WalletAddress,
-		Name:           *input.Name,
-		Image:          *input.Image,
-		Thumbnail:      *input.Thumbnail,
-		Description:    *input.Description,
+		CreatorID:         creator.ID,
+		CreatorAddress:    aaSigerInfo.WalletAddress,
+		Name:              *input.Name,
+		Image:             *input.Image,
+		Thumbnail:         *input.Thumbnail,
+		Description:       *input.Description,
+		BlockchainNetwork: input.Network,
 	}
 
 	err = engine.CreateModel(newCollection)

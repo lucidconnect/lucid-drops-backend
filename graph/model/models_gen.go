@@ -18,6 +18,7 @@ type ClaimDetails struct {
 type Collection struct {
 	ID              string             `json:"ID"`
 	CreatorID       string             `json:"creatorID"`
+	CreatedAt       time.Time          `json:"createdAt"`
 	Name            string             `json:"name"`
 	Description     string             `json:"description"`
 	Image           string             `json:"image"`

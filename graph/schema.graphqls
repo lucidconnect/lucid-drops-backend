@@ -232,6 +232,7 @@ type JWTCreationResponse{
 type Collection {
   ID: ID!
   creatorID: String!
+  createdAt: Time!
 	name: String!
 	description: String!
 	image: String!
@@ -390,5 +391,3 @@ enum BlockchainNetwork {
   base
   polygon
 }
-
-
