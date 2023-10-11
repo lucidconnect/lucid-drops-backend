@@ -11,6 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"inverse.so/dbutils"
 	"inverse.so/engine"
+	"inverse.so/graph/model"
 	"inverse.so/mintwatcher"
 	"inverse.so/models"
 )
@@ -34,7 +35,12 @@ func VerifyItemTokenIDs() {
 			continue
 		}
 
-		tokenID, err := FetchTokenUri(*collection.AAContractAddress, item.ID.String())
+		var isBase bool
+		if collection.BlockchainNetwork != nil {
+			isBase = *collection.BlockchainNetwork == model.BlockchainNetworkBase
+		}
+		
+		tokenID, err := FetchTokenUri(*collection.AAContractAddress, item.ID.String(), isBase)
 		if err != nil {
 			log.Error().Msg(err.Error())
 			continue
@@ -64,10 +70,14 @@ func fetchItemsWithUnresolvedTokenIDs() (*[]models.Item, error) {
 	return &items, nil
 }
 
-func FetchTokenUri(contractAddress, itemID string) (*int, error) {
+func FetchTokenUri(contractAddress, itemID string, isBase bool) (*int, error) {
 
 	inverseAPIBaseURL := "https://inverse-prod.onrender.com"
 	rpcProvider := "https://polygon-mainnet.g.alchemy.com/v2/ay1nWdnN3kgnXSKHAdJxUq8-qElvSngM"
+	if isBase {
+		rpcProvider = "https://base-mainnet.g.alchemy.com/v2/bQBUCmzXkksxrIX3JKYxfGr-FzsHFRwP"
+	}
+	
 	client, err := ethclient.Dial(rpcProvider)
 	if err != nil {
 		log.Error().Msg(err.Error())
