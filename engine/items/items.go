@@ -59,9 +59,10 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 			return
 		}
 
-		itemData, err := json.Marshal(map[string]string{
+		itemData, err := json.Marshal(map[string]interface{}{
 			"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *collection.AAContractAddress, newItem.ID.String()),
 			"contractAddress": *collection.AAContractAddress,
+			"Network":         collection.BlockchainNetwork,
 		})
 
 		if err != nil {
