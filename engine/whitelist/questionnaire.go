@@ -238,6 +238,7 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 		ItemId:                    itemID,
 		ItemIdOnContract:          *item.TokenID,
 		CollectionContractAddress: smartContractAddress,
+		BlockchainNetwork:         collection.BlockchainNetwork,
 	}
 
 	err = dbutils.DB.Create(&newMint).Error

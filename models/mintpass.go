@@ -15,6 +15,7 @@ type MintPass struct {
 
 	ItemIdOnContract          int64
 	CollectionContractAddress string
+	BlockchainNetwork         *model.BlockchainNetwork `gorm:"default:base"`
 }
 
 func (m *MintPass) ToGraphData() *model.ClaimDetails {

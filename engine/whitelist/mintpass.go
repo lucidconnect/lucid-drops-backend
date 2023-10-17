@@ -56,6 +56,7 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		ItemId:                    item.ID.String(),
 		ItemIdOnContract:          *item.TokenID,
 		CollectionContractAddress: *collection.AAContractAddress,
+		BlockchainNetwork:         collection.BlockchainNetwork,
 	}
 
 	err = dbutils.DB.Create(&newMint).Error

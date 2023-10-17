@@ -48,6 +48,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model
 			"receiptientAddresses": []string{input.ClaimingAddress},
 			"items":                []int64{mintPass.ItemIdOnContract},
 			"contractAddress":      mintPass.CollectionContractAddress,
+			"Network":              mintPass.BlockchainNetwork,
 		})
 
 		if err != nil {

@@ -131,6 +131,7 @@ func createMintPassForTelegramMint(item *models.Item) (*string, error) {
 		ItemId:                    item.ID.String(),
 		ItemIdOnContract:          *item.TokenID,
 		CollectionContractAddress: *collection.AAContractAddress,
+		BlockchainNetwork:         collection.BlockchainNetwork,
 	}
 
 	err = dbutils.DB.Create(&newMint).Error
