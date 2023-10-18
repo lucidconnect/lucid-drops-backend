@@ -46,6 +46,7 @@ type Mutation {
 
   createQuestionnaireCriteriaForItem( input:QuestionnaireCriteriaInput!): Item!
   createEmailWhitelistForItem(input: NewEmailWhitelistInput!): Item!
+  createWalletAddressWhitelistForItem(input: NewWalletAddressWhitelistInput!): Item!
   createEmailDomainWhitelist(input: NewEmailDomainWhitelistInput!): Item!
   createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
   createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
@@ -79,6 +80,11 @@ input CreateJWTTokenInput{
 input NewEmailWhitelistInput {
   itemID: String!
   authorizedEmails: [String!]!
+}
+
+input NewWalletAddressWhitelistInput {
+  itemID: String!
+  authorizedWalletAddresses: [String!]!
 }
 
 input QuestionnaireCriteriaInput {
@@ -353,6 +359,7 @@ enum ClaimCriteriaType{
   directAnswerQuestionnaire
   mutliChoiceQuestionnaire
   emptyCriteria
+  walletAddress
 }
 
 enum AiImageStyle{

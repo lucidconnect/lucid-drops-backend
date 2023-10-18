@@ -77,6 +77,7 @@ func SetupDB(dsn string) *gorm.DB {
 		&models.PatreonAuthDetails{},
 		&models.MultiChoiceCriteria{},
 		&models.DirectAnswerCriteria{},
+		&models.WalletAddressClaim{},
 	)
 
 	return DB

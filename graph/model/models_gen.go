@@ -190,6 +190,11 @@ type NewUsernameRegisgration struct {
 	InverseUsername string `json:"inverseUsername"`
 }
 
+type NewWalletAddressWhitelistInput struct {
+	ItemID                    string   `json:"itemID"`
+	AuthorizedWalletAddresses []string `json:"authorizedWalletAddresses"`
+}
+
 type OnboardingProgress struct {
 	Creator                  *CreatorDetails `json:"creator,omitempty"`
 	RegisterdInverseUsername bool            `json:"registerdInverseUsername"`
@@ -384,6 +389,7 @@ const (
 	ClaimCriteriaTypeDirectAnswerQuestionnaire ClaimCriteriaType = "directAnswerQuestionnaire"
 	ClaimCriteriaTypeMutliChoiceQuestionnaire  ClaimCriteriaType = "mutliChoiceQuestionnaire"
 	ClaimCriteriaTypeEmptyCriteria             ClaimCriteriaType = "emptyCriteria"
+	ClaimCriteriaTypeWalletAddress             ClaimCriteriaType = "walletAddress"
 )
 
 var AllClaimCriteriaType = []ClaimCriteriaType{
@@ -396,11 +402,12 @@ var AllClaimCriteriaType = []ClaimCriteriaType{
 	ClaimCriteriaTypeDirectAnswerQuestionnaire,
 	ClaimCriteriaTypeMutliChoiceQuestionnaire,
 	ClaimCriteriaTypeEmptyCriteria,
+	ClaimCriteriaTypeWalletAddress,
 }
 
 func (e ClaimCriteriaType) IsValid() bool {
 	switch e {
-	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire, ClaimCriteriaTypeEmptyCriteria:
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire, ClaimCriteriaTypeEmptyCriteria, ClaimCriteriaTypeWalletAddress:
 		return true
 	}
 	return false

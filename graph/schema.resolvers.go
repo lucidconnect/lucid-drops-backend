@@ -159,6 +159,11 @@ func (r *mutationResolver) CreateEmailWhitelistForItem(ctx context.Context, inpu
 	return whitelist.CreateEmailWhitelistForItem(&input, authenticationDetails)
 }
 
+// CreateWalletAddressWhitelistForItem is the resolver for the createWalletAddressWhitelistForItem field.
+func (r *mutationResolver) CreateWalletAddressWhitelistForItem(ctx context.Context, input model.NewWalletAddressWhitelistInput) (*model.Item, error) {
+	panic(fmt.Errorf("not implemented: CreateWalletAddressWhitelistForItem - createWalletAddressWhitelistForItem"))
+}
+
 // CreateEmailDomainWhitelist is the resolver for the createEmailDomainWhitelist field.
 func (r *mutationResolver) CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
