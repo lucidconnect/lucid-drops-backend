@@ -251,6 +251,15 @@ func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, i
 	return whitelist.ValidatePatreonCriteriaForItem(itemID, authID)
 }
 
+// ValidateWalletCriteriaForItem is the resolver for the validateWalletCriteriaForItem field.
+func (r *mutationResolver) ValidateWalletCriteriaForItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error) {
+	if walletAddress == "" {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "wallet address is required", ctx)
+	}
+
+	return whitelist.ValidateAddressCriteria(itemID, walletAddress, nil)
+}
+
 // ValidateQuestionnaireCriteriaForItem is the resolver for the validateQuestionnaireCriteriaForItem field.
 func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
 	return whitelist.ValidateQuestionnaireCriteriaForItem(itemID, input)

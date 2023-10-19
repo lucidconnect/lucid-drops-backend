@@ -155,6 +155,7 @@ type ComplexityRoot struct {
 		ValidateQuestionnaireCriteriaForItem func(childComplexity int, itemID string, input []*model.QuestionnaireAnswerInput) int
 		ValidateTelegramCriteriaForItem      func(childComplexity int, itemID string, authID *string) int
 		ValidateTwitterCriteriaForItem       func(childComplexity int, itemID string, authID *string) int
+		ValidateWalletCriteriaForItem        func(childComplexity int, itemID string, walletAddress string) int
 	}
 
 	OnboardingProgress struct {
@@ -259,6 +260,7 @@ type MutationResolver interface {
 	ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
 	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
 	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
+	ValidateWalletCriteriaForItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error)
 	ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error)
 	CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error)
 	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
@@ -974,6 +976,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ValidateTwitterCriteriaForItem(childComplexity, args["itemID"].(string), args["authID"].(*string)), true
+
+	case "Mutation.validateWalletCriteriaForItem":
+		if e.complexity.Mutation.ValidateWalletCriteriaForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_validateWalletCriteriaForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ValidateWalletCriteriaForItem(childComplexity, args["itemID"].(string), args["walletAddress"].(string)), true
 
 	case "OnboardingProgress.creator":
 		if e.complexity.OnboardingProgress.Creator == nil {
@@ -1977,6 +1991,30 @@ func (ec *executionContext) field_Mutation_validateTwitterCriteriaForItem_args(c
 		}
 	}
 	args["authID"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_validateWalletCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["itemID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["itemID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["walletAddress"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("walletAddress"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["walletAddress"] = arg1
 	return args, nil
 }
 
@@ -5952,6 +5990,64 @@ func (ec *executionContext) fieldContext_Mutation_validatePatreonCriteriaForItem
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_validatePatreonCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_validateWalletCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_validateWalletCriteriaForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ValidateWalletCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["walletAddress"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ValidationRespoonse)
+	fc.Result = res
+	return ec.marshalOValidationRespoonse2ᚖinverseᚗsoᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_validateWalletCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "valid":
+				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
+			case "passID":
+				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_validateWalletCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -12601,6 +12697,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "validatePatreonCriteriaForItem":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_validatePatreonCriteriaForItem(ctx, field)
+			})
+		case "validateWalletCriteriaForItem":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_validateWalletCriteriaForItem(ctx, field)
 			})
 		case "validateQuestionnaireCriteriaForItem":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {

@@ -56,6 +56,7 @@ type Mutation {
   validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validatePatreonCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
+  validateWalletCriteriaForItem(itemID: String!, walletAddress: String!): ValidationRespoonse
   validateQuestionnaireCriteriaForItem(itemID: String!, input: [QuestionnaireAnswerInput!]!): String
 
   createJWTToken(input: CreateJWTTokenInput): JWTCreationResponse!

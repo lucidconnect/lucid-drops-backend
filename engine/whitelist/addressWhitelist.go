@@ -71,3 +71,54 @@ func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistI
 
 	return item.ToGraphData(), nil
 }
+
+func ValidateAddressCriteria(itemID, walletAddress string, authDetails *internal.AuthDetails) (*model.ValidationRespoonse, error) {
+	resp := &model.ValidationRespoonse{
+		Valid: false,
+	}
+
+	item, err := engine.GetItemByID(itemID)
+	if err != nil {
+		return nil, errors.New("item not found")
+	}
+
+	if item.ClaimDeadline != nil {
+		if time.Now().After(*item.ClaimDeadline) {
+			return nil, errors.New("the item is no longer available to be claimed")
+		}
+	}
+
+	if item.Criteria == nil {
+		return nil, errors.New("item does not have any criteria")
+	}
+
+	if *item.Criteria != model.ClaimCriteriaTypeWalletAddress {
+		return nil, errors.New("item does not have wallet address criteria")
+	}
+
+	claimVal := &models.WalletAddressClaim{}
+	err = dbutils.DB.Where("item_id = ? AND wallet_address = ?", item.ID, walletAddress).First(&claimVal).Error
+	if err != nil {
+		return resp, errors.New("wallet address not found")
+	}
+
+	if claimVal.SentOutAt != nil {
+		return resp, errors.New("wallet address has claimed the item already")
+	}
+
+	now := time.Now()
+	claimVal.SentOutAt = &now
+	err = dbutils.DB.Save(claimVal).Error
+	if err != nil {
+		return resp, errors.New("error updating wallet address claim")
+	}
+
+	PassID, err := createMintPassForPatreonMint(item)
+	if err != nil {
+		return resp, errors.New("error creating mint pass")
+	}
+
+	resp.Valid = true
+	resp.PassID = PassID
+	return resp, nil
+}
