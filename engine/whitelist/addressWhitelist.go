@@ -51,12 +51,7 @@ func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistI
 
 	for _, dbWallet := range dbWallets {
 
-		timeNow := time.Now()
-
-		dbWallet.SentOutAt = &timeNow
-
 		insertionErr := dbutils.DB.Save(dbWallet).Error
-
 		if insertionErr != nil {
 			continue
 		}
