@@ -62,6 +62,7 @@ func SetupDB(dsn string) *gorm.DB {
 	DB.AutoMigrate(
 		&models.Creator{},
 		&models.Collection{},
+		&models.WalletAddressClaim{},
 		&models.EmptyCriteria{},
 		&models.Item{},
 		&models.MintPass{},
@@ -77,7 +78,6 @@ func SetupDB(dsn string) *gorm.DB {
 		&models.PatreonAuthDetails{},
 		&models.MultiChoiceCriteria{},
 		&models.DirectAnswerCriteria{},
-		&models.WalletAddressClaim{},
 	)
 
 	return DB
