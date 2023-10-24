@@ -392,6 +392,18 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 	return nil
 }
 
+func GetCCreatorIDFromWalletAddress(walletAddress string) (*string, error) {
+	var creator models.Creator
+
+	err := dbutils.DB.Where("wallet_address=?", walletAddress).First(&creator).Error
+	if err != nil {
+		return nil, errors.New("creator not found")
+	}
+
+	creatorID := creator.ID.String()
+	return &creatorID, nil
+}
+
 func GetUserProfileDetails(userName string) (*model.UserProfileType, *string, error) {
 	var profile models.Creator
 	err := dbutils.DB.Model(&models.Creator{}).Where("inverse_username=?", userName).First(&profile).Error
@@ -401,6 +413,17 @@ func GetUserProfileDetails(userName string) (*model.UserProfileType, *string, er
 
 	profileGraphData := profile.CreatorToProfileData()
 	return profileGraphData, &profile.WalletAddress, nil
+}
+
+func GetUserInverseWallet(creatorID string) (*model.Wallet, error) {
+
+	var wallet models.Wallet
+	err := dbutils.DB.Model(&models.Wallet{}).Where("creator_id=?", creatorID).First(&wallet).Error
+	if err != nil {
+		return nil, errors.New("user profile not found")
+	}
+
+	return wallet.ToGraphData(), nil
 }
 
 func CreateModel(newModel interface{}) error {

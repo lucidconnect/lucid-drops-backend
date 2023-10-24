@@ -7,6 +7,7 @@ directive @goField(
 
 type Query {
   getCreatorDetails: CreatorDetails!
+  getWallet: Wallet!
   getOnboardinProgress: OnboardingProgress!
   isInverseNameIsAvailable(input: NewUsernameRegisgration!): Boolean!
   getUserProfileDetails (userName: String!): userProfileType
@@ -213,6 +214,11 @@ input SocialsInput {
   github: String
 }
 
+type Wallet {
+  balance: Int!
+  currency: String!
+}
+
 type Socials {
   twitter: String
   instagram: String
@@ -258,6 +264,7 @@ type CreatorDetails {
   creatorID: ID!
   address: String!
   inverseUsername: String
+  firstPayment: Boolean!
 }
 
 type Item {

@@ -10,6 +10,7 @@ type Creator struct {
 	WalletAddress   string
 	InverseUsername *string      `gorm:"default:null"`
 	Thumbnail       *string      `gorm:"default:null"`
+	FirstPayment    bool         `gorm:"default:false"`
 	Image           *string      `gorm:"default:null"`
 	Bio             *string      `gorm:"default:null"`
 	Twitter         *string      `gorm:"default:null"`
@@ -23,6 +24,7 @@ func (c *Creator) ToGraphData() *model.CreatorDetails {
 		Address:         c.WalletAddress,
 		CreatorID:       c.ID.String(),
 		InverseUsername: c.InverseUsername,
+		FirstPayment:    c.FirstPayment,
 	}
 }
 

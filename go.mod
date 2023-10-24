@@ -20,6 +20,7 @@ require (
 	github.com/rs/zerolog v1.30.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.8.4
+	github.com/stripe/stripe-go v70.15.0+incompatible
 	github.com/vektah/gqlparser/v2 v2.5.10
 	go.step.sm/crypto v0.35.1
 	golang.org/x/crypto v0.13.0

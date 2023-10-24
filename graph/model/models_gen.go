@@ -60,6 +60,7 @@ type CreatorDetails struct {
 	CreatorID       string  `json:"creatorID"`
 	Address         string  `json:"address"`
 	InverseUsername *string `json:"inverseUsername,omitempty"`
+	FirstPayment    bool    `json:"firstPayment"`
 }
 
 type DeploymentInfo struct {
@@ -263,6 +264,11 @@ type UserDetails struct {
 type ValidationRespoonse struct {
 	Valid  bool    `json:"valid"`
 	PassID *string `json:"passID,omitempty"`
+}
+
+type Wallet struct {
+	Balance  int    `json:"balance"`
+	Currency string `json:"currency"`
 }
 
 type UserProfileType struct {

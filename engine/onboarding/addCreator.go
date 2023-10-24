@@ -19,9 +19,17 @@ func CreateCreatorProfileIfAddressIsMissing(address common.Address) (*models.Cre
 			if creationErr != nil {
 				return nil, creationErr
 			}
+
+			go CreateWalletAccount(newCreator.ID.String())
 			return &newCreator, nil
 		}
 	}
 
 	return cachedCreator, nil
+}
+
+func CreateWalletAccount(creatorID string) error {
+	return dbutils.DB.Create(&models.Wallet{
+		CreatorID: creatorID,
+	}).Error
 }
