@@ -61,6 +61,7 @@ func SetupDB(dsn string) *gorm.DB {
 	//User managment
 	DB.AutoMigrate(
 		&models.Creator{},
+		&models.Wallet{},
 		&models.Collection{},
 		&models.WalletAddressClaim{},
 		&models.EmptyCriteria{},
