@@ -61,7 +61,7 @@ func confirmOrSeedNewSysAccount(db *gorm.DB) (*models.Wallet, error) {
 				CreatorID:     sysUser.ID.String(),
 				BalanceBase:   0,
 				CanBeNegative: true,
-				Currency:      models.NGN,
+				Currency:      models.USD,
 			}
 
 			err = db.Create(&sysAccount).Error

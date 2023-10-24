@@ -69,6 +69,7 @@ func main() {
 	router.Handle("/telegram/callback/", http.HandlerFunc(route.TelegramCallBack))
 	router.Handle("/patreon/callback/", http.HandlerFunc(route.PatreonCallBack))
 	router.Handle("/whitelist/patreon/callback/", http.HandlerFunc(route.PatreonWhitelistCallBack))
+	router.Handle("/handle-stripe-webhook", http.HandlerFunc(route.HandleStripeWebhook))
 
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
 
