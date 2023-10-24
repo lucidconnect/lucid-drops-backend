@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -212,6 +213,7 @@ func FetchAuthotizedSubdomainsForItem(itemID string) ([]string, error) {
 
 func FetchCollectionItems(collectionID string, authDetails *internal.AuthDetails) ([]*model.Item, error) {
 	// All Collection data will be public for now
+
 	// creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	// if err != nil {
 	// 	return nil, errors.New("creator has not been onboarded")
@@ -223,8 +225,9 @@ func FetchCollectionItems(collectionID string, authDetails *internal.AuthDetails
 	}
 
 	mappedItems := make([]*model.Item, len(items))
-
 	for idx, item := range items {
+		mintPasses, _ := FetchMintPassesForItems(item.ID.String())
+		item.MintPasses = mintPasses
 		mappedItems[idx] = item.ToGraphData()
 	}
 
@@ -236,6 +239,9 @@ func FetchItemByID(itemID string) (*model.Item, error) {
 	if err != nil {
 		return nil, errors.New("item not found")
 	}
+
+	mintPasses, _ := FetchMintPassesForItems(item.ID.String())
+	item.MintPasses = mintPasses
 
 	return item.ToGraphData(), nil
 }
@@ -288,4 +294,15 @@ func SetItemClaimDeadline(itemID string, deadline string) (*model.Item, error) {
 	}
 
 	return item.ToGraphData(), nil
+}
+
+func FetchMintPassesForItems(itemID string) ([]models.MintPass, error) {
+
+	var mintPasses []models.MintPass
+	err := dbutils.DB.Model(&models.MintPass{}).Where("item_id = ?", itemID).Find(&mintPasses).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return mintPasses, nil
 }
