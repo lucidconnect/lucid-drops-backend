@@ -74,6 +74,7 @@ type ComplexityRoot struct {
 	CreatorDetails struct {
 		Address         func(childComplexity int) int
 		CreatorID       func(childComplexity int) int
+		FirstPayment    func(childComplexity int) int
 		InverseUsername func(childComplexity int) int
 	}
 
@@ -423,6 +424,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.CreatorDetails.CreatorID(childComplexity), true
+
+	case "CreatorDetails.firstPayment":
+		if e.complexity.CreatorDetails.FirstPayment == nil {
+			break
+		}
+
+		return e.complexity.CreatorDetails.FirstPayment(childComplexity), true
 
 	case "CreatorDetails.inverseUsername":
 		if e.complexity.CreatorDetails.InverseUsername == nil {
@@ -3061,6 +3069,50 @@ func (ec *executionContext) fieldContext_CreatorDetails_inverseUsername(ctx cont
 	return fc, nil
 }
 
+func (ec *executionContext) _CreatorDetails_firstPayment(ctx context.Context, field graphql.CollectedField, obj *model.CreatorDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreatorDetails_firstPayment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FirstPayment, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreatorDetails_firstPayment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreatorDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ImageResponse_image(ctx context.Context, field graphql.CollectedField, obj *model.ImageResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ImageResponse_image(ctx, field)
 	if err != nil {
@@ -3619,6 +3671,8 @@ func (ec *executionContext) fieldContext_Item_creator(ctx context.Context, field
 				return ec.fieldContext_CreatorDetails_address(ctx, field)
 			case "inverseUsername":
 				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
+			case "firstPayment":
+				return ec.fieldContext_CreatorDetails_firstPayment(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
 		},
@@ -4403,6 +4457,8 @@ func (ec *executionContext) fieldContext_Mutation_registerInverseUsername(ctx co
 				return ec.fieldContext_CreatorDetails_address(ctx, field)
 			case "inverseUsername":
 				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
+			case "firstPayment":
+				return ec.fieldContext_CreatorDetails_firstPayment(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
 		},
@@ -6577,6 +6633,8 @@ func (ec *executionContext) fieldContext_OnboardingProgress_creator(ctx context.
 				return ec.fieldContext_CreatorDetails_address(ctx, field)
 			case "inverseUsername":
 				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
+			case "firstPayment":
+				return ec.fieldContext_CreatorDetails_firstPayment(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
 		},
@@ -6673,6 +6731,8 @@ func (ec *executionContext) fieldContext_Query_getCreatorDetails(ctx context.Con
 				return ec.fieldContext_CreatorDetails_address(ctx, field)
 			case "inverseUsername":
 				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
+			case "firstPayment":
+				return ec.fieldContext_CreatorDetails_firstPayment(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
 		},
@@ -12313,6 +12373,11 @@ func (ec *executionContext) _CreatorDetails(ctx context.Context, sel ast.Selecti
 			}
 		case "inverseUsername":
 			out.Values[i] = ec._CreatorDetails_inverseUsername(ctx, field, obj)
+		case "firstPayment":
+			out.Values[i] = ec._CreatorDetails_firstPayment(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

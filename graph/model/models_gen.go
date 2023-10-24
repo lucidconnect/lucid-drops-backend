@@ -60,6 +60,7 @@ type CreatorDetails struct {
 	CreatorID       string  `json:"creatorID"`
 	Address         string  `json:"address"`
 	InverseUsername *string `json:"inverseUsername,omitempty"`
+	FirstPayment    bool    `json:"firstPayment"`
 }
 
 type DeploymentInfo struct {

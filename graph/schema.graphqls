@@ -264,6 +264,7 @@ type CreatorDetails {
   creatorID: ID!
   address: String!
   inverseUsername: String
+  firstPayment: Boolean!
 }
 
 type Item {
