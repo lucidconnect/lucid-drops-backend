@@ -330,6 +330,21 @@ func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDe
 	return creatorInfo.ToGraphData(), nil
 }
 
+// GetWallet is the resolver for the getWallet field.
+func (r *queryResolver) GetWallet(ctx context.Context) (*model.Wallet, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	creatorID, err := engine.GetCCreatorIDFromWalletAddress(authenticationDetails.Address.Hex())
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return engine.GetUserInverseWallet(*creatorID)
+}
+
 // GetOnboardinProgress is the resolver for the getOnboardinProgress field.
 func (r *queryResolver) GetOnboardinProgress(ctx context.Context) (*model.OnboardingProgress, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)

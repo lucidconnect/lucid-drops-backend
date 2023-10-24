@@ -265,6 +265,11 @@ type ValidationRespoonse struct {
 	PassID *string `json:"passID,omitempty"`
 }
 
+type Wallet struct {
+	Balance  int    `json:"balance"`
+	Currency string `json:"currency"`
+}
+
 type UserProfileType struct {
 	CreatorID       *string       `json:"creatorID,omitempty"`
 	Thumbnail       *string       `json:"thumbnail,omitempty"`
