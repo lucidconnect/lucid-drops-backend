@@ -120,10 +120,10 @@ func (l *Ledger) Transfer(tx *gorm.DB, instruction TransferInstruction) error {
 	return nil
 }
 
-func (l *Ledger) fetchAccountsByUserID(userID string) (*models.Wallet, error) {
+func (l *Ledger) fetchAccountsByCreatorID(creatorID string) (*models.Wallet, error) {
 
 	var accounts models.Wallet
-	err := l.DB.Where("user_id = ?", userID).First(&accounts).Error
+	err := l.DB.Where("creator_id = ?", creatorID).First(&accounts).Error
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (l *Ledger) fetchAndLockTransferScope(tx *gorm.DB, instruction TransferInst
 
 	accounts[0] = *sysAccount
 
-	userAccount, err := l.fetchAccountsByUserID(instruction.UserID.String())
+	userAccount, err := l.fetchAccountsByCreatorID(instruction.UserID.String())
 	if err != nil {
 		return nil, err
 	}
