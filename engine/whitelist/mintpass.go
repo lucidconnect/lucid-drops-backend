@@ -52,6 +52,10 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
 	}
 
+	if !checItemEditionLimit(item) {
+		return nil, errors.New("item edition limit reached")
+	}
+
 	newMint := models.MintPass{
 		ItemId:                    item.ID.String(),
 		ItemIdOnContract:          *item.TokenID,
@@ -68,4 +72,71 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		Valid:  true,
 		PassID: utils.GetStrPtr(newMint.ID.String()),
 	}, nil
+}
+
+func CreateMintPassForValidatedCriteriaItem(itemID string) (*model.ValidationRespoonse, error) {
+
+	item, err := engine.GetItemByID(itemID)
+	if err != nil {
+		return nil, err
+	}
+
+	if item.ClaimDeadline != nil {
+		if time.Now().After(*item.ClaimDeadline) {
+			return nil, errors.New("the item is no longer available to be claimed")
+		}
+	}
+
+	if item.Criteria == nil {
+		return nil, errors.New("unable to generate mintpass for this item")
+	}
+
+	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	if collection.AAContractAddress == nil {
+		return nil, errors.New("collection contract address not found")
+	}
+
+	if item.TokenID == nil {
+		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
+	}
+
+	if !checItemEditionLimit(item) {
+		return nil, errors.New("item edition limit reached")
+	}
+
+	newMint := models.MintPass{
+		ItemId:                    item.ID.String(),
+		ItemIdOnContract:          *item.TokenID,
+		CollectionContractAddress: *collection.AAContractAddress,
+		BlockchainNetwork:         collection.BlockchainNetwork,
+	}
+
+	err = dbutils.DB.Create(&newMint).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.ValidationRespoonse{
+		Valid:  true,
+		PassID: utils.GetStrPtr(newMint.ID.String()),
+	}, nil
+}
+
+func checItemEditionLimit(item *models.Item) bool {
+
+	if item.EditionLimit != nil {
+		var editionCount int64
+		err := dbutils.DB.Model(&models.MintPass{}).Where("item_id = ?", item.ID).Count(&editionCount).Error
+		if err != nil {
+			return false
+		}
+
+		return int(editionCount) >= *item.EditionLimit 
+	}
+
+	return true
 }

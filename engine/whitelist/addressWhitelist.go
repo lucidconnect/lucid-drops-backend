@@ -108,42 +108,10 @@ func ValidateAddressCriteria(itemID, walletAddress string, authDetails *internal
 		return resp, errors.New("error updating wallet address claim")
 	}
 
-	PassID, err := createMintPassForPatreonMint(item)
+	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
 	if err != nil {
-		return resp, err
+		return passResp, errors.New("error creating mint pass")
 	}
 
-	resp.Valid = true
-	resp.PassID = PassID
-	return resp, nil
-}
-
-func createMintPassForWalletAddressMint(item *models.Item) (*string, error) {
-	collection, err := engine.GetCollectionByID(item.CollectionID.String())
-	if err != nil {
-		return nil, errors.New("collection not found")
-	}
-
-	if collection.AAContractAddress == nil {
-		return nil, errors.New("collection contract address not found")
-	}
-
-	if item.TokenID == nil {
-		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
-	}
-
-	newMint := models.MintPass{
-		ItemId:                    item.ID.String(),
-		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: *collection.AAContractAddress,
-		BlockchainNetwork:         collection.BlockchainNetwork,
-	}
-
-	err = dbutils.DB.Create(&newMint).Error
-	if err != nil {
-		return nil, err
-	}
-
-	passId := newMint.ID.String()
-	return &passId, nil
+	return passResp, nil
 }

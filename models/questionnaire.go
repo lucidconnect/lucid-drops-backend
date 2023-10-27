@@ -14,7 +14,8 @@ type DirectAnswerCriteria struct {
 	CreatorID  uuid.UUID `gorm:"primaryKey"`
 	Question   string    `gorm:"primaryKey"`
 	// Answers contains a marshalled hashmap of all corrent answers
-	Answers string
+	Answers   string
+	ClaimCode bool `gorm:"default:false"`
 }
 
 func (d *DirectAnswerCriteria) ToGraphData() *model.QuestionnaireType {
@@ -22,6 +23,7 @@ func (d *DirectAnswerCriteria) ToGraphData() *model.QuestionnaireType {
 		Question:     d.Question,
 		QuestionID:   d.QuestionID.String(),
 		QuestionType: model.QuestionTypeDirectAnswer,
+		ClaimCode:    &d.ClaimCode,
 	}
 
 	return question

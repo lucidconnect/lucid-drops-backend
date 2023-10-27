@@ -172,14 +172,12 @@ func ValidatePatreonCriteriaForItem(itemID string, authID *string) (*model.Valid
 				return resp, errors.New("error saving patreon auth")
 			}
 
-			PassID, err := createMintPassForPatreonMint(item)
+			passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
 			if err != nil {
-				return resp, errors.New("error creating mint pass")
+				return passResp, errors.New("error creating mint pass")
 			}
 
-			resp.Valid = true
-			resp.PassID = PassID
-			return resp, nil
+			return passResp, nil
 		}
 	}
 

@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -100,47 +99,15 @@ func ValidateTelegramClaimCriteria(itemID, authID string) (*model.ValidationResp
 
 	if member.Status == "member" || member.Status == "creator" || member.Status == "administrator" {
 
-		PassID, err := createMintPassForTelegramMint(item)
+		passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
 		if err != nil {
-			return resp, errors.New("error creating mint pass")
+			return passResp, errors.New("error creating mint pass")
 		}
 
-		resp.Valid = true
-		resp.PassID = PassID
-		return resp, nil
+		return passResp, nil
 	}
 
 	return nil, errors.New("telegram account not authorized by group admin")
-}
-
-func createMintPassForTelegramMint(item *models.Item) (*string, error) {
-	collection, err := engine.GetCollectionByID(item.CollectionID.String())
-	if err != nil {
-		return nil, errors.New("collection not found")
-	}
-
-	if collection.AAContractAddress == nil {
-		return nil, errors.New("collection contract address not found")
-	}
-
-	if item.TokenID == nil {
-		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
-	}
-
-	newMint := models.MintPass{
-		ItemId:                    item.ID.String(),
-		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: *collection.AAContractAddress,
-		BlockchainNetwork:         collection.BlockchainNetwork,
-	}
-
-	err = dbutils.DB.Create(&newMint).Error
-	if err != nil {
-		return nil, err
-	}
-
-	passId := newMint.ID.String()
-	return &passId, nil
 }
 
 func ProcessTelegramCallBack(id, username, hash, photoURL string) (*string, error) {

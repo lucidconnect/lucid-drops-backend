@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
-	"inverse.so/dbutils"
 	"inverse.so/emails"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
@@ -156,20 +155,12 @@ func CompleteEmailVerificationForClaim(input *model.CompleteEmailVerificationInp
 		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
 	}
 
-	newMint := models.MintPass{
-		ItemId:                    otpDetails.ItemID.String(),
-		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: otpDetails.CollectionContractAddress,
-	}
-
-	err = dbutils.DB.Create(&newMint).Error
+	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
 	if err != nil {
-		return nil, err
+		return nil, errors.New("error creating mint pass")
 	}
-
-	passId := newMint.ID.String()
 
 	return &model.CompleteEmailVerificationResponse{
-		OtpRequestID: passId,
+		OtpRequestID: *passResp.PassID,
 	}, nil
 }

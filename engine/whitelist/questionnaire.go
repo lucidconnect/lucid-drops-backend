@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm/clause"
 	"inverse.so/dbutils"
@@ -60,6 +59,10 @@ func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input
 				Question:   questionInput.Question,
 				Answers:    string(answerBytes),
 				QuestionID: uuid.NewV4(),
+			}
+
+			if input.ClaimCode != nil && *input.ClaimCode {
+				dbQuestions[idx].ClaimCode = *input.ClaimCode
 			}
 		}
 
@@ -219,34 +222,10 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 		return nil, errors.New("item cannot be claimed via this method")
 	}
 
-	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
 	if err != nil {
-		log.Err(err)
-		return nil, err
+		return nil, errors.New("error creating mint pass")
 	}
 
-	var smartContractAddress string
-	if collection.AAContractAddress != nil {
-		smartContractAddress = *collection.AAContractAddress
-	}
-
-	if item.TokenID == nil {
-		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
-	}
-
-	newMint := models.MintPass{
-		ItemId:                    itemID,
-		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: smartContractAddress,
-		BlockchainNetwork:         collection.BlockchainNetwork,
-	}
-
-	err = dbutils.DB.Create(&newMint).Error
-	if err != nil {
-		return nil, err
-	}
-
-	claimingID := newMint.ID.String()
-
-	return &claimingID, nil
+	return passResp.PassID, nil
 }
