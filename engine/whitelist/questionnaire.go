@@ -71,7 +71,11 @@ func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input
 			return nil, insertionErr
 		}
 
+		claimCodeType := model.ClaimCriteriaTypeClaimCode
 		directAnswerQuestionnaireType := model.ClaimCriteriaTypeDirectAnswerQuestionnaire
+		if input.ClaimCode != nil && *input.ClaimCode {
+			item.Criteria = &claimCodeType
+		}
 		item.Criteria = &directAnswerQuestionnaireType
 		itemUpdateErr := engine.SaveModel(item)
 		if itemUpdateErr != nil {
