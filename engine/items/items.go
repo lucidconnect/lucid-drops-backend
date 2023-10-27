@@ -42,6 +42,8 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 		Image:        *input.Image,
 		Description:  *input.Description,
 		CollectionID: collection.ID,
+		UserLimit:    input.UserLimit,
+		EditionLimit: input.EditionLimit,
 	}
 
 	err = engine.CreateModel(newItem)

@@ -23,6 +23,8 @@ type Item struct {
 	PatreonCriteria      *PatreonCriteria  `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	ShowEmailDomainHints bool              `gorm:"default:false"`
 	Featured             bool              `gorm:"default:false"`
+	UserLimit            *int              `gorm:"default:null"`
+	EditionLimit         *int              `gorm:"default:null"`
 	MintPasses           []MintPass        `gorm:"foreignKey:ItemId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
@@ -56,6 +58,7 @@ func (i *Item) ToGraphData() *model.Item {
 		ClaimCriteria: i.Criteria,
 		CreatedAt:     i.CreatedAt,
 		Deadline:      i.ClaimDeadline,
+		EditionLimit:  i.EditionLimit,
 	}
 
 	if i.TwitterCriteria != nil {

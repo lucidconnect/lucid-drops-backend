@@ -113,6 +113,7 @@ type Item struct {
 	TweetLink                        *string            `json:"tweetLink,omitempty"`
 	ProfileLink                      *string            `json:"profileLink,omitempty"`
 	CampaignName                     *string            `json:"campaignName,omitempty"`
+	EditionLimit                     *int               `json:"editionLimit,omitempty"`
 	CreatedAt                        time.Time          `json:"createdAt"`
 	Deadline                         *time.Time         `json:"deadline,omitempty"`
 	ClaimDetails                     []*ClaimDetails    `json:"claimDetails,omitempty"`
@@ -123,6 +124,8 @@ type ItemInput struct {
 	Image        *string `json:"image,omitempty"`
 	Description  *string `json:"description,omitempty"`
 	CollectionID *string `json:"collectionID,omitempty"`
+	UserLimit    *int    `json:"userLimit,omitempty"`
+	EditionLimit *int    `json:"editionLimit,omitempty"`
 }
 
 type JWTCreationResponse struct {
@@ -216,6 +219,7 @@ type QuestionnaireCriteriaInput struct {
 	QuestionType     QuestionType            `json:"questionType"`
 	OpenEndedInput   []*OpenEndedInputType   `json:"openEndedInput,omitempty"`
 	MultiChoiceInput []*MultiChoiceInputType `json:"multiChoiceInput,omitempty"`
+	ClaimCode        *bool                   `json:"claimCode,omitempty"`
 }
 
 type QuestionnaireType struct {
@@ -224,6 +228,7 @@ type QuestionnaireType struct {
 	Question     string       `json:"question"`
 	QuestionID   string       `json:"questionId"`
 	QuestionType QuestionType `json:"questionType"`
+	ClaimCode    *bool        `json:"claimCode,omitempty"`
 }
 
 type SignerInfo struct {
@@ -396,6 +401,7 @@ const (
 	ClaimCriteriaTypeMutliChoiceQuestionnaire  ClaimCriteriaType = "mutliChoiceQuestionnaire"
 	ClaimCriteriaTypeEmptyCriteria             ClaimCriteriaType = "emptyCriteria"
 	ClaimCriteriaTypeWalletAddress             ClaimCriteriaType = "walletAddress"
+	ClaimCriteriaTypeClaimCode                 ClaimCriteriaType = "claimCode"
 )
 
 var AllClaimCriteriaType = []ClaimCriteriaType{
@@ -409,11 +415,12 @@ var AllClaimCriteriaType = []ClaimCriteriaType{
 	ClaimCriteriaTypeMutliChoiceQuestionnaire,
 	ClaimCriteriaTypeEmptyCriteria,
 	ClaimCriteriaTypeWalletAddress,
+	ClaimCriteriaTypeClaimCode,
 }
 
 func (e ClaimCriteriaType) IsValid() bool {
 	switch e {
-	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire, ClaimCriteriaTypeEmptyCriteria, ClaimCriteriaTypeWalletAddress:
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire, ClaimCriteriaTypeEmptyCriteria, ClaimCriteriaTypeWalletAddress, ClaimCriteriaTypeClaimCode:
 		return true
 	}
 	return false

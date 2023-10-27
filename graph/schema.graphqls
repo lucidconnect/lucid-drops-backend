@@ -94,6 +94,7 @@ input QuestionnaireCriteriaInput {
   questionType: QuestionType!
   openEndedInput: [OpenEndedInputType!]
   multiChoiceInput: [MultiChoiceInputType!]
+  claimCode: Boolean
 }
 
 input MultiChoiceInputType {
@@ -156,6 +157,8 @@ input ItemInput {
 	image: String
 	description: String
 	collectionID: String
+  userLimit: Int
+  editionLimit: Int
 }
 
 input NewTwitterCriteriaInput {
@@ -247,7 +250,7 @@ type Collection {
   creatorID: String!
   createdAt: Time!
 	name: String!
-	description: String!
+	description: String!  
 	image: String!
 	thumbnail: String!
   contractAddress: String
@@ -281,6 +284,7 @@ type Item {
   tweetLink: String
   profileLink: String
   campaignName: String
+  editionLimit: Int
   createdAt: Time!
   deadline: Time
   claimDetails: [ClaimDetails]
@@ -292,6 +296,7 @@ type QuestionnaireType {
   question: String!
   questionId: String!
   questionType: QuestionType!
+  claimCode: Boolean
 }
 
 type ImageResponse {
@@ -368,6 +373,7 @@ enum ClaimCriteriaType{
   mutliChoiceQuestionnaire
   emptyCriteria
   walletAddress
+  claimCode
 }
 
 enum AiImageStyle{
