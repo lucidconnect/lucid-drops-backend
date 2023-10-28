@@ -25,7 +25,7 @@ type LogContractCreation struct {
 }
 
 func SubscribeToInverseContractDeployments() {
-	rpcProvider := utils.UseEnvOrDefault("RPC_PROVIDER", "wss://polygon-mumbai.g.alchemy.com/v2/SjkYprQJA0Dp-5l5XpafAmqj_uoJ_A5G")
+	rpcProvider := utils.UseEnvOrDefault("RPC_PROVIDER", "wss://polygon-mainnet.g.alchemy.com/v2/JKEn31gUjMUuyOjgCGpTNS-fJnGp-mYF")
 	inveseNFTFactoryAddress := utils.UseEnvOrDefault("INVERSE_FACTORY_ADDRESS", "0x021406A44658CAbcBc5540Ec2045123E5FDb0ca8")
 
 attemptReconnect:
