@@ -84,7 +84,7 @@ func GetPrivyWalletsFromSubKey(privySubKey string) (*common.Address, error) {
 	var embededWallet *common.Address
 
 	for _, accounts := range userResponse.LinkedAccounts {
-		if accounts.Type == "wallet" && accounts.WalletClientType == "embedded" {
+		if accounts.Type == "wallet" && accounts.ConnectorType == "embedded" {
 			parsedAddress := common.HexToAddress(accounts.Address)
 			embededWallet = &parsedAddress
 		}
