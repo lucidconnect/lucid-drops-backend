@@ -110,7 +110,7 @@ func ValidateAddressCriteria(itemID, walletAddress string, authDetails *internal
 
 	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
 	if err != nil {
-		return passResp, errors.New("error creating mint pass")
+		return passResp, err
 	}
 
 	return passResp, nil
