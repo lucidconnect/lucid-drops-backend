@@ -101,16 +101,16 @@ func ValidateAddressCriteria(itemID, walletAddress string, authDetails *internal
 		return resp, errors.New("wallet address has claimed the item already")
 	}
 
+	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
+	if err != nil {
+		return passResp, err
+	}
+
 	now := time.Now()
 	claimVal.SentOutAt = &now
 	err = dbutils.DB.Save(claimVal).Error
 	if err != nil {
 		return resp, errors.New("error updating wallet address claim")
-	}
-
-	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
-	if err != nil {
-		return passResp, err
 	}
 
 	return passResp, nil
