@@ -415,6 +415,17 @@ func GetUserProfileDetails(userName string) (*model.UserProfileType, *string, er
 	return profileGraphData, &profile.WalletAddress, nil
 }
 
+func GetWhitelistedWalletAddresses(itemID string) ([]string, error) {
+	var walletAddresses []string
+
+	err := dbutils.DB.Model(&models.WalletAddressClaim{}).Where("item_id=?", itemID).Pluck("wallet_address", &walletAddresses).Error
+	if err != nil {
+		return nil, errors.New("wallet addresses not found")
+	}
+
+	return walletAddresses, nil
+}
+
 func GetUserInverseWallet(creatorID string) (*model.Wallet, error) {
 
 	var wallet models.Wallet

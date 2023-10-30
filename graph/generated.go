@@ -166,24 +166,25 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		FetchClaimedItems             func(childComplexity int, address string) int
-		FetchCollectionByID           func(childComplexity int, collectionID string) int
-		FetchCreatorCollections       func(childComplexity int) int
-		FetchCriteriaAuthorizedEmails func(childComplexity int, itemID string) int
-		FetchFeaturedCollections      func(childComplexity int) int
-		FetchFeaturedItems            func(childComplexity int) int
-		FetchItemByID                 func(childComplexity int, itemID string) int
-		FetchItemsInCollection        func(childComplexity int, collectionID string) int
-		FetchQuestionsByItemID        func(childComplexity int, itemID string) int
-		GetCreatorDetails             func(childComplexity int) int
-		GetImageSuggestions           func(childComplexity int, prompt string, preset *model.AiImageStyle) int
-		GetOnboardinProgress          func(childComplexity int) int
-		GetTweetDetails               func(childComplexity int, tweetLink string) int
-		GetTwitterUserDetails         func(childComplexity int, userName string) int
-		GetUserProfileDetails         func(childComplexity int, userName string) int
-		GetWallet                     func(childComplexity int) int
-		IsInverseNameIsAvailable      func(childComplexity int, input model.NewUsernameRegisgration) int
-		QueryImageStatus              func(childComplexity int, taskID string, position *int) int
+		FetchClaimedItems                      func(childComplexity int, address string) int
+		FetchCollectionByID                    func(childComplexity int, collectionID string) int
+		FetchCreatorCollections                func(childComplexity int) int
+		FetchCriteriaAuthorizedEmails          func(childComplexity int, itemID string) int
+		FetchCriteriaAuthorizedWalletAddresses func(childComplexity int, itemID string) int
+		FetchFeaturedCollections               func(childComplexity int) int
+		FetchFeaturedItems                     func(childComplexity int) int
+		FetchItemByID                          func(childComplexity int, itemID string) int
+		FetchItemsInCollection                 func(childComplexity int, collectionID string) int
+		FetchQuestionsByItemID                 func(childComplexity int, itemID string) int
+		GetCreatorDetails                      func(childComplexity int) int
+		GetImageSuggestions                    func(childComplexity int, prompt string, preset *model.AiImageStyle) int
+		GetOnboardinProgress                   func(childComplexity int) int
+		GetTweetDetails                        func(childComplexity int, tweetLink string) int
+		GetTwitterUserDetails                  func(childComplexity int, userName string) int
+		GetUserProfileDetails                  func(childComplexity int, userName string) int
+		GetWallet                              func(childComplexity int) int
+		IsInverseNameIsAvailable               func(childComplexity int, input model.NewUsernameRegisgration) int
+		QueryImageStatus                       func(childComplexity int, taskID string, position *int) int
 	}
 
 	QuestionnaireType struct {
@@ -291,6 +292,7 @@ type QueryResolver interface {
 	FetchItemsInCollection(ctx context.Context, collectionID string) ([]*model.Item, error)
 	FetchItemByID(ctx context.Context, itemID string) (*model.Item, error)
 	FetchCriteriaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error)
+	FetchCriteriaAuthorizedWalletAddresses(ctx context.Context, itemID string) ([]string, error)
 	GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error)
 	GetTweetDetails(ctx context.Context, tweetLink string) (*model.TweetDetails, error)
 	GetTwitterUserDetails(ctx context.Context, userName string) (*model.UserDetails, error)
@@ -1069,6 +1071,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.FetchCriteriaAuthorizedEmails(childComplexity, args["itemID"].(string)), true
+
+	case "Query.fetchCriteriaAuthorizedWalletAddresses":
+		if e.complexity.Query.FetchCriteriaAuthorizedWalletAddresses == nil {
+			break
+		}
+
+		args, err := ec.field_Query_fetchCriteriaAuthorizedWalletAddresses_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.FetchCriteriaAuthorizedWalletAddresses(childComplexity, args["itemID"].(string)), true
 
 	case "Query.fetchFeaturedCollections":
 		if e.complexity.Query.FetchFeaturedCollections == nil {
@@ -2116,6 +2130,21 @@ func (ec *executionContext) field_Query_fetchCollectionById_args(ctx context.Con
 }
 
 func (ec *executionContext) field_Query_fetchCriteriaAuthorizedEmails_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["itemID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["itemID"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_fetchCriteriaAuthorizedWalletAddresses_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -7512,6 +7541,58 @@ func (ec *executionContext) fieldContext_Query_fetchCriteriaAuthorizedEmails(ctx
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_fetchCriteriaAuthorizedEmails_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_fetchCriteriaAuthorizedWalletAddresses(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_fetchCriteriaAuthorizedWalletAddresses(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().FetchCriteriaAuthorizedWalletAddresses(rctx, fc.Args["itemID"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_fetchCriteriaAuthorizedWalletAddresses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_fetchCriteriaAuthorizedWalletAddresses_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -13469,6 +13550,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_fetchCriteriaAuthorizedEmails(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "fetchCriteriaAuthorizedWalletAddresses":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_fetchCriteriaAuthorizedWalletAddresses(ctx, field)
 				return res
 			}
 

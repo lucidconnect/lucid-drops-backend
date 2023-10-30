@@ -442,6 +442,11 @@ func (r *queryResolver) FetchCriteriaAuthorizedEmails(ctx context.Context, itemI
 	return whitelist.FetchCriteriaAuthorizedEmails(itemID)
 }
 
+// FetchCriteriaAuthorizedWalletAddresses is the resolver for the fetchCriteriaAuthorizedWalletAddresses field.
+func (r *queryResolver) FetchCriteriaAuthorizedWalletAddresses(ctx context.Context, itemID string) ([]string, error) {
+	return engine.GetWhitelistedWalletAddresses(itemID)
+}
+
 // GetImageSuggestions is the resolver for the getImageSuggestions field.
 func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error) {
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
