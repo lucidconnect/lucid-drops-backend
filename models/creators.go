@@ -16,6 +16,7 @@ type Creator struct {
 	Twitter         *string      `gorm:"default:null"`
 	Instagram       *string      `gorm:"default:null"`
 	Github          *string      `gorm:"default:null"`
+	Warpcast        *string      `gorm:"default:null"`
 	SignerInfo      []SignerInfo `gorm:"foreignKey:CreatorID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 

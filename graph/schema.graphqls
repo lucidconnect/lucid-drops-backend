@@ -215,6 +215,7 @@ input SocialsInput {
   twitter: String
   instagram: String
   github: String
+  warpcast: String
 }
 
 type Wallet {

@@ -54,6 +54,10 @@ func EditUserProfile(input model.EditUserProfileInputType, authDetails *internal
 		if input.Socials.Github != nil {
 			creator.Github = input.Socials.Github
 		}
+
+		if input.Socials.Warpcast != nil {
+			creator.Warpcast = input.Socials.Warpcast
+		}
 	}
 
 	err = engine.SaveModel(creator)

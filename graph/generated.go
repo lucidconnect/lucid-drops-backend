@@ -12279,7 +12279,7 @@ func (ec *executionContext) unmarshalInputSocialsInput(ctx context.Context, obj 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"twitter", "instagram", "github"}
+	fieldsInOrder := [...]string{"twitter", "instagram", "github", "warpcast"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12313,6 +12313,15 @@ func (ec *executionContext) unmarshalInputSocialsInput(ctx context.Context, obj 
 				return it, err
 			}
 			it.Github = data
+		case "warpcast":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("warpcast"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Warpcast = data
 		}
 	}
 

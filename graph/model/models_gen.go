@@ -247,6 +247,7 @@ type SocialsInput struct {
 	Twitter   *string `json:"twitter,omitempty"`
 	Instagram *string `json:"instagram,omitempty"`
 	Github    *string `json:"github,omitempty"`
+	Warpcast  *string `json:"warpcast,omitempty"`
 }
 
 type StartEmailVerificationResponse struct {
