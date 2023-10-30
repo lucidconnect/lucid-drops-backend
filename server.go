@@ -12,7 +12,6 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog/log"
-	"inverse.so/addresswatcher"
 	"inverse.so/dbutils"
 	"inverse.so/engine/whitelist"
 	"inverse.so/graph"
@@ -79,7 +78,7 @@ func main() {
 	}
 
 	go createTelegramBotInstance()
-	go addresswatcher.SubscribeToInverseContractDeployments()
+	// go addresswatcher.SubscribeToInverseContractDeployments()
 	log.Err(httpServer.ListenAndServe())
 }
 
