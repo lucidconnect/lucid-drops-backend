@@ -154,6 +154,21 @@ func GetItemQuestionsByItem(item *models.Item) ([]*model.QuestionnaireType, erro
 	}
 
 	switch *item.Criteria {
+	case model.ClaimCriteriaTypeClaimCode:
+		var directQuestions []*models.DirectAnswerCriteria
+
+		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).Find(&directQuestions).Error
+		if err != nil {
+			return nil, errors.New("seems item doesn't have any direct questions")
+		}
+
+		marshalledQuestion := make([]*model.QuestionnaireType, len(directQuestions))
+		for idx, q := range directQuestions {
+			marshalledQuestion[idx] = q.ToGraphData()
+		}
+
+		return marshalledQuestion, nil
+
 	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire:
 		var directQuestions []*models.DirectAnswerCriteria
 
