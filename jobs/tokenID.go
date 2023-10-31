@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -40,7 +41,7 @@ func VerifyItemTokenIDs() {
 		if collection.BlockchainNetwork != nil {
 			isBase = *collection.BlockchainNetwork == model.BlockchainNetworkBase
 		}
-		
+
 		tokenID, err := FetchTokenUri(*collection.AAContractAddress, item.ID.String(), isBase)
 		if err != nil {
 			log.Error().Msg(err.Error())
@@ -63,7 +64,8 @@ func VerifyItemTokenIDs() {
 
 func fetchItemsWithUnresolvedTokenIDs() (*[]models.Item, error) {
 	var items []models.Item
-	err := dbutils.DB.Where("token_id IS NULL").Find(&items).Error
+	oneHourAgo := time.Now().Add(-1 * time.Hour)
+	err := dbutils.DB.Where("token_id IS NULL and created_at BETWEEN ? AND ?", oneHourAgo, time.Now()).Find(&items).Error
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +80,7 @@ func FetchTokenUri(contractAddress, itemID string, isBase bool) (*int, error) {
 	if isBase {
 		rpcProvider = utils.UseEnvOrDefault("BASE_RPC_PROVIDER", "https://base-mainnet.g.alchemy.com/v2/2jx1c05x5vFN7Swv9R_ZJKKAXZUfas8A")
 	}
-	
+
 	client, err := ethclient.Dial(rpcProvider)
 	if err != nil {
 		log.Error().Msg(err.Error())
