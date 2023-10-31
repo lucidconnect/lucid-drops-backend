@@ -40,6 +40,7 @@ func (c *Creator) CreatorToProfileData() *model.UserProfileType {
 			Twitter:   c.Twitter,
 			Instagram: c.Instagram,
 			Github:    c.Github,
+			Warpcast:  c.Warpcast,
 		},
 	}
 }

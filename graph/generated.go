@@ -199,6 +199,7 @@ type ComplexityRoot struct {
 		Github    func(childComplexity int) int
 		Instagram func(childComplexity int) int
 		Twitter   func(childComplexity int) int
+		Warpcast  func(childComplexity int) int
 	}
 
 	StartEmailVerificationResponse struct {
@@ -1282,6 +1283,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Socials.Twitter(childComplexity), true
+
+	case "Socials.warpcast":
+		if e.complexity.Socials.Warpcast == nil {
+			break
+		}
+
+		return e.complexity.Socials.Warpcast(childComplexity), true
 
 	case "StartEmailVerificationResponse.otpRequestID":
 		if e.complexity.StartEmailVerificationResponse.OtpRequestID == nil {
@@ -8532,6 +8540,47 @@ func (ec *executionContext) fieldContext_Socials_github(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Socials_warpcast(ctx context.Context, field graphql.CollectedField, obj *model.Socials) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Socials_warpcast(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Warpcast, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Socials_warpcast(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Socials",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _StartEmailVerificationResponse_otpRequestID(ctx context.Context, field graphql.CollectedField, obj *model.StartEmailVerificationResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_StartEmailVerificationResponse_otpRequestID(ctx, field)
 	if err != nil {
@@ -11073,6 +11122,8 @@ func (ec *executionContext) fieldContext_userProfileType_socials(ctx context.Con
 				return ec.fieldContext_Socials_instagram(ctx, field)
 			case "github":
 				return ec.fieldContext_Socials_github(ctx, field)
+			case "warpcast":
+				return ec.fieldContext_Socials_warpcast(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Socials", field.Name)
 		},
@@ -13833,6 +13884,8 @@ func (ec *executionContext) _Socials(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Socials_instagram(ctx, field, obj)
 		case "github":
 			out.Values[i] = ec._Socials_github(ctx, field, obj)
+		case "warpcast":
+			out.Values[i] = ec._Socials_warpcast(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

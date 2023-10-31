@@ -228,6 +228,7 @@ type Socials {
   twitter: String
   instagram: String
   github: String
+  warpcast: String
 }
 
 type userProfileType{
