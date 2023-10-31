@@ -14,6 +14,7 @@ import (
 	"inverse.so/graph/model"
 	"inverse.so/mintwatcher"
 	"inverse.so/models"
+	"inverse.so/utils"
 )
 
 func VerifyItemTokenIDs() {
@@ -73,9 +74,9 @@ func fetchItemsWithUnresolvedTokenIDs() (*[]models.Item, error) {
 func FetchTokenUri(contractAddress, itemID string, isBase bool) (*int, error) {
 
 	inverseAPIBaseURL := "https://inverse-prod.onrender.com"
-	rpcProvider := "https://polygon-mainnet.g.alchemy.com/v2/ay1nWdnN3kgnXSKHAdJxUq8-qElvSngM"
+	rpcProvider := utils.UseEnvOrDefault("POLYGON_RPC_PROVIDER", "https://polygon-mainnet.g.alchemy.com/v2/ay1nWdnN3kgnXSKHAdJxUq8-qElvSngM")
 	if isBase {
-		rpcProvider = "https://base-mainnet.g.alchemy.com/v2/bQBUCmzXkksxrIX3JKYxfGr-FzsHFRwP"
+		rpcProvider = utils.UseEnvOrDefault("BASE_RPC_PROVIDER", "https://base-mainnet.g.alchemy.com/v2/2jx1c05x5vFN7Swv9R_ZJKKAXZUfas8A")
 	}
 	
 	client, err := ethclient.Dial(rpcProvider)
