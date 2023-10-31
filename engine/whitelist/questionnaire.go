@@ -146,6 +146,47 @@ func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.Question
 	}
 
 	switch *item.Criteria {
+	case model.ClaimCriteriaTypeClaimCode:
+		var directQuestions []*models.DirectAnswerCriteria
+
+		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).Find(&directQuestions).Error
+		if err != nil {
+			return nil, errors.New("seems item doesn't have any direct questions")
+		}
+
+		if len(directQuestions) != len(input) {
+			return nil, fmt.Errorf("provide anwsers for all (%d) questions", len(directQuestions))
+		}
+
+		mappedQuestionsAndChoices := make(map[string]map[string]bool, len(directQuestions))
+		for _, q := range directQuestions {
+			var unmarshelledAnswers map[string]bool
+
+			json.Unmarshal([]byte(q.Answers), &unmarshelledAnswers)
+
+			mappedQuestionsAndChoices[q.QuestionID.String()] = unmarshelledAnswers
+		}
+
+		answeredQuestions := make(map[string]bool)
+
+		for _, potentialAnswers := range input {
+			answeredQuestions[potentialAnswers.QuestionID] = true
+
+			correctAnswers, found := mappedQuestionsAndChoices[potentialAnswers.QuestionID]
+			if !found {
+				return nil, fmt.Errorf("(%s) is not part of the item claim questions", potentialAnswers.QuestionID)
+			}
+
+			_, correct := correctAnswers[strings.ToLower(potentialAnswers.Answer)]
+			if !correct {
+				return nil, errors.New("wrong answer supplied for one of the questions")
+			}
+		}
+
+		if len(answeredQuestions) != len(directQuestions) {
+			return nil, errors.New("submitted duplicate questions")
+		}
+
 	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire:
 		var directQuestions []*models.DirectAnswerCriteria
 
