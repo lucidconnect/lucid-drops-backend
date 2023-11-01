@@ -69,13 +69,13 @@ func CreditValidStripeWebhook(paymentIntent stripe.PaymentIntent, req *stripe.Ev
 
 func getUserIDFromCustomerID(customerID string) (string, bool) {
 
-	var userID uuid.UUID
-	err := dbutils.DB.Model(&models.Creator{}).Where("stripe_customer_id", customerID).Pluck("id", userID).Error
+	var user models.Creator
+	err := dbutils.DB.Model(&models.Creator{}).Where("stripe_customer_id", customerID).First(user).Error
 	if err != nil {
 		return "", false
 	}
 
-	return userID.String(), true
+	return user.ID.String(), true
 }
 
 func getStripeCustomer(id string) (*stripe.Customer, error) {
