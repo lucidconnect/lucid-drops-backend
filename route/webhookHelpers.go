@@ -126,3 +126,14 @@ func updateFirstPaymentAndCustomerIDStatus(userID, customerID string) error {
 
 	return nil
 }
+
+func isStripeWebhookProcessed(idempotencyKey string) bool {
+
+	var stripeWebhookBody models.StripeWebhooks
+	err := dbutils.DB.Where("idempotency_key = ?", idempotencyKey).First(&stripeWebhookBody).Error
+	if err != nil {
+		return false
+	}
+
+	return stripeWebhookBody.Processed
+}

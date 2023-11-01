@@ -31,6 +31,12 @@ func HandleStripeWebhook(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if isStripeWebhookProcessed(event.Request.ID) {
+		log.Debug().Msg("Webhook already processed")
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	
 	// Replace this endpoint secret with your endpoint's unique secret
 	// If you are testing with the CLI, find the secret by running 'stripe listen'
 	// If you are using an endpoint defined with the API or dashboard, look in your webhook settings
