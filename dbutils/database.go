@@ -62,6 +62,7 @@ func SetupDB(dsn string) *gorm.DB {
 	DB.AutoMigrate(
 		&models.Creator{},
 		&models.Wallet{},
+		&models.StripeWebhooks{},
 		&models.DoubleEntryLedger{},
 		&models.Collection{},
 		&models.WalletAddressClaim{},
