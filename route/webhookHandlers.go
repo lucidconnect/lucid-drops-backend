@@ -58,7 +58,7 @@ func HandleStripeWebhook(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		err = CreditValidStripeWebhook(paymentIntent)
+		err = CreditValidStripeWebhook(paymentIntent, event.Request)
 		if err != nil {
 			log.Debug().Msg("Error crediting user")
 			fmt.Fprintf(os.Stderr, "Error crediting user: %v\n", err)
