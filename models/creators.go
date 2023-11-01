@@ -7,17 +7,18 @@ import (
 
 type Creator struct {
 	Base
-	WalletAddress   string
-	InverseUsername *string      `gorm:"default:null"`
-	Thumbnail       *string      `gorm:"default:null"`
-	FirstPayment    bool         `gorm:"default:false"`
-	Image           *string      `gorm:"default:null"`
-	Bio             *string      `gorm:"default:null"`
-	Twitter         *string      `gorm:"default:null"`
-	Instagram       *string      `gorm:"default:null"`
-	Github          *string      `gorm:"default:null"`
-	Warpcast        *string      `gorm:"default:null"`
-	SignerInfo      []SignerInfo `gorm:"foreignKey:CreatorID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	WalletAddress    string
+	InverseUsername  *string      `gorm:"default:null"`
+	Thumbnail        *string      `gorm:"default:null"`
+	FirstPayment     bool         `gorm:"default:false"`
+	Image            *string      `gorm:"default:null"`
+	Bio              *string      `gorm:"default:null"`
+	Twitter          *string      `gorm:"default:null"`
+	Instagram        *string      `gorm:"default:null"`
+	Github           *string      `gorm:"default:null"`
+	Warpcast         *string      `gorm:"default:null"`
+	StripeCustomerID *string      `gorm:"default:null"`
+	SignerInfo       []SignerInfo `gorm:"foreignKey:CreatorID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 func (c *Creator) ToGraphData() *model.CreatorDetails {
