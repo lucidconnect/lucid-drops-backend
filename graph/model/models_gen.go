@@ -126,6 +126,8 @@ type ItemInput struct {
 	CollectionID *string `json:"collectionID,omitempty"`
 	UserLimit    *int    `json:"userLimit,omitempty"`
 	EditionLimit *int    `json:"editionLimit,omitempty"`
+	// This should typically be in cents
+	ClaimFee *int `json:"claimFee,omitempty"`
 }
 
 type JWTCreationResponse struct {

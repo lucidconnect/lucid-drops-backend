@@ -11735,7 +11735,7 @@ func (ec *executionContext) unmarshalInputItemInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "image", "description", "collectionID", "userLimit", "editionLimit"}
+	fieldsInOrder := [...]string{"name", "image", "description", "collectionID", "userLimit", "editionLimit", "claimFee"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -11796,6 +11796,15 @@ func (ec *executionContext) unmarshalInputItemInput(ctx context.Context, obj int
 				return it, err
 			}
 			it.EditionLimit = data
+		case "claimFee":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("claimFee"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClaimFee = data
 		}
 	}
 

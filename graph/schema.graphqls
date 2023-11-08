@@ -160,6 +160,10 @@ input ItemInput {
 	collectionID: String
   userLimit: Int
   editionLimit: Int
+  """
+  This should typically be in cents
+  """
+  claimFee: Int
 }
 
 input NewTwitterCriteriaInput {
