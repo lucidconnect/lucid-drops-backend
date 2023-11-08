@@ -77,7 +77,7 @@ func GenerateMobileWalletConfigs(authDetails *internal.AuthDetails) (*model.Mobi
 	altSigner.AltPublicKey = accountDetails.PublicKey
 	altSigner.AltPrivateKey = accountDetails.PrivateKey
 
-	err = engine.SaveModel(altSigner)
+	err = engine.SaveModel(nil, altSigner)
 	if err != nil {
 		return nil, err
 	}

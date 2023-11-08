@@ -60,7 +60,7 @@ func EditUserProfile(input model.EditUserProfileInputType, authDetails *internal
 		}
 	}
 
-	err = engine.SaveModel(creator)
+	err = engine.SaveModel(nil, creator)
 	if err != nil {
 		return nil, err
 	}

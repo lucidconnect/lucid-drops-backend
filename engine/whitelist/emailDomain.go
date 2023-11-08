@@ -29,7 +29,7 @@ func CreateEmailDomainWhitelist(input *model.NewEmailDomainWhitelistInput, authD
 			return nil, err
 		}
 	}
-	
+
 	dbEmails := make([]*models.EmailDomainWhiteList, len(input.AuthorizedSubdomains))
 
 	for idx, domain := range input.AuthorizedSubdomains {
@@ -49,7 +49,7 @@ func CreateEmailDomainWhitelist(input *model.NewEmailDomainWhitelistInput, authD
 	item.Criteria = &emailCriteria
 	item.ShowEmailDomainHints = input.Visible
 
-	itemUpdateErr := engine.SaveModel(item)
+	itemUpdateErr := engine.SaveModel(nil, item)
 	if itemUpdateErr != nil {
 		return nil, itemUpdateErr
 	}

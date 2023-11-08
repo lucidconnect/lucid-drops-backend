@@ -72,7 +72,7 @@ func (bot *BotImplementation) processNewMemberEvent(update *telegrambot.Update) 
 	criteria.GroupID = getChatID(update.Message)
 	// criteria.BotAdded = true
 
-	err = engine.SaveModel(criteria)
+	err = engine.SaveModel(nil, criteria)
 	if err != nil {
 		log.Print(err)
 		return

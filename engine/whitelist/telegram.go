@@ -51,14 +51,14 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 		criteria.GroupTitle = groupTitle
 	}
 
-	criteriaUpdateErr := engine.SaveModel(criteria)
+	criteriaUpdateErr := engine.SaveModel(nil, criteria)
 	if criteriaUpdateErr != nil {
 		return nil, criteriaUpdateErr
 	}
 
 	telegramCriteria := model.ClaimCriteriaTypeTelegram
 	item.Criteria = &telegramCriteria
-	err = engine.SaveModel(item)
+	err = engine.SaveModel(nil, item)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func ProcessTelegramCallBack(id, username, hash, photoURL string) (*string, erro
 		PhotoURL: photoURL,
 	}
 
-	telegramInfoUpdateErr := engine.SaveModel(telegramInfo)
+	telegramInfoUpdateErr := engine.SaveModel(nil, telegramInfo)
 	if telegramInfoUpdateErr != nil {
 		return nil, telegramInfoUpdateErr
 	}

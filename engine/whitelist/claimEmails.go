@@ -129,7 +129,7 @@ func CompleteEmailVerificationForClaim(input *model.CompleteEmailVerificationInp
 
 	if otpDetails.ExpectedOTP != input.Otp {
 		otpDetails.Attempts++
-		otpSaveError := engine.SaveModel(otpDetails)
+		otpSaveError := engine.SaveModel(nil, otpDetails)
 		if otpSaveError != nil {
 			log.Info().Msgf("🚨 OTP Model failed to updated in DB %+v", otpDetails)
 			return nil, errors.New("an error occured when verifying the OTP")
@@ -145,7 +145,7 @@ func CompleteEmailVerificationForClaim(input *model.CompleteEmailVerificationInp
 
 	now := time.Now().Unix()
 	otpDetails.VerifiedAt = &now
-	otpSaveError := engine.SaveModel(otpDetails)
+	otpSaveError := engine.SaveModel(nil, otpDetails)
 	if otpSaveError != nil {
 		log.Info().Msgf("🚨 OTP Model failed to updated in DB %+v", otpDetails)
 		return nil, errors.New("an error when verifying the OTP")

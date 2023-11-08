@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"inverse.so/dbutils"
 	"inverse.so/graph/model"
@@ -22,7 +23,7 @@ func AttachContractAddressForCreationHash(transactionHash, contractAddress strin
 
 	collection.AAContractAddress = utils.GetStrPtr(contractAddress)
 
-	return SaveModel(collection)
+	return SaveModel(nil, collection)
 }
 
 func GetCollectionByDeploymentHash(deploymentHash string) (*models.Collection, error) {
@@ -456,8 +457,18 @@ func CreateModel(newModel interface{}) error {
 	return dbutils.DB.Create(newModel).Error
 }
 
-func SaveModel(model interface{}) error {
-	return dbutils.DB.Save(model).Error
+func SaveModel(tx *gorm.DB, model interface{}) error {
+
+	isLocalTx := tx == nil
+	if isLocalTx {
+		tx = dbutils.DB.Begin()
+	}
+
+	if isLocalTx {
+		return tx.Commit().Error
+	}
+
+	return nil
 }
 
 func SoftDeleteModel(model interface{}) error {

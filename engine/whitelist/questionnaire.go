@@ -77,7 +77,7 @@ func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input
 		if input.ClaimCode != nil && *input.ClaimCode {
 			item.Criteria = &claimCodeType
 		}
-		itemUpdateErr := engine.SaveModel(item)
+		itemUpdateErr := engine.SaveModel(nil, item)
 		if itemUpdateErr != nil {
 			return nil, itemUpdateErr
 		}
@@ -118,7 +118,7 @@ func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input
 
 		multiChoiceQuestionnaireType := model.ClaimCriteriaTypeMutliChoiceQuestionnaire
 		item.Criteria = &multiChoiceQuestionnaireType
-		itemUpdateErr := engine.SaveModel(item)
+		itemUpdateErr := engine.SaveModel(nil, item)
 		if itemUpdateErr != nil {
 			return nil, itemUpdateErr
 		}

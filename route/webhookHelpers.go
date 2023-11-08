@@ -27,7 +27,7 @@ func CreditValidStripeWebhook(paymentIntent stripe.PaymentIntent, req *stripe.Ev
 		customer, err := getStripeCustomer(paymentIntent.Customer.ID)
 		if err != nil {
 			stripeWebhookBody.ErrorMetaData = fmt.Sprintf("customer not found from stripe %v\n", err)
-			go engine.SaveModel(stripeWebhookBody)
+			go engine.SaveModel(nil, stripeWebhookBody)
 			return err
 		}
 
@@ -35,7 +35,7 @@ func CreditValidStripeWebhook(paymentIntent stripe.PaymentIntent, req *stripe.Ev
 		userID, ok = customer.Metadata["creatorId"]
 		if !ok {
 			stripeWebhookBody.ErrorMetaData = "creatorId not found in stripe webhook customer metadata"
-			go engine.SaveModel(stripeWebhookBody)
+			go engine.SaveModel(nil, stripeWebhookBody)
 			return fmt.Errorf("creatorId not found in customer metadata")
 		}
 	}
@@ -53,7 +53,7 @@ func CreditValidStripeWebhook(paymentIntent stripe.PaymentIntent, req *stripe.Ev
 	err := l.Transfer(tx, instruction)
 	if err != nil {
 		stripeWebhookBody.ErrorMetaData = fmt.Sprintf("Ledger transfer error %v\n", err)
-		go engine.SaveModel(stripeWebhookBody)
+		go engine.SaveModel(nil, stripeWebhookBody)
 		tx.Rollback()
 		return err
 	}
@@ -62,7 +62,7 @@ func CreditValidStripeWebhook(paymentIntent stripe.PaymentIntent, req *stripe.Ev
 	customerID := paymentIntent.Customer.ID
 	stripeWebhookBody.Processed = true
 	go updateFirstPaymentAndCustomerIDStatus(userID, customerID)
-	go engine.SaveModel(stripeWebhookBody)
+	go engine.SaveModel(nil, stripeWebhookBody)
 	tx.Commit()
 	return nil
 }

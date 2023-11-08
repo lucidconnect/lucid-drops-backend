@@ -96,7 +96,7 @@ func UpdateCollection(collectionID string, input *model.CollectionInput, authDet
 		collection.Description = *input.Description
 	}
 
-	err = engine.SaveModel(collection)
+	err = engine.SaveModel(nil, collection)
 	if err != nil {
 		return nil, errors.New("couldn't create new collection")
 	}

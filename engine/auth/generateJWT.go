@@ -48,7 +48,7 @@ func CreateJWTToken(input *model.CreateJWTTokenInput) (*model.JWTCreationRespons
 			Provider:      model.SignerProviderConnectKit,
 		}
 
-		err = engine.SaveModel(altSigner)
+		err = engine.SaveModel(nil, altSigner)
 		if err != nil {
 			return &model.JWTCreationResponse{
 				Token: jwt,

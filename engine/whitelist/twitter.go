@@ -73,12 +73,12 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 
 	twitterCriteria := input.CriteriaType
 	item.Criteria = &twitterCriteria
-	itemUpdateErr := engine.SaveModel(item)
+	itemUpdateErr := engine.SaveModel(nil, item)
 	if itemUpdateErr != nil {
 		return nil, itemUpdateErr
 	}
 
-	criteriaUpdateErr := engine.SaveModel(criteria)
+	criteriaUpdateErr := engine.SaveModel(nil, criteria)
 	if criteriaUpdateErr != nil {
 		return nil, criteriaUpdateErr
 	}
@@ -94,7 +94,7 @@ func ProcessTwitterCallback(token, verifier *string) (*string, error) {
 	}
 
 	// do other claim specific stuff here
-	err = engine.SaveModel(tweetInfo)
+	err = engine.SaveModel(nil, tweetInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func indexTweetRetweets(criteria models.TwitterCriteria) error {
 	}
 
 	criteria.IndexedRetweets = string(retweetsToBytes)
-	err = engine.SaveModel(criteria)
+	err = engine.SaveModel(nil, criteria)
 	if err != nil {
 		return err
 	}
@@ -171,7 +171,7 @@ func indexTwitterFollowers(criteria models.TwitterCriteria) error {
 	}
 
 	criteria.IndexedFollowers = string(followersToBytes)
-	err = engine.SaveModel(criteria)
+	err = engine.SaveModel(nil, criteria)
 	if err != nil {
 		return err
 	}
@@ -242,7 +242,7 @@ func validateTwitterAuthWithCriteria(auth *models.TwitterAuthDetails, criteria *
 
 	auth.WhiteListed = true
 	auth.ItemID = &criteria.ItemID
-	err = engine.SaveModel(auth)
+	err = engine.SaveModel(nil, auth)
 	if err != nil {
 		return resp, err
 	}

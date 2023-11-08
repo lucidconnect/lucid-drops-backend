@@ -138,7 +138,7 @@ func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.Depl
 		collection.AAContractAddress = input.ContractAddress
 	}
 
-	err = engine.SaveModel(collection)
+	err = engine.SaveModel(nil, collection)
 	if err != nil {
 		return nil, err
 	}
