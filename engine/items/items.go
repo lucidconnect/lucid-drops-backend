@@ -273,8 +273,7 @@ func SetItemClaimDeadline(itemID string, deadline string) (*model.Item, error) {
 		return nil, errors.New("item not found")
 	}
 
-	defaultTimeFormat := "2006-01-02"
-	dateForrmatted, err := time.Parse(defaultTimeFormat, deadline)
+	dateForrmatted, err := time.Parse(time.RFC3339Nano, deadline)
 	if err != nil {
 		return nil, err
 	}
