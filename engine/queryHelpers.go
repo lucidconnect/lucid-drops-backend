@@ -355,7 +355,7 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 	var err error
 	if item.Criteria == nil {
 		switch *item.Criteria {
-		case model.ClaimCriteriaTypeDirectAnswerQuestionnaire:
+		case model.ClaimCriteriaTypeDirectAnswerQuestionnaire, model.ClaimCriteriaTypeMutliChoiceQuestionnaire, model.ClaimCriteriaTypeClaimCode:
 			//Delete existing questionnaire criteria
 			err = dbutils.DB.Delete(&models.DirectAnswerCriteria{}, "item_id = ?", item.ID).Error
 			if err != nil {
