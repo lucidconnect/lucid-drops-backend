@@ -355,17 +355,19 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 	var err error
 	if item.Criteria == nil {
 		switch *item.Criteria {
-		case model.ClaimCriteriaTypeDirectAnswerQuestionnaire, model.ClaimCriteriaTypeMutliChoiceQuestionnaire, model.ClaimCriteriaTypeClaimCode:
+		case model.ClaimCriteriaTypeDirectAnswerQuestionnaire, model.ClaimCriteriaTypeClaimCode:
 			//Delete existing questionnaire criteria
 			err = dbutils.DB.Delete(&models.DirectAnswerCriteria{}, "item_id = ?", item.ID).Error
 			if err != nil {
 				return errors.New("an error occured while updating updating questionnaire criteria")
 			}
 
+		case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
 			err = dbutils.DB.Delete(&models.MultiChoiceCriteria{}, "item_id = ?", item.ID).Error
 			if err != nil {
 				return errors.New("an error occured while updating updating questionnaire criteria")
 			}
+
 		case model.ClaimCriteriaTypeTwitterInteractions:
 			//Delete existing twitter criteria
 			err = dbutils.DB.Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
