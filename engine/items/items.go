@@ -39,6 +39,10 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 		EditionLimit: input.EditionLimit,
 	}
 
+	if input.ClaimFee != nil {
+		newItem.ClaimFee = *input.ClaimFee
+	}
+
 	err = engine.CreateModel(newItem)
 	if err != nil {
 		return nil, errors.New("couldn't create new collection")
@@ -172,7 +176,7 @@ func UpdateItem(itemID string, input *model.ItemInput, authDetails *internal.Aut
 		item.CollectionID = collection.ID
 	}
 
-	err = engine.SaveModel(item)
+	err = engine.SaveModel(nil, item)
 	if err != nil {
 		return nil, errors.New("couldn't create new item")
 	}
@@ -280,7 +284,7 @@ func SetItemClaimDeadline(itemID string, deadline string) (*model.Item, error) {
 	}
 
 	item.ClaimDeadline = &dateForrmatted
-	err = engine.SaveModel(item)
+	err = engine.SaveModel(nil, item)
 	if err != nil {
 		return nil, errors.New("couldn't save item")
 	}

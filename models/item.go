@@ -16,6 +16,7 @@ type Item struct {
 	TokenID              *int64    `gorm:"index;default:null"`
 	Image                string    `json:"image"`
 	Description          string    `json:"description"`
+	ClaimFee             int       `gorm:"default:0"`
 	Criteria             *model.ClaimCriteriaType
 	ClaimDeadline        *time.Time        `gorm:"default:null"`
 	TwitterCriteria      *TwitterCriteria  `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
