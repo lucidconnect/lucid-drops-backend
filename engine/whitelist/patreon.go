@@ -47,7 +47,7 @@ func ProcessPatreonCallback(code *string, creator bool) (*string, []*structure.P
 		patreonDetails.CampaignID = campaigns[0].Id
 	}
 
-	err = engine.SaveModel(nil, patreonDetails)
+	err = engine.SaveModel(patreonDetails)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -91,7 +91,7 @@ func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *int
 	if input.CampaignID != nil {
 
 		authdetails.CampaignID = *input.CampaignID
-		err = engine.SaveModel(nil, authdetails)
+		err = engine.SaveModel(authdetails)
 		if err != nil {
 			return nil, err
 		}
@@ -101,14 +101,14 @@ func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *int
 		criteria.CampaignName = *input.CampaignName
 	}
 
-	criteriaUpdateErr := engine.SaveModel(nil, criteria)
+	criteriaUpdateErr := engine.SaveModel(criteria)
 	if criteriaUpdateErr != nil {
 		return nil, criteriaUpdateErr
 	}
 
 	patreonCriteria := model.ClaimCriteriaTypePatreon
 	item.Criteria = &patreonCriteria
-	err = engine.SaveModel(nil, item)
+	err = engine.SaveModel(item)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func ValidatePatreonCriteriaForItem(itemID string, authID *string) (*model.Valid
 		_, ok := campaignPledges[membershipID]
 		if ok {
 			patreonAuth.WhiteListed = true
-			err = engine.SaveModel(nil, patreonAuth)
+			err = engine.SaveModel(patreonAuth)
 			if err != nil {
 				return resp, errors.New("error saving patreon auth")
 			}

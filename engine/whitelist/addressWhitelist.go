@@ -59,7 +59,7 @@ func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistI
 
 	addressCriteria := model.ClaimCriteriaTypeWalletAddress
 	item.Criteria = &addressCriteria
-	itemUpdateErr := engine.SaveModel(nil, item)
+	itemUpdateErr := engine.SaveModel(item)
 	if itemUpdateErr != nil {
 		return nil, itemUpdateErr
 	}

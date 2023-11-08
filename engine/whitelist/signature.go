@@ -54,7 +54,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model
 	}
 
 	mintPass.MinterAddress = input.ClaimingAddress
-	mintPassSaveError := engine.SaveModel(tx, mintPass)
+	mintPassSaveError := engine.SaveModelInDBTransaction(tx, mintPass)
 	if mintPassSaveError != nil {
 		log.Info().Msgf("🚨 Mint Pass Model failed to updated in DB %+v", mintPass)
 		return nil, errors.New("an error when verifying the Claim")

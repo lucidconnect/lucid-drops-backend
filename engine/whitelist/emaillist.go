@@ -95,7 +95,7 @@ func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetail
 
 	emailCriteria := model.ClaimCriteriaTypeEmailWhiteList
 	item.Criteria = &emailCriteria
-	itemUpdateErr := engine.SaveModel(nil, item)
+	itemUpdateErr := engine.SaveModel(item)
 	if itemUpdateErr != nil {
 		return nil, itemUpdateErr
 	}

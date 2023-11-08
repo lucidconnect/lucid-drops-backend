@@ -34,7 +34,7 @@ func StoreUserAccountSignerAddress(input model.SignerInfo, authDetails *internal
 		altSigner.Signature = input.Signature
 	}
 
-	alterr := engine.SaveModel(nil, altSigner)
+	alterr := engine.SaveModel(altSigner)
 	if alterr != nil {
 		return false, err
 	}

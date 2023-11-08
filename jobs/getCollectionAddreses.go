@@ -31,7 +31,7 @@ func FillOutContractAddresses() {
 
 		deployment.AAContractAddress = contractAdddress
 
-		err = engine.SaveModel(nil, deployment)
+		err = engine.SaveModel(deployment)
 		if err != nil {
 			notifier.NotifyTelegram(fmt.Sprintf("👺 Collection (%s )Saving failed (%s)", *contractAdddress, err), structure.EngineeringTeam)
 			continue

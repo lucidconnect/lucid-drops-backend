@@ -55,7 +55,7 @@ func VerifyItemTokenIDs() {
 
 		tokenIDint64 := int64(*tokenID)
 		item.TokenID = &tokenIDint64
-		err = engine.SaveModel(nil, &item)
+		err = engine.SaveModel(&item)
 		if err != nil {
 			log.Error().Msg(err.Error())
 		}

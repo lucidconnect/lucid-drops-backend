@@ -176,7 +176,7 @@ func UpdateItem(itemID string, input *model.ItemInput, authDetails *internal.Aut
 		item.CollectionID = collection.ID
 	}
 
-	err = engine.SaveModel(nil, item)
+	err = engine.SaveModel(item)
 	if err != nil {
 		return nil, errors.New("couldn't create new item")
 	}
@@ -283,7 +283,7 @@ func SetItemClaimDeadline(itemID string, deadline string) (*model.Item, error) {
 	}
 
 	item.ClaimDeadline = &dateForrmatted
-	err = engine.SaveModel(nil, item)
+	err = engine.SaveModel(item)
 	if err != nil {
 		return nil, errors.New("couldn't save item")
 	}

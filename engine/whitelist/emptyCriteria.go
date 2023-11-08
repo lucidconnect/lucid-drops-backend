@@ -37,12 +37,12 @@ func CreateEmptyCriteria(input model.NewEmptyCriteriaInput, authDetails *interna
 	emptyCriteria := model.ClaimCriteriaTypeEmptyCriteria
 	item.Criteria = &emptyCriteria
 
-	itemUpdateErr := engine.SaveModel(nil, item)
+	itemUpdateErr := engine.SaveModel(item)
 	if itemUpdateErr != nil {
 		return nil, itemUpdateErr
 	}
 
-	criteriaUpdateErr := engine.SaveModel(nil, criteria)
+	criteriaUpdateErr := engine.SaveModel(criteria)
 	if criteriaUpdateErr != nil {
 		return nil, criteriaUpdateErr
 	}

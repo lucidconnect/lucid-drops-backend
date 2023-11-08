@@ -73,7 +73,7 @@ func RegisterInverseUsername(address common.Address, input *model.NewUsernameReg
 		altSigner.Provider = model.SignerProviderConnectKit
 	}
 
-	err = engine.SaveModel(nil, altSigner)
+	err = engine.SaveModel(altSigner)
 	if err != nil {
 		return nil, err
 	}

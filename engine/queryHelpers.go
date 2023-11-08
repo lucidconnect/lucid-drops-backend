@@ -23,7 +23,7 @@ func AttachContractAddressForCreationHash(transactionHash, contractAddress strin
 
 	collection.AAContractAddress = utils.GetStrPtr(contractAddress)
 
-	return SaveModel(nil, collection)
+	return SaveModel(collection)
 }
 
 func GetCollectionByDeploymentHash(deploymentHash string) (*models.Collection, error) {
@@ -457,11 +457,14 @@ func CreateModel(newModel interface{}) error {
 	return dbutils.DB.Create(newModel).Error
 }
 
-// The first argument is an oprional sql transaction parameter.
-//If nil, it will create a new transaction and commit before returning.
-// If not nil, it will use the transaction passed in and the transaction shall not be committed
-func SaveModel(tx *gorm.DB, model interface{}) error {
+func SaveModel(model interface{}) error {
+	return dbutils.DB.Save(model).Error
+}
 
+// The first argument is an oprional sql transaction parameter.
+// If nil, it will create a new transaction and commit before returning.
+// If not nil, it will use the transaction passed in and the transaction shall not be committed
+func SaveModelInDBTransaction(tx *gorm.DB, model interface{}) error {
 	isLocalTx := tx == nil
 	if isLocalTx {
 		tx = dbutils.DB.Begin()

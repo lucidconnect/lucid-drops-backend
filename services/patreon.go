@@ -372,7 +372,7 @@ func refreshAccessTokenIfExpired(auth *models.PatreonAuthDetails) error {
 	auth.RefreshToken = accessTokenResponse.RefreshToken
 	auth.ExpiresAt = time.Now().Add(time.Second * time.Duration(accessTokenResponse.ExpiresIn))
 
-	err = engine.SaveModel(nil, auth)
+	err = engine.SaveModel(auth)
 	if err != nil {
 		return err
 	}
