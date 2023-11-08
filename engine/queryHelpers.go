@@ -457,6 +457,9 @@ func CreateModel(newModel interface{}) error {
 	return dbutils.DB.Create(newModel).Error
 }
 
+// The first argument is an oprional sql transaction parameter.
+//If nil, it will create a new transaction and commit before returning.
+// If not nil, it will use the transaction passed in and the transaction shall not be committed
 func SaveModel(tx *gorm.DB, model interface{}) error {
 
 	isLocalTx := tx == nil
