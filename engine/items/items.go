@@ -1,14 +1,21 @@
 package items
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
 	"time"
 
+	"github.com/rs/zerolog/log"
 	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
+	"inverse.so/jobs"
 	"inverse.so/models"
+	"inverse.so/utils"
 )
 
 func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {
@@ -49,65 +56,65 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 	}
 
 	// This was removed because all deployments are now triggered by the FE
-	// go func() {
-	// inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "https://inverse-aa.onrender.com")
-	// inverseAPIBaseURL := utils.UseEnvOrDefault("INVERSE_API_BASEURL", "https://inverse-backend.onrender.com")
-	// client := &http.Client{}
-	// if collection.AAContractAddress == nil {
-	// 	log.Info().Msg("🪼TODO ADD SUPPORT FOR QUEING")
-	// 	return
-	// }
-	// itemData, err := json.Marshal(map[string]interface{}{
-	// 	"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *collection.AAContractAddress, newItem.ID.String()),
-	// 	"contractAddress": *collection.AAContractAddress,
-	// 	"Network":         collection.BlockchainNetwork,
-	// })
+	go func() {
+		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "https://inverse-aa.onrender.com")
+		inverseAPIBaseURL := utils.UseEnvOrDefault("INVERSE_API_BASEURL", "https://inverse-backend.onrender.com")
+		client := &http.Client{}
+		if collection.AAContractAddress == nil {
+			log.Info().Msg("🪼TODO ADD SUPPORT FOR QUEING")
+			return
+		}
+		itemData, err := json.Marshal(map[string]interface{}{
+			"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *collection.AAContractAddress, newItem.ID.String()),
+			"contractAddress": *collection.AAContractAddress,
+			"Network":         collection.BlockchainNetwork,
+		})
 
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-	// req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/additem", bytes.NewBuffer(itemData))
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/additem", bytes.NewBuffer(itemData))
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-	// req.Header.Add("Content-Type", "application/json")
-	// res, err := client.Do(req)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+		req.Header.Add("Content-Type", "application/json")
+		res, err := client.Do(req)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 
-	// var isBase bool
-	// if collection.BlockchainNetwork != nil {
-	// 	isBase = *collection.BlockchainNetwork == model.BlockchainNetworkBase
-	// }
+		var isBase bool
+		if collection.BlockchainNetwork != nil {
+			isBase = *collection.BlockchainNetwork == model.BlockchainNetworkBase
+		}
 
-	// if res.StatusCode == http.StatusOK {
-	// 	go func() {
-	// 		tokenID, err := jobs.FetchTokenUri(*collection.AAContractAddress, newItem.ID.String(), isBase)
-	// 		if err != nil {
-	// 			return
-	// 		}
+		if res.StatusCode == http.StatusOK {
+			go func() {
+				tokenID, err := jobs.FetchTokenUri(*collection.AAContractAddress, newItem.ID.String(), isBase)
+				if err != nil {
+					return
+				}
 
-	// 		if tokenID == nil {
-	// 			log.Info().Msgf("🚨 Token ID not found for Item %s", newItem.ID)
-	// 			return
-	// 		}
+				if tokenID == nil {
+					log.Info().Msgf("🚨 Token ID not found for Item %s", newItem.ID)
+					return
+				}
 
-	// 		tokenIDint64 := int64(*tokenID)
-	// 		newItem.TokenID = &tokenIDint64
-	// 		err = engine.SaveModel(&newItem)
-	// 		if err != nil {
-	// 			log.Error().Msg(err.Error())
-	// 		}
-	// 	}()
-	// }
-	// 	defer res.Body.Close()
-	// }()
+				tokenIDint64 := int64(*tokenID)
+				newItem.TokenID = &tokenIDint64
+				err = engine.SaveModel(nil, &newItem)
+				if err != nil {
+					log.Error().Msg(err.Error())
+				}
+			}()
+		}
+		defer res.Body.Close()
+	}()
 
 	return newItem.ToGraphData(), nil
 }
