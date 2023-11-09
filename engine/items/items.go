@@ -103,7 +103,7 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 
 				tokenIDint64 := int64(*tokenID)
 				newItem.TokenID = &tokenIDint64
-				err = engine.SaveModel(nil, &newItem)
+				err = engine.SaveModel(&newItem)
 				if err != nil {
 					log.Error().Msg(err.Error())
 				}
