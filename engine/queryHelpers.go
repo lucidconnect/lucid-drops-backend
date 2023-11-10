@@ -118,9 +118,9 @@ func GetCollectionByID(collectionID string) (*models.Collection, error) {
 func GetClaimedItemByAddress(address string) ([]*models.Item, error) {
 	var mintPasses []models.MintPass
 
-	err := dbutils.DB.Where("minter_address=?", address).Find(&mintPasses).Error
+	err := dbutils.DB.Model(&models.MintPass{}).Where("minter_address=?", address).Find(&mintPasses).Error
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("claimed items not found")
 	}
 
 	itemsIds := make([]string, len(mintPasses))
