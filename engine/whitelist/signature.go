@@ -15,6 +15,7 @@ import (
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/magic"
+	"inverse.so/models"
 	"inverse.so/utils"
 )
 
@@ -26,6 +27,14 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model
 
 	if mintPass.UsedAt != nil {
 		return nil, errors.New("mint pass has already been used")
+	}
+
+	var passes int64
+	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id=? AND minter_address = ?", mintPass.ItemId, mintPass.MinterAddress).Count(&passes).Error
+	if err == nil {
+		if passes > 1 {
+			return nil, errors.New("more than one mint pass found for this minter address")
+		}
 	}
 
 	if IsThisAValidEthAddress(input.ClaimingAddress) {
@@ -46,7 +55,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model
 	}
 
 	if item.ClaimFee > 0 {
-		err = deductClaimFeeFromUser(*userID, item, tx)
+		err = chargeClaimFee(*userID, item, tx)
 		if err != nil {
 			tx.Rollback()
 			return nil, err

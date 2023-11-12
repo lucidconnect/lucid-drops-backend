@@ -85,12 +85,11 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 	}, nil
 }
 
-func deductClaimFeeFromUser(userID string, item *models.Item, tx *gorm.DB) error {
+func chargeClaimFee(userID string, item *models.Item, tx *gorm.DB) error {
 
 	inverseMargin := 0.25
 	marginDeduction := int64(float64(item.ClaimFee) * inverseMargin)
 	claimFeeAfterMarginDeduction := int64(item.ClaimFee) - marginDeduction
-
 
 	collection, err := engine.GetCollectionByID(item.CollectionID.String())
 	if err != nil {
