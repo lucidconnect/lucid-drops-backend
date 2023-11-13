@@ -138,6 +138,29 @@ func GetClaimedItemByAddress(address string) ([]*models.Item, error) {
 	return claimedItems, nil
 }
 
+func GetClaimedItemsByEOAAddress(address string) ([]*models.Item, error) {
+	var walletAddressClaims []models.WalletAddressClaim
+
+	err := dbutils.DB.Model(&models.WalletAddressClaim{}).Where("embedded_wallet_address=? AND sent_out_at <> NULL", address).Find(&walletAddressClaims).Error
+	if err != nil {
+		return nil, errors.New("claimed items not found")
+	}
+
+	itemsIds := make([]string, len(walletAddressClaims))
+
+	for idx, pass := range walletAddressClaims {
+		itemsIds[idx] = pass.ItemID.String()
+	}
+
+	var claimedItems []*models.Item
+	err = dbutils.DB.Where("id IN (?)", itemsIds).Find(&claimedItems).Error
+	if err != nil {
+		return nil, errors.New("claimed items no longer exists")
+	}
+
+	return claimedItems, nil
+}
+
 func GetItemByID(itemID string) (*models.Item, error) {
 	var item models.Item
 

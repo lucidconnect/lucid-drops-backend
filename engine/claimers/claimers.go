@@ -21,6 +21,12 @@ func FetchClaimedItems(address string) ([]*model.Item, error) {
 		return nil, err
 	}
 
+	eoaClaimedItems, err := engine.GetClaimedItemsByEOAAddress(address)
+	if err != nil {
+		return nil, err
+	}
+
+	items = append(items, eoaClaimedItems...)
 	mappedItems := make([]*model.Item, len(items))
 
 	for idx, item := range items {

@@ -8,8 +8,9 @@ import (
 
 type WalletAddressClaim struct {
 	BaseWithoutPrimaryKey
-	CreatorID     uuid.UUID  `gorm:"primaryKey"`
-	ItemID        uuid.UUID  `gorm:"primaryKey"`
-	WalletAddress string     `gorm:"primaryKey"`
-	SentOutAt     *time.Time `gorm:"default:null"`
+	CreatorID             uuid.UUID  `gorm:"primaryKey"`
+	ItemID                uuid.UUID  `gorm:"primaryKey"`
+	WalletAddress         string     `gorm:"primaryKey"`
+	EmbeddedWalletAddress string     `gorm:"default:null"`
+	SentOutAt             *time.Time `gorm:"default:null"`
 }
