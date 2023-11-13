@@ -27,6 +27,11 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		return nil, errors.New("mint pass not found")
 	}
 
+	if embeddedWalletAddress == "" {
+		return nil, errors.New("embedded wallet address is required")
+	}
+
+	log.Info().Msgf("🔐 Embedded wallet Address: %s", embeddedWalletAddress)
 	if strings.Contains(input.ClaimingAddress, ".eth") {
 		resolvedAddress, err := utils.ResolveENSName(input.ClaimingAddress)
 		if err != nil {
@@ -82,9 +87,8 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	now := time.Now()
 	addressClaiim.EmbeddedWalletAddress = embeddedWalletAddress
 	addressClaiim.SentOutAt = &now
-	addressClaimError := engine.SaveModelInDBTransaction(tx, &addressClaiim)
+	addressClaimError := engine.SaveModel(&addressClaiim)
 	if addressClaimError != nil {
-		tx.Rollback()
 		log.Info().Msgf("🚨 Address Claim Model failed to updated in DB %+v", addressClaiim)
 		return nil, errors.New("an error when verifying the Claim")
 	}
