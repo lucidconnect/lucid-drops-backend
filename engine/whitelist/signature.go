@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	inlog "log"
 	"net/http"
 	"strings"
 	"time"
@@ -32,7 +31,6 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		return nil, errors.New("embedded wallet address is required")
 	}
 
-	inlog.Printf("🔐 Embedded wallet Address: %s", embeddedWalletAddress)
 	if strings.Contains(input.ClaimingAddress, ".eth") {
 		resolvedAddress, err := utils.ResolveENSName(input.ClaimingAddress)
 		if err != nil {
@@ -92,7 +90,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		}
 	}
 
-	mintPass.MinterAddress = input.ClaimingAddress
+	mintPass.MinterAddress = addressClaiim.WalletAddress
 	mintPassSaveError := engine.SaveModelInDBTransaction(tx, mintPass)
 	if mintPassSaveError != nil {
 		tx.Rollback()

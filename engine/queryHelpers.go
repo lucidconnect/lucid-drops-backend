@@ -141,7 +141,7 @@ func GetClaimedItemByAddress(address string) ([]*models.Item, error) {
 func GetClaimedItemsByEOAAddress(address string) ([]*models.Item, error) {
 	var walletAddressClaims []models.WalletAddressClaim
 
-	err := dbutils.DB.Model(&models.WalletAddressClaim{}).Where("embedded_wallet_address=? AND sent_out_at <> NULL", address).Find(&walletAddressClaims).Error
+	err := dbutils.DB.Model(&models.WalletAddressClaim{}).Where("wallet_address=? AND sent_out_at <> NULL", address).Find(&walletAddressClaims).Error
 	if err != nil {
 		return nil, errors.New("claimed items not found")
 	}
