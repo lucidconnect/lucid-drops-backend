@@ -30,9 +30,9 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model
 	}
 
 	var passes int64
-	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id=? AND minter_address = ?", mintPass.ItemId, mintPass.MinterAddress).Count(&passes).Error
+	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id = ? AND minter_address = ?", mintPass.ItemId, input.ClaimingAddress).Count(&passes).Error
 	if err == nil {
-		if passes > 1 {
+		if passes != 0 {
 			return nil, errors.New("more than one mint pass found for this minter address")
 		}
 	}
