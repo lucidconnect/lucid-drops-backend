@@ -19,7 +19,7 @@ import (
 	"inverse.so/utils"
 )
 
-func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error) {
+func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embeddedWalletAddress string) (*model.MintAuthorizationResponse, error) {
 	mintPass, err := engine.GetMintPassById(input.OtpRequestID)
 	if err != nil {
 		return nil, errors.New("mint pass not found")
@@ -42,7 +42,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model
 	}
 
 	tx := dbutils.DB.Begin()
-	userID, err := engine.GetCCreatorIDFromWalletAddress(input.ClaimingAddress)
+	userID, err := engine.GetCCreatorIDFromWalletAddress(embeddedWalletAddress)
 	if err != nil {
 		tx.Rollback()
 		return nil, errors.New("claimer not found")

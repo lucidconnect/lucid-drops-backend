@@ -282,7 +282,12 @@ func (r *mutationResolver) CompleteEmailVerificationForClaim(ctx context.Context
 
 // GenerateSignatureForClaim is the resolver for the generateSignatureForClaim field.
 func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error) {
-	return whitelist.GenerateSignatureForClaim(&input)
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return whitelist.GenerateSignatureForClaim(&input, authenticationDetails.Address.Hex())
 }
 
 // StoreSignerInfo is the resolver for the storeSignerInfo field.
