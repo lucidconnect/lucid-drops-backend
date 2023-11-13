@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -51,6 +52,12 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		return nil, errors.New("the passed in address in not a valid Ethereum address")
 	}
 
+	var addressClaiim models.WalletAddressClaim
+	err = dbutils.DB.Where("item_id = ? AND wallet_address = ?", mintPass.ItemId, input.ClaimingAddress).First(&addressClaiim).Error
+	if err != nil {
+		return nil, errors.New("this wallet address is not allow-listed for this item")
+	}
+
 	tx := dbutils.DB.Begin()
 	userID, err := engine.GetCCreatorIDFromWalletAddress(embeddedWalletAddress)
 	if err != nil {
@@ -72,9 +79,20 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		}
 	}
 
+	now := time.Now()
+	addressClaiim.EmbeddedWalletAddress = embeddedWalletAddress
+	addressClaiim.SentOutAt = &now
+	addressClaimError := engine.SaveModelInDBTransaction(tx, &addressClaiim)
+	if addressClaimError != nil {
+		tx.Rollback()
+		log.Info().Msgf("🚨 Address Claim Model failed to updated in DB %+v", addressClaiim)
+		return nil, errors.New("an error when verifying the Claim")
+	}
+
 	mintPass.MinterAddress = input.ClaimingAddress
 	mintPassSaveError := engine.SaveModelInDBTransaction(tx, mintPass)
 	if mintPassSaveError != nil {
+		tx.Rollback()
 		log.Info().Msgf("🚨 Mint Pass Model failed to updated in DB %+v", mintPass)
 		return nil, errors.New("an error when verifying the Claim")
 	}

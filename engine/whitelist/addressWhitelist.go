@@ -120,7 +120,6 @@ func ValidateAddressCriteria(itemID, walletAddress string, authDetails *internal
 
 	now := time.Now()
 	claimVal.SentOutAt = &now
-	claimVal.EmbeddedWalletAddress = authDetails.Address.Hex()
 	err = dbutils.DB.Save(claimVal).Error
 	if err != nil {
 		return resp, errors.New("error updating wallet address claim")
