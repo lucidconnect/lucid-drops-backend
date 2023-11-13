@@ -2,11 +2,11 @@ package whitelist
 
 import (
 	"errors"
+
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/models"
-	
 )
 
 func CreateEmptyCriteria(input model.NewEmptyCriteriaInput, authDetails *internal.AuthDetails) (*model.Item, error) {
@@ -32,7 +32,6 @@ func CreateEmptyCriteria(input model.NewEmptyCriteriaInput, authDetails *interna
 	criteria := &models.EmptyCriteria{
 		ItemID:    item.ID.String(),
 		CreatorID: creator.ID.String(),
-		
 	}
 
 	emptyCriteria := model.ClaimCriteriaTypeEmptyCriteria

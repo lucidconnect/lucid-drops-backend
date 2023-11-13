@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"inverse.so/dbutils"
 	"inverse.so/graph/model"
@@ -354,17 +355,19 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 	var err error
 	if item.Criteria == nil {
 		switch *item.Criteria {
-		case model.ClaimCriteriaTypeDirectAnswerQuestionnaire:
+		case model.ClaimCriteriaTypeDirectAnswerQuestionnaire, model.ClaimCriteriaTypeClaimCode:
 			//Delete existing questionnaire criteria
 			err = dbutils.DB.Delete(&models.DirectAnswerCriteria{}, "item_id = ?", item.ID).Error
 			if err != nil {
 				return errors.New("an error occured while updating updating questionnaire criteria")
 			}
 
+		case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
 			err = dbutils.DB.Delete(&models.MultiChoiceCriteria{}, "item_id = ?", item.ID).Error
 			if err != nil {
 				return errors.New("an error occured while updating updating questionnaire criteria")
 			}
+
 		case model.ClaimCriteriaTypeTwitterInteractions:
 			//Delete existing twitter criteria
 			err = dbutils.DB.Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
@@ -458,6 +461,22 @@ func CreateModel(newModel interface{}) error {
 
 func SaveModel(model interface{}) error {
 	return dbutils.DB.Save(model).Error
+}
+
+// The first argument is an oprional sql transaction parameter.
+// If nil, it will create a new transaction and commit before returning.
+// If not nil, it will use the transaction passed in and the transaction shall not be committed
+func SaveModelInDBTransaction(tx *gorm.DB, model interface{}) error {
+	isLocalTx := tx == nil
+	if isLocalTx {
+		tx = dbutils.DB.Begin()
+	}
+
+	if isLocalTx {
+		return tx.Commit().Error
+	}
+
+	return nil
 }
 
 func SoftDeleteModel(model interface{}) error {

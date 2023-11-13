@@ -11,9 +11,11 @@ import (
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/rs/zerolog/log"
+	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/magic"
+	"inverse.so/models"
 	"inverse.so/utils"
 )
 
@@ -27,16 +29,50 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model
 		return nil, errors.New("mint pass has already been used")
 	}
 
+	var passes int64
+	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id=? AND minter_address = ?", mintPass.ItemId, mintPass.MinterAddress).Count(&passes).Error
+	if err == nil {
+		if passes > 1 {
+			return nil, errors.New("more than one mint pass found for this minter address")
+		}
+	}
+
 	if IsThisAValidEthAddress(input.ClaimingAddress) {
 		return nil, errors.New("the passed in address in not a valid Ethereum address")
 	}
 
-	mintPass.MinterAddress = input.ClaimingAddress
+	tx := dbutils.DB.Begin()
+	userID, err := engine.GetCCreatorIDFromWalletAddress(input.ClaimingAddress)
+	if err != nil {
+		tx.Rollback()
+		return nil, errors.New("claimer not found")
+	}
 
-	mintPassSaveError := engine.SaveModel(mintPass)
+	item, err := engine.GetItemByID(mintPass.ItemId)
+	if err != nil {
+		tx.Rollback()
+		return nil, errors.New("item not found")
+	}
+
+	if item.ClaimFee > 0 {
+		err = chargeClaimFee(*userID, item, tx)
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+
+	mintPass.MinterAddress = input.ClaimingAddress
+	mintPassSaveError := engine.SaveModelInDBTransaction(tx, mintPass)
 	if mintPassSaveError != nil {
 		log.Info().Msgf("🚨 Mint Pass Model failed to updated in DB %+v", mintPass)
 		return nil, errors.New("an error when verifying the Claim")
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
 	}
 
 	go func() {

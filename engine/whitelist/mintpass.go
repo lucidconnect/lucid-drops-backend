@@ -2,12 +2,16 @@ package whitelist
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 	"time"
 
+	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 	"inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
+	"inverse.so/ledger"
 	"inverse.so/models"
 	"inverse.so/utils"
 )
@@ -56,6 +60,7 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		return nil, errors.New("item edition limit reached")
 	}
 
+	tx := dbutils.DB.Begin()
 	newMint := models.MintPass{
 		ItemId:                    item.ID.String(),
 		ItemIdOnContract:          *item.TokenID,
@@ -63,7 +68,13 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		BlockchainNetwork:         collection.BlockchainNetwork,
 	}
 
-	err = dbutils.DB.Create(&newMint).Error
+	err = tx.Create(&newMint).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit().Error
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +83,62 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		Valid:  true,
 		PassID: utils.GetStrPtr(newMint.ID.String()),
 	}, nil
+}
+
+func chargeClaimFee(userID string, item *models.Item, tx *gorm.DB) error {
+
+	inverseMargin := 0.25
+	marginDeduction := int64(float64(item.ClaimFee) * inverseMargin)
+	claimFeeAfterMarginDeduction := int64(item.ClaimFee) - marginDeduction
+
+	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	if err != nil {
+		return errors.New("collection not found")
+	}
+
+	///debit side instruction for collector
+	l := ledger.New(dbutils.DB)
+	debitInstruction := ledger.TransferInstruction{
+		UserID: uuid.FromStringOrNil(userID),
+		Amount: int64(item.ClaimFee),
+		Side:   ledger.Debit,
+		TxRef:  fmt.Sprintf("claim-%s-%s-%s", item.ID.String(), userID, utils.RandAlphaNumericRunes(5)),
+	}
+
+	err = l.Transfer(tx, debitInstruction)
+	if err != nil {
+		return err
+	}
+
+	//credit side instruction for creator
+	creditInstruction := ledger.TransferInstruction{
+		UserID: uuid.FromStringOrNil(collection.CreatorID.String()),
+		Amount: claimFeeAfterMarginDeduction,
+		Side:   ledger.Credit,
+		TxRef:  fmt.Sprintf("claim-%s-%s-%s", item.ID.String(), collection.CreatorID.String(), utils.RandAlphaNumericRunes(5)),
+	}
+
+	err = l.Transfer(tx, creditInstruction)
+	if err != nil {
+		return err
+	}
+
+	// send creator successful charge/money made email
+
+	//credit side instruction for inverse margin
+	collectInstruction := ledger.TransferInstruction{
+		UserID: uuid.FromStringOrNil(l.CollectAccount.CreatorID),
+		Amount: marginDeduction,
+		Side:   ledger.Credit,
+		TxRef:  fmt.Sprintf("claim-%s-%s-%s", item.ID.String(), collection.CreatorID.String(), utils.RandAlphaNumericRunes(5)),
+	}
+
+	err = l.Transfer(tx, collectInstruction)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func CreateMintPassForValidatedCriteriaItem(itemID string) (*model.ValidationRespoonse, error) {
@@ -135,7 +202,7 @@ func checItemEditionLimit(item *models.Item) bool {
 			return false
 		}
 
-		return int(editionCount) >= *item.EditionLimit 
+		return int(editionCount) >= *item.EditionLimit
 	}
 
 	return true

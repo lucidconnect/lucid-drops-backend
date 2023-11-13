@@ -29,7 +29,7 @@ func CreateEmailDomainWhitelist(input *model.NewEmailDomainWhitelistInput, authD
 			return nil, err
 		}
 	}
-	
+
 	dbEmails := make([]*models.EmailDomainWhiteList, len(input.AuthorizedSubdomains))
 
 	for idx, domain := range input.AuthorizedSubdomains {

@@ -46,6 +46,10 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 		EditionLimit: input.EditionLimit,
 	}
 
+	if input.ClaimFee != nil {
+		newItem.ClaimFee = *input.ClaimFee
+	}
+
 	err = engine.CreateModel(newItem)
 	if err != nil {
 		return nil, errors.New("couldn't create new collection")
