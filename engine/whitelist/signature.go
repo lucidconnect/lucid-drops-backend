@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -23,6 +24,15 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	mintPass, err := engine.GetMintPassById(input.OtpRequestID)
 	if err != nil {
 		return nil, errors.New("mint pass not found")
+	}
+
+	if strings.Contains(input.ClaimingAddress, ".eth") {
+		resolvedAddress, err := utils.ResolveENSName(input.ClaimingAddress)
+		if err != nil {
+			return nil, err
+		}
+
+		input.ClaimingAddress = *resolvedAddress
 	}
 
 	if mintPass.UsedAt != nil {
