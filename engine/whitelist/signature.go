@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	inlog "log"
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -31,7 +32,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		return nil, errors.New("embedded wallet address is required")
 	}
 
-	log.Info().Msgf("🔐 Embedded wallet Address: %s", embeddedWalletAddress)
+	inlog.Printf("🔐 Embedded wallet Address: %s", embeddedWalletAddress)
 	if strings.Contains(input.ClaimingAddress, ".eth") {
 		resolvedAddress, err := utils.ResolveENSName(input.ClaimingAddress)
 		if err != nil {
