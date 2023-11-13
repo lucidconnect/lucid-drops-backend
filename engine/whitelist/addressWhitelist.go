@@ -2,6 +2,7 @@ package whitelist
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"gorm.io/gorm/clause"
@@ -10,6 +11,7 @@ import (
 	"inverse.so/graph/model"
 	"inverse.so/internal"
 	"inverse.so/models"
+	"inverse.so/utils"
 )
 
 func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistInput, authDetails *internal.AuthDetails) (*model.Item, error) {
@@ -37,6 +39,16 @@ func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistI
 
 	dbWallets := make([]*models.WalletAddressClaim, len(input.AuthorizedWalletAddresses))
 	for idx, address := range input.AuthorizedWalletAddresses {
+
+		if strings.Contains(address, ".eth") {
+			resolvedAddress, err := utils.ResolveENSName(address)
+			if err != nil {
+				continue
+			}
+			
+			address = *resolvedAddress
+		}
+
 		dbWallets[idx] = &models.WalletAddressClaim{
 			CreatorID:     creator.ID,
 			ItemID:        item.ID,
@@ -114,4 +126,20 @@ func ValidateAddressCriteria(itemID, walletAddress string, authDetails *internal
 	}
 
 	return passResp, nil
+}
+
+func resolveENSToAddress(AddressList []string) ([]string, error) {
+
+	for idx, address := range AddressList {
+		if strings.Contains(address, ".eth") {
+			resolvedAddress, err := utils.ResolveENSName(address)
+			if err != nil {
+				continue
+			}
+			
+			AddressList[idx] = *resolvedAddress
+		}
+	}
+
+	return AddressList, nil
 }
