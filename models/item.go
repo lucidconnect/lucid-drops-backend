@@ -50,6 +50,11 @@ func (i *Item) ToOpenSeaMetadata() *OpenSeaMetaDataFormat {
 
 func (i *Item) ToGraphData() *model.Item {
 
+	var tokenID *int
+	if i.TokenID != nil {
+		tokenID = utils.GetIntPtr(int(*i.TokenID))
+	}
+	
 	item := &model.Item{
 		ID:            i.ID.String(),
 		Name:          i.Name,
@@ -60,6 +65,7 @@ func (i *Item) ToGraphData() *model.Item {
 		CreatedAt:     i.CreatedAt,
 		Deadline:      i.ClaimDeadline,
 		EditionLimit:  i.EditionLimit,
+		TokenID:       tokenID,
 	}
 
 	if i.TwitterCriteria != nil {
