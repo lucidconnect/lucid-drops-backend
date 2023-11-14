@@ -53,7 +53,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	}
 
 	if IsThisAValidEthAddress(input.ClaimingAddress) {
-		return nil, errors.New("the passed in address in not a valid Ethereum address")
+		return nil, errors.New("the address in not a valid Ethereum address")
 	}
 
 	var addressClaiim models.WalletAddressClaim
@@ -90,7 +90,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		}
 	}
 
-	mintPass.MinterAddress = addressClaiim.WalletAddress
+	mintPass.MinterAddress = input.ClaimingAddress
 	mintPassSaveError := engine.SaveModelInDBTransaction(tx, mintPass)
 	if mintPassSaveError != nil {
 		tx.Rollback()
