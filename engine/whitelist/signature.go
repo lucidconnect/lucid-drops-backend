@@ -91,7 +91,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	}
 
 	mintPass.MinterAddress = input.ClaimingAddress
-	mintPassSaveError := engine.SaveModelInDBTransaction(tx, mintPass)
+	mintPassSaveError := engine.SaveModel(&mintPass)
 	if mintPassSaveError != nil {
 		tx.Rollback()
 		log.Info().Msgf("🚨 Mint Pass Model failed to updated in DB %+v", mintPass)
