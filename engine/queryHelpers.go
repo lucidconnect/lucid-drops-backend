@@ -427,6 +427,12 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 			if err != nil {
 				return errors.New("an error occured while updating updating email domain criteria")
 			}
+		case model.ClaimCriteriaTypeWalletAddress:
+			//Delete existing email domain criteria
+			err = dbutils.DB.Delete(&models.WalletAddressClaim{}, "item_id = ?", item.ID).Error
+			if err != nil {
+				return errors.New("an error occured while updating updating email domain criteria")
+			}
 		}
 	}
 
