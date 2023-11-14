@@ -56,7 +56,7 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
 	}
 
-	if !checItemEditionLimit(item) {
+	if ItemOverEditionLimit(item) {
 		return nil, errors.New("item edition limit reached")
 	}
 
@@ -171,7 +171,7 @@ func CreateMintPassForValidatedCriteriaItem(itemID string) (*model.ValidationRes
 		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
 	}
 
-	if !checItemEditionLimit(item) {
+	if ItemOverEditionLimit(item) {
 		return nil, errors.New("item edition limit reached")
 	}
 
@@ -193,7 +193,7 @@ func CreateMintPassForValidatedCriteriaItem(itemID string) (*model.ValidationRes
 	}, nil
 }
 
-func checItemEditionLimit(item *models.Item) bool {
+func ItemOverEditionLimit(item *models.Item) bool {
 
 	if item.EditionLimit != nil {
 		var editionCount int64
@@ -203,5 +203,5 @@ func checItemEditionLimit(item *models.Item) bool {
 		}
 	}
 
-	return true
+	return false
 }
