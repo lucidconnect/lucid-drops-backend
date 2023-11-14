@@ -106,6 +106,7 @@ type ComplexityRoot struct {
 		Name                             func(childComplexity int) int
 		ProfileLink                      func(childComplexity int) int
 		TelegramGroupTitle               func(childComplexity int) int
+		TokenID                          func(childComplexity int) int
 		TweetLink                        func(childComplexity int) int
 		TwitterClaimCriteriaInteractions func(childComplexity int) int
 	}
@@ -590,6 +591,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.TelegramGroupTitle(childComplexity), true
+
+	case "Item.TokenID":
+		if e.complexity.Item.TokenID == nil {
+			break
+		}
+
+		return e.complexity.Item.TokenID(childComplexity), true
 
 	case "Item.tweetLink":
 		if e.complexity.Item.TweetLink == nil {
@@ -2938,6 +2946,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -4022,6 +4032,47 @@ func (ec *executionContext) fieldContext_Item_editionLimit(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Item_TokenID(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_TokenID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TokenID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_TokenID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Item_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Item_createdAt(ctx, field)
 	if err != nil {
@@ -4943,6 +4994,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5034,6 +5087,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5125,6 +5180,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5216,6 +5273,8 @@ func (ec *executionContext) fieldContext_Mutation_addItemDeadline(ctx context.Co
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5307,6 +5366,8 @@ func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaFor
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5398,6 +5459,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5489,6 +5552,8 @@ func (ec *executionContext) fieldContext_Mutation_createWalletAddressWhitelistFo
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5580,6 +5645,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5671,6 +5738,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5762,6 +5831,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5853,6 +5924,8 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -5944,6 +6017,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -7154,6 +7229,8 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -7388,6 +7465,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -7479,6 +7558,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -7932,6 +8013,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -11258,6 +11341,8 @@ func (ec *executionContext) fieldContext_userProfileType_items(ctx context.Conte
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -11335,6 +11420,8 @@ func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx contex
 				return ec.fieldContext_Item_campaignName(ctx, field)
 			case "editionLimit":
 				return ec.fieldContext_Item_editionLimit(ctx, field)
+			case "TokenID":
+				return ec.fieldContext_Item_TokenID(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
@@ -12921,6 +13008,8 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Item_campaignName(ctx, field, obj)
 		case "editionLimit":
 			out.Values[i] = ec._Item_editionLimit(ctx, field, obj)
+		case "TokenID":
+			out.Values[i] = ec._Item_TokenID(ctx, field, obj)
 		case "createdAt":
 			out.Values[i] = ec._Item_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

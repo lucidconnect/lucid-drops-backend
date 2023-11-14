@@ -292,6 +292,7 @@ type Item {
   profileLink: String
   campaignName: String
   editionLimit: Int
+  TokenID: Int
   createdAt: Time!
   deadline: Time
   claimDetails: [ClaimDetails]

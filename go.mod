@@ -22,6 +22,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/stripe/stripe-go v70.15.0+incompatible
 	github.com/vektah/gqlparser/v2 v2.5.10
+	github.com/wealdtech/go-ens/v3 v3.6.0
 	go.step.sm/crypto v0.35.1
 	golang.org/x/crypto v0.13.0
 	golang.org/x/oauth2 v0.12.0
@@ -89,7 +90,6 @@ require (
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
 	github.com/tklauser/numcpus v0.6.1 // indirect
 	github.com/urfave/cli/v2 v2.25.7 // indirect
-	github.com/wealdtech/go-ens/v3 v3.6.0 // indirect
 	github.com/wealdtech/go-multicodec v1.4.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63 // indirect
