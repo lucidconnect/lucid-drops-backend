@@ -198,11 +198,9 @@ func checItemEditionLimit(item *models.Item) bool {
 	if item.EditionLimit != nil {
 		var editionCount int64
 		err := dbutils.DB.Model(&models.MintPass{}).Where("item_id = ?", item.ID).Count(&editionCount).Error
-		if err != nil {
-			return false
+		if err == nil {
+			return int(editionCount) >= *item.EditionLimit
 		}
-
-		return int(editionCount) >= *item.EditionLimit
 	}
 
 	return true
