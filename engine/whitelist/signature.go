@@ -22,6 +22,8 @@ import (
 )
 
 func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embeddedWalletAddress string) (*model.MintAuthorizationResponse, error) {
+	
+	now := time.Now()
 	mintPass, err := engine.GetMintPassById(input.OtpRequestID)
 	if err != nil {
 		return nil, errors.New("mint pass not found")
@@ -45,7 +47,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	}
 
 	var passes int64
-	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id = ? AND minter_address = ?", mintPass.ItemId, input.ClaimingAddress).Count(&passes).Error
+	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id = ? AND minter_address = ? AND used_at <> NULL", mintPass.ItemId, input.ClaimingAddress).Count(&passes).Error
 	if err == nil {
 		if passes != 0 {
 			return nil, errors.New("more than one mint pass found for this minter address")
@@ -59,7 +61,6 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	var addressClaiim models.WalletAddressClaim
 	err = dbutils.DB.Where("item_id = ? AND wallet_address = ?", mintPass.ItemId, input.ClaimingAddress).First(&addressClaiim).Error
 	if err == nil {
-		now := time.Now()
 		addressClaiim.EmbeddedWalletAddress = embeddedWalletAddress
 		addressClaiim.SentOutAt = &now
 		addressClaimError := engine.SaveModel(&addressClaiim)
@@ -91,6 +92,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	}
 
 	mintPass.MinterAddress = input.ClaimingAddress
+	mintPass.UsedAt = &now
 	mintPassSaveError := engine.SaveModel(&mintPass)
 	if mintPassSaveError != nil {
 		tx.Rollback()

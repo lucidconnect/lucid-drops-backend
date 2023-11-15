@@ -276,11 +276,17 @@ func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {
 }
 
 func GetCollectionItems(collectionID string) ([]*models.Item, error) {
-	var items []*models.Item
 
-	err := dbutils.DB.Where("collection_id=?", collectionID).Find(&items).Error
+	var items []*models.Item
+	rows, err := dbutils.DB.Raw(fmt.Sprintf("SELECT *  FROM items WHERE collection_id = %s", collectionID)).Rows()
 	if err != nil {
 		return nil, errors.New("items not found")
+	}
+
+	for rows.Next() {
+		var item models.Item
+		rows.Scan(&item)
+		items = append(items, &item)
 	}
 
 	return items, nil
