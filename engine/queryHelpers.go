@@ -276,21 +276,15 @@ func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {
 }
 
 func GetCollectionItems(collectionID string) ([]*models.Item, error) {
-
 	var items []*models.Item
-	rows, err := dbutils.DB.Raw(fmt.Sprintf("SELECT *  FROM items WHERE collection_id = %s", collectionID)).Rows()
-	if err != nil {
-		return nil, errors.New("items not found")
-	}
 
-	for rows.Next() {
-		var item models.Item
-		rows.Scan(&item)
-		items = append(items, &item)
-	}
+ 	err := dbutils.DB.Unscoped().Where("collection_id=?", collectionID).Find(&items).Error
+ 	if err != nil {
+ 		return nil, errors.New("items not found")
+ 	}
 
-	return items, nil
-}
+ 	return items, nil
+ }
 
 func GetAuthorizedSubdomainsForItem(itemID string) ([]*models.EmailDomainWhiteList, error) {
 	var subDomains []*models.EmailDomainWhiteList
