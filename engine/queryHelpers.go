@@ -435,12 +435,6 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 		}
 	}
 
-	item.Criteria = nil
-	err = dbutils.DB.Save(item).Error
-	if err != nil {
-		return errors.New("an error occured while updating item")
-	}
-
 	return nil
 }
 
