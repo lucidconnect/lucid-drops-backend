@@ -278,13 +278,13 @@ func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {
 func GetCollectionItems(collectionID string) ([]*models.Item, error) {
 	var items []*models.Item
 
- 	err := dbutils.DB.Unscoped().Where("collection_id=?", collectionID).Find(&items).Error
- 	if err != nil {
- 		return nil, errors.New("items not found")
- 	}
+	err := dbutils.DB.Unscoped().Where("collection_id=?", collectionID).Find(&items).Error
+	if err != nil {
+		return nil, errors.New("items not found")
+	}
 
- 	return items, nil
- }
+	return items, nil
+}
 
 func GetAuthorizedSubdomainsForItem(itemID string) ([]*models.EmailDomainWhiteList, error) {
 	var subDomains []*models.EmailDomainWhiteList
@@ -375,65 +375,70 @@ func GetFeaturedCollections() ([]*models.Collection, error) {
 }
 
 func DeleteCriteriaIfExists(item *models.Item) error {
+
 	var err error
-	if item.Criteria == nil {
-		switch *item.Criteria {
-		case model.ClaimCriteriaTypeDirectAnswerQuestionnaire, model.ClaimCriteriaTypeClaimCode:
-			//Delete existing questionnaire criteria
-			err = dbutils.DB.Delete(&models.DirectAnswerCriteria{}, "item_id = ?", item.ID).Error
-			if err != nil {
-				return errors.New("an error occured while updating updating questionnaire criteria")
-			}
-
-		case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
-			err = dbutils.DB.Delete(&models.MultiChoiceCriteria{}, "item_id = ?", item.ID).Error
-			if err != nil {
-				return errors.New("an error occured while updating updating questionnaire criteria")
-			}
-
-		case model.ClaimCriteriaTypeTwitterInteractions:
-			//Delete existing twitter criteria
-			err = dbutils.DB.Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
-			if err != nil {
-				return errors.New("an error occured while updating updating twitter criteria")
-			}
-		case model.ClaimCriteriaTypeTwitterFollowers:
-			//Delete existing twitter criteria
-			err = dbutils.DB.Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
-			if err != nil {
-				return errors.New("an error occured while updating updating twitter criteria")
-			}
-		case model.ClaimCriteriaTypePatreon:
-			//Delete existing patreon criteria
-			err = dbutils.DB.Delete(&models.PatreonCriteria{}, "item_id = ?", item.ID).Error
-			if err != nil {
-				return errors.New("an error occured while updating updating patreon criteria")
-			}
-		case model.ClaimCriteriaTypeTelegram:
-			//Delete existing telegram criteria
-			err = dbutils.DB.Delete(&models.TelegramCriteria{}, "item_id = ?", item.ID).Error
-			if err != nil {
-				return errors.New("an error occured while updating updating telegram criteria")
-			}
-		case model.ClaimCriteriaTypeEmailDomain:
-			//Delete existing email domain criteria
-			err = dbutils.DB.Delete(&models.EmailDomainWhiteList{}, "item_id = ?", item.ID).Error
-			if err != nil {
-				return errors.New("an error occured while updating updating email domain criteria")
-			}
-		case model.ClaimCriteriaTypeEmailWhiteList:
-			//Delete existing email domain criteria
-			err = dbutils.DB.Delete(&models.SingleEmailClaim{}, "item_id = ?", item.ID).Error
-			if err != nil {
-				return errors.New("an error occured while updating updating email domain criteria")
-			}
-		case model.ClaimCriteriaTypeWalletAddress:
-			//Delete existing email domain criteria
-			err = dbutils.DB.Delete(&models.WalletAddressClaim{}, "item_id = ?", item.ID).Error
-			if err != nil {
-				return errors.New("an error occured while updating updating email domain criteria")
-			}
+	switch *item.Criteria {
+	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire, model.ClaimCriteriaTypeClaimCode:
+		//Delete existing questionnaire criteria
+		err = dbutils.DB.Delete(&models.DirectAnswerCriteria{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return errors.New("an error occured while updating updating questionnaire criteria")
 		}
+
+	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
+		err = dbutils.DB.Delete(&models.MultiChoiceCriteria{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return errors.New("an error occured while updating updating questionnaire criteria")
+		}
+
+	case model.ClaimCriteriaTypeTwitterInteractions:
+		//Delete existing twitter criteria
+		err = dbutils.DB.Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return errors.New("an error occured while updating updating twitter criteria")
+		}
+	case model.ClaimCriteriaTypeTwitterFollowers:
+		//Delete existing twitter criteria
+		err = dbutils.DB.Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return errors.New("an error occured while updating updating twitter criteria")
+		}
+	case model.ClaimCriteriaTypePatreon:
+		//Delete existing patreon criteria
+		err = dbutils.DB.Delete(&models.PatreonCriteria{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return errors.New("an error occured while updating updating patreon criteria")
+		}
+	case model.ClaimCriteriaTypeTelegram:
+		//Delete existing telegram criteria
+		err = dbutils.DB.Delete(&models.TelegramCriteria{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return errors.New("an error occured while updating updating telegram criteria")
+		}
+	case model.ClaimCriteriaTypeEmailDomain:
+		//Delete existing email domain criteria
+		err = dbutils.DB.Delete(&models.EmailDomainWhiteList{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return errors.New("an error occured while updating updating email domain criteria")
+		}
+	case model.ClaimCriteriaTypeEmailWhiteList:
+		//Delete existing email domain criteria
+		err = dbutils.DB.Delete(&models.SingleEmailClaim{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return errors.New("an error occured while updating updating email domain criteria")
+		}
+	case model.ClaimCriteriaTypeWalletAddress:
+		//Delete existing email domain criteria
+		err = dbutils.DB.Delete(&models.WalletAddressClaim{}, "item_id = ?", item.ID).Error
+		if err != nil {
+			return errors.New("an error occured while updating updating email domain criteria")
+		}
+	}
+
+	item.Criteria = nil
+	err = dbutils.DB.Save(item).Error
+	if err != nil {
+		return errors.New("an error occured while updating item")
 	}
 
 	return nil
