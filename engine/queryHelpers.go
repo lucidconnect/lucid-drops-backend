@@ -393,13 +393,13 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 
 	case model.ClaimCriteriaTypeTwitterInteractions:
 		//Delete existing twitter criteria
-		err = dbutils.DB.Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating twitter criteria")
 		}
 	case model.ClaimCriteriaTypeTwitterFollowers:
 		//Delete existing twitter criteria
-		err = dbutils.DB.Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating twitter criteria")
 		}
@@ -411,7 +411,7 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 		}
 	case model.ClaimCriteriaTypeTelegram:
 		//Delete existing telegram criteria
-		err = dbutils.DB.Delete(&models.TelegramCriteria{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.TelegramCriteria{}, "item_id = ?", item.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating telegram criteria")
 		}
