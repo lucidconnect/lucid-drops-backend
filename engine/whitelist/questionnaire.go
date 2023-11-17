@@ -38,7 +38,7 @@ func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input
 	switch input.QuestionType {
 	case model.QuestionTypeDirectAnswer:
 		if input.OpenEndedInput == nil || len(input.OpenEndedInput) == 0 {
-			return nil, errors.New("questionTypeDirectAnswer should contain at least have a OpenEndedInput")
+			return nil, errors.New("questionTypeDirectAnswer should contain at least one OpenEndedInput")
 		}
 
 		dbQuestions := make([]*models.DirectAnswerCriteria, len(input.OpenEndedInput))
