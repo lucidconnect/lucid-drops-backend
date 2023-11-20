@@ -63,6 +63,7 @@ func SetupDB(dsn string) *gorm.DB {
 		&models.Creator{},
 		&models.Wallet{},
 		&models.StripeWebhooks{},
+		&models.TelegramAuthDetails{},
 		&models.DirectAnswerCriteria{},
 		&models.DoubleEntryLedger{},
 		&models.Collection{},
@@ -78,7 +79,6 @@ func SetupDB(dsn string) *gorm.DB {
 		&models.PatreonCriteria{},
 		&models.SignerInfo{},
 		&models.TwitterAuthDetails{},
-		&models.TelegramAuthDetails{},
 		&models.PatreonAuthDetails{},
 		&models.MultiChoiceCriteria{},
 	)
