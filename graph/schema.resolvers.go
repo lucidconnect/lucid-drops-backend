@@ -29,22 +29,24 @@ import (
 func (r *collectionResolver) Items(ctx context.Context, obj *model.Collection) ([]*model.Item, error) {
 	var err error
 	var itemArr []*model.Item
-	const dontIncludeDeleted = false
 
 	opCtx := graphql.GetFieldContext(ctx)
-
-	if opCtx.Parent.Field.Name == "fetchCollectionById" {
-		itemArr, err = items.FetchCollectionItems(obj.ID, dontIncludeDeleted, nil)
-		if err != nil {
-			return []*model.Item{}, nil
-		}
-	} else {
-		itemArr, err = items.FetchCollectionItems(obj.ID, true, nil)
-		if err != nil {
-			return []*model.Item{}, nil
+	for parent := opCtx.Parent; parent != nil; parent = parent.Parent {
+		if parent.IsResolver {
+			if parent.Field.Name == "fetchCollectionById" {
+				itemArr, err = items.FetchCollectionItems(obj.ID, false, nil)
+				if err != nil {
+					return []*model.Item{}, nil
+				}
+				return itemArr, nil
+			}
 		}
 	}
 
+	itemArr, err = items.FetchCollectionItems(obj.ID, true, nil)
+	if err != nil {
+		return []*model.Item{}, nil
+	}
 	return itemArr, nil
 }
 
