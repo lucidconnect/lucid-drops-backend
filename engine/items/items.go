@@ -214,7 +214,7 @@ func FetchAuthotizedSubdomainsForItem(itemID string) ([]string, error) {
 	return mappedDomains, nil
 }
 
-func FetchCollectionItems(collectionID string, authDetails *internal.AuthDetails) ([]*model.Item, error) {
+func FetchCollectionItems(collectionID string, includeDelelted bool, authDetails *internal.AuthDetails) ([]*model.Item, error) {
 	// All Collection data will be public for now
 
 	// creator, err := engine.GetCreatorByAddress(authDetails.Address)
@@ -222,9 +222,20 @@ func FetchCollectionItems(collectionID string, authDetails *internal.AuthDetails
 	// 	return nil, errors.New("creator has not been onboarded")
 	// }
 
-	items, err := engine.GetCollectionItems(collectionID)
-	if err != nil {
-		return nil, errors.New("items not found")
+	var err error
+	var items []*models.Item
+
+	if includeDelelted {
+		items, err = engine.GetCollectionItemsIncludeDeleted(collectionID)
+		if err != nil {
+			return nil, errors.New("items not found")
+		}
+
+	} else {
+		items, err = engine.GetCollectionItems(collectionID)
+		if err != nil {
+			return nil, errors.New("items not found")
+		}
 	}
 
 	mappedItems := make([]*model.Item, len(items))

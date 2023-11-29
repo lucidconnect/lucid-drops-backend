@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/99designs/gqlgen/graphql"
 	"inverse.so/engine"
 	"inverse.so/engine/aiimages"
 	"inverse.so/engine/auth"
@@ -26,12 +27,25 @@ import (
 
 // Items is the resolver for the items field.
 func (r *collectionResolver) Items(ctx context.Context, obj *model.Collection) ([]*model.Item, error) {
-	items, err := items.FetchCollectionItems(obj.ID, nil)
-	if err != nil {
-		return []*model.Item{}, nil
+	var err error
+	var itemArr []*model.Item
+	const dontIncludeDeleted = false
+
+	opCtx := graphql.GetFieldContext(ctx)
+
+	if opCtx.Parent.Field.Name == "fetchCollectionById" {
+		itemArr, err = items.FetchCollectionItems(obj.ID, dontIncludeDeleted, nil)
+		if err != nil {
+			return []*model.Item{}, nil
+		}
+	} else {
+		itemArr, err = items.FetchCollectionItems(obj.ID, true, nil)
+		if err != nil {
+			return []*model.Item{}, nil
+		}
 	}
 
-	return items, nil
+	return itemArr, nil
 }
 
 // Creator is the resolver for the creator field.
@@ -389,7 +403,7 @@ func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName stri
 
 	var allItems []*model.Item
 	for _, collection := range mappedCollections {
-		items, err := items.FetchCollectionItems(collection.ID, nil)
+		items, err := items.FetchCollectionItems(collection.ID, false, nil)
 		if err != nil {
 			continue
 		}
@@ -434,7 +448,7 @@ func (r *queryResolver) FetchItemsInCollection(ctx context.Context, collectionID
 	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	// }
 
-	return items.FetchCollectionItems(collectionID, nil)
+	return items.FetchCollectionItems(collectionID, false, nil)
 }
 
 // FetchItemByID is the resolver for the fetchItemById field.

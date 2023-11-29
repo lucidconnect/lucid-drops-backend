@@ -278,6 +278,17 @@ func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {
 func GetCollectionItems(collectionID string) ([]*models.Item, error) {
 	var items []*models.Item
 
+	err := dbutils.DB.Where("collection_id=?", collectionID).Find(&items).Error
+	if err != nil {
+		return nil, errors.New("items not found")
+	}
+
+	return items, nil
+}
+
+func GetCollectionItemsIncludeDeleted(collectionID string) ([]*models.Item, error) {
+	var items []*models.Item
+
 	err := dbutils.DB.Unscoped().Where("collection_id=?", collectionID).Find(&items).Error
 	if err != nil {
 		return nil, errors.New("items not found")
