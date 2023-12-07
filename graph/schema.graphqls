@@ -42,6 +42,7 @@ type Mutation {
   deleteCollection(collectionID: String!): Collection!
 
   createItem(input: ItemInput!): Item!
+  tempCreateItem(input: ItemInput!, creatorAddress: String!): Item!
   updateItem(itemID: String!,input: ItemInput!): Item!
   deleteItem(itemID: String!): Item!
   addItemDeadline(itemID: String!, deadline: String!): Item!

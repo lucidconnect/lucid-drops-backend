@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/ethereum/go-ethereum/common"
 	"inverse.so/engine"
 	"inverse.so/engine/aiimages"
 	"inverse.so/engine/auth"
@@ -123,6 +124,13 @@ func (r *mutationResolver) CreateItem(ctx context.Context, input model.ItemInput
 	}
 
 	return items.CreateItem(&input, authenticationDetails)
+}
+
+// TempCreateItem is the resolver for the tempCreateItem field.
+func (r *mutationResolver) TempCreateItem(ctx context.Context, input model.ItemInput, creatorAddress string) (*model.Item, error) {
+	return items.TempCreateItem(&input, &internal.AuthDetails{
+		Address: common.HexToAddress(creatorAddress),
+	})
 }
 
 // UpdateItem is the resolver for the updateItem field.

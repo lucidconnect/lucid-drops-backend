@@ -18,6 +18,46 @@ import (
 	"inverse.so/utils"
 )
 
+func TempCreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {
+	creator, err := engine.GetCreatorByAddress(authDetails.Address)
+	if err != nil {
+		return nil, errors.New("creator has not been onboarded to create a new collection")
+	}
+
+	if input.Name == nil || input.Image == nil || input.CollectionID == nil || input.Description == nil {
+		return nil, errors.New("pass in all Fields inorder to create a new item")
+	}
+
+	collection, err := engine.GetCollectionByID(*input.CollectionID)
+	if err != nil {
+		return nil, errors.New("collection not found")
+	}
+
+	if collection.CreatorID != creator.ID {
+		return nil, errors.New("collection doesn't belong to the creator if the item")
+	}
+
+	newItem := &models.Item{
+		Name:         *input.Name,
+		Image:        *input.Image,
+		Description:  *input.Description,
+		CollectionID: collection.ID,
+		UserLimit:    input.UserLimit,
+		EditionLimit: input.EditionLimit,
+	}
+
+	if input.ClaimFee != nil {
+		newItem.ClaimFee = *input.ClaimFee
+	}
+
+	err = engine.CreateModel(newItem)
+	if err != nil {
+		return nil, errors.New("couldn't create new collection")
+	}
+
+	return newItem.ToGraphData(), nil
+}
+
 func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
