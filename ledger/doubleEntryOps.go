@@ -159,7 +159,7 @@ func (l *Ledger) fetchAndLockTransferScope(tx *gorm.DB, instruction TransferInst
 
 	userAccount, err := l.fetchAccountsByCreatorID(instruction.UserID.String())
 	if err != nil {
-		return nil, fmt.Errorf("unable to fetch user account %v", err)
+		return nil, fmt.Errorf("unable to fetch user account - %s %v", instruction.UserID.String(), err)
 	}
 
 	accounts[1] = *userAccount
