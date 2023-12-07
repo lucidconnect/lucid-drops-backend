@@ -27,7 +27,7 @@ func (l *Ledger) Transfer(tx *gorm.DB, instruction TransferInstruction) error {
 	//fetch and lock accounts
 	accounts, err := l.fetchAndLockTransferScope(tx, instruction)
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to fetch and lock accounts %v", err)
 	}
 
 	if isNegativeInt(instruction.Amount) {
@@ -89,7 +89,7 @@ func (l *Ledger) Transfer(tx *gorm.DB, instruction TransferInstruction) error {
 		err := tx.Create(&entry).Error
 		if err != nil {
 			tx.Rollback()
-			return err
+			return fmt.Errorf("unable to create ledger entry %v", err)
 		}
 	}
 
@@ -104,17 +104,22 @@ func (l *Ledger) Transfer(tx *gorm.DB, instruction TransferInstruction) error {
 	err = tx.Model(&sourceAccount).Update("balance_base", gorm.Expr("balance_base + ?", toNegativeInt(instruction.Amount))).Error
 	if err != nil {
 		tx.Rollback()
-		return err
+		return fmt.Errorf("unable to update source account balance %v", err)
 	}
 
 	err = tx.Model(&destinationAccount).Update("balance_base", gorm.Expr("balance_base + ?", instruction.Amount)).Error
 	if err != nil {
 		tx.Rollback()
-		return err
+		return fmt.Errorf("unable to update destination account balance %v", err)
 	}
 
 	if isLocalTx {
-		return tx.Commit().Error
+
+		err = tx.Commit().Error
+		if err != nil {
+			return fmt.Errorf("unable to commit transaction %v", err)
+		}
+
 	}
 
 	return nil
@@ -147,21 +152,21 @@ func (l *Ledger) fetchAndLockTransferScope(tx *gorm.DB, instruction TransferInst
 	accounts := make([]models.Wallet, 2)
 	sysAccount, err := l.fetchSysAccount()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to fetch sys account %v", err)
 	}
 
 	accounts[0] = *sysAccount
 
 	userAccount, err := l.fetchAccountsByCreatorID(instruction.UserID.String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to fetch user account %v", err)
 	}
 
 	accounts[1] = *userAccount
 
 	err = l.lockTransferScope(tx, &accounts)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to lock transfer scope %v", err)
 	}
 
 	log.Print(accounts)
