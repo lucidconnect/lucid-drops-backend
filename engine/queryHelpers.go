@@ -422,7 +422,7 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 		}
 	case model.ClaimCriteriaTypeTelegram:
 		//Delete existing telegram criteria
-		err = dbutils.DB.Delete(&models.TelegramCriteria{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Where("item_id = ?", item.ID).Unscoped().Delete(&models.TelegramCriteria{}).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating telegram criteria")
 		}
