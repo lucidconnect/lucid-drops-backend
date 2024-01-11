@@ -42,12 +42,13 @@ func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistI
 
 		var ENS *string
 		if strings.Contains(address, ".eth") {
+			origialEns := address
 			resolvedAddress, err := utils.ResolveENSName(address)
 			if err != nil {
 				continue
 			}
 
-			ENS = &address
+			ENS = &origialEns
 			address = *resolvedAddress
 		}
 
