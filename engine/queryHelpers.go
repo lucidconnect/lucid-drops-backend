@@ -391,13 +391,13 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 	switch *item.Criteria {
 	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire, model.ClaimCriteriaTypeClaimCode:
 		//Delete existing questionnaire criteria
-		err = dbutils.DB.Delete(&models.DirectAnswerCriteria{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.DirectAnswerCriteria{}, "item_id = ?", item.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating questionnaire criteria")
 		}
 
 	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
-		err = dbutils.DB.Delete(&models.MultiChoiceCriteria{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.MultiChoiceCriteria{}, "item_id = ?", item.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating questionnaire criteria")
 		}
@@ -422,8 +422,7 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 		}
 	case model.ClaimCriteriaTypeTelegram:
 		//Delete existing telegram criteria
-		query := fmt.Sprintf("DELETE FROM telegram_criteria WHERE item_id='%s'", item.ID)
-		err = dbutils.DB.Raw(query).Error
+		err = dbutils.DB.Unscoped().Delete(&models.TelegramCriteria{}, "item_id = ?", item.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating telegram criteria")
 		}
@@ -441,7 +440,7 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 		}
 	case model.ClaimCriteriaTypeWalletAddress:
 		//Delete existing email domain criteria
-		err = dbutils.DB.Delete(&models.WalletAddressClaim{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.WalletAddressClaim{}, "item_id = ?", item.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating email domain criteria")
 		}
