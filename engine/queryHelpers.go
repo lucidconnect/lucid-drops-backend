@@ -473,11 +473,21 @@ func GetUserProfileDetails(userName string) (*model.UserProfileType, *string, er
 }
 
 func GetWhitelistedWalletAddresses(itemID string) ([]string, error) {
-	var walletAddresses []string
+	var dbwalletAddresses []models.WalletAddressClaim
 
-	err := dbutils.DB.Model(&models.WalletAddressClaim{}).Where("item_id=?", itemID).Pluck("wallet_address", &walletAddresses).Error
+	err := dbutils.DB.Select("ens", "wallet_address").Where("item_id=?", itemID).Find(&dbwalletAddresses).Error
 	if err != nil {
 		return nil, errors.New("wallet addresses not found")
+	}
+
+	walletAddresses := make([]string, len(dbwalletAddresses))
+
+	for idx, pairing := range dbwalletAddresses {
+		if pairing.ENS != nil {
+			walletAddresses[idx] = *pairing.ENS
+		} else {
+			walletAddresses[idx] = pairing.WalletAddress
+		}
 	}
 
 	return walletAddresses, nil

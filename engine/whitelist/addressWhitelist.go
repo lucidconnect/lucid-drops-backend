@@ -40,18 +40,21 @@ func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistI
 	dbWallets := make([]*models.WalletAddressClaim, len(input.AuthorizedWalletAddresses))
 	for idx, address := range input.AuthorizedWalletAddresses {
 
+		var ENS *string
 		if strings.Contains(address, ".eth") {
 			resolvedAddress, err := utils.ResolveENSName(address)
 			if err != nil {
 				continue
 			}
 
+			ENS = &address
 			address = *resolvedAddress
 		}
 
 		dbWallets[idx] = &models.WalletAddressClaim{
 			CreatorID:     creator.ID,
 			ItemID:        item.ID,
+			ENS:           ENS,
 			WalletAddress: address,
 		}
 	}
