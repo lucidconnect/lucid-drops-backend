@@ -34,7 +34,7 @@ func (r *collectionResolver) Items(ctx context.Context, obj *model.Collection) (
 	opCtx := graphql.GetFieldContext(ctx)
 	for parent := opCtx.Parent; parent != nil; parent = parent.Parent {
 		if parent.IsResolver {
-			if parent.Field.Name == "fetchCollectionById" {
+			if parent.Field.Name == "fetchCollectionById" || parent.Field.Name == "fetchCreatorCollections" {
 				itemArr, err = items.FetchCollectionItems(obj.ID, false, nil)
 				if err != nil {
 					return []*model.Item{}, nil
