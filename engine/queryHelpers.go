@@ -429,13 +429,13 @@ func DeleteCriteriaIfExists(item *models.Item) error {
 		}
 	case model.ClaimCriteriaTypeEmailDomain:
 		//Delete existing email domain criteria
-		err = dbutils.DB.Delete(&models.EmailDomainWhiteList{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.EmailDomainWhiteList{}, "item_id = ?", item.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating email domain criteria")
 		}
 	case model.ClaimCriteriaTypeEmailWhiteList:
 		//Delete existing email domain criteria
-		err = dbutils.DB.Delete(&models.SingleEmailClaim{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.SingleEmailClaim{}, "item_id = ?", item.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating email domain criteria")
 		}
