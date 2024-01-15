@@ -285,6 +285,7 @@ type Item {
 	description: String!
 	collectionId: String!
   claimCriteria: ClaimCriteriaType
+  claimFee: Int!
   creator: CreatorDetails! @goField(forceResolver: true)
   authorizedSubdomains: [String!] @goField(forceResolver: true)
   twitterClaimCriteriaInteractions: [InteractionType]

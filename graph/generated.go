@@ -95,6 +95,7 @@ type ComplexityRoot struct {
 		CampaignName                     func(childComplexity int) int
 		ClaimCriteria                    func(childComplexity int) int
 		ClaimDetails                     func(childComplexity int) int
+		ClaimFee                         func(childComplexity int) int
 		CollectionID                     func(childComplexity int) int
 		CreatedAt                        func(childComplexity int) int
 		Creator                          func(childComplexity int) int
@@ -516,6 +517,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.ClaimDetails(childComplexity), true
+
+	case "Item.claimFee":
+		if e.complexity.Item.ClaimFee == nil {
+			break
+		}
+
+		return e.complexity.Item.ClaimFee(childComplexity), true
 
 	case "Item.collectionId":
 		if e.complexity.Item.CollectionID == nil {
@@ -2968,6 +2976,8 @@ func (ec *executionContext) fieldContext_Collection_items(ctx context.Context, f
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -3724,6 +3734,50 @@ func (ec *executionContext) fieldContext_Item_claimCriteria(ctx context.Context,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ClaimCriteriaType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Item_claimFee(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_claimFee(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClaimFee, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_claimFee(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5016,6 +5070,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5109,6 +5165,8 @@ func (ec *executionContext) fieldContext_Mutation_tempCreateItem(ctx context.Con
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5202,6 +5260,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5295,6 +5355,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5388,6 +5450,8 @@ func (ec *executionContext) fieldContext_Mutation_addItemDeadline(ctx context.Co
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5481,6 +5545,8 @@ func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaFor
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5574,6 +5640,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5667,6 +5735,8 @@ func (ec *executionContext) fieldContext_Mutation_createWalletAddressWhitelistFo
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5760,6 +5830,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5853,6 +5925,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -5946,6 +6020,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -6039,6 +6115,8 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -6132,6 +6210,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -7344,6 +7424,8 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -7580,6 +7662,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInCollection(ctx contex
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -7673,6 +7757,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -8128,6 +8214,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -11456,6 +11544,8 @@ func (ec *executionContext) fieldContext_userProfileType_items(ctx context.Conte
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -11535,6 +11625,8 @@ func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx contex
 				return ec.fieldContext_Item_collectionId(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
+			case "claimFee":
+				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
 				return ec.fieldContext_Item_creator(ctx, field)
 			case "authorizedSubdomains":
@@ -13058,6 +13150,11 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "claimCriteria":
 			out.Values[i] = ec._Item_claimCriteria(ctx, field, obj)
+		case "claimFee":
+			out.Values[i] = ec._Item_claimFee(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "creator":
 			field := field
 
