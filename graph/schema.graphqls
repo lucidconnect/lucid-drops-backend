@@ -63,6 +63,7 @@ type Mutation {
   validateQuestionnaireCriteriaForItem(itemID: String!, input: [QuestionnaireAnswerInput!]!): String
 
   createJWTToken(input: CreateJWTTokenInput): JWTCreationResponse!
+  createPaymentIntentSecretKey(amount: Int!): String
 
   startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
