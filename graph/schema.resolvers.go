@@ -18,6 +18,7 @@ import (
 	"inverse.so/engine/items"
 	"inverse.so/engine/mobile"
 	"inverse.so/engine/onboarding"
+	"inverse.so/engine/wallet"
 	"inverse.so/engine/whitelist"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -292,6 +293,16 @@ func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Cont
 // CreateJWTToken is the resolver for the createJWTToken field.
 func (r *mutationResolver) CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error) {
 	return auth.CreateJWTToken(input)
+}
+
+// CreatePaymentIntentSecretKey is the resolver for the createPaymentIntentSecretKey field.
+func (r *mutationResolver) CreatePaymentIntentSecretKey(ctx context.Context, amount int) (*string, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return wallet.GenerateCreatorPaymentIntentSecret(authenticationDetails, int64(amount))
 }
 
 // StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.
