@@ -4,6 +4,7 @@ import (
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
+	"inverse.so/services"
 )
 
 func FetchItemCreatorByCollectionId(collectionID string) (*model.CreatorDetails, error) {
@@ -66,4 +67,29 @@ func EditUserProfile(input model.EditUserProfileInputType, authDetails *internal
 	}
 
 	return creator.CreatorToProfileData(), nil
+}
+
+func FindOrCreateStripeCustomerID(authDetails *internal.AuthDetails) (*string, error) {
+	creator, err := engine.GetCreatorByAddress(authDetails.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	if creator.StripeCustomerID != nil {
+		return creator.StripeCustomerID, nil
+	}
+
+	// create stripe customer
+	customer, err := services.CreateStripeCustomerID(creator.ID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	creator.StripeCustomerID = &customer.ID
+	err = engine.SaveModel(creator)
+	if err != nil {
+		return nil, err
+	}
+
+	return creator.StripeCustomerID, nil
 }
