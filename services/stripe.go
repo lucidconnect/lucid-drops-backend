@@ -33,7 +33,6 @@ func CreateStripePaymentIntent(amount int64, currency string, customerID string)
 		Amount:        stripe.Int64(amount),
 		Currency:      stripe.String(currency),
 		Customer:      stripe.String(customerID),
-		PaymentMethod: stripe.String("card"),
 	}
 
 	sc := &client.API{}
