@@ -89,7 +89,7 @@ func ValidateTelegramClaimCriteria(itemID, authID string) (*model.ValidationResp
 	}
 
 	var authDetails *models.TelegramAuthDetails
-	err = dbutils.DB.Model(&models.TelegramAuthDetails{}).Where("user_id = ? AND item_id IS NULL", authID).First(&authDetails).Error
+	err = dbutils.DB.Model(&models.TelegramAuthDetails{}).Where("id = ? AND item_id IS NULL", authID).First(&authDetails).Error
 	if err != nil {
 		return resp, errors.New("telegram account not yet authorized")
 	}
