@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"inverse.so/dbutils"
+	// "inverse.so/dbutils"
 	"inverse.so/engine"
 	"inverse.so/graph/model"
 	"inverse.so/internal"
@@ -88,24 +88,24 @@ func ValidateTelegramClaimCriteria(itemID, authID string) (*model.ValidationResp
 		return resp, errors.New("item does not have a telegram criteria")
 	}
 
-	var authDetails *models.TelegramAuthDetails
-	err = dbutils.DB.Model(&models.TelegramAuthDetails{}).Where("id = ? AND item_id IS NULL", authID).First(&authDetails).Error
-	if err != nil {
-		return resp, errors.New("telegram account not yet authorized")
-	}
+	// var authDetails *models.TelegramAuthDetails
+	// err = dbutils.DB.Model(&models.TelegramAuthDetails{}).Where("id = ? AND item_id IS NULL", authID).First(&authDetails).Error
+	// if err != nil {
+	// 	return resp, errors.New("telegram account not yet authorized")
+	// }
 
-	var itemCount int64
-	err = dbutils.DB.Model(&models.TelegramAuthDetails{}).Where("user_id = ? AND item_id = ?", authDetails.UserID, itemID).Count(&itemCount).Error
-	if err != nil {
-		return resp, errors.New("error validating telegram account")
-	}
+	// var itemCount int64
+	// err = dbutils.DB.Model(&models.TelegramAuthDetails{}).Where("user_id = ? AND item_id = ?", authDetails.UserID, itemID).Count(&itemCount).Error
+	// if err != nil {
+	// 	return resp, errors.New("error validating telegram account")
+	// }
 
-	if itemCount > 0 {
-		return resp, errors.New("telegram account already authorized")
-	}
+	// if itemCount > 0 {
+	// 	return resp, errors.New("telegram account already authorized")
+	// }
 
 
-	IdToInt, _ := strconv.Atoi(authDetails.UserID)
+	IdToInt, _ := strconv.Atoi(authID)
 	member, err := InverseBot.GetTelegramGroupUser(item.TelegramCriteria.GroupID, int64(IdToInt))
 	if err != nil {
 		return resp, errors.New("telegram account not authorized by group admin")
@@ -122,11 +122,11 @@ func ValidateTelegramClaimCriteria(itemID, authID string) (*model.ValidationResp
 			return passResp, errors.New("error creating mint pass")
 		}
 
-		authDetails.ItemID = &itemID
-		err = engine.SaveModel(authDetails)
-		if err != nil {
-			return passResp, err
-		}
+		// authDetails.ItemID = &itemID
+		// err = engine.SaveModel(authDetails)
+		// if err != nil {
+		// 	return passResp, err
+		// }
 
 		return passResp, nil
 	}
