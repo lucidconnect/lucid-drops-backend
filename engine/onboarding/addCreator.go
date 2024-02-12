@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/models"
 	"gorm.io/gorm"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/models"
 )
 
 func CreateCreatorProfileIfAddressIsMissing(address common.Address) (*models.Creator, error) {

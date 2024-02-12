@@ -3,12 +3,12 @@ package dbutils
 import (
 	"time"
 
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"inverse.so/models"
-	"inverse.so/utils"
 )
 
 var DB *gorm.DB

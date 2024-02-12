@@ -1,8 +1,8 @@
 package onboarding
 
 import (
-	"inverse.so/engine"
-	"inverse.so/graph/model"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
 )
 
 func CheckIfInverseNameIsAvailable(input *model.NewUsernameRegisgration) (bool, error) {

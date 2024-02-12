@@ -14,8 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"inverse.so/engine"
-	"inverse.so/utils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/utils"
 )
 
 var globalRPCClient *ethclient.Client

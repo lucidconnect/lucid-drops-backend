@@ -3,12 +3,12 @@ package whitelist
 import (
 	"errors"
 
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/models"
 	"gorm.io/gorm/clause"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
-	"inverse.so/models"
 )
 
 func CreateEmailDomainWhitelist(input *model.NewEmailDomainWhitelistInput, authDetails *internal.AuthDetails) (*model.Item, error) {

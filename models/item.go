@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/utils"
 	uuid "github.com/satori/go.uuid"
-	"inverse.so/graph/model"
-	"inverse.so/utils"
 )
 
 type Item struct {
@@ -54,7 +54,7 @@ func (i *Item) ToGraphData() *model.Item {
 	if i.TokenID != nil {
 		tokenID = utils.GetIntPtr(int(*i.TokenID))
 	}
-	
+
 	item := &model.Item{
 		ID:            i.ID.String(),
 		Name:          i.Name,

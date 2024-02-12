@@ -10,12 +10,12 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/structure"
+	"github.com/lucidconnect/inverse/utils"
 	"golang.org/x/oauth2"
 	patreonAuth "gopkg.in/mxpv/patreon-go.v1"
-	"inverse.so/engine"
-	"inverse.so/models"
-	"inverse.so/structure"
-	"inverse.so/utils"
 )
 
 const (

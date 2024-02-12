@@ -5,12 +5,12 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/engine/mobile"
-	"inverse.so/graph/model"
-	"inverse.so/models"
-	"inverse.so/utils"
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/engine/mobile"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 )
 
 func RegisterInverseUsername(address common.Address, input *model.NewUsernameRegisgration) (*model.CreatorDetails, error) {

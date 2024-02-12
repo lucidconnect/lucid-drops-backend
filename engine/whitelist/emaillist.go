@@ -4,14 +4,14 @@ import (
 	"errors"
 	"time"
 
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/emails"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 	"gorm.io/gorm/clause"
-	"inverse.so/dbutils"
-	"inverse.so/emails"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
-	"inverse.so/models"
-	"inverse.so/utils"
 )
 
 func sendEmailOnCreate(dbEmail *models.SingleEmailClaim) error {
@@ -32,7 +32,7 @@ func sendEmailOnCreate(dbEmail *models.SingleEmailClaim) error {
 		return err
 	}
 
-	claimLink := utils.UseEnvOrDefault("FE_BASE_URL", "https://inverse.so") + "/claim/" + item.ID.String() + "?requestId=" + *mintPass.PassID
+	claimLink := utils.UseEnvOrDefault("FE_BASE_URL", "https://github.com/lucidconnect/inverse") + "/claim/" + item.ID.String() + "?requestId=" + *mintPass.PassID
 	err = emails.SendClaimNudgeEmail(dbEmail.EmailAddress, from, item.Name, claimLink, *creator.InverseUsername, item.Image)
 	if err != nil {
 		return err

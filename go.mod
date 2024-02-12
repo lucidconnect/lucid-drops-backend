@@ -1,4 +1,4 @@
-module inverse.so
+module github.com/lucidconnect/inverse
 
 go 1.19
 
@@ -22,7 +22,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/stripe/stripe-go v70.15.0+incompatible
 	github.com/vektah/gqlparser/v2 v2.5.10
-	github.com/wealdtech/go-ens/v3 v3.6.0
+	github.com/wealdtech/go-ens/v3 v3.5.5
 	go.step.sm/crypto v0.35.1
 	golang.org/x/crypto v0.13.0
 	golang.org/x/oauth2 v0.12.0

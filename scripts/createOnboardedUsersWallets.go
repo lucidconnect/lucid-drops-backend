@@ -3,8 +3,8 @@ package scripts
 import (
 	"log"
 
-	"inverse.so/dbutils"
-	"inverse.so/models"
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/models"
 )
 
 func CreateOnboardedUsersWallets() {
@@ -19,5 +19,5 @@ func CreateOnboardedUsersWallets() {
 			log.Printf("Error creating wallet for creator %v\n", err)
 		}
 	}
-	
+
 }

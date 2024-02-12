@@ -3,13 +3,13 @@ package jobs
 import (
 	"fmt"
 
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/engine/collections"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/notifier"
+	"github.com/lucidconnect/inverse/structure"
 	"github.com/rs/zerolog/log"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/engine/collections"
-	"inverse.so/models"
-	"inverse.so/notifier"
-	"inverse.so/structure"
 )
 
 func FillOutContractAddresses() {

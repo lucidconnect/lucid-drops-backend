@@ -5,13 +5,13 @@ import (
 	"strconv"
 	"time"
 
-	// "inverse.so/dbutils"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
-	"inverse.so/models"
-	"inverse.so/services"
+	// "github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/services"
 )
 
 var InverseBot *services.BotImplementation

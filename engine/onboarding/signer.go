@@ -2,10 +2,10 @@ package onboarding
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
-	"inverse.so/models"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/models"
 )
 
 func StoreUserAccountSignerAddress(input model.SignerInfo, authDetails *internal.AuthDetails) (bool, error) {

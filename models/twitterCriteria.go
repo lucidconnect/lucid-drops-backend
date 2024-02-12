@@ -1,6 +1,6 @@
 package models
 
-import "inverse.so/graph/model"
+import "github.com/lucidconnect/inverse/graph/model"
 
 type TwitterCriteria struct {
 	Base

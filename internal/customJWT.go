@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt"
-	"inverse.so/utils"
+	"github.com/lucidconnect/inverse/utils"
 )
 
 func GenerateJWT(address string) (string, error) {

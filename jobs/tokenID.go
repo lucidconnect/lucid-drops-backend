@@ -9,13 +9,13 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/mintwatcher"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 	"github.com/rs/zerolog/log"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/mintwatcher"
-	"inverse.so/models"
-	"inverse.so/utils"
 )
 
 func VerifyItemTokenIDs() {

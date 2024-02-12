@@ -4,12 +4,12 @@ import (
 	"errors"
 	"time"
 
+	"github.com/lucidconnect/inverse/emails"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 	"github.com/rs/zerolog/log"
-	"inverse.so/emails"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/models"
-	"inverse.so/utils"
 )
 
 const (

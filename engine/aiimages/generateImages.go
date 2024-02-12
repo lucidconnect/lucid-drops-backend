@@ -1,7 +1,7 @@
 package aiimages
 
 import (
-	"inverse.so/graph/model"
+	"github.com/lucidconnect/inverse/graph/model"
 )
 
 var numberOfImagesToGenerate int = 4

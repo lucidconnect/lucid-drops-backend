@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/jobs"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 	"github.com/rs/zerolog/log"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
-	"inverse.so/jobs"
-	"inverse.so/models"
-	"inverse.so/utils"
 )
 
 func TempCreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {

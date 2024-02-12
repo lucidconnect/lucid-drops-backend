@@ -3,10 +3,10 @@ package collections
 import (
 	"errors"
 
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
-	"inverse.so/models"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/models"
 )
 
 func CreateCollection(input *model.CollectionInput, authDetails *internal.AuthDetails) (*model.Collection, error) {

@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/lucidconnect/inverse/structure"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
-	"inverse.so/structure"
 )
 
 type JSONError struct {

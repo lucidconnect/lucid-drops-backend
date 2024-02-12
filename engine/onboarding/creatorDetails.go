@@ -1,10 +1,10 @@
 package onboarding
 
 import (
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
-	"inverse.so/services"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/services"
 )
 
 func FetchItemCreatorByCollectionId(collectionID string) (*model.CreatorDetails, error) {

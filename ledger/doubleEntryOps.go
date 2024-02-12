@@ -7,8 +7,8 @@ import (
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 
-	"inverse.so/models"
-	"inverse.so/utils"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

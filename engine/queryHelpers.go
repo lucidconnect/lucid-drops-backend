@@ -6,13 +6,13 @@ import (
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"inverse.so/dbutils"
-	"inverse.so/graph/model"
-	"inverse.so/models"
-	"inverse.so/utils"
 )
 
 func AttachContractAddressForCreationHash(transactionHash, contractAddress string) error {

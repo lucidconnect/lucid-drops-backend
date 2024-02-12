@@ -5,10 +5,10 @@ import (
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
-	"inverse.so/models"
-	"inverse.so/utils"
 )
 
 type Ledger struct {

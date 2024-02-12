@@ -7,13 +7,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/models"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm/clause"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
-	"inverse.so/models"
 )
 
 func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input *model.QuestionnaireCriteriaInput) (*model.Item, error) {

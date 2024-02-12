@@ -112,5 +112,5 @@ func ToFirstNamePlusInitials(in string) string {
 		return strings.ToTitle(in)
 	}
 
-	return	fmt.Sprintf("%s %s.", names[0], strings.ToUpper(string(names[1][0:1])))
+	return fmt.Sprintf("%s %s.", names[0], strings.ToUpper(string(names[1][0:1])))
 }

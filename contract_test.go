@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/stretchr/testify/assert"
 	"github.com/rs/zerolog/log"
-	"inverse.so/mintwatcher"
+	"github.com/lucidconnect/inverse/mintwatcher"
 )
 
 func TestCorrectURI(t *testing.T) {

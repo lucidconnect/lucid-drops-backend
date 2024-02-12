@@ -17,7 +17,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
-	"inverse.so/graph/model"
+	"github.com/lucidconnect/inverse/graph/model"
 )
 
 // region    ************************** generated!.gotpl **************************

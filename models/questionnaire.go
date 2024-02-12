@@ -3,8 +3,8 @@ package models
 import (
 	"encoding/json"
 
+	"github.com/lucidconnect/inverse/graph/model"
 	uuid "github.com/satori/go.uuid"
-	"inverse.so/graph/model"
 )
 
 type DirectAnswerCriteria struct {

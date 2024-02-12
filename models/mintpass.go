@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"inverse.so/graph/model"
+	"github.com/lucidconnect/inverse/graph/model"
 )
 
 type MintPass struct {

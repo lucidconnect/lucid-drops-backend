@@ -12,7 +12,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/golang-jwt/jwt"
-	"inverse.so/services"
+	"github.com/lucidconnect/inverse/services"
 )
 
 type contextKey struct {

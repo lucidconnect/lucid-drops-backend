@@ -1,9 +1,9 @@
 package wallet
 
 import (
-	"inverse.so/engine/onboarding"
-	"inverse.so/internal"
-	"inverse.so/services"
+	"github.com/lucidconnect/inverse/engine/onboarding"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/services"
 )
 
 func GenerateCreatorPaymentIntentSecret(authDetails *internal.AuthDetails, amount int64) (*string, error) {

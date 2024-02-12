@@ -4,12 +4,12 @@ import (
 	"errors"
 
 	"github.com/ethereum/go-ethereum/common"
-	"inverse.so/engine"
-	"inverse.so/engine/onboarding"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
-	"inverse.so/magic"
-	"inverse.so/models"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/engine/onboarding"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
+	"github.com/lucidconnect/inverse/magic"
+	"github.com/lucidconnect/inverse/models"
 )
 
 const (

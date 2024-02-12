@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi"
-	"inverse.so/engine"
+	"github.com/lucidconnect/inverse/engine"
 )
 
 func MetadataHandler(w http.ResponseWriter, r *http.Request) {

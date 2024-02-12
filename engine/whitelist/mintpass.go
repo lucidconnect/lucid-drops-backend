@@ -6,14 +6,14 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/ledger"
+	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/utils"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/ledger"
-	"inverse.so/models"
-	"inverse.so/utils"
 )
 
 func IsThisAValidEthAddress(maybeAddress string) bool {

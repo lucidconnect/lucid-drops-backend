@@ -1,7 +1,7 @@
 package models
 
 import (
-	"inverse.so/graph/model"
+	"github.com/lucidconnect/inverse/graph/model"
 )
 
 type SignerInfo struct {

@@ -9,9 +9,9 @@ import (
 	"log"
 	"net/http"
 
-	"inverse.so/graph/model"
-	"inverse.so/structure"
-	"inverse.so/utils"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/structure"
+	"github.com/lucidconnect/inverse/utils"
 )
 
 const midJourneyURLURL = "https://api.midjourneyapi.io/v2"

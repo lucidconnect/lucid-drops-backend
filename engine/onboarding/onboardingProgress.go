@@ -2,8 +2,8 @@ package onboarding
 
 import (
 	"github.com/ethereum/go-ethereum/common"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
 )
 
 func GetOnboardinProgress(address common.Address) (*model.OnboardingProgress, error) {

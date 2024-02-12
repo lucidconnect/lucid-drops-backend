@@ -2,11 +2,11 @@ package claimers
 
 import (
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/models"
 	"gorm.io/gorm"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/models"
 )
 
 func FetchClaimedItems(address string) ([]*model.Item, error) {
@@ -38,7 +38,7 @@ func FetchClaimedItems(address string) ([]*model.Item, error) {
 
 func fetchAAAddressFromSignerInfo(address string) (*string, error) {
 
-	creator, err := engine.GetCreatorByAddress(common.HexToAddress(address)) 
+	creator, err := engine.GetCreatorByAddress(common.HexToAddress(address))
 	if err != nil {
 		return nil, err
 	}

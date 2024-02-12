@@ -3,7 +3,7 @@ package aiimages
 import (
 	"fmt"
 
-	"inverse.so/graph/model"
+	"github.com/lucidconnect/inverse/graph/model"
 )
 
 // const baseSalt = "highly detailed, flat illustration, nft style, cyberpunk, "

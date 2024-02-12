@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/lucidconnect/inverse/structure"
 	"github.com/rs/zerolog/log"
-	"inverse.so/structure"
 
 	telegrambot "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )

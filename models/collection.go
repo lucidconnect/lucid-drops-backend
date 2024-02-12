@@ -1,8 +1,8 @@
 package models
 
 import (
+	"github.com/lucidconnect/inverse/graph/model"
 	uuid "github.com/satori/go.uuid"
-	"inverse.so/graph/model"
 )
 
 type Collection struct {

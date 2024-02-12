@@ -3,10 +3,10 @@ package services
 import (
 	"time"
 
+	"github.com/lucidconnect/inverse/utils"
 	"github.com/magiclabs/magic-admin-go"
 	"github.com/magiclabs/magic-admin-go/client"
 	"github.com/magiclabs/magic-admin-go/token"
-	"inverse.so/utils"
 )
 
 func GetMagicClient() *client.API {

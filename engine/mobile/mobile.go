@@ -7,10 +7,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/internal"
 	"golang.org/x/crypto/sha3"
-	"inverse.so/engine"
-	"inverse.so/graph/model"
-	"inverse.so/internal"
 )
 
 type KeyPair struct {

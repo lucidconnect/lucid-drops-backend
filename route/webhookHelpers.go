@@ -5,13 +5,13 @@ import (
 	"log"
 	"os"
 
+	"github.com/lucidconnect/inverse/dbutils"
+	"github.com/lucidconnect/inverse/engine"
+	"github.com/lucidconnect/inverse/ledger"
+	"github.com/lucidconnect/inverse/models"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/client"
-	"inverse.so/dbutils"
-	"inverse.so/engine"
-	"inverse.so/ledger"
-	"inverse.so/models"
 )
 
 func CreditValidStripeWebhook(paymentIntent stripe.PaymentIntent, req *stripe.EventRequest) error {

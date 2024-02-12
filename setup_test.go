@@ -5,9 +5,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/lucidconnect/inverse/mintwatcher"
+	"github.com/lucidconnect/inverse/utils"
 	"github.com/rs/zerolog/log"
-	"inverse.so/mintwatcher"
-	"inverse.so/utils"
 )
 
 var ContractAddress = common.HexToAddress("0x783D65396Ea7c260FF7D1ABbcc626c4D9c7A2FB2")

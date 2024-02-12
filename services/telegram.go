@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	telegrambot "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"inverse.so/engine"
+	"github.com/lucidconnect/inverse/engine"
 )
 
 type BotImplementation struct {

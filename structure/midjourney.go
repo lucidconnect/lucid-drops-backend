@@ -1,6 +1,6 @@
 package structure
 
-import "inverse.so/graph/model"
+import "github.com/lucidconnect/inverse/graph/model"
 
 type MidJourneyImageRequest struct {
 	Prompt      string `json:"prompt"`

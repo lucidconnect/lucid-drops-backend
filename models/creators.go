@@ -1,8 +1,8 @@
 package models
 
 import (
-	"inverse.so/graph/model"
-	"inverse.so/utils"
+	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/utils"
 )
 
 type Creator struct {
