@@ -19,6 +19,7 @@ func InitTelegramBot() *BotImplementation {
 	bot, err := telegrambot.NewBotAPI(os.Getenv("TELEGRAM_BOT_TOKEN"))
 	if err != nil {
 		log.Print(err)
+		return nil
 	}
 
 	bot.Debug = false
