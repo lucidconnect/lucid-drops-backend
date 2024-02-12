@@ -1,0 +1,51 @@
+databases:
+  - name: silver-arrow-staging-db
+    plan: starter
+  
+services:
+  - type: web
+    name: silver-arrow-staging
+    env: go
+    region: oregon
+    buildCommand: ./render-build.sh
+    startCommand: ./silver-arrow
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: silver-arrow-staging-db
+          property: connectionString
+      - key: APP_ENV
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_USER
+        sync: false
+      - key: POLYGON_MUMBAI_NODE_URL
+        sync: false
+      - key: PAYMASTER_URL
+        sync: false
+      - key: ENTRY_POINT
+        sync: false
+      - key: DEFAULT_VALIDATOR
+        sync: false
+      - key: VALIDATOR_ADDRESS
+        sync: false
+      - key: USE_PAYMASTER
+        sync: false
+      - key: TURNKEY_KEY
+        sync: false
+      - key: TURNKEY_API_KEY_NAME
+        sync: false
+      - key: TURNKEY_HOST
+        sync: false
+      - key: KERNEL_FACTORY_ADDRESS
+        sync: false
+      - key: TK_KEYS_DIR
+        sync: false
+      - key: TK_KEYS_NAME
+        sync: false
+      - key: USE_AUTH
+        sync: false
+      - key: OPTIMISM_NODE_URL
+        sync: false

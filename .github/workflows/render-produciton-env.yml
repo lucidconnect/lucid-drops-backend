@@ -1,0 +1,33 @@
+name: GENERATE PRODUCTION RENDER.YAML
+
+on:
+  push:
+    branches:
+      - production
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.COMMIT_RENDER_YAML_ACCESS_TOKEN }}
+
+      - name: delete render.yaml if any
+        uses: JesseTG/rm@v1.0.3
+        with:
+          path: /render.yaml
+
+      - name: create new render.yaml
+        uses: canastro/copy-file-action@master
+        with:
+          source: "render.production.yaml"
+          target: "render.yaml"
+
+      - name: commit & push changes
+        uses: GuillaumeFalourd/git-commit-push@v1.3
+        with:
+          commit_message: "updated render.yaml for production"
+          access_token: ${{ secrets.COMMIT_RENDER_YAML_ACCESS_TOKEN }}
