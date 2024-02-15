@@ -8,7 +8,7 @@ services:
     env: go
     region: oregon
     buildCommand: ./render-build.sh
-    startCommand: ./silver-arrow
+    startCommand: ./inverse
     healthCheckPath: /
     envVars:
       - key: DATABASE_URL

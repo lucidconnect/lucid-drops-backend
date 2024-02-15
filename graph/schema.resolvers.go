@@ -7,6 +7,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ethereum/go-ethereum/common"
@@ -359,11 +360,13 @@ func (r *mutationResolver) StoreHashForDeployment(ctx context.Context, input mod
 func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
+		log.Println("auth details: ",err)
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
 	creatorInfo, err := onboarding.CreateCreatorProfileIfAddressIsMissing(authenticationDetails.Address)
 	if err != nil {
+		log.Println("creator profile: ",err)
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
