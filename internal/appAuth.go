@@ -148,7 +148,7 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 
 		token, err := jwt.ParseWithClaims(claims["authHeader"].(string), &c, keyFunc)
 		if err != nil {
-			log.Err(err).Caller().Send()
+			log.Err(err).Caller().Stack().Send()
 			return nil, err
 		}
 
@@ -161,13 +161,13 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 		// Check the JWT claims
 		err = c.Valid()
 		if err != nil {
-			log.Err(err).Caller().Send()
+			log.Err(err).Caller().Stack().Send()
 			return nil, err
 		}
 
 		privyWallet, err := GetPrivyWalletsFromSubKey(privyClaim.UserId)
 		if err != nil {
-			log.Err(err).Caller().Send()
+			log.Err(err).Caller().Stack().Send()
 			return nil, err
 		}
 

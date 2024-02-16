@@ -6,6 +6,7 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/rs/zerolog/pkgerrors"
 )
 
 // SetUpDefaultLogger ... is used to bootstrap logging since some logging configurations are in the app config
@@ -20,6 +21,7 @@ func SetUpLoggerFromConfig() {
 	level := GetLevel(UseEnvOrDefault("LOG_LEVEL", "INFO"))
 	log.Info().Msgf("Setting log level to %v", level)
 	zerolog.SetGlobalLevel(level)
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 }
 
 // GetLevel ...
