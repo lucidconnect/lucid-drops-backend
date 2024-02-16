@@ -13,6 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/golang-jwt/jwt"
 	"github.com/lucidconnect/inverse/services"
+	"github.com/rs/zerolog/log"
 )
 
 type contextKey struct {
@@ -147,6 +148,7 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 
 		token, err := jwt.ParseWithClaims(claims["authHeader"].(string), &c, keyFunc)
 		if err != nil {
+			log.Err(err).Caller().Send()
 			return nil, err
 		}
 
@@ -159,11 +161,13 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 		// Check the JWT claims
 		err = c.Valid()
 		if err != nil {
+			log.Err(err).Caller().Send()
 			return nil, err
 		}
 
 		privyWallet, err := GetPrivyWalletsFromSubKey(privyClaim.UserId)
 		if err != nil {
+			log.Err(err).Caller().Send()
 			return nil, err
 		}
 
@@ -179,6 +183,7 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 			var jwtInfo Web3AuthMetadata
 			err = json.Unmarshal(rawDecodedText, &jwtInfo)
 			if err != nil {
+				log.Err(err).Caller().Send()
 				return nil, err
 			}
 
@@ -195,6 +200,7 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 			// TODO add JWT verification and assert address is present before proceeding
 			_, err = services.VerifyWeb3AuthKey(claims["authHeader"].(string), isExt)
 			if err != nil {
+				log.Err(err).Caller().Send()
 				return nil, err
 			}
 		} else {
@@ -209,11 +215,13 @@ func GetAuthDetailsFromContext(ctx context.Context) (authDetails *AuthDetails, e
 		}
 		magicPayload, err := services.GenerateMagicJWT(string(jwtClaims))
 		if err != nil {
+			log.Err(err).Caller().Send()
 			return nil, err
 		}
 
 		publicAddress, err := services.GetMagicAddress(magicPayload)
 		if err != nil {
+			log.Err(err).Caller().Send()
 			return nil, err
 		}
 
