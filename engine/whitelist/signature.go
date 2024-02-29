@@ -260,6 +260,7 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 			return
 		}
 
+		// TODO: do this in Go natively
 		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/sendnfts", bytes.NewBuffer(itemData))
 		if err != nil {
 			fmt.Println(err)
@@ -273,6 +274,20 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 			return
 		}
 
+		log.Info().Msgf("response: %v", res)
+
+		type responseBody struct {
+			TransactionHash string `json:"transactionHash"`
+			Status          string `json:"status"`
+		}
+
+		tx := responseBody{}
+		err = json.NewDecoder(res.Body).Decode(&tx)
+		if err != nil {
+			log.Err(err).Caller().Send()
+		}
+
+		
 		defer res.Body.Close()
 	}()
 
