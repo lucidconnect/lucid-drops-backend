@@ -39,9 +39,9 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 		}
 	}
 
-	if item.Criteria == nil || *item.Criteria != model.ClaimCriteriaTypeEmptyCriteria {
-		return nil, errors.New("unable to generate mintpass for this item")
-	}
+	// if item.Criteria == nil || *item.Criteria != model.ClaimCriteriaTypeEmptyCriteria {
+	// 	return nil, errors.New("unable to generate mintpass for this item")
+	// }
 
 	collection, err := engine.GetCollectionByID(item.CollectionID.String())
 	if err != nil {
