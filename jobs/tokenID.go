@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"os"
 	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -74,8 +75,7 @@ func fetchItemsWithUnresolvedTokenIDs() (*[]models.Item, error) {
 }
 
 func FetchTokenUri(contractAddress, itemID string, isBase bool) (*int, error) {
-
-	inverseAPIBaseURL := "https://inverse-prod.onrender.com"
+	inverseAPIBaseURL := os.Getenv("API_BASE_URL")
 	rpcProvider := utils.UseEnvOrDefault("POLYGON_RPC_PROVIDER", "https://polygon-mainnet.g.alchemy.com/v2/wH3GkDxLOS4h8O7hmIPWqvmOvE4VIqWn")
 	if isBase {
 		rpcProvider = utils.UseEnvOrDefault("BASE_RPC_PROVIDER", "https://base-mainnet.g.alchemy.com/v2/2jx1c05x5vFN7Swv9R_ZJKKAXZUfas8A")
