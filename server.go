@@ -86,11 +86,11 @@ func main() {
 
 func SetupCronJobs() {
 
-	isProd, _ := utils.IsProduction()
-	if !isProd {
-		log.Print("Not in production, skipping cron jobs 🦕")
-		return
-	}
+	// isProd, _ := utils.IsProduction()
+	// if !isProd {
+	// 	log.Print("Not in production, skipping cron jobs 🦕")
+	// 	return
+	// }
 
 	c := cron.New(
 		cron.WithChain(
