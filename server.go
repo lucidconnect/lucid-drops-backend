@@ -71,7 +71,7 @@ func main() {
 	router.Handle("/handle-stripe-webhook", http.HandlerFunc(route.HandleStripeWebhook))
 	router.HandleFunc("/mintPass", route.CreateMintPassForNoCriteriaItem)
 	router.HandleFunc("/claim", route.GenerateSignatureForClaim)
-
+	router.HandleFunc("/fetchTokenUri", route.FetchTokenUri)
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
 
 	httpServer := &http.Server{
