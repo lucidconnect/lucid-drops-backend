@@ -42,7 +42,7 @@ func (i *Item) ToOpenSeaMetadata() *OpenSeaMetaDataFormat {
 		Name:        i.Name,
 		Image:       i.Image,
 		Description: i.Description,
-		ExternalUrl: utils.UseEnvOrDefault("INVERSE_API_BASEURL", "https://localhost:8090"),
+		ExternalUrl: utils.UseEnvOrDefault("API_BASE_URL", "https://localhost:8090"),
 	}
 
 	return openSeaMetadata
