@@ -39,7 +39,7 @@ services:
         sync: false
       - key: AA_SERVER
         sync: false
-      - key: INVERSE_API_BASEURL
+      - key: API_BASE_URL
         sync: false
       - key: MIDJOURNEY_API_KEY
         sync: false
