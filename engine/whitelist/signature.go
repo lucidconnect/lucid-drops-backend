@@ -107,7 +107,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	}
 
 	go func() {
-		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "https://inverse-aa.onrender.com")
+		inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
 
 		client := &http.Client{}
 
@@ -244,7 +244,7 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 	}
 
 	go func() {
-		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "https://inverse-aa.onrender.com")
+		inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
 
 		client := &http.Client{}
 
@@ -287,7 +287,6 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 			log.Err(err).Caller().Send()
 		}
 
-		
 		defer res.Body.Close()
 	}()
 

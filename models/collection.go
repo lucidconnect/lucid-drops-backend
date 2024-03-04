@@ -34,7 +34,7 @@ type DeplyomenResponse struct {
 // We nolonger trigger AA-wallet deployments
 // func (c *Collection) AfterCreate(tx *gorm.DB) (err error) {
 // 	go func() {
-// 		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "https://inverse-aa.onrender.com")
+// 		inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
 
 // 		client := &http.Client{}
 

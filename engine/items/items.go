@@ -97,7 +97,7 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 
 	// This was removed because all deployments are now triggered by the FE
 	go func() {
-		inverseAAServerURL := utils.UseEnvOrDefault("INVERSE_AA_SERVER", "https://inverse-aa.onrender.com")
+		inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
 		inverseAPIBaseURL := utils.UseEnvOrDefault("API_BASE_URL", "https://inverse-backend.onrender.com")
 		client := &http.Client{}
 		if collection.AAContractAddress == nil {
