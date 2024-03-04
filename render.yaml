@@ -39,7 +39,7 @@ services:
         sync: false
       - key: AA_SERVER
         sync: false
-      - key: INVERSE_API_BASEURL
+      - key: API_BASE_URL
         sync: false
       - key: MIDJOURNEY_API_KEY
         sync: false
@@ -49,7 +49,5 @@ services:
         sync: false
       - key: PRIVY_VERIFICATION_KEY
         sync: false
-      - key: STRIPE_SECRET_KEY
-        sync: false
-      - key: STRIPE_WEBHOOK_SECRET
+      - key: LOG_LEVEL
         sync: false
