@@ -123,7 +123,7 @@ func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.Depl
 	}
 
 	collection.AAWalletDeploymentHash = &input.DeploymentHash
-
+	log.Info().Msgf("deployment info: %v", input)
 	if input.ContractAddress == nil {
 		// Introduce an artificial delay for before fethcing the actual contract address
 		time.Sleep(time.Second * 3)
