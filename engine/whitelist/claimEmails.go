@@ -61,13 +61,13 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 		return nil, errors.New("an error occurred while sending the verification email, please try again")
 	}
 
-	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	drop, err := engine.GetDropByID(item.DropID.String())
 	if err != nil {
 		log.Err(err)
 		return nil, err
 	}
 
-	items, err := engine.GetCollectionItems(item.CollectionID.String())
+	items, err := engine.GetDropItems(item.DropID.String())
 	if err != nil {
 		log.Err(err)
 		return nil, err
@@ -75,26 +75,26 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 
 	// TODO use DB order or smart contract deploys to persist this on the item level
 	var ItemIdOnContract int64
-	for idx, collectionItem := range items {
-		if collectionItem.ID.String() == input.ItemID {
+	for idx, dropItem := range items {
+		if dropItem.ID.String() == input.ItemID {
 			ItemIdOnContract = int64((idx) + 1)
 		}
 	}
 
 	var smartContractAddress string
-	if collection.AAContractAddress != nil {
-		smartContractAddress = *collection.AAContractAddress
+	if drop.AAContractAddress != nil {
+		smartContractAddress = *drop.AAContractAddress
 	}
 
 	newEmailOTP := &models.EmailOTP{
-		IssuedAt:                  time.Now().Unix(),
-		ExpiresAt:                 time.Now().Add(time.Minute * time.Duration(emailOTPttl)).Unix(),
-		ItemID:                    item.ID,
-		UserEmail:                 input.EmailAddress,
-		ExpectedOTP:               generatedOTP,
-		Attempts:                  0,
-		ItemIdOnContract:          ItemIdOnContract,
-		CollectionContractAddress: smartContractAddress,
+		IssuedAt:            time.Now().Unix(),
+		ExpiresAt:           time.Now().Add(time.Minute * time.Duration(emailOTPttl)).Unix(),
+		ItemID:              item.ID,
+		UserEmail:           input.EmailAddress,
+		ExpectedOTP:         generatedOTP,
+		Attempts:            0,
+		ItemIdOnContract:    ItemIdOnContract,
+		DropContractAddress: smartContractAddress,
 	}
 
 	err = engine.CreateModel(newEmailOTP)

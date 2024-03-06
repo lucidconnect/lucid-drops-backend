@@ -1,4 +1,4 @@
-package collections
+package drops
 
 import (
 	"encoding/json"
@@ -97,10 +97,10 @@ func FetchOpsFromJiffyscan(transactionHash string) (*JiffyscanResponse, error) {
 	return &response, err
 }
 
-func GetOnchainContractAddressFromDeploymentHash(aaHash string) (*string, error) {
+func GetOnchainContractAddressFromDeploymentHash(aaHash string) (string, error) {
 	resp, err := FetchOpsFromJiffyscan(aaHash)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	var bloomHash string
@@ -110,19 +110,19 @@ func GetOnchainContractAddressFromDeploymentHash(aaHash string) (*string, error)
 
 	contractAddress, err := addresswatcher.GetContractAddressFromParentHash(bloomHash)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	return contractAddress, nil
 }
 
 func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.DeploymentInfo) (*bool, error) {
-	collection, err := engine.GetCollectionByID(input.CollectionID)
+	drop, err := engine.GetDropByID(input.DropID)
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	collection.AAWalletDeploymentHash = &input.DeploymentHash
+	drop.AAWalletDeploymentHash = &input.DeploymentHash
 	log.Info().Msgf("deployment info: %v", input)
 	if input.ContractAddress == nil {
 		// Introduce an artificial delay for before fethcing the actual contract address
@@ -133,12 +133,12 @@ func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.Depl
 			log.Err(err)
 		}
 
-		collection.AAContractAddress = contractAdddress
+		drop.AAContractAddress = &contractAdddress
 	} else {
-		collection.AAContractAddress = input.ContractAddress
+		drop.AAContractAddress = input.ContractAddress
 	}
 
-	err = engine.SaveModel(collection)
+	err = engine.SaveModel(drop)
 	if err != nil {
 		return nil, err
 	}

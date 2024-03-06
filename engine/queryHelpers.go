@@ -16,25 +16,25 @@ import (
 )
 
 func AttachContractAddressForCreationHash(transactionHash, contractAddress string) error {
-	collection, err := GetCollectionByDeploymentHash(transactionHash)
+	drop, err := GetDropByDeploymentHash(transactionHash)
 	if err != nil {
 		return err
 	}
 
-	collection.AAContractAddress = utils.GetStrPtr(contractAddress)
+	drop.AAContractAddress = utils.GetStrPtr(contractAddress)
 
-	return SaveModel(collection)
+	return SaveModel(drop)
 }
 
-func GetCollectionByDeploymentHash(deploymentHash string) (*models.Collection, error) {
-	var collection models.Collection
+func GetDropByDeploymentHash(deploymentHash string) (*models.Drop, error) {
+	var drop models.Drop
 
-	err := dbutils.DB.Where("transaction_hash=?", deploymentHash).First(&collection).Error
+	err := dbutils.DB.Where("transaction_hash=?", deploymentHash).First(&drop).Error
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	return &collection, nil
+	return &drop, nil
 }
 
 func GetCreatorByID(creatorID string) (*models.Creator, error) {
@@ -104,15 +104,15 @@ func GetCreatorByInverseUsername(inverseUsername string) (*models.Creator, error
 	return &creator, nil
 }
 
-func GetCollectionByID(collectionID string) (*models.Collection, error) {
-	var collection models.Collection
+func GetDropByID(dropID string) (*models.Drop, error) {
+	var drop models.Drop
 
-	err := dbutils.DB.Where("id=?", collectionID).First(&collection).Error
+	err := dbutils.DB.Where("id=?", dropID).First(&drop).Error
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	return &collection, nil
+	return &drop, nil
 }
 
 func GetClaimedItemByAddress(address string) ([]*models.Item, error) {
@@ -264,21 +264,21 @@ func GetEmailClaimIDByItemAndEmail(itemID *uuid.UUID, claimingEmail string) (*mo
 	return &claim, nil
 }
 
-func GetCreatorCollections(creatorID string) ([]*models.Collection, error) {
-	var collections []*models.Collection
+func GetCreatorDrops(creatorID string) ([]*models.Drop, error) {
+	var drops []*models.Drop
 
-	err := dbutils.DB.Where("creator_id=?", creatorID).Find(&collections).Error
+	err := dbutils.DB.Where("creator_id=?", creatorID).Find(&drops).Error
 	if err != nil {
-		return nil, errors.New("collections not found")
+		return nil, errors.New("drops not found")
 	}
 
-	return collections, nil
+	return drops, nil
 }
 
-func GetCollectionItems(collectionID string) ([]*models.Item, error) {
+func GetDropItems(dropID string) ([]*models.Item, error) {
 	var items []*models.Item
 
-	err := dbutils.DB.Where("collection_id=?", collectionID).Find(&items).Error
+	err := dbutils.DB.Where("drop_id=?", dropID).Find(&items).Error
 	if err != nil {
 		return nil, errors.New("items not found")
 	}
@@ -286,10 +286,10 @@ func GetCollectionItems(collectionID string) ([]*models.Item, error) {
 	return items, nil
 }
 
-func GetCollectionItemsIncludeDeleted(collectionID string) ([]*models.Item, error) {
+func GetDropItemsIncludeDeleted(dropID string) ([]*models.Item, error) {
 	var items []*models.Item
 
-	err := dbutils.DB.Unscoped().Where("collection_id=?", collectionID).Find(&items).Error
+	err := dbutils.DB.Unscoped().Where("drop_id=?", dropID).Find(&items).Error
 	if err != nil {
 		return nil, errors.New("items not found")
 	}
@@ -374,15 +374,15 @@ func GetFeaturedItems() ([]*models.Item, error) {
 	return items, nil
 }
 
-func GetFeaturedCollections() ([]*models.Collection, error) {
-	var collections []*models.Collection
+func GetFeaturedDrops() ([]*models.Drop, error) {
+	var drops []*models.Drop
 
-	err := dbutils.DB.Where("featured=?", true).Find(&collections).Error
+	err := dbutils.DB.Where("featured=?", true).Find(&drops).Error
 	if err != nil {
-		return nil, errors.New("collections not found")
+		return nil, errors.New("drops not found")
 	}
 
-	return collections, nil
+	return drops, nil
 }
 
 func DeleteCriteriaIfExists(item *models.Item) error {

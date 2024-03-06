@@ -43,13 +43,13 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 	// 	return nil, errors.New("unable to generate mintpass for this item")
 	// }
 
-	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	drop, err := engine.GetDropByID(item.DropID.String())
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	if collection.AAContractAddress == nil {
-		return nil, errors.New("collection contract address not found")
+	if drop.AAContractAddress == nil {
+		return nil, errors.New("drop contract address not found")
 	}
 
 	if item.TokenID == nil {
@@ -62,10 +62,10 @@ func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse,
 
 	tx := dbutils.DB.Begin()
 	newMint := models.MintPass{
-		ItemId:                    item.ID.String(),
-		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: *collection.AAContractAddress,
-		BlockchainNetwork:         collection.BlockchainNetwork,
+		ItemId:              item.ID.String(),
+		ItemIdOnContract:    *item.TokenID,
+		DropContractAddress: *drop.AAContractAddress,
+		BlockchainNetwork:   drop.BlockchainNetwork,
 	}
 
 	err = tx.Create(&newMint).Error
@@ -91,9 +91,9 @@ func chargeClaimFee(userID string, item *models.Item, tx *gorm.DB) error {
 	marginDeduction := int64(float64(item.ClaimFee) * inverseMargin)
 	claimFeeAfterMarginDeduction := int64(item.ClaimFee) - marginDeduction
 
-	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	drop, err := engine.GetDropByID(item.DropID.String())
 	if err != nil {
-		return errors.New("collection not found")
+		return errors.New("drop not found")
 	}
 
 	///debit side instruction for collector
@@ -112,10 +112,10 @@ func chargeClaimFee(userID string, item *models.Item, tx *gorm.DB) error {
 
 	//credit side instruction for creator
 	creditInstruction := ledger.TransferInstruction{
-		UserID: uuid.FromStringOrNil(collection.CreatorID.String()),
+		UserID: uuid.FromStringOrNil(drop.CreatorID.String()),
 		Amount: claimFeeAfterMarginDeduction,
 		Side:   ledger.Credit,
-		TxRef:  fmt.Sprintf("claim-%s-%s-%s", item.ID.String(), collection.CreatorID.String(), utils.RandAlphaNumericRunes(5)),
+		TxRef:  fmt.Sprintf("claim-%s-%s-%s", item.ID.String(), drop.CreatorID.String(), utils.RandAlphaNumericRunes(5)),
 	}
 
 	err = l.Transfer(tx, creditInstruction)
@@ -130,7 +130,7 @@ func chargeClaimFee(userID string, item *models.Item, tx *gorm.DB) error {
 		UserID: uuid.FromStringOrNil(l.CollectAccount.CreatorID),
 		Amount: marginDeduction,
 		Side:   ledger.Credit,
-		TxRef:  fmt.Sprintf("claim-%s-%s-%s", item.ID.String(), collection.CreatorID.String(), utils.RandAlphaNumericRunes(5)),
+		TxRef:  fmt.Sprintf("claim-%s-%s-%s", item.ID.String(), drop.CreatorID.String(), utils.RandAlphaNumericRunes(5)),
 	}
 
 	err = l.Transfer(tx, collectInstruction)
@@ -158,13 +158,13 @@ func CreateMintPassForValidatedCriteriaItem(itemID string) (*model.ValidationRes
 		return nil, errors.New("unable to generate mintpass for this item")
 	}
 
-	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	drop, err := engine.GetDropByID(item.DropID.String())
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	if collection.AAContractAddress == nil {
-		return nil, errors.New("collection contract address not found")
+	if drop.AAContractAddress == nil {
+		return nil, errors.New("drop contract address not found")
 	}
 
 	if item.TokenID == nil {
@@ -176,10 +176,10 @@ func CreateMintPassForValidatedCriteriaItem(itemID string) (*model.ValidationRes
 	}
 
 	newMint := models.MintPass{
-		ItemId:                    item.ID.String(),
-		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: *collection.AAContractAddress,
-		BlockchainNetwork:         collection.BlockchainNetwork,
+		ItemId:              item.ID.String(),
+		ItemIdOnContract:    *item.TokenID,
+		DropContractAddress: *drop.AAContractAddress,
+		BlockchainNetwork:   drop.BlockchainNetwork,
 	}
 
 	err = dbutils.DB.Create(&newMint).Error
