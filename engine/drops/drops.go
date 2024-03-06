@@ -57,7 +57,26 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 		return nil, errors.New("couldn't create new drop")
 	}
 
-	return newDrop.ToGraphData(), nil
+	// create item
+	dropId := newDrop.ID.String()
+	itemInput := &model.ItemInput{
+		Name:         input.Name,
+		Image:        input.Image,
+		Description:  input.Description,
+		DropID:       &dropId,
+		EditionLimit: input.EditionLimit,
+		ClaimFee:     input.ClaimFee,
+	}
+
+	item, err := CreateItem(itemInput, authDetails)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return newDrop.ToGraphData(nil), errors.New("failed to create item in drop")
+	}
+
+	var items []*model.Item
+	items = append(items, item)
+	return newDrop.ToGraphData(items), nil
 }
 
 func DeleteDrop(dropID string, authDetails *internal.AuthDetails) (*model.Drop, error) {
@@ -80,7 +99,7 @@ func DeleteDrop(dropID string, authDetails *internal.AuthDetails) (*model.Drop, 
 		return nil, errors.New("couldn't delete drop")
 	}
 
-	return drop.ToGraphData(), nil
+	return drop.ToGraphData(nil), nil
 }
 
 func UpdateDrop(dropID string, input *model.DropInput, authDetails *internal.AuthDetails) (*model.Drop, error) {
@@ -119,7 +138,7 @@ func UpdateDrop(dropID string, input *model.DropInput, authDetails *internal.Aut
 		return nil, errors.New("couldn't create new drop")
 	}
 
-	return drop.ToGraphData(), nil
+	return drop.ToGraphData(nil), nil
 }
 
 func FetchCreatorDrops(authDetails *internal.AuthDetails) ([]*model.Drop, error) {
@@ -136,7 +155,8 @@ func FetchCreatorDrops(authDetails *internal.AuthDetails) ([]*model.Drop, error)
 	mappedDrops := make([]*model.Drop, len(drops))
 
 	for idx, drop := range drops {
-		mappedDrops[idx] = drop.ToGraphData()
+		items, _ := FetchDropItems(drop.ID.String(), false, nil)
+		mappedDrops[idx] = drop.ToGraphData(items)
 	}
 
 	return mappedDrops, nil
@@ -148,7 +168,9 @@ func FetchDropByID(dropID string) (*model.Drop, error) {
 		return nil, errors.New("drop not found")
 	}
 
-	return drop.ToGraphData(), nil
+	items, _ := FetchDropItems(dropID, false, nil)
+
+	return drop.ToGraphData(items), nil
 }
 
 func FetchFeaturedDrops() ([]*model.Drop, error) {
@@ -160,7 +182,7 @@ func FetchFeaturedDrops() ([]*model.Drop, error) {
 	mappedDrops := make([]*model.Drop, len(drops))
 
 	for idx, drop := range drops {
-		mappedDrops[idx] = drop.ToGraphData()
+		mappedDrops[idx] = drop.ToGraphData(nil)
 	}
 
 	return mappedDrops, nil

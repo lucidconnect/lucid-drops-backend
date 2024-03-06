@@ -27,13 +27,13 @@ func FillOutContractAddresses() {
 			continue
 		}
 
-		notifier.NotifyTelegram("🪼 New Drop deployed at "+*contractAdddress, structure.EngineeringTeam)
+		notifier.NotifyTelegram("🪼 New Drop deployed at "+contractAdddress, structure.EngineeringTeam)
 
-		deployment.AAContractAddress = contractAdddress
+		deployment.AAContractAddress = &contractAdddress
 
 		err = engine.SaveModel(deployment)
 		if err != nil {
-			notifier.NotifyTelegram(fmt.Sprintf("👺 Drop (%s )Saving failed (%s)", *contractAdddress, err), structure.EngineeringTeam)
+			notifier.NotifyTelegram(fmt.Sprintf("👺 Drop (%s )Saving failed (%s)", contractAdddress, err), structure.EngineeringTeam)
 			continue
 		}
 	}

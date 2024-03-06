@@ -85,7 +85,7 @@ type DeplyomenResponse struct {
 // 	return nil
 // }
 
-func (c *Drop) ToGraphData() *model.Drop {
+func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 	mappedDrop := &model.Drop{
 		ID:              c.ID.String(),
 		CreatorID:       c.CreatorID.String(),
@@ -100,6 +100,10 @@ func (c *Drop) ToGraphData() *model.Drop {
 
 	if c.AAContractAddress != nil {
 		mappedDrop.ContractAddress = c.AAContractAddress
+	}
+
+	if items != nil {
+		mappedDrop.Items = items
 	}
 
 	return mappedDrop

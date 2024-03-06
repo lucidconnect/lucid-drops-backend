@@ -16,7 +16,6 @@ import (
 	"github.com/lucidconnect/inverse/engine/auth"
 	"github.com/lucidconnect/inverse/engine/claimers"
 	"github.com/lucidconnect/inverse/engine/drops"
-	"github.com/lucidconnect/inverse/engine/items"
 	"github.com/lucidconnect/inverse/engine/mobile"
 	"github.com/lucidconnect/inverse/engine/onboarding"
 	"github.com/lucidconnect/inverse/engine/wallet"
@@ -37,7 +36,7 @@ func (r *dropResolver) Items(ctx context.Context, obj *model.Drop) ([]*model.Ite
 	for parent := opCtx.Parent; parent != nil; parent = parent.Parent {
 		if parent.IsResolver {
 			if parent.Field.Name == "fetchDropById" || parent.Field.Name == "fetchCreatorDrops" {
-				itemArr, err = items.FetchDropItems(obj.ID, false, nil)
+				itemArr, err = drops.FetchDropItems(obj.ID, false, nil)
 				if err != nil {
 					return []*model.Item{}, nil
 				}
@@ -46,7 +45,7 @@ func (r *dropResolver) Items(ctx context.Context, obj *model.Drop) ([]*model.Ite
 		}
 	}
 
-	itemArr, err = items.FetchDropItems(obj.ID, true, nil)
+	itemArr, err = drops.FetchDropItems(obj.ID, true, nil)
 	if err != nil {
 		return []*model.Item{}, nil
 	}
@@ -60,7 +59,7 @@ func (r *itemResolver) Creator(ctx context.Context, obj *model.Item) (*model.Cre
 
 // AuthorizedSubdomains is the resolver for the authorizedSubdomains field.
 func (r *itemResolver) AuthorizedSubdomains(ctx context.Context, obj *model.Item) ([]string, error) {
-	subdomains, err := items.FetchAuthotizedSubdomainsForItem(obj.ID)
+	subdomains, err := drops.FetchAuthotizedSubdomainsForItem(obj.ID)
 	if err != nil {
 		return []string{}, nil
 	}
@@ -125,12 +124,12 @@ func (r *mutationResolver) CreateItem(ctx context.Context, input model.ItemInput
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	return items.CreateItem(&input, authenticationDetails)
+	return drops.CreateItem(&input, authenticationDetails)
 }
 
 // TempCreateItem is the resolver for the tempCreateItem field.
 func (r *mutationResolver) TempCreateItem(ctx context.Context, input model.ItemInput, creatorAddress string) (*model.Item, error) {
-	return items.TempCreateItem(&input, &internal.AuthDetails{
+	return drops.TempCreateItem(&input, &internal.AuthDetails{
 		Address: common.HexToAddress(creatorAddress),
 	})
 }
@@ -142,7 +141,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input 
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	return items.UpdateItem(itemID, &input, authenticationDetails)
+	return drops.UpdateItem(itemID, &input, authenticationDetails)
 }
 
 // DeleteItem is the resolver for the deleteItem field.
@@ -152,12 +151,12 @@ func (r *mutationResolver) DeleteItem(ctx context.Context, itemID string) (*mode
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	return items.DeleteItem(itemID, authenticationDetails)
+	return drops.DeleteItem(itemID, authenticationDetails)
 }
 
 // AddItemDeadline is the resolver for the addItemDeadline field.
 func (r *mutationResolver) AddItemDeadline(ctx context.Context, itemID string, deadline string) (*model.Item, error) {
-	return items.SetItemClaimDeadline(itemID, deadline)
+	return drops.SetItemClaimDeadline(itemID, deadline)
 }
 
 // CreateQuestionnaireCriteriaForItem is the resolver for the createQuestionnaireCriteriaForItem field.
@@ -415,19 +414,21 @@ func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName stri
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	drops, err := engine.GetCreatorDrops(*profileData.CreatorID)
+	creatorDrops, err := engine.GetCreatorDrops(*profileData.CreatorID)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
-	mappedDrops := make([]*model.Drop, len(drops))
-	for idx, drop := range drops {
-		mappedDrops[idx] = drop.ToGraphData()
+	mappedDrops := make([]*model.Drop, len(creatorDrops))
+	for idx, drop := range creatorDrops {
+		items, _ := drops.FetchDropItems(drop.ID.String(), false, nil)
+
+		mappedDrops[idx] = drop.ToGraphData(items)
 	}
 	profileData.Drops = mappedDrops
 
 	var allItems []*model.Item
 	for _, drop := range mappedDrops {
-		items, err := items.FetchDropItems(drop.ID, false, nil)
+		items, err := drops.FetchDropItems(drop.ID, false, nil)
 		if err != nil {
 			continue
 		}
@@ -472,12 +473,12 @@ func (r *queryResolver) FetchItemsInDrop(ctx context.Context, dropID string) ([]
 	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	// }
 
-	return items.FetchDropItems(dropID, false, nil)
+	return drops.FetchDropItems(dropID, false, nil)
 }
 
 // FetchItemByID is the resolver for the fetchItemById field.
 func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*model.Item, error) {
-	return items.FetchItemByID(itemID)
+	return drops.FetchItemByID(itemID)
 }
 
 // FetchCriteriaAuthorizedEmails is the resolver for the fetchCriteriaAuthorizedEmails field.
@@ -511,12 +512,12 @@ func (r *queryResolver) GetTwitterUserDetails(ctx context.Context, userName stri
 
 // FetchQuestionsByItemID is the resolver for the fetchQuestionsByItemId field.
 func (r *queryResolver) FetchQuestionsByItemID(ctx context.Context, itemID string) ([]*model.QuestionnaireType, error) {
-	return items.FetchQuestionsByItemID(itemID)
+	return drops.FetchQuestionsByItemID(itemID)
 }
 
 // FetchFeaturedItems is the resolver for the fetchFeaturedItems field.
 func (r *queryResolver) FetchFeaturedItems(ctx context.Context) ([]*model.Item, error) {
-	return items.FetchFeaturedItems()
+	return drops.FetchFeaturedItems()
 }
 
 // FetchFeaturedDrops is the resolver for the fetchFeaturedDrops field.

@@ -69,6 +69,8 @@ type DropInput struct {
 	Network         *BlockchainNetwork `json:"network,omitempty"`
 	DeploymentHash  string             `json:"deploymentHash"`
 	ContractAddress *string            `json:"contractAddress,omitempty"`
+	EditionLimit    *int               `json:"editionLimit,omitempty"`
+	ClaimFee        *int               `json:"claimFee,omitempty"`
 }
 
 type EditUserProfileInputType struct {

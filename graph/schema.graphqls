@@ -155,6 +155,8 @@ input DropInput {
   network: BlockchainNetwork
   deploymentHash: String!
   contractAddress: String
+  editionLimit: Int
+  claimFee: Int
 }
 
 input ItemInput {
