@@ -2,11 +2,13 @@ package drops
 
 import (
 	"errors"
+	"time"
 
 	"github.com/lucidconnect/inverse/engine"
 	"github.com/lucidconnect/inverse/graph/model"
 	"github.com/lucidconnect/inverse/internal"
 	"github.com/lucidconnect/inverse/models"
+	"github.com/rs/zerolog/log"
 )
 
 func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*model.Drop, error) {
@@ -24,14 +26,30 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 		return nil, errors.New("creator has not been onboarded to create a new drop ( They lack an AA wallet )")
 	}
 
+	var contractAdddress string
+	if input.ContractAddress == nil {
+		// Introduce an artificial delay for before fethcing the actual contract address
+		time.Sleep(time.Second * 3)
+
+		contractAdddress, err = GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
+		if err != nil {
+			log.Err(err)
+		}
+
+	} else {
+		contractAdddress = *input.ContractAddress
+	}
+
 	newDrop := &models.Drop{
-		CreatorID:         creator.ID,
-		CreatorAddress:    aaSigerInfo.WalletAddress,
-		Name:              *input.Name,
-		Image:             *input.Image,
-		Thumbnail:         *input.Thumbnail,
-		Description:       *input.Description,
-		BlockchainNetwork: input.Network,
+		CreatorID:              creator.ID,
+		CreatorAddress:         aaSigerInfo.WalletAddress,
+		Name:                   *input.Name,
+		Image:                  *input.Image,
+		Thumbnail:              *input.Thumbnail,
+		Description:            *input.Description,
+		BlockchainNetwork:      input.Network,
+		AAWalletDeploymentHash: &input.DeploymentHash,
+		AAContractAddress:      &contractAdddress,
 	}
 
 	err = engine.CreateModel(newDrop)

@@ -153,6 +153,8 @@ input DropInput {
 	image: String
 	thumbnail: String
   network: BlockchainNetwork
+  deploymentHash: String!
+  contractAddress: String
 }
 
 input ItemInput {

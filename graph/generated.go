@@ -11920,7 +11920,7 @@ func (ec *executionContext) unmarshalInputDropInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "image", "thumbnail", "network"}
+	fieldsInOrder := [...]string{"name", "description", "image", "thumbnail", "network", "deploymentHash", "contractAddress"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -11972,6 +11972,24 @@ func (ec *executionContext) unmarshalInputDropInput(ctx context.Context, obj int
 				return it, err
 			}
 			it.Network = data
+		case "deploymentHash":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deploymentHash"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.DeploymentHash = data
+		case "contractAddress":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contractAddress"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ContractAddress = data
 		}
 	}
 

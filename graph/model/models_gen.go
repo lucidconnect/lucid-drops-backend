@@ -62,11 +62,13 @@ type Drop struct {
 }
 
 type DropInput struct {
-	Name        *string            `json:"name,omitempty"`
-	Description *string            `json:"description,omitempty"`
-	Image       *string            `json:"image,omitempty"`
-	Thumbnail   *string            `json:"thumbnail,omitempty"`
-	Network     *BlockchainNetwork `json:"network,omitempty"`
+	Name            *string            `json:"name,omitempty"`
+	Description     *string            `json:"description,omitempty"`
+	Image           *string            `json:"image,omitempty"`
+	Thumbnail       *string            `json:"thumbnail,omitempty"`
+	Network         *BlockchainNetwork `json:"network,omitempty"`
+	DeploymentHash  string             `json:"deploymentHash"`
+	ContractAddress *string            `json:"contractAddress,omitempty"`
 }
 
 type EditUserProfileInputType struct {
