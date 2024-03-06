@@ -5,7 +5,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-type Collection struct {
+type Drop struct {
 	Base
 	CreatorID              uuid.UUID
 	CreatorAddress         string
@@ -32,21 +32,21 @@ type DeplyomenResponse struct {
 }
 
 // We nolonger trigger AA-wallet deployments
-// func (c *Collection) AfterCreate(tx *gorm.DB) (err error) {
+// func (c *Drop) AfterCreate(tx *gorm.DB) (err error) {
 // 	go func() {
 // 		inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
 
 // 		client := &http.Client{}
 
-// 		collectionData, err := json.Marshal(c)
+// 		dropData, err := json.Marshal(c)
 // 		if err != nil {
 // 			fmt.Println(err)
 // 			return
 // 		}
 
-// 		log.Info().Msgf("🪼 Sending Request to AA server at %s and Data : %s", inverseAAServerURL, utils.AsJson(collectionData))
+// 		log.Info().Msgf("🪼 Sending Request to AA server at %s and Data : %s", inverseAAServerURL, utils.AsJson(dropData))
 
-// 		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/deploy", bytes.NewBuffer(collectionData))
+// 		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/deploy", bytes.NewBuffer(dropData))
 // 		if err != nil {
 // 			fmt.Println(err)
 // 			return
@@ -85,8 +85,8 @@ type DeplyomenResponse struct {
 // 	return nil
 // }
 
-func (c *Collection) ToGraphData() *model.Collection {
-	mappedCollection := &model.Collection{
+func (c *Drop) ToGraphData() *model.Drop {
+	mappedDrop := &model.Drop{
 		ID:              c.ID.String(),
 		CreatorID:       c.CreatorID.String(),
 		CreatedAt:       c.CreatedAt,
@@ -99,8 +99,8 @@ func (c *Collection) ToGraphData() *model.Collection {
 	}
 
 	if c.AAContractAddress != nil {
-		mappedCollection.ContractAddress = c.AAContractAddress
+		mappedDrop.ContractAddress = c.AAContractAddress
 	}
 
-	return mappedCollection
+	return mappedDrop
 }

@@ -28,22 +28,22 @@ func VerifyItemTokenIDs() {
 	}
 
 	for _, item := range *items {
-		collection, err := engine.GetCollectionByID(item.CollectionID.String())
+		drop, err := engine.GetDropByID(item.DropID.String())
 		if err != nil {
 			log.Error().Msg(err.Error())
 			continue
 		}
 
-		if collection.AAContractAddress == nil {
+		if drop.AAContractAddress == nil {
 			continue
 		}
 
 		var isBase bool
-		if collection.BlockchainNetwork != nil {
-			isBase = *collection.BlockchainNetwork == model.BlockchainNetworkBase
+		if drop.BlockchainNetwork != nil {
+			isBase = *drop.BlockchainNetwork == model.BlockchainNetworkBase
 		}
 
-		tokenID, err := FetchTokenUri(*collection.AAContractAddress, item.ID.String(), isBase)
+		tokenID, err := FetchTokenUri(*drop.AAContractAddress, item.ID.String(), isBase)
 		if err != nil {
 			log.Error().Msg(err.Error())
 			continue

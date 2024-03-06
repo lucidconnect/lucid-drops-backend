@@ -21,27 +21,27 @@ import (
 func TempCreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new drop")
 	}
 
-	if input.Name == nil || input.Image == nil || input.CollectionID == nil || input.Description == nil {
+	if input.Name == nil || input.Image == nil || input.DropID == nil || input.Description == nil {
 		return nil, errors.New("pass in all Fields inorder to create a new item")
 	}
 
-	collection, err := engine.GetCollectionByID(*input.CollectionID)
+	drop, err := engine.GetDropByID(*input.DropID)
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	if collection.CreatorID != creator.ID {
-		return nil, errors.New("collection doesn't belong to the creator if the item")
+	if drop.CreatorID != creator.ID {
+		return nil, errors.New("drop doesn't belong to the creator if the item")
 	}
 
 	newItem := &models.Item{
 		Name:         *input.Name,
 		Image:        *input.Image,
 		Description:  *input.Description,
-		CollectionID: collection.ID,
+		DropID:       drop.ID,
 		UserLimit:    input.UserLimit,
 		EditionLimit: input.EditionLimit,
 	}
@@ -52,7 +52,7 @@ func TempCreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (
 
 	err = engine.CreateModel(newItem)
 	if err != nil {
-		return nil, errors.New("couldn't create new collection")
+		return nil, errors.New("couldn't create new drop")
 	}
 
 	return newItem.ToGraphData(), nil
@@ -61,27 +61,27 @@ func TempCreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (
 func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new drop")
 	}
 
-	if input.Name == nil || input.Image == nil || input.CollectionID == nil || input.Description == nil {
+	if input.Name == nil || input.Image == nil || input.DropID == nil || input.Description == nil {
 		return nil, errors.New("pass in all Fields inorder to create a new item")
 	}
 
-	collection, err := engine.GetCollectionByID(*input.CollectionID)
+	drop, err := engine.GetDropByID(*input.DropID)
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	if collection.CreatorID != creator.ID {
-		return nil, errors.New("collection doesn't belong to the creator if the item")
+	if drop.CreatorID != creator.ID {
+		return nil, errors.New("drop doesn't belong to the creator if the item")
 	}
 
 	newItem := &models.Item{
 		Name:         *input.Name,
 		Image:        *input.Image,
 		Description:  *input.Description,
-		CollectionID: collection.ID,
+		DropID:       drop.ID,
 		UserLimit:    input.UserLimit,
 		EditionLimit: input.EditionLimit,
 	}
@@ -92,7 +92,7 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 
 	err = engine.CreateModel(newItem)
 	if err != nil {
-		return nil, errors.New("couldn't create new collection")
+		return nil, errors.New("couldn't create new drop")
 	}
 
 	// This was removed because all deployments are now triggered by the FE
@@ -100,14 +100,14 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 		inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
 		inverseAPIBaseURL := utils.UseEnvOrDefault("API_BASE_URL", "https://inverse-backend.onrender.com")
 		client := &http.Client{}
-		if collection.AAContractAddress == nil {
+		if drop.AAContractAddress == nil {
 			log.Info().Msg("🪼TODO ADD SUPPORT FOR QUEING")
 			return
 		}
 		itemData, err := json.Marshal(map[string]interface{}{
-			"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *collection.AAContractAddress, newItem.ID.String()),
-			"contractAddress": *collection.AAContractAddress,
-			"Network":         collection.BlockchainNetwork,
+			"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *drop.AAContractAddress, newItem.ID.String()),
+			"contractAddress": *drop.AAContractAddress,
+			"Network":         drop.BlockchainNetwork,
 		})
 
 		if err != nil {
@@ -129,13 +129,13 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 		}
 
 		var isBase bool
-		if collection.BlockchainNetwork != nil {
-			isBase = *collection.BlockchainNetwork == model.BlockchainNetworkBase
+		if drop.BlockchainNetwork != nil {
+			isBase = *drop.BlockchainNetwork == model.BlockchainNetworkBase
 		}
 
 		if res.StatusCode == http.StatusOK {
 			go func() {
-				tokenID, err := jobs.FetchTokenUri(*collection.AAContractAddress, newItem.ID.String(), isBase)
+				tokenID, err := jobs.FetchTokenUri(*drop.AAContractAddress, newItem.ID.String(), isBase)
 				if err != nil {
 					return
 				}
@@ -167,16 +167,16 @@ func DeleteItem(itemID string, authDetails *internal.AuthDetails) (*model.Item, 
 
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	drop, err := engine.GetDropByID(item.DropID.String())
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	if creator.ID != collection.CreatorID {
-		return nil, errors.New("the collection doesn't belong to this creator")
+	if creator.ID != drop.CreatorID {
+		return nil, errors.New("the drop doesn't belong to this creator")
 	}
 
 	err = engine.SoftDeleteModel(item)
@@ -195,7 +195,7 @@ func UpdateItem(itemID string, input *model.ItemInput, authDetails *internal.Aut
 
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
 	if input.Name != nil {
@@ -210,17 +210,17 @@ func UpdateItem(itemID string, input *model.ItemInput, authDetails *internal.Aut
 		item.Description = *input.Description
 	}
 
-	if input.CollectionID != nil {
-		collection, err := engine.GetCollectionByID(*input.CollectionID)
+	if input.DropID != nil {
+		drop, err := engine.GetDropByID(*input.DropID)
 		if err != nil {
-			return nil, errors.New("collection not found")
+			return nil, errors.New("drop not found")
 		}
 
-		if creator.ID != collection.CreatorID {
-			return nil, errors.New("the collection doesn't belong to this creator")
+		if creator.ID != drop.CreatorID {
+			return nil, errors.New("the drop doesn't belong to this creator")
 		}
 
-		item.CollectionID = collection.ID
+		item.DropID = drop.ID
 	}
 
 	err = engine.SaveModel(item)
@@ -254,8 +254,8 @@ func FetchAuthotizedSubdomainsForItem(itemID string) ([]string, error) {
 	return mappedDomains, nil
 }
 
-func FetchCollectionItems(collectionID string, includeDelelted bool, authDetails *internal.AuthDetails) ([]*model.Item, error) {
-	// All Collection data will be public for now
+func FetchDropItems(dropID string, includeDelelted bool, authDetails *internal.AuthDetails) ([]*model.Item, error) {
+	// All Drop data will be public for now
 
 	// creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	// if err != nil {
@@ -266,13 +266,13 @@ func FetchCollectionItems(collectionID string, includeDelelted bool, authDetails
 	var items []*models.Item
 
 	if includeDelelted {
-		items, err = engine.GetCollectionItemsIncludeDeleted(collectionID)
+		items, err = engine.GetDropItemsIncludeDeleted(dropID)
 		if err != nil {
 			return nil, errors.New("items not found")
 		}
 
 	} else {
-		items, err = engine.GetCollectionItems(collectionID)
+		items, err = engine.GetDropItems(dropID)
 		if err != nil {
 			return nil, errors.New("items not found")
 		}

@@ -1,4 +1,4 @@
-package collections
+package drops
 
 import (
 	"encoding/json"
@@ -117,12 +117,12 @@ func GetOnchainContractAddressFromDeploymentHash(aaHash string) (*string, error)
 }
 
 func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.DeploymentInfo) (*bool, error) {
-	collection, err := engine.GetCollectionByID(input.CollectionID)
+	drop, err := engine.GetDropByID(input.DropID)
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	collection.AAWalletDeploymentHash = &input.DeploymentHash
+	drop.AAWalletDeploymentHash = &input.DeploymentHash
 	log.Info().Msgf("deployment info: %v", input)
 	if input.ContractAddress == nil {
 		// Introduce an artificial delay for before fethcing the actual contract address
@@ -133,12 +133,12 @@ func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.Depl
 			log.Err(err)
 		}
 
-		collection.AAContractAddress = contractAdddress
+		drop.AAContractAddress = contractAdddress
 	} else {
-		collection.AAContractAddress = input.ContractAddress
+		drop.AAContractAddress = input.ContractAddress
 	}
 
-	err = engine.SaveModel(collection)
+	err = engine.SaveModel(drop)
 	if err != nil {
 		return nil, err
 	}

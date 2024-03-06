@@ -114,7 +114,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		itemData, err := json.Marshal(map[string]interface{}{
 			"receiptientAddresses": []string{input.ClaimingAddress},
 			"items":                []int64{mintPass.ItemIdOnContract},
-			"contractAddress":      mintPass.CollectionContractAddress,
+			"contractAddress":      mintPass.DropContractAddress,
 			"Network":              mintPass.BlockchainNetwork,
 		})
 
@@ -251,7 +251,7 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 		itemData, err := json.Marshal(map[string]interface{}{
 			"receiptientAddresses": []string{input.ClaimingAddress},
 			"items":                []int64{mintPass.ItemIdOnContract},
-			"contractAddress":      mintPass.CollectionContractAddress,
+			"contractAddress":      mintPass.DropContractAddress,
 			"Network":              mintPass.BlockchainNetwork,
 		})
 

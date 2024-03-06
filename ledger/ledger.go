@@ -25,16 +25,16 @@ func New(db *gorm.DB) *Ledger {
 		panic(err)
 	}
 
-	collectionsAccount, err := confirmOrSeedNewCollectionsAccount(db)
+	dropsAccount, err := confirmOrSeedNewDropsAccount(db)
 	if err != nil {
-		log.Print("Error confirming or seeding collections account", err)
+		log.Print("Error confirming or seeding drops account", err)
 		panic(err)
 	}
 
 	return &Ledger{
 		DB:             db,
 		SysAccount:     sysAccount,
-		CollectAccount: collectionsAccount,
+		CollectAccount: dropsAccount,
 	}
 }
 
@@ -84,9 +84,9 @@ func confirmOrSeedNewSysAccount(db *gorm.DB) (*models.Wallet, error) {
 	return &sysAccount, nil
 }
 
-func confirmOrSeedNewCollectionsAccount(db *gorm.DB) (*models.Wallet, error) {
-	var collectionsAccount models.Wallet
-	var collectionsAccountUser models.Creator
+func confirmOrSeedNewDropsAccount(db *gorm.DB) (*models.Wallet, error) {
+	var dropsAccount models.Wallet
+	var dropsAccountUser models.Creator
 	collectUserID := uuid.FromStringOrNil("97B91EAF-3EE1-4F9A-836B-6B49E7B0AC9E")
 	collectUser := models.Creator{
 		Base: models.Base{
@@ -94,11 +94,11 @@ func confirmOrSeedNewCollectionsAccount(db *gorm.DB) (*models.Wallet, error) {
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
-		InverseUsername: utils.GetStrPtr("CollectionAccount"),
+		InverseUsername: utils.GetStrPtr("DropAccount"),
 		WalletAddress:   "warrenbuffetcollects@inverse.wtf",
 	}
 
-	err := db.Model(&models.Creator{}).Where("wallet_address = ?", "warrenbuffetcollects@inverse.wtf").First(&collectionsAccountUser).Error
+	err := db.Model(&models.Creator{}).Where("wallet_address = ?", "warrenbuffetcollects@inverse.wtf").First(&dropsAccountUser).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 
@@ -111,11 +111,11 @@ func confirmOrSeedNewCollectionsAccount(db *gorm.DB) (*models.Wallet, error) {
 		}
 	}
 
-	err = db.Model(&models.Wallet{}).Where("creator_id = ?", collectUser.ID.String()).First(&collectionsAccount).Error
+	err = db.Model(&models.Wallet{}).Where("creator_id = ?", collectUser.ID.String()).First(&dropsAccount).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 
-			collectionsAccount = models.Wallet{
+			dropsAccount = models.Wallet{
 				Base: models.Base{
 					ID:        uuid.NewV4(),
 					CreatedAt: time.Now(),
@@ -127,7 +127,7 @@ func confirmOrSeedNewCollectionsAccount(db *gorm.DB) (*models.Wallet, error) {
 				Currency:      models.USD,
 			}
 
-			err = db.Create(&collectionsAccount).Error
+			err = db.Create(&dropsAccount).Error
 			if err != nil {
 				return nil, err
 			}
@@ -137,5 +137,5 @@ func confirmOrSeedNewCollectionsAccount(db *gorm.DB) (*models.Wallet, error) {
 		}
 	}
 
-	return &collectionsAccount, nil
+	return &dropsAccount, nil
 }

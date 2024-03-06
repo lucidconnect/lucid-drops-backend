@@ -18,7 +18,7 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new drop")
 	}
 
 	item, err := engine.GetItemByID(input.ItemID)
@@ -368,13 +368,13 @@ func validateFollowerCriteria(auth *models.TwitterAuthDetails, criteria *models.
 }
 
 func createMintPassForTwitterMint(item *models.Item) (*string, error) {
-	collection, err := engine.GetCollectionByID(item.CollectionID.String())
+	drop, err := engine.GetDropByID(item.DropID.String())
 	if err != nil {
-		return nil, errors.New("collection not found")
+		return nil, errors.New("drop not found")
 	}
 
-	if collection.AAContractAddress == nil {
-		return nil, errors.New("collection contract address not found")
+	if drop.AAContractAddress == nil {
+		return nil, errors.New("drop contract address not found")
 	}
 
 	if item.TokenID == nil {
@@ -382,10 +382,10 @@ func createMintPassForTwitterMint(item *models.Item) (*string, error) {
 	}
 
 	newMint := models.MintPass{
-		ItemId:                    item.ID.String(),
-		ItemIdOnContract:          *item.TokenID,
-		CollectionContractAddress: *collection.AAContractAddress,
-		BlockchainNetwork:         collection.BlockchainNetwork,
+		ItemId:              item.ID.String(),
+		ItemIdOnContract:    *item.TokenID,
+		DropContractAddress: *drop.AAContractAddress,
+		BlockchainNetwork:   drop.BlockchainNetwork,
 	}
 
 	err = dbutils.DB.Create(&newMint).Error
