@@ -117,10 +117,14 @@ type ComplexityRoot struct {
 	}
 
 	MintAuthorizationResponse struct {
+		Amount               func(childComplexity int) int
+		Chain                func(childComplexity int) int
 		MintingAbi           func(childComplexity int) int
 		MintingSignature     func(childComplexity int) int
+		Nonce                func(childComplexity int) int
 		PackedData           func(childComplexity int) int
 		SmartContractAddress func(childComplexity int) int
+		TokenID              func(childComplexity int) int
 	}
 
 	MobileWalletConfig struct {
@@ -632,6 +636,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.JWTCreationResponse.Token(childComplexity), true
 
+	case "MintAuthorizationResponse.amount":
+		if e.complexity.MintAuthorizationResponse.Amount == nil {
+			break
+		}
+
+		return e.complexity.MintAuthorizationResponse.Amount(childComplexity), true
+
+	case "MintAuthorizationResponse.chain":
+		if e.complexity.MintAuthorizationResponse.Chain == nil {
+			break
+		}
+
+		return e.complexity.MintAuthorizationResponse.Chain(childComplexity), true
+
 	case "MintAuthorizationResponse.mintingABI":
 		if e.complexity.MintAuthorizationResponse.MintingAbi == nil {
 			break
@@ -646,6 +664,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MintAuthorizationResponse.MintingSignature(childComplexity), true
 
+	case "MintAuthorizationResponse.nonce":
+		if e.complexity.MintAuthorizationResponse.Nonce == nil {
+			break
+		}
+
+		return e.complexity.MintAuthorizationResponse.Nonce(childComplexity), true
+
 	case "MintAuthorizationResponse.packedData":
 		if e.complexity.MintAuthorizationResponse.PackedData == nil {
 			break
@@ -659,6 +684,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MintAuthorizationResponse.SmartContractAddress(childComplexity), true
+
+	case "MintAuthorizationResponse.tokenId":
+		if e.complexity.MintAuthorizationResponse.TokenID == nil {
+			break
+		}
+
+		return e.complexity.MintAuthorizationResponse.TokenID(childComplexity), true
 
 	case "MobileWalletConfig.aaWallet":
 		if e.complexity.MobileWalletConfig.AaWallet == nil {
@@ -4372,6 +4404,182 @@ func (ec *executionContext) fieldContext_JWTCreationResponse_token(ctx context.C
 	return fc, nil
 }
 
+func (ec *executionContext) _MintAuthorizationResponse_amount(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MintAuthorizationResponse_amount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Amount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MintAuthorizationResponse_amount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MintAuthorizationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MintAuthorizationResponse_tokenId(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MintAuthorizationResponse_tokenId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TokenID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MintAuthorizationResponse_tokenId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MintAuthorizationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MintAuthorizationResponse_nonce(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MintAuthorizationResponse_nonce(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Nonce, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MintAuthorizationResponse_nonce(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MintAuthorizationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _MintAuthorizationResponse_chain(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_MintAuthorizationResponse_chain(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Chain, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_MintAuthorizationResponse_chain(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "MintAuthorizationResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _MintAuthorizationResponse_packedData(ctx context.Context, field graphql.CollectedField, obj *model.MintAuthorizationResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_MintAuthorizationResponse_packedData(ctx, field)
 	if err != nil {
@@ -6893,6 +7101,14 @@ func (ec *executionContext) fieldContext_Mutation_generateSignatureForClaim(ctx 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "amount":
+				return ec.fieldContext_MintAuthorizationResponse_amount(ctx, field)
+			case "tokenId":
+				return ec.fieldContext_MintAuthorizationResponse_tokenId(ctx, field)
+			case "nonce":
+				return ec.fieldContext_MintAuthorizationResponse_nonce(ctx, field)
+			case "chain":
+				return ec.fieldContext_MintAuthorizationResponse_chain(ctx, field)
 			case "packedData":
 				return ec.fieldContext_MintAuthorizationResponse_packedData(ctx, field)
 			case "mintingABI":
@@ -13437,6 +13653,26 @@ func (ec *executionContext) _MintAuthorizationResponse(ctx context.Context, sel 
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("MintAuthorizationResponse")
+		case "amount":
+			out.Values[i] = ec._MintAuthorizationResponse_amount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "tokenId":
+			out.Values[i] = ec._MintAuthorizationResponse_tokenId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "nonce":
+			out.Values[i] = ec._MintAuthorizationResponse_nonce(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "chain":
+			out.Values[i] = ec._MintAuthorizationResponse_chain(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "packedData":
 			out.Values[i] = ec._MintAuthorizationResponse_packedData(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

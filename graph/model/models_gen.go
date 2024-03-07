@@ -141,6 +141,10 @@ type JWTCreationResponse struct {
 }
 
 type MintAuthorizationResponse struct {
+	Amount               string `json:"amount"`
+	TokenID              string `json:"tokenId"`
+	Nonce                string `json:"nonce"`
+	Chain                int    `json:"chain"`
 	PackedData           string `json:"packedData"`
 	MintingAbi           string `json:"mintingABI"`
 	MintingSignature     string `json:"mintingSignature"`
