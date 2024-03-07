@@ -1,12 +1,9 @@
 package drops
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
-	"net/http"
 	"os"
 	"time"
 
@@ -94,6 +91,8 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 	if input.ClaimFee != nil {
 		newItem.ClaimFee = *input.ClaimFee
 	}
+	tokenId := int64(1)
+	newItem.TokenID = &tokenId
 
 	err = engine.CreateModel(newItem)
 	if err != nil {
@@ -101,65 +100,65 @@ func CreateItem(input *model.ItemInput, authDetails *internal.AuthDetails) (*mod
 	}
 
 	// This was removed because all deployments are now triggered by the FE
-	go func() {
-		inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
-		inverseAPIBaseURL := utils.UseEnvOrDefault("API_BASE_URL", "https://inverse-backend.onrender.com")
-		client := &http.Client{}
-		if drop.AAContractAddress == nil {
-			log.Info().Msg("🪼TODO ADD SUPPORT FOR QUEING")
-			return
-		}
-		itemData, err := json.Marshal(map[string]interface{}{
-			"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *drop.AAContractAddress, newItem.ID.String()),
-			"contractAddress": *drop.AAContractAddress,
-			"Network":         drop.BlockchainNetwork,
-		})
+	// go func() {
+	// 	inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
+	// 	inverseAPIBaseURL := utils.UseEnvOrDefault("API_BASE_URL", "https://inverse-backend.onrender.com")
+	// 	client := &http.Client{}
+	// 	if drop.AAContractAddress == nil {
+	// 		log.Info().Msg("🪼TODO ADD SUPPORT FOR QUEING")
+	// 		return
+	// 	}
+	// 	itemData, err := json.Marshal(map[string]interface{}{
+	// 		"image":           fmt.Sprintf("%s/metadata/%s/%s", inverseAPIBaseURL, *drop.AAContractAddress, newItem.ID.String()),
+	// 		"contractAddress": *drop.AAContractAddress,
+	// 		"Network":         drop.BlockchainNetwork,
+	// 	})
 
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
 
-		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/additem", bytes.NewBuffer(itemData))
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// 	req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/additem", bytes.NewBuffer(itemData))
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
 
-		req.Header.Add("Content-Type", "application/json")
-		res, err := client.Do(req)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// 	req.Header.Add("Content-Type", "application/json")
+	// 	res, err := client.Do(req)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
 
-		var isBase bool
-		if drop.BlockchainNetwork != nil {
-			isBase = *drop.BlockchainNetwork == model.BlockchainNetworkBase
-		}
+	// 	var isBase bool
+	// 	if drop.BlockchainNetwork != nil {
+	// 		isBase = *drop.BlockchainNetwork == model.BlockchainNetworkBase
+	// 	}
 
-		if res.StatusCode == http.StatusOK {
-			go func() {
-				tokenID, err := FetchTokenUri(*drop.AAContractAddress, newItem.ID.String(), isBase)
-				if err != nil {
-					return
-				}
+	// 	if res.StatusCode == http.StatusOK {
+	// 		go func() {
+	// 			tokenID, err := FetchTokenUri(*drop.AAContractAddress, newItem.ID.String(), isBase)
+	// 			if err != nil {
+	// 				return
+	// 			}
 
-				if tokenID == nil {
-					log.Info().Msgf("🚨 Token ID not found for Item %s", newItem.ID)
-					return
-				}
+	// 			if tokenID == nil {
+	// 				log.Info().Msgf("🚨 Token ID not found for Item %s", newItem.ID)
+	// 				return
+	// 			}
 
-				tokenIDint64 := int64(*tokenID)
-				newItem.TokenID = &tokenIDint64
-				err = engine.SaveModel(&newItem)
-				if err != nil {
-					log.Error().Msg(err.Error())
-				}
-			}()
-		}
-		defer res.Body.Close()
-	}()
+	// 			tokenIDint64 := int64(*tokenID)
+	// 			newItem.TokenID = &tokenIDint64
+	// 			err = engine.SaveModel(&newItem)
+	// 			if err != nil {
+	// 				log.Error().Msg(err.Error())
+	// 			}
+	// 		}()
+	// 	}
+	// 	defer res.Body.Close()
+	// }()
 
 	return newItem.ToGraphData(), nil
 }
