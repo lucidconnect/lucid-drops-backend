@@ -329,6 +329,10 @@ type CompleteEmailVerificationResponse {
 }
 
 type MintAuthorizationResponse {
+  amount: String!
+  tokenId: String!
+  nonce: String!
+  chain: Int!
   packedData: String!
   mintingABI: String!
   mintingSignature: String!
