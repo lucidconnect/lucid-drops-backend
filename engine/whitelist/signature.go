@@ -357,9 +357,9 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 		// utils.EncodeAddress("0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160"),
 		utils.EncodeAddress(input.ClaimingAddress), // Some Addresss
 		utils.EncodeAddress(contractAddress.Hex()),
-		chainId.Bytes(),
-		common.Big1.Bytes(),
-		mints.Bytes(),
+		utils.EncodeUint256(chainId.String()),
+		utils.EncodeUint256("1"),
+		utils.EncodeUint256(mints.String()),
 	)
 
 	rawData := hexutil.Encode(dataInPackedFormat)
