@@ -14,10 +14,10 @@ type Query {
 
   fetchClaimedItems(address: String!): [Item!]!
 
-  fetchCollectionById(collectionID: String!): Collection!
-  fetchCreatorCollections: [Collection!]!
+  fetchDropById(dropID: String!): Drop!
+  fetchCreatorDrops: [Drop!]!
 
-  fetchItemsInCollection(collectionID: String!): [Item!]!
+  fetchItemsInDrop(dropID: String!): [Item!]!
   fetchItemById(itemID: String!): Item!
   fetchCriteriaAuthorizedEmails(itemID: String!): [String!]
   fetchCriteriaAuthorizedWalletAddresses(itemID: String!): [String!]
@@ -28,7 +28,7 @@ type Query {
 
   fetchQuestionsByItemId(itemId: String!): [QuestionnaireType!]!
   fetchFeaturedItems: [Item!]!
-  fetchFeaturedCollections: [Collection!]!
+  fetchFeaturedDrops: [Drop!]!
 
   queryImageStatus(taskID: String!, position: Int): ImageStatusResponse!
 }
@@ -37,9 +37,9 @@ type Mutation {
   registerInverseUsername(input: NewUsernameRegisgration!): CreatorDetails!
   editUserProfile (input: EditUserProfileInputType!):userProfileType
 
-  createCollection(input: CollectionInput!): Collection!
-  updateCollection(collectionID: String!,input: CollectionInput!): Collection!
-  deleteCollection(collectionID: String!): Collection!
+  createDrop(input: DropInput!): Drop!
+  updateDrop(dropID: String!,input: DropInput!): Drop!
+  deleteDrop(dropID: String!): Drop!
 
   createItem(input: ItemInput!): Item!
   tempCreateItem(input: ItemInput!, creatorAddress: String!): Item!
@@ -147,19 +147,23 @@ input NewUsernameRegisgration {
   inverseUsername: String!
 }
 
-input CollectionInput {
+input DropInput {
 	name: String
 	description: String
 	image: String
 	thumbnail: String
   network: BlockchainNetwork
+  deploymentHash: String!
+  contractAddress: String
+  editionLimit: Int
+  claimFee: Int
 }
 
 input ItemInput {
 	name: String
 	image: String
 	description: String
-	collectionID: String
+	dropID: String
   userLimit: Int
   editionLimit: Int
   """
@@ -205,7 +209,7 @@ input SignerInfo {
 }
 
 input DeploymentInfo{
-  collectionId: String!
+  dropId: String!
   deploymentHash: String!
   contractAddress: String
 }
@@ -244,7 +248,7 @@ type userProfileType{
 	inverseUsername: String
 	bio: String
 	socials: Socials
-	collections: [Collection]
+	drops: [Drop]
 	items: [Item]
 	claimedItems: [Item]
 }
@@ -254,7 +258,7 @@ type JWTCreationResponse{
   token: String!
 }
 
-type Collection {
+type Drop {
   ID: ID!
   creatorID: String!
   createdAt: Time!
@@ -284,7 +288,7 @@ type Item {
 	name: String!
 	image: String!
 	description: String!
-	collectionId: String!
+	dropId: String!
   claimCriteria: ClaimCriteriaType
   claimFee: Int!
   creator: CreatorDetails! @goField(forceResolver: true)
@@ -325,6 +329,10 @@ type CompleteEmailVerificationResponse {
 }
 
 type MintAuthorizationResponse {
+  amount: String!
+  tokenId: String!
+  nonce: String!
+  chain: Int!
   packedData: String!
   mintingABI: String!
   mintingSignature: String!

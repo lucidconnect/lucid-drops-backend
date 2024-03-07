@@ -17,7 +17,7 @@ import (
 func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
-		return nil, errors.New("creator has not been onboarded to create a new collection")
+		return nil, errors.New("creator has not been onboarded to create a new drop")
 	}
 
 	item, err := engine.GetItemByID(input.ItemID)

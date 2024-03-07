@@ -1,20 +1,20 @@
 package whitelist
 
 import (
-	"bytes"
-	"encoding/hex"
-	"encoding/json"
 	"errors"
-	"fmt"
-	"net/http"
+	"math/big"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/lucidconnect/inverse/dbutils"
 	"github.com/lucidconnect/inverse/engine"
 	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/lucidNft"
 	"github.com/lucidconnect/inverse/magic"
 	"github.com/lucidconnect/inverse/models"
 	"github.com/lucidconnect/inverse/utils"
@@ -106,46 +106,64 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		return nil, err
 	}
 
-	go func() {
-		inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
+	// go func() {
+	// 	inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
 
-		client := &http.Client{}
+	// 	client := &http.Client{}
 
-		itemData, err := json.Marshal(map[string]interface{}{
-			"receiptientAddresses": []string{input.ClaimingAddress},
-			"items":                []int64{mintPass.ItemIdOnContract},
-			"contractAddress":      mintPass.CollectionContractAddress,
-			"Network":              mintPass.BlockchainNetwork,
-		})
+	// 	itemData, err := json.Marshal(map[string]interface{}{
+	// 		"receiptientAddresses": []string{input.ClaimingAddress},
+	// 		"items":                []int64{mintPass.ItemIdOnContract},
+	// 		"contractAddress":      mintPass.DropContractAddress,
+	// 		"Network":              mintPass.BlockchainNetwork,
+	// 	})
 
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
 
-		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/sendnfts", bytes.NewBuffer(itemData))
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// 	req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/sendnfts", bytes.NewBuffer(itemData))
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
 
-		req.Header.Add("Content-Type", "application/json")
-		res, err := client.Do(req)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// 	req.Header.Add("Content-Type", "application/json")
+	// 	res, err := client.Do(req)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
 
-		defer res.Body.Close()
-	}()
+	// 	defer res.Body.Close()
+	// }()
 
 	// TODO add back signature flow
+	// (claim_address+contract_address+chain_id+amount+number_of_mints)
+	contractAddress := common.HexToAddress(mintPass.DropContractAddress)
+	chainId := getChainId(*mintPass.BlockchainNetwork)
+
+	caller := getEthBackend(os.Getenv("RPC_PROVIDER"))
+	lucidNftCaller, err := lucidNft.NewLucidNftCaller(contractAddress, caller)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, err
+	}
+
+	mints, err := lucidNftCaller.GetMints(nil, common.Big1)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, err
+	}
+
 	dataInPackedFormat := utils.EncodePacked(
 		// utils.EncodeAddress("0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160"),
 		utils.EncodeAddress(input.ClaimingAddress), // Some Addresss
-		utils.EncodeUint256("123"),
-		utils.EncodeBytesString(hex.EncodeToString([]byte("coffee and donuts"))),
-		utils.EncodeUint256("1"),
+		utils.EncodeAddress(contractAddress.Hex()),
+		chainId.Bytes(),
+		common.Big1.Bytes(),
+		mints.Bytes(),
 	)
 
 	rawData := hexutil.Encode(dataInPackedFormat)
@@ -155,11 +173,38 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	signature := magic.SecretlySignThisMessage("\x19Ethereum Signed Message:\n32" + string(keccakOfTheMessageInBytes))
 
 	return &model.MintAuthorizationResponse{
+		Amount:               "1",
+		TokenID:              "1",
+		Nonce:                mints.String(),
+		Chain:                int(chainId.Int64()),
 		PackedData:           rawData,
 		MintingAbi:           "['function mint(address _to) public']",
 		MintingSignature:     signature,
-		SmartContractAddress: "0x34bE7f35132E97915633BC1fc020364EA5134863",
+		SmartContractAddress: contractAddress.Hex(),
 	}, nil
+}
+
+func getEthBackend(rpc string) *ethclient.Client {
+	conn, err := ethclient.Dial(rpc)
+	if err != nil {
+		log.Err(err).Msg("Failed to connect to the Ethereum client")
+	}
+	return conn
+}
+
+func getChainId(network model.BlockchainNetwork) *big.Int {
+	var chain *big.Int
+	switch network {
+	case model.BlockchainNetworkBase:
+		if ok, _ := utils.IsProduction(); ok {
+			chain = big.NewInt(8453)
+		} else {
+			chain = big.NewInt(84532)
+		}
+	default:
+		return nil
+	}
+	return chain
 }
 
 func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error) {
@@ -243,60 +288,78 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 		return nil, err
 	}
 
-	go func() {
-		inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
+	// go func() {
+	// 	inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
 
-		client := &http.Client{}
+	// 	client := &http.Client{}
 
-		itemData, err := json.Marshal(map[string]interface{}{
-			"receiptientAddresses": []string{input.ClaimingAddress},
-			"items":                []int64{mintPass.ItemIdOnContract},
-			"contractAddress":      mintPass.CollectionContractAddress,
-			"Network":              mintPass.BlockchainNetwork,
-		})
+	// 	itemData, err := json.Marshal(map[string]interface{}{
+	// 		"receiptientAddresses": []string{input.ClaimingAddress},
+	// 		"items":                []int64{mintPass.ItemIdOnContract},
+	// 		"contractAddress":      mintPass.DropContractAddress,
+	// 		"Network":              mintPass.BlockchainNetwork,
+	// 	})
 
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
 
-		// TODO: do this in Go natively
-		req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/sendnfts", bytes.NewBuffer(itemData))
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// 	// TODO: do this in Go natively
+	// 	req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/sendnfts", bytes.NewBuffer(itemData))
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
 
-		req.Header.Add("Content-Type", "application/json")
-		res, err := client.Do(req)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+	// 	req.Header.Add("Content-Type", "application/json")
+	// 	res, err := client.Do(req)
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 		return
+	// 	}
 
-		log.Info().Msgf("response: %v", res)
+	// 	log.Info().Msgf("response: %v", res)
 
-		type responseBody struct {
-			TransactionHash string `json:"transactionHash"`
-			Status          string `json:"status"`
-		}
+	// 	type responseBody struct {
+	// 		TransactionHash string `json:"transactionHash"`
+	// 		Status          string `json:"status"`
+	// 	}
 
-		tx := responseBody{}
-		err = json.NewDecoder(res.Body).Decode(&tx)
-		if err != nil {
-			log.Err(err).Caller().Send()
-		}
+	// 	tx := responseBody{}
+	// 	err = json.NewDecoder(res.Body).Decode(&tx)
+	// 	if err != nil {
+	// 		log.Err(err).Caller().Send()
+	// 	}
 
-		defer res.Body.Close()
-	}()
+	// 	defer res.Body.Close()
+	// }()
 
 	// TODO add back signature flow
+	// (claim_address+contract_address+chain_id+amount+number_of_mints)
+	contractAddress := common.HexToAddress(mintPass.DropContractAddress)
+	chainId := getChainId(*mintPass.BlockchainNetwork)
+
+	caller := getEthBackend(os.Getenv("RPC_PROVIDER"))
+	lucidNftCaller, err := lucidNft.NewLucidNftCaller(contractAddress, caller)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, err
+	}
+
+	mints, err := lucidNftCaller.GetMints(nil, common.Big1)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, err
+	}
+
 	dataInPackedFormat := utils.EncodePacked(
 		// utils.EncodeAddress("0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160"),
 		utils.EncodeAddress(input.ClaimingAddress), // Some Addresss
-		utils.EncodeUint256("123"),
-		utils.EncodeBytesString(hex.EncodeToString([]byte("coffee and donuts"))),
+		utils.EncodeAddress(contractAddress.Hex()),
+		utils.EncodeUint256(chainId.String()),
 		utils.EncodeUint256("1"),
+		utils.EncodeUint256(mints.String()),
 	)
 
 	rawData := hexutil.Encode(dataInPackedFormat)
@@ -306,9 +369,13 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 	signature := magic.SecretlySignThisMessage("\x19Ethereum Signed Message:\n32" + string(keccakOfTheMessageInBytes))
 
 	return &model.MintAuthorizationResponse{
+		Amount:               "1",
+		TokenID:              "1",
+		Nonce:                mints.String(),
+		Chain:                int(chainId.Int64()),
 		PackedData:           rawData,
 		MintingAbi:           "['function mint(address _to) public']",
 		MintingSignature:     signature,
-		SmartContractAddress: "0x34bE7f35132E97915633BC1fc020364EA5134863",
+		SmartContractAddress: contractAddress.Hex(),
 	}, nil
 }

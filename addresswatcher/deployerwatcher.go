@@ -81,14 +81,14 @@ attemptReconnect:
 		}
 	}
 }
-func GetContractAddressFromParentHash(onchainHash string) (*string, error) {
+func GetContractAddressFromParentHash(onchainHash string) (string, error) {
 	if globalRPCClient == nil {
 		rpcProvider := utils.UseEnvOrDefault("RPC_PROVIDER", "wss://polygon-mainnet.g.alchemy.com/v2/98DqwUXmmWt8TZc7sbDSwHGdBAY0PeuF")
 
 		var err error
 		globalRPCClient, err = ethclient.Dial(rpcProvider)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 	}
 
@@ -99,13 +99,13 @@ func GetContractAddressFromParentHash(onchainHash string) (*string, error) {
 	receipt, err := globalRPCClient.TransactionReceipt(context.Background(), txHash)
 	if err != nil {
 		fmt.Println("Error fetching transaction receipt:", err)
-		return nil, err
+		return "", err
 	}
 
 	contractDeploymentHash := crypto.Keccak256Hash([]byte("TokenDeployed(address)"))
 
 	if len(receipt.Logs) == 0 {
-		return nil, errors.New("transaction has no logs")
+		return "", errors.New("transaction has no logs")
 	}
 
 	for _, vLog := range receipt.Logs {
@@ -126,8 +126,8 @@ func GetContractAddressFromParentHash(onchainHash string) (*string, error) {
 
 		deployedContractAddress := creationEvent.NFTAddress.String()
 
-		return &deployedContractAddress, nil
+		return deployedContractAddress, nil
 	}
 
-	return nil, errors.New("transaction has no logs")
+	return "", errors.New("transaction has no logs")
 }

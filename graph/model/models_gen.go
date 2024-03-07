@@ -15,27 +15,6 @@ type ClaimDetails struct {
 	ClaimerAddress  *string    `json:"claimerAddress,omitempty"`
 }
 
-type Collection struct {
-	ID              string             `json:"ID"`
-	CreatorID       string             `json:"creatorID"`
-	CreatedAt       time.Time          `json:"createdAt"`
-	Name            string             `json:"name"`
-	Description     string             `json:"description"`
-	Image           string             `json:"image"`
-	Thumbnail       string             `json:"thumbnail"`
-	ContractAddress *string            `json:"contractAddress,omitempty"`
-	Network         *BlockchainNetwork `json:"network,omitempty"`
-	Items           []*Item            `json:"items"`
-}
-
-type CollectionInput struct {
-	Name        *string            `json:"name,omitempty"`
-	Description *string            `json:"description,omitempty"`
-	Image       *string            `json:"image,omitempty"`
-	Thumbnail   *string            `json:"thumbnail,omitempty"`
-	Network     *BlockchainNetwork `json:"network,omitempty"`
-}
-
 type CompleteEmailClaimInput struct {
 	Otp          string `json:"otp"`
 	OtpRequestID string `json:"otpRequestID"`
@@ -64,9 +43,34 @@ type CreatorDetails struct {
 }
 
 type DeploymentInfo struct {
-	CollectionID    string  `json:"collectionId"`
+	DropID          string  `json:"dropId"`
 	DeploymentHash  string  `json:"deploymentHash"`
 	ContractAddress *string `json:"contractAddress,omitempty"`
+}
+
+type Drop struct {
+	ID              string             `json:"ID"`
+	CreatorID       string             `json:"creatorID"`
+	CreatedAt       time.Time          `json:"createdAt"`
+	Name            string             `json:"name"`
+	Description     string             `json:"description"`
+	Image           string             `json:"image"`
+	Thumbnail       string             `json:"thumbnail"`
+	ContractAddress *string            `json:"contractAddress,omitempty"`
+	Network         *BlockchainNetwork `json:"network,omitempty"`
+	Items           []*Item            `json:"items"`
+}
+
+type DropInput struct {
+	Name            *string            `json:"name,omitempty"`
+	Description     *string            `json:"description,omitempty"`
+	Image           *string            `json:"image,omitempty"`
+	Thumbnail       *string            `json:"thumbnail,omitempty"`
+	Network         *BlockchainNetwork `json:"network,omitempty"`
+	DeploymentHash  string             `json:"deploymentHash"`
+	ContractAddress *string            `json:"contractAddress,omitempty"`
+	EditionLimit    *int               `json:"editionLimit,omitempty"`
+	ClaimFee        *int               `json:"claimFee,omitempty"`
 }
 
 type EditUserProfileInputType struct {
@@ -104,7 +108,7 @@ type Item struct {
 	Name                             string             `json:"name"`
 	Image                            string             `json:"image"`
 	Description                      string             `json:"description"`
-	CollectionID                     string             `json:"collectionId"`
+	DropID                           string             `json:"dropId"`
 	ClaimCriteria                    *ClaimCriteriaType `json:"claimCriteria,omitempty"`
 	ClaimFee                         int                `json:"claimFee"`
 	Creator                          *CreatorDetails    `json:"creator"`
@@ -125,7 +129,7 @@ type ItemInput struct {
 	Name         *string `json:"name,omitempty"`
 	Image        *string `json:"image,omitempty"`
 	Description  *string `json:"description,omitempty"`
-	CollectionID *string `json:"collectionID,omitempty"`
+	DropID       *string `json:"dropID,omitempty"`
 	UserLimit    *int    `json:"userLimit,omitempty"`
 	EditionLimit *int    `json:"editionLimit,omitempty"`
 	// This should typically be in cents
@@ -137,6 +141,10 @@ type JWTCreationResponse struct {
 }
 
 type MintAuthorizationResponse struct {
+	Amount               string `json:"amount"`
+	TokenID              string `json:"tokenId"`
+	Nonce                string `json:"nonce"`
+	Chain                int    `json:"chain"`
 	PackedData           string `json:"packedData"`
 	MintingAbi           string `json:"mintingABI"`
 	MintingSignature     string `json:"mintingSignature"`
@@ -283,15 +291,15 @@ type Wallet struct {
 }
 
 type UserProfileType struct {
-	CreatorID       *string       `json:"creatorID,omitempty"`
-	Thumbnail       *string       `json:"thumbnail,omitempty"`
-	Image           *string       `json:"image,omitempty"`
-	InverseUsername *string       `json:"inverseUsername,omitempty"`
-	Bio             *string       `json:"bio,omitempty"`
-	Socials         *Socials      `json:"socials,omitempty"`
-	Collections     []*Collection `json:"collections,omitempty"`
-	Items           []*Item       `json:"items,omitempty"`
-	ClaimedItems    []*Item       `json:"claimedItems,omitempty"`
+	CreatorID       *string  `json:"creatorID,omitempty"`
+	Thumbnail       *string  `json:"thumbnail,omitempty"`
+	Image           *string  `json:"image,omitempty"`
+	InverseUsername *string  `json:"inverseUsername,omitempty"`
+	Bio             *string  `json:"bio,omitempty"`
+	Socials         *Socials `json:"socials,omitempty"`
+	Drops           []*Drop  `json:"drops,omitempty"`
+	Items           []*Item  `json:"items,omitempty"`
+	ClaimedItems    []*Item  `json:"claimedItems,omitempty"`
 }
 
 type AiImageStyle string

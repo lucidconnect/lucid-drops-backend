@@ -12,7 +12,7 @@ import (
 type Item struct {
 	Base
 	Name                 string
-	CollectionID         uuid.UUID `gorm:"index"`
+	DropID               uuid.UUID `gorm:"index"`
 	TokenID              *int64    `gorm:"index;default:null"`
 	Image                string    `json:"image"`
 	Description          string    `json:"description"`
@@ -60,7 +60,7 @@ func (i *Item) ToGraphData() *model.Item {
 		Name:          i.Name,
 		Image:         i.Image,
 		Description:   i.Description,
-		CollectionID:  i.CollectionID.String(),
+		DropID:        i.DropID.String(),
 		ClaimCriteria: i.Criteria,
 		ClaimFee:      i.ClaimFee,
 		CreatedAt:     i.CreatedAt,

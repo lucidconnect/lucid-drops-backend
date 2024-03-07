@@ -7,14 +7,14 @@ import (
 	"github.com/lucidconnect/inverse/services"
 )
 
-func FetchItemCreatorByCollectionId(collectionID string) (*model.CreatorDetails, error) {
+func FetchItemCreatorByDropId(dropID string) (*model.CreatorDetails, error) {
 	// add cache
-	collection, err := engine.GetCollectionByID(collectionID)
+	drop, err := engine.GetDropByID(dropID)
 	if err != nil {
 		return nil, err
 	}
 
-	creator, err := engine.GetCreatorByID(collection.CreatorID.String())
+	creator, err := engine.GetCreatorByID(drop.CreatorID.String())
 	if err != nil {
 		return nil, err
 	}
