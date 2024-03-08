@@ -18,6 +18,7 @@ type Drop struct {
 	AAWalletDeploymentHash *string
 	BlockchainNetwork      *model.BlockchainNetwork
 	Featured               bool `gorm:"default:false"`
+	MintUrl                string
 }
 
 type DeplyomenResponse struct {
@@ -96,6 +97,7 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		Thumbnail:       c.Thumbnail,
 		ContractAddress: c.AAContractAddress,
 		Network:         c.BlockchainNetwork,
+		MintURL:         c.MintUrl,
 	}
 
 	if c.AAContractAddress != nil {
