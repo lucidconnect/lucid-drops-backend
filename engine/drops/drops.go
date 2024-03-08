@@ -1,7 +1,12 @@
 package drops
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"net/http"
+	"os"
 	"time"
 
 	"github.com/lucidconnect/inverse/engine"
@@ -58,23 +63,41 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 	}
 
 	// create item
-	dropId := newDrop.ID.String()
-	itemInput := &model.ItemInput{
-		Name:         input.Name,
-		Image:        input.Image,
-		Description:  input.Description,
-		DropID:       &dropId,
+	newItem := &models.Item{
+		Name:        *input.Name,
+		Image:       *input.Image,
+		Description: *input.Description,
+		DropID:      newDrop.ID,
+		// UserLimit:    input.EditionLimit,
 		EditionLimit: input.EditionLimit,
-		ClaimFee:     input.ClaimFee,
 	}
 
-	item, err := CreateItem(itemInput, authDetails)
+	if input.ClaimFee != nil {
+		newItem.ClaimFee = *input.ClaimFee
+	}
+	tokenId := int64(1)
+	newItem.TokenID = &tokenId
+
+	err = engine.CreateModel(newItem)
+	if err != nil {
+		return nil, errors.New("couldn't create new drop")
+	}
+
+	url, err := createMintUrl(newItem.ID.String(), newItem.Image, *newDrop.AAContractAddress)
 	if err != nil {
 		log.Err(err).Caller().Send()
 		return newDrop.ToGraphData(nil), errors.New("failed to create item in drop")
 	}
 
+	newDrop.MintUrl = url
+
+	if err = engine.SaveModel(newDrop); err != nil {
+		log.Err(err).Caller().Send()
+		return newDrop.ToGraphData(nil), errors.New("failed to create item in drop")
+	}
+
 	var items []*model.Item
+	item := newItem.ToGraphData()
 	items = append(items, item)
 	return newDrop.ToGraphData(items), nil
 }
@@ -186,4 +209,46 @@ func FetchFeaturedDrops() ([]*model.Drop, error) {
 	}
 
 	return mappedDrops, nil
+}
+
+func createMintUrl(item, imagUrl, contract string) (string, error) {
+	baseurl := os.Getenv("FRAME_SERVER")
+	url := fmt.Sprintf("%v/createframe", baseurl)
+
+	type createFrameRequest struct {
+		ItemId     string `json:"itemId"`
+		ImageUrl   string `json:"imageUrl"`
+		Collection string `json:"collection"`
+	}
+
+	request := createFrameRequest{
+		ItemId:     item,
+		ImageUrl:   imagUrl,
+		Collection: contract,
+	}
+
+	payload, err := json.Marshal(request)
+	if err != nil {
+		return "", err
+	}
+
+	httpRequest, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(payload))
+	if err != nil {
+		return "", err
+	}
+
+	httpRequest.Header.Set("Content-Type", "appication/json")
+
+	res, err := http.DefaultClient.Do(httpRequest)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+
+	var frameUrl string
+	if err = json.NewDecoder(res.Body).Decode(&frameUrl); err != nil {
+		return "", err
+	}
+
+	return frameUrl, nil
 }
