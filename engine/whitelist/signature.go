@@ -253,25 +253,6 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 	// }
 
 	tx := dbutils.DB.Begin()
-	// userID, err := engine.GetCCreatorIDFromWalletAddress(embeddedWalletAddress)
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return nil, errors.New("claimer not found")
-	// }
-
-	// item, err := engine.GetItemByID(mintPass.ItemId)
-	// if err != nil {
-	// 	tx.Rollback()
-	// 	return nil, errors.New("item not found")
-	// }
-
-	// if item.ClaimFee > 0 {
-	// 	err = chargeClaimFee(*userID, item, tx)
-	// 	if err != nil {
-	// 		tx.Rollback()
-	// 		return nil, err
-	// 	}
-	// }
 
 	mintPass.MinterAddress = input.ClaimingAddress
 	mintPass.UsedAt = &now
@@ -287,53 +268,6 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 		tx.Rollback()
 		return nil, err
 	}
-
-	// go func() {
-	// 	inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
-
-	// 	client := &http.Client{}
-
-	// 	itemData, err := json.Marshal(map[string]interface{}{
-	// 		"receiptientAddresses": []string{input.ClaimingAddress},
-	// 		"items":                []int64{mintPass.ItemIdOnContract},
-	// 		"contractAddress":      mintPass.DropContractAddress,
-	// 		"Network":              mintPass.BlockchainNetwork,
-	// 	})
-
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 		return
-	// 	}
-
-	// 	// TODO: do this in Go natively
-	// 	req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/sendnfts", bytes.NewBuffer(itemData))
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 		return
-	// 	}
-
-	// 	req.Header.Add("Content-Type", "application/json")
-	// 	res, err := client.Do(req)
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 		return
-	// 	}
-
-	// 	log.Info().Msgf("response: %v", res)
-
-	// 	type responseBody struct {
-	// 		TransactionHash string `json:"transactionHash"`
-	// 		Status          string `json:"status"`
-	// 	}
-
-	// 	tx := responseBody{}
-	// 	err = json.NewDecoder(res.Body).Decode(&tx)
-	// 	if err != nil {
-	// 		log.Err(err).Caller().Send()
-	// 	}
-
-	// 	defer res.Body.Close()
-	// }()
 
 	// TODO add back signature flow
 	// (claim_address+contract_address+chain_id+amount+number_of_mints)
@@ -354,7 +288,6 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 	}
 
 	dataInPackedFormat := utils.EncodePacked(
-		// utils.EncodeAddress("0x14723A09ACff6D2A60DcdF7aA4AFf308FDDC160"),
 		utils.EncodeAddress(input.ClaimingAddress), // Some Addresss
 		utils.EncodeAddress(contractAddress.Hex()),
 		utils.EncodeUint256(chainId.String()),
