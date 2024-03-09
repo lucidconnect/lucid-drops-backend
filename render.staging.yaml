@@ -51,3 +51,5 @@ services:
         sync: false
       - key: LOG_LEVEL
         sync: false
+      - key: FRAME_SERVER
+        sync: false

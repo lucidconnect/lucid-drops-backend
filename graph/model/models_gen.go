@@ -59,6 +59,7 @@ type Drop struct {
 	ContractAddress *string            `json:"contractAddress,omitempty"`
 	Network         *BlockchainNetwork `json:"network,omitempty"`
 	Items           []*Item            `json:"items"`
+	MintURL         string             `json:"mintUrl"`
 }
 
 type DropInput struct {

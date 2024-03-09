@@ -269,6 +269,7 @@ type Drop {
   contractAddress: String
   network: BlockchainNetwork
   items: [Item!]! @goField(forceResolver: true)
+  mintUrl: String!
 }
 
 type OnboardingProgress{
