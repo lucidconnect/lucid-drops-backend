@@ -26,7 +26,10 @@ func IsThisAValidEthAddress(maybeAddress string) bool {
 	return re.MatchString(maybeAddress)
 }
 
-func CreateMintPassForNoCriteriaItem(itemID string) (*model.ValidationRespoonse, error) {
+func CreateMintPassForNoCriteriaItem(itemID, walletAddress string) (*model.ValidationRespoonse, error) {
+	if WalletLimitReached(walletAddress, itemID) {
+		return nil, errors.New("wallet limit reached")
+	}
 
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
@@ -141,7 +144,10 @@ func chargeClaimFee(userID string, item *models.Item, tx *gorm.DB) error {
 	return nil
 }
 
-func CreateMintPassForValidatedCriteriaItem(itemID string) (*model.ValidationRespoonse, error) {
+func CreateMintPassForValidatedCriteriaItem(itemID, walletAddress string) (*model.ValidationRespoonse, error) {
+	if WalletLimitReached(walletAddress, itemID) {
+		return nil, errors.New("wallet limit reached")
+	}
 
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
@@ -203,5 +209,15 @@ func ItemOverEditionLimit(item *models.Item) bool {
 		}
 	}
 
+	return false
+}
+
+func WalletLimitReached(walletAddress, itemId string) bool {
+	// set default claim limit to 1
+	var mintsByAddress int64
+	err := dbutils.DB.Model(&models.MintPass{}).Where("item_id = ?", itemId).Where("minter_address = ?", walletAddress).Count(&mintsByAddress).Error
+	if err == nil {
+		return mintsByAddress == 1
+	}
 	return false
 }

@@ -143,7 +143,7 @@ type ComplexityRoot struct {
 		CreateEmptyCriteriaForItem           func(childComplexity int, input model.NewEmptyCriteriaInput) int
 		CreateItem                           func(childComplexity int, input model.ItemInput) int
 		CreateJWTToken                       func(childComplexity int, input *model.CreateJWTTokenInput) int
-		CreateMintPassForNoCriteriaItem      func(childComplexity int, itemID string) int
+		CreateMintPassForNoCriteriaItem      func(childComplexity int, itemID string, walletAddress string) int
 		CreatePatreonCriteriaForItem         func(childComplexity int, input model.NewPatreonCriteriaInput) int
 		CreatePaymentIntentSecretKey         func(childComplexity int, amount int) int
 		CreateQuestionnaireCriteriaForItem   func(childComplexity int, input model.QuestionnaireCriteriaInput) int
@@ -277,7 +277,7 @@ type MutationResolver interface {
 	CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error)
 	CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error)
 	CreateEmptyCriteriaForItem(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Item, error)
-	CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string) (*model.ValidationRespoonse, error)
+	CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error)
 	ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
 	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
 	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
@@ -827,7 +827,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateMintPassForNoCriteriaItem(childComplexity, args["itemID"].(string)), true
+		return e.complexity.Mutation.CreateMintPassForNoCriteriaItem(childComplexity, args["itemID"].(string), args["walletAddress"].(string)), true
 
 	case "Mutation.createPatreonCriteriaForItem":
 		if e.complexity.Mutation.CreatePatreonCriteriaForItem == nil {
@@ -1810,6 +1810,15 @@ func (ec *executionContext) field_Mutation_createMintPassForNoCriteriaItem_args(
 		}
 	}
 	args["itemID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["walletAddress"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("walletAddress"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["walletAddress"] = arg1
 	return args, nil
 }
 
@@ -6563,7 +6572,7 @@ func (ec *executionContext) _Mutation_createMintPassForNoCriteriaItem(ctx contex
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateMintPassForNoCriteriaItem(rctx, fc.Args["itemID"].(string))
+		return ec.resolvers.Mutation().CreateMintPassForNoCriteriaItem(rctx, fc.Args["itemID"].(string), fc.Args["walletAddress"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
