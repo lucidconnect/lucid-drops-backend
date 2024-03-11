@@ -3,9 +3,7 @@ package whitelist
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
-	"time"
 
 	"github.com/lucidconnect/inverse/dbutils"
 	"github.com/lucidconnect/inverse/engine"
@@ -129,148 +127,148 @@ func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input
 	return nil, nil
 }
 
-func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
-	item, err := engine.GetItemByID(itemID)
-	if err != nil {
-		return nil, errors.New("item not found")
-	}
+// func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
+// 	item, err := engine.GetItemByID(itemID)
+// 	if err != nil {
+// 		return nil, errors.New("item not found")
+// 	}
 
-	if item.ClaimDeadline != nil {
-		if time.Now().After(*item.ClaimDeadline) {
-			return nil, errors.New("the item is no longer available to be claimed")
-		}
-	}
+// 	if item.ClaimDeadline != nil {
+// 		if time.Now().After(*item.ClaimDeadline) {
+// 			return nil, errors.New("the item is no longer available to be claimed")
+// 		}
+// 	}
 
-	if item.Criteria == nil {
-		return nil, errors.New("item can be freely claimed")
-	}
+// 	if item.Criteria == nil {
+// 		return nil, errors.New("item can be freely claimed")
+// 	}
 
-	switch *item.Criteria {
-	case model.ClaimCriteriaTypeClaimCode:
-		var directQuestions []*models.DirectAnswerCriteria
+// 	switch *item.Criteria {
+// 	case model.ClaimCriteriaTypeClaimCode:
+// 		var directQuestions []*models.DirectAnswerCriteria
 
-		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).Find(&directQuestions).Error
-		if err != nil {
-			return nil, errors.New("seems item doesn't have any direct questions")
-		}
+// 		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).Find(&directQuestions).Error
+// 		if err != nil {
+// 			return nil, errors.New("seems item doesn't have any direct questions")
+// 		}
 
-		if len(directQuestions) != len(input) {
-			return nil, fmt.Errorf("provide anwsers for all (%d) questions", len(directQuestions))
-		}
+// 		if len(directQuestions) != len(input) {
+// 			return nil, fmt.Errorf("provide anwsers for all (%d) questions", len(directQuestions))
+// 		}
 
-		mappedQuestionsAndChoices := make(map[string]map[string]bool, len(directQuestions))
-		for _, q := range directQuestions {
-			var unmarshelledAnswers map[string]bool
+// 		mappedQuestionsAndChoices := make(map[string]map[string]bool, len(directQuestions))
+// 		for _, q := range directQuestions {
+// 			var unmarshelledAnswers map[string]bool
 
-			json.Unmarshal([]byte(q.Answers), &unmarshelledAnswers)
+// 			json.Unmarshal([]byte(q.Answers), &unmarshelledAnswers)
 
-			mappedQuestionsAndChoices[q.QuestionID.String()] = unmarshelledAnswers
-		}
+// 			mappedQuestionsAndChoices[q.QuestionID.String()] = unmarshelledAnswers
+// 		}
 
-		answeredQuestions := make(map[string]bool)
+// 		answeredQuestions := make(map[string]bool)
 
-		for _, potentialAnswers := range input {
-			answeredQuestions[potentialAnswers.QuestionID] = true
+// 		for _, potentialAnswers := range input {
+// 			answeredQuestions[potentialAnswers.QuestionID] = true
 
-			correctAnswers, found := mappedQuestionsAndChoices[potentialAnswers.QuestionID]
-			if !found {
-				return nil, fmt.Errorf("(%s) is not part of the item claim questions", potentialAnswers.QuestionID)
-			}
+// 			correctAnswers, found := mappedQuestionsAndChoices[potentialAnswers.QuestionID]
+// 			if !found {
+// 				return nil, fmt.Errorf("(%s) is not part of the item claim questions", potentialAnswers.QuestionID)
+// 			}
 
-			_, correct := correctAnswers[strings.ToLower(potentialAnswers.Answer)]
-			if !correct {
-				return nil, errors.New("wrong answer supplied for one of the questions")
-			}
-		}
+// 			_, correct := correctAnswers[strings.ToLower(potentialAnswers.Answer)]
+// 			if !correct {
+// 				return nil, errors.New("wrong answer supplied for one of the questions")
+// 			}
+// 		}
 
-		if len(answeredQuestions) != len(directQuestions) {
-			return nil, errors.New("submitted duplicate questions")
-		}
+// 		if len(answeredQuestions) != len(directQuestions) {
+// 			return nil, errors.New("submitted duplicate questions")
+// 		}
 
-	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire:
-		var directQuestions []*models.DirectAnswerCriteria
+// 	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire:
+// 		var directQuestions []*models.DirectAnswerCriteria
 
-		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).Find(&directQuestions).Error
-		if err != nil {
-			return nil, errors.New("seems item doesn't have any direct questions")
-		}
+// 		err := dbutils.DB.Where(&models.DirectAnswerCriteria{ItemID: item.ID}).Find(&directQuestions).Error
+// 		if err != nil {
+// 			return nil, errors.New("seems item doesn't have any direct questions")
+// 		}
 
-		if len(directQuestions) != len(input) {
-			return nil, fmt.Errorf("provide anwsers for all (%d) questions", len(directQuestions))
-		}
+// 		if len(directQuestions) != len(input) {
+// 			return nil, fmt.Errorf("provide anwsers for all (%d) questions", len(directQuestions))
+// 		}
 
-		mappedQuestionsAndChoices := make(map[string]map[string]bool, len(directQuestions))
-		for _, q := range directQuestions {
-			var unmarshelledAnswers map[string]bool
+// 		mappedQuestionsAndChoices := make(map[string]map[string]bool, len(directQuestions))
+// 		for _, q := range directQuestions {
+// 			var unmarshelledAnswers map[string]bool
 
-			json.Unmarshal([]byte(q.Answers), &unmarshelledAnswers)
+// 			json.Unmarshal([]byte(q.Answers), &unmarshelledAnswers)
 
-			mappedQuestionsAndChoices[q.QuestionID.String()] = unmarshelledAnswers
-		}
+// 			mappedQuestionsAndChoices[q.QuestionID.String()] = unmarshelledAnswers
+// 		}
 
-		answeredQuestions := make(map[string]bool)
+// 		answeredQuestions := make(map[string]bool)
 
-		for _, potentialAnswers := range input {
-			answeredQuestions[potentialAnswers.QuestionID] = true
+// 		for _, potentialAnswers := range input {
+// 			answeredQuestions[potentialAnswers.QuestionID] = true
 
-			correctAnswers, found := mappedQuestionsAndChoices[potentialAnswers.QuestionID]
-			if !found {
-				return nil, fmt.Errorf("(%s) is not part of the item claim questions", potentialAnswers.QuestionID)
-			}
+// 			correctAnswers, found := mappedQuestionsAndChoices[potentialAnswers.QuestionID]
+// 			if !found {
+// 				return nil, fmt.Errorf("(%s) is not part of the item claim questions", potentialAnswers.QuestionID)
+// 			}
 
-			_, correct := correctAnswers[strings.ToLower(potentialAnswers.Answer)]
-			if !correct {
-				return nil, errors.New("wrong answer supplied for one of the questions")
-			}
-		}
+// 			_, correct := correctAnswers[strings.ToLower(potentialAnswers.Answer)]
+// 			if !correct {
+// 				return nil, errors.New("wrong answer supplied for one of the questions")
+// 			}
+// 		}
 
-		if len(answeredQuestions) != len(directQuestions) {
-			return nil, errors.New("submitted duplicate questions")
-		}
+// 		if len(answeredQuestions) != len(directQuestions) {
+// 			return nil, errors.New("submitted duplicate questions")
+// 		}
 
-	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
-		var multiChoiceQuestions []*models.MultiChoiceCriteria
+// 	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
+// 		var multiChoiceQuestions []*models.MultiChoiceCriteria
 
-		err := dbutils.DB.Where(&models.MultiChoiceCriteria{ItemID: item.ID}).Find(&multiChoiceQuestions).Error
-		if err != nil {
-			return nil, errors.New("seems item doesn't have any multi choice questions")
-		}
+// 		err := dbutils.DB.Where(&models.MultiChoiceCriteria{ItemID: item.ID}).Find(&multiChoiceQuestions).Error
+// 		if err != nil {
+// 			return nil, errors.New("seems item doesn't have any multi choice questions")
+// 		}
 
-		if len(multiChoiceQuestions) != len(input) {
-			return nil, fmt.Errorf("provide anwsers for all (%d) questions", len(multiChoiceQuestions))
-		}
+// 		if len(multiChoiceQuestions) != len(input) {
+// 			return nil, fmt.Errorf("provide anwsers for all (%d) questions", len(multiChoiceQuestions))
+// 		}
 
-		mappedQuestionsAndAnswer := make(map[string]string, len(multiChoiceQuestions))
-		for _, q := range multiChoiceQuestions {
-			mappedQuestionsAndAnswer[q.QuestionID.String()] = q.CorrectChoice
-		}
+// 		mappedQuestionsAndAnswer := make(map[string]string, len(multiChoiceQuestions))
+// 		for _, q := range multiChoiceQuestions {
+// 			mappedQuestionsAndAnswer[q.QuestionID.String()] = q.CorrectChoice
+// 		}
 
-		answeredQuestions := make(map[string]bool)
+// 		answeredQuestions := make(map[string]bool)
 
-		for _, potentialAnswers := range input {
-			answeredQuestions[potentialAnswers.QuestionID] = true
+// 		for _, potentialAnswers := range input {
+// 			answeredQuestions[potentialAnswers.QuestionID] = true
 
-			correctAnswer, found := mappedQuestionsAndAnswer[potentialAnswers.QuestionID]
-			if !found {
-				return nil, fmt.Errorf("(%s) is not part of the item claim", potentialAnswers.QuestionID)
-			}
+// 			correctAnswer, found := mappedQuestionsAndAnswer[potentialAnswers.QuestionID]
+// 			if !found {
+// 				return nil, fmt.Errorf("(%s) is not part of the item claim", potentialAnswers.QuestionID)
+// 			}
 
-			if !strings.EqualFold(correctAnswer, potentialAnswers.Answer) {
-				return nil, fmt.Errorf("wrong choice %s supplied for some of the questions %s", potentialAnswers.Answer, correctAnswer)
-			}
-		}
+// 			if !strings.EqualFold(correctAnswer, potentialAnswers.Answer) {
+// 				return nil, fmt.Errorf("wrong choice %s supplied for some of the questions %s", potentialAnswers.Answer, correctAnswer)
+// 			}
+// 		}
 
-		if len(answeredQuestions) != len(multiChoiceQuestions) {
-			return nil, errors.New("submitted duplicate questions")
-		}
-	default:
-		return nil, errors.New("item cannot be claimed via this method")
-	}
+// 		if len(answeredQuestions) != len(multiChoiceQuestions) {
+// 			return nil, errors.New("submitted duplicate questions")
+// 		}
+// 	default:
+// 		return nil, errors.New("item cannot be claimed via this method")
+// 	}
 
-	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
-	if err != nil {
-		return nil, errors.New("error creating mint pass")
-	}
+// 	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
+// 	if err != nil {
+// 		return nil, errors.New("error creating mint pass")
+// 	}
 
-	return passResp.PassID, nil
-}
+// 	return passResp.PassID, nil
+// }
