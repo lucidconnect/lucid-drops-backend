@@ -28,7 +28,9 @@ func IsThisAValidEthAddress(maybeAddress string) bool {
 
 func CreateMintPassForNoCriteriaItem(itemID, walletAddress string) (*model.ValidationRespoonse, error) {
 	if WalletLimitReached(walletAddress, itemID) {
-		return nil, errors.New("wallet limit reached")
+		return &model.ValidationRespoonse{
+			Valid:  false,
+		}, nil
 	}
 
 	item, err := engine.GetItemByID(itemID)
@@ -217,7 +219,7 @@ func WalletLimitReached(walletAddress, itemId string) bool {
 	var mintsByAddress int64
 	err := dbutils.DB.Model(&models.MintPass{}).Where("item_id = ?", itemId).Where("minter_address = ?", walletAddress).Count(&mintsByAddress).Error
 	if err == nil {
-		return mintsByAddress == 1
+		return mintsByAddress >= 1
 	}
 	return false
 }
