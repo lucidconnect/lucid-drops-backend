@@ -108,59 +108,59 @@ func StartEmailVerificationForClaim(input *model.EmailClaimInput) (*model.StartE
 	}, nil
 }
 
-func CompleteEmailVerificationForClaim(input *model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error) {
-	otpDetails, err := engine.GetEmailOTPRecordByID(input.OtpRequestID)
-	if err != nil {
-		return nil, errors.New("email verification attempt could not be found")
-	}
+// func CompleteEmailVerificationForClaim(input *model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error) {
+// 	otpDetails, err := engine.GetEmailOTPRecordByID(input.OtpRequestID)
+// 	if err != nil {
+// 		return nil, errors.New("email verification attempt could not be found")
+// 	}
 
-	if otpDetails.VerifiedAt != nil {
-		return nil, errors.New("email has already been verified please procced to claim page")
-	}
+// 	if otpDetails.VerifiedAt != nil {
+// 		return nil, errors.New("email has already been verified please procced to claim page")
+// 	}
 
-	if otpDetails.Attempts >= maximumOTPReattempts {
-		return nil, errors.New("email verification attempts have been exceded")
-	}
+// 	if otpDetails.Attempts >= maximumOTPReattempts {
+// 		return nil, errors.New("email verification attempts have been exceded")
+// 	}
 
-	timeToTime := time.Unix(otpDetails.ExpiresAt, 0)
-	if time.Now().After(timeToTime) {
-		return nil, errors.New("email verification OTP has expired try again")
-	}
+// 	timeToTime := time.Unix(otpDetails.ExpiresAt, 0)
+// 	if time.Now().After(timeToTime) {
+// 		return nil, errors.New("email verification OTP has expired try again")
+// 	}
 
-	if otpDetails.ExpectedOTP != input.Otp {
-		otpDetails.Attempts++
-		otpSaveError := engine.SaveModel(otpDetails)
-		if otpSaveError != nil {
-			log.Info().Msgf("🚨 OTP Model failed to updated in DB %+v", otpDetails)
-			return nil, errors.New("an error occured when verifying the OTP")
-		}
+// 	if otpDetails.ExpectedOTP != input.Otp {
+// 		otpDetails.Attempts++
+// 		otpSaveError := engine.SaveModel(otpDetails)
+// 		if otpSaveError != nil {
+// 			log.Info().Msgf("🚨 OTP Model failed to updated in DB %+v", otpDetails)
+// 			return nil, errors.New("an error occured when verifying the OTP")
+// 		}
 
-		return nil, errors.New("otp is invalid try again")
-	}
+// 		return nil, errors.New("otp is invalid try again")
+// 	}
 
-	item, err := engine.GetItemByID(otpDetails.ItemID.String())
-	if err != nil {
-		return nil, errors.New("item not found")
-	}
+// 	item, err := engine.GetItemByID(otpDetails.ItemID.String())
+// 	if err != nil {
+// 		return nil, errors.New("item not found")
+// 	}
 
-	now := time.Now().Unix()
-	otpDetails.VerifiedAt = &now
-	otpSaveError := engine.SaveModel(otpDetails)
-	if otpSaveError != nil {
-		log.Info().Msgf("🚨 OTP Model failed to updated in DB %+v", otpDetails)
-		return nil, errors.New("an error when verifying the OTP")
-	}
+// 	now := time.Now().Unix()
+// 	otpDetails.VerifiedAt = &now
+// 	otpSaveError := engine.SaveModel(otpDetails)
+// 	if otpSaveError != nil {
+// 		log.Info().Msgf("🚨 OTP Model failed to updated in DB %+v", otpDetails)
+// 		return nil, errors.New("an error when verifying the OTP")
+// 	}
 
-	if item.TokenID == nil {
-		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
-	}
+// 	if item.TokenID == nil {
+// 		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
+// 	}
 
-	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
-	if err != nil {
-		return nil, errors.New("error creating mint pass")
-	}
+// 	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
+// 	if err != nil {
+// 		return nil, errors.New("error creating mint pass")
+// 	}
 
-	return &model.CompleteEmailVerificationResponse{
-		OtpRequestID: *passResp.PassID,
-	}, nil
-}
+// 	return &model.CompleteEmailVerificationResponse{
+// 		OtpRequestID: *passResp.PassID,
+// 	}, nil
+// }
