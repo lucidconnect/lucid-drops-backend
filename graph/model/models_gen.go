@@ -105,27 +105,28 @@ type ImageStatusResponse struct {
 }
 
 type Item struct {
-	ID                               string             `json:"ID"`
-	Name                             string             `json:"name"`
-	Image                            string             `json:"image"`
-	Description                      string             `json:"description"`
-	DropID                           string             `json:"dropId"`
-	DropAddress                      string             `json:"dropAddress"`
-	ClaimCriteria                    *ClaimCriteriaType `json:"claimCriteria,omitempty"`
-	ClaimFee                         int                `json:"claimFee"`
-	Creator                          *CreatorDetails    `json:"creator"`
-	AuthorizedSubdomains             []string           `json:"authorizedSubdomains,omitempty"`
-	TwitterClaimCriteriaInteractions []*InteractionType `json:"twitterClaimCriteriaInteractions,omitempty"`
-	TelegramGroupTitle               *string            `json:"telegramGroupTitle,omitempty"`
-	TweetLink                        *string            `json:"tweetLink,omitempty"`
-	ProfileLink                      *string            `json:"profileLink,omitempty"`
-	CampaignName                     *string            `json:"campaignName,omitempty"`
-	EditionLimit                     *int               `json:"editionLimit,omitempty"`
-	TokenID                          *int               `json:"TokenID,omitempty"`
-	CreatedAt                        time.Time          `json:"createdAt"`
-	Deadline                         *time.Time         `json:"deadline,omitempty"`
-	ClaimDetails                     []*ClaimDetails    `json:"claimDetails,omitempty"`
-	Holders                          []string           `json:"holders"`
+	ID                                 string                      `json:"ID"`
+	Name                               string                      `json:"name"`
+	Image                              string                      `json:"image"`
+	Description                        string                      `json:"description"`
+	DropID                             string                      `json:"dropId"`
+	DropAddress                        string                      `json:"dropAddress"`
+	ClaimCriteria                      *ClaimCriteriaType          `json:"claimCriteria,omitempty"`
+	ClaimFee                           int                         `json:"claimFee"`
+	Creator                            *CreatorDetails             `json:"creator"`
+	AuthorizedSubdomains               []string                    `json:"authorizedSubdomains,omitempty"`
+	TwitterClaimCriteriaInteractions   []*InteractionType          `json:"twitterClaimCriteriaInteractions,omitempty"`
+	FarcasterClaimCriteriaInteractions []*FarcasterInteractionType `json:"farcasterClaimCriteriaInteractions,omitempty"`
+	TelegramGroupTitle                 *string                     `json:"telegramGroupTitle,omitempty"`
+	TweetLink                          *string                     `json:"tweetLink,omitempty"`
+	ProfileLink                        *string                     `json:"profileLink,omitempty"`
+	CampaignName                       *string                     `json:"campaignName,omitempty"`
+	EditionLimit                       *int                        `json:"editionLimit,omitempty"`
+	TokenID                            *int                        `json:"TokenID,omitempty"`
+	CreatedAt                          time.Time                   `json:"createdAt"`
+	Deadline                           *time.Time                  `json:"deadline,omitempty"`
+	ClaimDetails                       []*ClaimDetails             `json:"claimDetails,omitempty"`
+	Holders                            []string                    `json:"holders"`
 }
 
 type ItemInput struct {
@@ -179,6 +180,13 @@ type NewEmailWhitelistInput struct {
 
 type NewEmptyCriteriaInput struct {
 	ItemID string `json:"itemID"`
+}
+
+type NewFarcasterCriteriaInput struct {
+	ItemID       string                      `json:"itemID"`
+	Cast         *string                     `json:"cast,omitempty"`
+	Interaction  []*FarcasterInteractionType `json:"interaction,omitempty"`
+	CriteriaType ClaimCriteriaType           `json:"criteriaType"`
 }
 
 type NewPatreonCriteriaInput struct {
@@ -419,6 +427,9 @@ const (
 	ClaimCriteriaTypeEmptyCriteria             ClaimCriteriaType = "emptyCriteria"
 	ClaimCriteriaTypeWalletAddress             ClaimCriteriaType = "walletAddress"
 	ClaimCriteriaTypeClaimCode                 ClaimCriteriaType = "claimCode"
+	ClaimCriteriaTypeFarcasterChannel          ClaimCriteriaType = "farcasterChannel"
+	ClaimCriteriaTypeFarcasterFollowing        ClaimCriteriaType = "farcasterFollowing"
+	ClaimCriteriaTypeFarcasterInteractions     ClaimCriteriaType = "farcasterInteractions"
 )
 
 var AllClaimCriteriaType = []ClaimCriteriaType{
@@ -433,11 +444,14 @@ var AllClaimCriteriaType = []ClaimCriteriaType{
 	ClaimCriteriaTypeEmptyCriteria,
 	ClaimCriteriaTypeWalletAddress,
 	ClaimCriteriaTypeClaimCode,
+	ClaimCriteriaTypeFarcasterChannel,
+	ClaimCriteriaTypeFarcasterFollowing,
+	ClaimCriteriaTypeFarcasterInteractions,
 }
 
 func (e ClaimCriteriaType) IsValid() bool {
 	switch e {
-	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire, ClaimCriteriaTypeEmptyCriteria, ClaimCriteriaTypeWalletAddress, ClaimCriteriaTypeClaimCode:
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire, ClaimCriteriaTypeEmptyCriteria, ClaimCriteriaTypeWalletAddress, ClaimCriteriaTypeClaimCode, ClaimCriteriaTypeFarcasterChannel, ClaimCriteriaTypeFarcasterFollowing, ClaimCriteriaTypeFarcasterInteractions:
 		return true
 	}
 	return false
@@ -461,6 +475,49 @@ func (e *ClaimCriteriaType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ClaimCriteriaType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type FarcasterInteractionType string
+
+const (
+	FarcasterInteractionTypeLikes   FarcasterInteractionType = "likes"
+	FarcasterInteractionTypeReplies FarcasterInteractionType = "replies"
+	FarcasterInteractionTypeRecasts FarcasterInteractionType = "recasts"
+)
+
+var AllFarcasterInteractionType = []FarcasterInteractionType{
+	FarcasterInteractionTypeLikes,
+	FarcasterInteractionTypeReplies,
+	FarcasterInteractionTypeRecasts,
+}
+
+func (e FarcasterInteractionType) IsValid() bool {
+	switch e {
+	case FarcasterInteractionTypeLikes, FarcasterInteractionTypeReplies, FarcasterInteractionTypeRecasts:
+		return true
+	}
+	return false
+}
+
+func (e FarcasterInteractionType) String() string {
+	return string(e)
+}
+
+func (e *FarcasterInteractionType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = FarcasterInteractionType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid FarcasterInteractionType", str)
+	}
+	return nil
+}
+
+func (e FarcasterInteractionType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

@@ -69,7 +69,7 @@ func (r *itemResolver) AuthorizedSubdomains(ctx context.Context, obj *model.Item
 
 // Holders is the resolver for the holders field.
 func (r *itemResolver) Holders(ctx context.Context, obj *model.Item) ([]string, error) {
-	nftHolders, err := drops.FetchNftHolders(obj) 
+	nftHolders, err := drops.FetchNftHolders(obj)
 	if err != nil {
 		return nil, err
 	}
@@ -297,6 +297,11 @@ func (r *mutationResolver) ValidateWalletCriteriaForItem(ctx context.Context, it
 // ValidateQuestionnaireCriteriaForItem is the resolver for the validateQuestionnaireCriteriaForItem field.
 func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
 	return nil, fmt.Errorf("Not Implemented")
+}
+
+// ValidateFarcasterCriteriaForItem is the resolver for the validateFarcasterCriteriaForItem field.
+func (r *mutationResolver) ValidateFarcasterCriteriaForItem(ctx context.Context, itemID string, farcasterAddress string) (*model.ValidationRespoonse, error) {
+	panic(fmt.Errorf("not implemented: ValidateFarcasterCriteriaForItem - validateFarcasterCriteriaForItem"))
 }
 
 // CreateJWTToken is the resolver for the createJWTToken field.

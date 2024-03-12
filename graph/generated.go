@@ -92,27 +92,28 @@ type ComplexityRoot struct {
 	}
 
 	Item struct {
-		AuthorizedSubdomains             func(childComplexity int) int
-		CampaignName                     func(childComplexity int) int
-		ClaimCriteria                    func(childComplexity int) int
-		ClaimDetails                     func(childComplexity int) int
-		ClaimFee                         func(childComplexity int) int
-		CreatedAt                        func(childComplexity int) int
-		Creator                          func(childComplexity int) int
-		Deadline                         func(childComplexity int) int
-		Description                      func(childComplexity int) int
-		DropAddress                      func(childComplexity int) int
-		DropID                           func(childComplexity int) int
-		EditionLimit                     func(childComplexity int) int
-		Holders                          func(childComplexity int) int
-		ID                               func(childComplexity int) int
-		Image                            func(childComplexity int) int
-		Name                             func(childComplexity int) int
-		ProfileLink                      func(childComplexity int) int
-		TelegramGroupTitle               func(childComplexity int) int
-		TokenID                          func(childComplexity int) int
-		TweetLink                        func(childComplexity int) int
-		TwitterClaimCriteriaInteractions func(childComplexity int) int
+		AuthorizedSubdomains               func(childComplexity int) int
+		CampaignName                       func(childComplexity int) int
+		ClaimCriteria                      func(childComplexity int) int
+		ClaimDetails                       func(childComplexity int) int
+		ClaimFee                           func(childComplexity int) int
+		CreatedAt                          func(childComplexity int) int
+		Creator                            func(childComplexity int) int
+		Deadline                           func(childComplexity int) int
+		Description                        func(childComplexity int) int
+		DropAddress                        func(childComplexity int) int
+		DropID                             func(childComplexity int) int
+		EditionLimit                       func(childComplexity int) int
+		FarcasterClaimCriteriaInteractions func(childComplexity int) int
+		Holders                            func(childComplexity int) int
+		ID                                 func(childComplexity int) int
+		Image                              func(childComplexity int) int
+		Name                               func(childComplexity int) int
+		ProfileLink                        func(childComplexity int) int
+		TelegramGroupTitle                 func(childComplexity int) int
+		TokenID                            func(childComplexity int) int
+		TweetLink                          func(childComplexity int) int
+		TwitterClaimCriteriaInteractions   func(childComplexity int) int
 	}
 
 	JWTCreationResponse struct {
@@ -164,6 +165,7 @@ type ComplexityRoot struct {
 		TempCreateItem                       func(childComplexity int, input model.ItemInput, creatorAddress string) int
 		UpdateDrop                           func(childComplexity int, dropID string, input model.DropInput) int
 		UpdateItem                           func(childComplexity int, itemID string, input model.ItemInput) int
+		ValidateFarcasterCriteriaForItem     func(childComplexity int, itemID string, farcasterAddress string) int
 		ValidatePatreonCriteriaForItem       func(childComplexity int, itemID string, authID *string) int
 		ValidateQuestionnaireCriteriaForItem func(childComplexity int, itemID string, input []*model.QuestionnaireAnswerInput) int
 		ValidateTelegramCriteriaForItem      func(childComplexity int, itemID string, authID *string) int
@@ -287,6 +289,7 @@ type MutationResolver interface {
 	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
 	ValidateWalletCriteriaForItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error)
 	ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error)
+	ValidateFarcasterCriteriaForItem(ctx context.Context, itemID string, farcasterAddress string) (*model.ValidationRespoonse, error)
 	CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error)
 	CreatePaymentIntentSecretKey(ctx context.Context, amount int) (*string, error)
 	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
@@ -591,6 +594,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.EditionLimit(childComplexity), true
+
+	case "Item.farcasterClaimCriteriaInteractions":
+		if e.complexity.Item.FarcasterClaimCriteriaInteractions == nil {
+			break
+		}
+
+		return e.complexity.Item.FarcasterClaimCriteriaInteractions(childComplexity), true
 
 	case "Item.holders":
 		if e.complexity.Item.Holders == nil {
@@ -1057,6 +1067,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateItem(childComplexity, args["itemID"].(string), args["input"].(model.ItemInput)), true
+
+	case "Mutation.validateFarcasterCriteriaForItem":
+		if e.complexity.Mutation.ValidateFarcasterCriteriaForItem == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_validateFarcasterCriteriaForItem_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ValidateFarcasterCriteriaForItem(childComplexity, args["itemID"].(string), args["farcasterAddress"].(string)), true
 
 	case "Mutation.validatePatreonCriteriaForItem":
 		if e.complexity.Mutation.ValidatePatreonCriteriaForItem == nil {
@@ -1561,6 +1583,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNewEmailDomainWhitelistInput,
 		ec.unmarshalInputNewEmailWhitelistInput,
 		ec.unmarshalInputNewEmptyCriteriaInput,
+		ec.unmarshalInputNewFarcasterCriteriaInput,
 		ec.unmarshalInputNewPatreonCriteriaInput,
 		ec.unmarshalInputNewTelegramCriteriaInput,
 		ec.unmarshalInputNewTwitterCriteriaInput,
@@ -2119,6 +2142,30 @@ func (ec *executionContext) field_Mutation_updateItem_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_validateFarcasterCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["itemID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["itemID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["farcasterAddress"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("farcasterAddress"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["farcasterAddress"] = arg1
 	return args, nil
 }
 
@@ -3299,6 +3346,8 @@ func (ec *executionContext) fieldContext_Drop_items(ctx context.Context, field g
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -4102,6 +4151,47 @@ func (ec *executionContext) fieldContext_Item_twitterClaimCriteriaInteractions(c
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type InteractionType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Item_farcasterClaimCriteriaInteractions(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FarcasterClaimCriteriaInteractions, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.FarcasterInteractionType)
+	fc.Result = res
+	return ec.marshalOFarcasterInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_farcasterClaimCriteriaInteractions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type FarcasterInteractionType does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5494,6 +5584,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -5593,6 +5685,8 @@ func (ec *executionContext) fieldContext_Mutation_tempCreateItem(ctx context.Con
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -5692,6 +5786,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -5791,6 +5887,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -5890,6 +5988,8 @@ func (ec *executionContext) fieldContext_Mutation_addItemDeadline(ctx context.Co
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -5989,6 +6089,8 @@ func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaFor
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -6088,6 +6190,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -6187,6 +6291,8 @@ func (ec *executionContext) fieldContext_Mutation_createWalletAddressWhitelistFo
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -6286,6 +6392,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -6385,6 +6493,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -6484,6 +6594,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -6583,6 +6695,8 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -6682,6 +6796,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -7056,6 +7172,64 @@ func (ec *executionContext) fieldContext_Mutation_validateQuestionnaireCriteriaF
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_validateQuestionnaireCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_validateFarcasterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_validateFarcasterCriteriaForItem(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ValidateFarcasterCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["farcasterAddress"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ValidationRespoonse)
+	fc.Result = res
+	return ec.marshalOValidationRespoonse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_validateFarcasterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "valid":
+				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
+			case "passID":
+				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_validateFarcasterCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7960,6 +8134,8 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -8206,6 +8382,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInDrop(ctx context.Cont
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -8305,6 +8483,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -8766,6 +8946,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -12104,6 +12286,8 @@ func (ec *executionContext) fieldContext_userProfileType_items(ctx context.Conte
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -12189,6 +12373,8 @@ func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx contex
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -12870,6 +13056,62 @@ func (ec *executionContext) unmarshalInputNewEmptyCriteriaInput(ctx context.Cont
 				return it, err
 			}
 			it.ItemID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputNewFarcasterCriteriaInput(ctx context.Context, obj interface{}) (model.NewFarcasterCriteriaInput, error) {
+	var it model.NewFarcasterCriteriaInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"itemID", "cast", "interaction", "criteriaType"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "itemID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ItemID = data
+		case "cast":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cast"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Cast = data
+		case "interaction":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("interaction"))
+			data, err := ec.unmarshalOFarcasterInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Interaction = data
+		case "criteriaType":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("criteriaType"))
+			data, err := ec.unmarshalNClaimCriteriaType2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CriteriaType = data
 		}
 	}
 
@@ -13830,6 +14072,8 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "twitterClaimCriteriaInteractions":
 			out.Values[i] = ec._Item_twitterClaimCriteriaInteractions(ctx, field, obj)
+		case "farcasterClaimCriteriaInteractions":
+			out.Values[i] = ec._Item_farcasterClaimCriteriaInteractions(ctx, field, obj)
 		case "telegramGroupTitle":
 			out.Values[i] = ec._Item_telegramGroupTitle(ctx, field, obj)
 		case "tweetLink":
@@ -14237,6 +14481,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "validateQuestionnaireCriteriaForItem":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_validateQuestionnaireCriteriaForItem(ctx, field)
+			})
+		case "validateFarcasterCriteriaForItem":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_validateFarcasterCriteriaForItem(ctx, field)
 			})
 		case "createJWTToken":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -16573,6 +16821,83 @@ func (ec *executionContext) marshalODrop2ᚖgithubᚗcomᚋlucidconnectᚋinvers
 		return graphql.Null
 	}
 	return ec._Drop(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOFarcasterInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx context.Context, v interface{}) ([]*model.FarcasterInteractionType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.FarcasterInteractionType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOFarcasterInteractionType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOFarcasterInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx context.Context, sel ast.SelectionSet, v []*model.FarcasterInteractionType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOFarcasterInteractionType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOFarcasterInteractionType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx context.Context, v interface{}) (*model.FarcasterInteractionType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(model.FarcasterInteractionType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFarcasterInteractionType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx context.Context, sel ast.SelectionSet, v *model.FarcasterInteractionType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
 }
 
 func (ec *executionContext) marshalOImageResponse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐImageResponse(ctx context.Context, sel ast.SelectionSet, v *model.ImageResponse) graphql.Marshaler {
