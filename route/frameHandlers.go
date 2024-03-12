@@ -15,7 +15,7 @@ func CreateMintPassForNoCriteriaItem(w http.ResponseWriter, r *http.Request) {
 	pass, err := whitelist.CreateMintPassForNoCriteriaItem(itemId, walletAddress)
 	if err != nil {
 		log.Err(err).Caller().Msg("GenerateSignatureForClaim")
-		w.Write([]byte(err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	if err = json.NewEncoder(w).Encode(pass); err != nil {
