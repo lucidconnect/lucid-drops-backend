@@ -29,13 +29,19 @@ func IsThisAValidEthAddress(maybeAddress string) bool {
 func CreateMintPassForNoCriteriaItem(itemID, walletAddress string) (*model.ValidationRespoonse, error) {
 	if WalletLimitReached(walletAddress, itemID) {
 		return &model.ValidationRespoonse{
-			Valid:  false,
+			Valid: false,
 		}, nil
 	}
 
 	item, err := engine.GetItemByID(itemID)
 	if err != nil {
 		return nil, err
+	}
+
+	if ItemOverEditionLimit(item) {
+		return &model.ValidationRespoonse{
+			Valid: false,
+		}, nil
 	}
 
 	if item.ClaimDeadline != nil {
@@ -59,10 +65,6 @@ func CreateMintPassForNoCriteriaItem(itemID, walletAddress string) (*model.Valid
 
 	if item.TokenID == nil {
 		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
-	}
-
-	if ItemOverEditionLimit(item) {
-		return nil, errors.New("item edition limit reached")
 	}
 
 	tx := dbutils.DB.Begin()
