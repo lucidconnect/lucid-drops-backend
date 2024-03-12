@@ -105,6 +105,9 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 	}
 
 	if items != nil {
+		for _, item := range items {
+			item.DropAddress = *c.AAContractAddress
+		}
 		mappedDrop.Items = items
 	}
 

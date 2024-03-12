@@ -16,6 +16,7 @@ import (
 	"github.com/lucidconnect/inverse/internal"
 	"github.com/lucidconnect/inverse/mintwatcher"
 	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/services"
 	"github.com/lucidconnect/inverse/utils"
 	"github.com/rs/zerolog/log"
 )
@@ -400,4 +401,24 @@ func FetchTokenUri(contractAddress, itemID string, isBase bool) (*int, error) {
 		}
 	}
 	return nil, errors.New("token ID not found")
+}
+
+func FetchNftHolders(item *model.Item) ([]string, error) {
+	var alchemyOpts []services.Option
+	apiKeyOpt := services.WithApiKey(os.Getenv("ALCHEMY_API_KEY"))
+	urlOpt := services.WithUrl(os.Getenv("ALCHEMY_URL"))
+	alchemyOpts = append(alchemyOpts, apiKeyOpt, urlOpt)
+	alchemyClient, err := services.NewAlchemyClient(alchemyOpts...)
+	if err != nil {
+		log.Err(err).Send()
+		return nil, err
+	}
+
+	holders, err := alchemyClient.GetOwnersForNft(item.DropAddress, "1")
+	if err != nil {
+		log.Err(err).Send()
+		return nil, err
+	}
+
+	return holders, nil
 }
