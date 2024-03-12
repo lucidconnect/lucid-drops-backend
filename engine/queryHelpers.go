@@ -278,9 +278,18 @@ func GetCreatorDrops(creatorID string) ([]*models.Drop, error) {
 func GetDropItems(dropID string) ([]*models.Item, error) {
 	var items []*models.Item
 
-	err := dbutils.DB.Where("drop_id=?", dropID).Find(&items).Error
+	drop, err := GetDropByID(dropID)
+	if err != nil {
+		return nil, errors.New("drop not found")
+	}
+
+	err = dbutils.DB.Where("drop_id=?", dropID).Find(&items).Error
 	if err != nil {
 		return nil, errors.New("items not found")
+	}
+
+	for _, item := range items {
+		item.DropAddress = *drop.AAContractAddress
 	}
 
 	return items, nil

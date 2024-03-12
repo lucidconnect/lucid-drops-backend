@@ -67,6 +67,15 @@ func (r *itemResolver) AuthorizedSubdomains(ctx context.Context, obj *model.Item
 	return subdomains, nil
 }
 
+// Holders is the resolver for the holders field.
+func (r *itemResolver) Holders(ctx context.Context, obj *model.Item) ([]string, error) {
+	nftHolders, err := drops.FetchNftHolders(obj) 
+	if err != nil {
+		return nil, err
+	}
+	return nftHolders, nil
+}
+
 // RegisterInverseUsername is the resolver for the registerInverseUsername field.
 func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
