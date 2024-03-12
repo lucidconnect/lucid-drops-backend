@@ -55,13 +55,14 @@ type Mutation {
   createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
   createPatreonCriteriaForItem(input: NewPatreonCriteriaInput!): Item!
   createEmptyCriteriaForItem(input: NewEmptyCriteriaInput!): Item!
+  createFarcasterCriteriaForItem(input: NewFarcasterCriteriaInput!): Item!
   createMintPassForNoCriteriaItem(itemID: String!, walletAddress: String!): ValidationRespoonse
   validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validatePatreonCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validateWalletCriteriaForItem(itemID: String!, walletAddress: String!): ValidationRespoonse
   validateQuestionnaireCriteriaForItem(itemID: String!, input: [QuestionnaireAnswerInput!]!): String
-
+  validateFarcasterCriteriaForItem(itemID: String!, farcasterAddress: String!): ValidationRespoonse
   createJWTToken(input: CreateJWTTokenInput): JWTCreationResponse!
   createPaymentIntentSecretKey(amount: Int!): String
 
@@ -172,6 +173,13 @@ input ItemInput {
   This should typically be in cents
   """
   claimFee: Int
+}
+
+input NewFarcasterCriteriaInput {
+  itemID: String!
+  cast: String
+  interaction: [FarcasterInteractionType]
+  criteriaType: ClaimCriteriaType!
 }
 
 input NewTwitterCriteriaInput {
@@ -300,6 +308,7 @@ type Item {
   creator: CreatorDetails! @goField(forceResolver: true)
   authorizedSubdomains: [String!] @goField(forceResolver: true)
   twitterClaimCriteriaInteractions: [InteractionType]
+  farcasterClaimCriteriaInteractions: [FarcasterInteractionType]
   telegramGroupTitle: String
   tweetLink: String
   profileLink: String
@@ -400,6 +409,9 @@ enum ClaimCriteriaType{
   emptyCriteria
   walletAddress
   claimCode
+  farcasterChannel
+  farcasterFollowing
+  farcasterInteractions
 }
 
 enum AiImageStyle{
@@ -425,6 +437,12 @@ enum InteractionType {
   likes
   retweets
   replies
+}
+
+enum FarcasterInteractionType {
+  likes
+  replies
+  recasts
 }
 
 enum SignerProvider {

@@ -299,6 +299,11 @@ func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Cont
 	return nil, fmt.Errorf("Not Implemented")
 }
 
+// ValidateFarcasterCriteriaForItem is the resolver for the validateFarcasterCriteriaForItem field.
+func (r *mutationResolver) ValidateFarcasterCriteriaForItem(ctx context.Context, itemID string, farcasterAddress string) (*model.ValidationRespoonse, error) {
+	panic(fmt.Errorf("not implemented: ValidateFarcasterCriteriaForItem - validateFarcasterCriteriaForItem"))
+}
+
 // CreateJWTToken is the resolver for the createJWTToken field.
 func (r *mutationResolver) CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error) {
 	return auth.CreateJWTToken(input)
