@@ -116,73 +116,73 @@ func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *int
 	return item.ToGraphData(), nil
 }
 
-func ValidatePatreonCriteriaForItem(itemID string, authID *string) (*model.ValidationRespoonse, error) {
+// func ValidatePatreonCriteriaForItem(itemID string, authID *string) (*model.ValidationRespoonse, error) {
 
-	resp := &model.ValidationRespoonse{
-		Valid: false,
-	}
+// 	resp := &model.ValidationRespoonse{
+// 		Valid: false,
+// 	}
 
-	item, err := engine.GetItemByID(itemID)
-	if err != nil {
-		return resp, errors.New("item not found")
-	}
+// 	item, err := engine.GetItemByID(itemID)
+// 	if err != nil {
+// 		return resp, errors.New("item not found")
+// 	}
 
-	if item.ClaimDeadline != nil {
-		if time.Now().After(*item.ClaimDeadline) {
-			return nil, errors.New("the item is no longer available to be claimed")
-		}
-	}
+// 	if item.ClaimDeadline != nil {
+// 		if time.Now().After(*item.ClaimDeadline) {
+// 			return nil, errors.New("the item is no longer available to be claimed")
+// 		}
+// 	}
 
-	if item.PatreonCriteria == nil {
-		return resp, errors.New("item does not have a patreon criteria")
-	}
+// 	if item.PatreonCriteria == nil {
+// 		return resp, errors.New("item does not have a patreon criteria")
+// 	}
 
-	if authID == nil {
-		return resp, errors.New("no patreon auth id provided")
-	}
+// 	if authID == nil {
+// 		return resp, errors.New("no patreon auth id provided")
+// 	}
 
-	patreonAuth, err := engine.FetchPatreonAuthByID(*authID)
-	if err != nil {
-		return resp, errors.New("patreon account not authorized")
-	}
+// 	patreonAuth, err := engine.FetchPatreonAuthByID(*authID)
+// 	if err != nil {
+// 		return resp, errors.New("patreon account not authorized")
+// 	}
 
-	creatorAuth, err := engine.FetchPatreonAuthByID(item.PatreonCriteria.AuthID)
-	if err != nil {
-		return resp, errors.New("creator patreon account not authorized")
-	}
+// 	creatorAuth, err := engine.FetchPatreonAuthByID(item.PatreonCriteria.AuthID)
+// 	if err != nil {
+// 		return resp, errors.New("creator patreon account not authorized")
+// 	}
 
-	campaignPledges, err := services.FetchPatreonPledgesLocal(creatorAuth)
-	if err != nil {
-		return resp, errors.New("error fetching pledges")
-	}
+// 	campaignPledges, err := services.FetchPatreonPledgesLocal(creatorAuth)
+// 	if err != nil {
+// 		return resp, errors.New("error fetching pledges")
+// 	}
 
-	var membershipIDs = make(map[string]string)
-	_ = json.Unmarshal([]byte(patreonAuth.MembershipUIDs), &membershipIDs)
-	if membershipIDs == nil {
-		return resp, errors.New("user is not a valid patron")
-	}
+// 	var membershipIDs = make(map[string]string)
+// 	_ = json.Unmarshal([]byte(patreonAuth.MembershipUIDs), &membershipIDs)
+// 	if membershipIDs == nil {
+// 		return resp, errors.New("user is not a valid patron")
+// 	}
 
-	for _, membershipID := range membershipIDs {
+// 	for _, membershipID := range membershipIDs {
 
-		_, ok := campaignPledges[membershipID]
-		if ok {
-			patreonAuth.WhiteListed = true
-			err = engine.SaveModel(patreonAuth)
-			if err != nil {
-				return resp, errors.New("error saving patreon auth")
-			}
+// 		_, ok := campaignPledges[membershipID]
+// 		if ok {
+// 			patreonAuth.WhiteListed = true
+// 			err = engine.SaveModel(patreonAuth)
+// 			if err != nil {
+// 				return resp, errors.New("error saving patreon auth")
+// 			}
 
-			passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
-			if err != nil {
-				return passResp, errors.New("error creating mint pass")
-			}
+// 			passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
+// 			if err != nil {
+// 				return passResp, errors.New("error creating mint pass")
+// 			}
 
-			return passResp, nil
-		}
-	}
+// 			return passResp, nil
+// 		}
+// 	}
 
-	return nil, errors.New("user is not a valid patron")
-}
+// 	return nil, errors.New("user is not a valid patron")
+// }
 
 func createMintPassForPatreonMint(item *models.Item) (*string, error) {
 	drop, err := engine.GetDropByID(item.DropID.String())

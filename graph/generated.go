@@ -101,8 +101,10 @@ type ComplexityRoot struct {
 		Creator                          func(childComplexity int) int
 		Deadline                         func(childComplexity int) int
 		Description                      func(childComplexity int) int
+		DropAddress                      func(childComplexity int) int
 		DropID                           func(childComplexity int) int
 		EditionLimit                     func(childComplexity int) int
+		Holders                          func(childComplexity int) int
 		ID                               func(childComplexity int) int
 		Image                            func(childComplexity int) int
 		Name                             func(childComplexity int) int
@@ -143,7 +145,7 @@ type ComplexityRoot struct {
 		CreateEmptyCriteriaForItem           func(childComplexity int, input model.NewEmptyCriteriaInput) int
 		CreateItem                           func(childComplexity int, input model.ItemInput) int
 		CreateJWTToken                       func(childComplexity int, input *model.CreateJWTTokenInput) int
-		CreateMintPassForNoCriteriaItem      func(childComplexity int, itemID string) int
+		CreateMintPassForNoCriteriaItem      func(childComplexity int, itemID string, walletAddress string) int
 		CreatePatreonCriteriaForItem         func(childComplexity int, input model.NewPatreonCriteriaInput) int
 		CreatePaymentIntentSecretKey         func(childComplexity int, amount int) int
 		CreateQuestionnaireCriteriaForItem   func(childComplexity int, input model.QuestionnaireCriteriaInput) int
@@ -257,6 +259,8 @@ type DropResolver interface {
 type ItemResolver interface {
 	Creator(ctx context.Context, obj *model.Item) (*model.CreatorDetails, error)
 	AuthorizedSubdomains(ctx context.Context, obj *model.Item) ([]string, error)
+
+	Holders(ctx context.Context, obj *model.Item) ([]string, error)
 }
 type MutationResolver interface {
 	RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error)
@@ -277,7 +281,7 @@ type MutationResolver interface {
 	CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error)
 	CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error)
 	CreateEmptyCriteriaForItem(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Item, error)
-	CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string) (*model.ValidationRespoonse, error)
+	CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error)
 	ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
 	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
 	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
@@ -567,6 +571,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.Description(childComplexity), true
 
+	case "Item.dropAddress":
+		if e.complexity.Item.DropAddress == nil {
+			break
+		}
+
+		return e.complexity.Item.DropAddress(childComplexity), true
+
 	case "Item.dropId":
 		if e.complexity.Item.DropID == nil {
 			break
@@ -580,6 +591,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.EditionLimit(childComplexity), true
+
+	case "Item.holders":
+		if e.complexity.Item.Holders == nil {
+			break
+		}
+
+		return e.complexity.Item.Holders(childComplexity), true
 
 	case "Item.ID":
 		if e.complexity.Item.ID == nil {
@@ -827,7 +845,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateMintPassForNoCriteriaItem(childComplexity, args["itemID"].(string)), true
+		return e.complexity.Mutation.CreateMintPassForNoCriteriaItem(childComplexity, args["itemID"].(string), args["walletAddress"].(string)), true
 
 	case "Mutation.createPatreonCriteriaForItem":
 		if e.complexity.Mutation.CreatePatreonCriteriaForItem == nil {
@@ -1810,6 +1828,15 @@ func (ec *executionContext) field_Mutation_createMintPassForNoCriteriaItem_args(
 		}
 	}
 	args["itemID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["walletAddress"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("walletAddress"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["walletAddress"] = arg1
 	return args, nil
 }
 
@@ -3260,6 +3287,8 @@ func (ec *executionContext) fieldContext_Drop_items(ctx context.Context, field g
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -3288,6 +3317,8 @@ func (ec *executionContext) fieldContext_Drop_items(ctx context.Context, field g
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -3799,6 +3830,50 @@ func (ec *executionContext) _Item_dropId(ctx context.Context, field graphql.Coll
 }
 
 func (ec *executionContext) fieldContext_Item_dropId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Item_dropAddress(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_dropAddress(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DropAddress, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_dropAddress(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Item",
 		Field:      field,
@@ -4407,6 +4482,50 @@ func (ec *executionContext) fieldContext_Item_claimDetails(ctx context.Context, 
 				return ec.fieldContext_ClaimDetails_claimerAddress(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ClaimDetails", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Item_holders(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Item_holders(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Item().Holders(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Item_holders(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5363,6 +5482,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -5391,6 +5512,8 @@ func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5458,6 +5581,8 @@ func (ec *executionContext) fieldContext_Mutation_tempCreateItem(ctx context.Con
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -5486,6 +5611,8 @@ func (ec *executionContext) fieldContext_Mutation_tempCreateItem(ctx context.Con
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5553,6 +5680,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -5581,6 +5710,8 @@ func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5648,6 +5779,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -5676,6 +5809,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5743,6 +5878,8 @@ func (ec *executionContext) fieldContext_Mutation_addItemDeadline(ctx context.Co
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -5771,6 +5908,8 @@ func (ec *executionContext) fieldContext_Mutation_addItemDeadline(ctx context.Co
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5838,6 +5977,8 @@ func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaFor
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -5866,6 +6007,8 @@ func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaFor
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -5933,6 +6076,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -5961,6 +6106,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ct
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -6028,6 +6175,8 @@ func (ec *executionContext) fieldContext_Mutation_createWalletAddressWhitelistFo
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -6056,6 +6205,8 @@ func (ec *executionContext) fieldContext_Mutation_createWalletAddressWhitelistFo
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -6123,6 +6274,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -6151,6 +6304,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -6218,6 +6373,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -6246,6 +6403,8 @@ func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(c
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -6313,6 +6472,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -6341,6 +6502,8 @@ func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -6408,6 +6571,8 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -6436,6 +6601,8 @@ func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(c
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -6503,6 +6670,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -6531,6 +6700,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -6563,7 +6734,7 @@ func (ec *executionContext) _Mutation_createMintPassForNoCriteriaItem(ctx contex
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateMintPassForNoCriteriaItem(rctx, fc.Args["itemID"].(string))
+		return ec.resolvers.Mutation().CreateMintPassForNoCriteriaItem(rctx, fc.Args["itemID"].(string), fc.Args["walletAddress"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7777,6 +7948,8 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -7805,6 +7978,8 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -8019,6 +8194,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInDrop(ctx context.Cont
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -8047,6 +8224,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInDrop(ctx context.Cont
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -8114,6 +8293,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -8142,6 +8323,8 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -8571,6 +8754,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -8599,6 +8784,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -11905,6 +12092,8 @@ func (ec *executionContext) fieldContext_userProfileType_items(ctx context.Conte
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -11933,6 +12122,8 @@ func (ec *executionContext) fieldContext_userProfileType_items(ctx context.Conte
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -11986,6 +12177,8 @@ func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx contex
 				return ec.fieldContext_Item_description(ctx, field)
 			case "dropId":
 				return ec.fieldContext_Item_dropId(ctx, field)
+			case "dropAddress":
+				return ec.fieldContext_Item_dropAddress(ctx, field)
 			case "claimCriteria":
 				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
@@ -12014,6 +12207,8 @@ func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx contex
 				return ec.fieldContext_Item_deadline(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Item_claimDetails(ctx, field)
+			case "holders":
+				return ec.fieldContext_Item_holders(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
 		},
@@ -13552,6 +13747,11 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "dropAddress":
+			out.Values[i] = ec._Item_dropAddress(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "claimCriteria":
 			out.Values[i] = ec._Item_claimCriteria(ctx, field, obj)
 		case "claimFee":
@@ -13651,6 +13851,42 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Item_deadline(ctx, field, obj)
 		case "claimDetails":
 			out.Values[i] = ec._Item_claimDetails(ctx, field, obj)
+		case "holders":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Item_holders(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

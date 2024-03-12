@@ -3,10 +3,9 @@ package whitelist
 import (
 	"errors"
 	"strconv"
-	"time"
 
 	// "github.com/lucidconnect/inverse/dbutils"
-	"github.com/lucidconnect/inverse/dbutils"
+
 	"github.com/lucidconnect/inverse/engine"
 	"github.com/lucidconnect/inverse/graph/model"
 	"github.com/lucidconnect/inverse/internal"
@@ -68,67 +67,67 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 	return item.ToGraphData(), nil
 }
 
-func ValidateTelegramClaimCriteria(itemID, telegramAuthID string) (*model.ValidationRespoonse, error) {
+// func ValidateTelegramClaimCriteria(itemID, telegramAuthID string) (*model.ValidationRespoonse, error) {
 
-	resp := &model.ValidationRespoonse{
-		Valid: false,
-	}
+// 	resp := &model.ValidationRespoonse{
+// 		Valid: false,
+// 	}
 
-	item, err := engine.GetItemByID(itemID)
-	if err != nil {
-		return resp, errors.New("item not found")
-	}
+// 	item, err := engine.GetItemByID(itemID)
+// 	if err != nil {
+// 		return resp, errors.New("item not found")
+// 	}
 
-	if item.ClaimDeadline != nil {
-		if time.Now().After(*item.ClaimDeadline) {
-			return nil, errors.New("the item is no longer available to be claimed")
-		}
-	}
+// 	if item.ClaimDeadline != nil {
+// 		if time.Now().After(*item.ClaimDeadline) {
+// 			return nil, errors.New("the item is no longer available to be claimed")
+// 		}
+// 	}
 
-	if item.TelegramCriteria == nil {
-		return resp, errors.New("item does not have a telegram criteria")
-	}
+// 	if item.TelegramCriteria == nil {
+// 		return resp, errors.New("item does not have a telegram criteria")
+// 	}
 
-	var itemCount int64
-	err = dbutils.DB.Model(&models.TelegramAuthDetails{}).Where("user_id = ? AND item_id = ?", telegramAuthID, itemID).Count(&itemCount).Error
-	if err != nil {
-		return resp, errors.New("error validating telegram account")
-	}
+// 	var itemCount int64
+// 	err = dbutils.DB.Model(&models.TelegramAuthDetails{}).Where("user_id = ? AND item_id = ?", telegramAuthID, itemID).Count(&itemCount).Error
+// 	if err != nil {
+// 		return resp, errors.New("error validating telegram account")
+// 	}
 
-	if itemCount > 0 {
-		return resp, errors.New("telegram account already authorized")
-	}
+// 	if itemCount > 0 {
+// 		return resp, errors.New("telegram account already authorized")
+// 	}
 
-	IdToInt, _ := strconv.Atoi(telegramAuthID)
-	member, err := InverseBot.GetTelegramGroupUser(item.TelegramCriteria.GroupID, int64(IdToInt))
-	if err != nil {
-		return resp, errors.New("telegram account not authorized by group admin")
-	}
+// 	IdToInt, _ := strconv.Atoi(telegramAuthID)
+// 	member, err := InverseBot.GetTelegramGroupUser(item.TelegramCriteria.GroupID, int64(IdToInt))
+// 	if err != nil {
+// 		return resp, errors.New("telegram account not authorized by group admin")
+// 	}
 
-	if member.User.IsBot {
-		return resp, errors.New("telegram account cannot be a bot")
-	}
+// 	if member.User.IsBot {
+// 		return resp, errors.New("telegram account cannot be a bot")
+// 	}
 
-	if member.Status == "member" || member.Status == "creator" || member.Status == "administrator" {
+// 	if member.Status == "member" || member.Status == "creator" || member.Status == "administrator" {
 
-		passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
-		if err != nil {
-			return passResp, errors.New("error creating mint pass")
-		}
+// 		passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
+// 		if err != nil {
+// 			return passResp, errors.New("error creating mint pass")
+// 		}
 
-		var authDetails models.TelegramAuthDetails
-		authDetails.UserID = telegramAuthID
-		authDetails.ItemID = &itemID
-		err = engine.SaveModel(authDetails)
-		if err != nil {
-			return passResp, err
-		}
+// 		var authDetails models.TelegramAuthDetails
+// 		authDetails.UserID = telegramAuthID
+// 		authDetails.ItemID = &itemID
+// 		err = engine.SaveModel(authDetails)
+// 		if err != nil {
+// 			return passResp, err
+// 		}
 
-		return passResp, nil
-	}
+// 		return passResp, nil
+// 	}
 
-	return nil, errors.New("telegram account not authorized by group admin")
-}
+// 	return nil, errors.New("telegram account not authorized by group admin")
+// }
 
 func ProcessTelegramCallBack(id, username, hash, photoURL string) (*string, error) {
 

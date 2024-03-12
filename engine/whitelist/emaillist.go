@@ -1,107 +1,98 @@
 package whitelist
 
 import (
-	"errors"
-	"time"
-
 	"github.com/lucidconnect/inverse/dbutils"
-	"github.com/lucidconnect/inverse/emails"
-	"github.com/lucidconnect/inverse/engine"
-	"github.com/lucidconnect/inverse/graph/model"
-	"github.com/lucidconnect/inverse/internal"
 	"github.com/lucidconnect/inverse/models"
-	"github.com/lucidconnect/inverse/utils"
-	"gorm.io/gorm/clause"
 )
 
-func sendEmailOnCreate(dbEmail *models.SingleEmailClaim) error {
-	from := "noreply@getabacus.app"
+// func sendEmailOnCreate(dbEmail *models.SingleEmailClaim) error {
+// 	from := "noreply@getabacus.app"
 
-	item, err := engine.GetItemByID(dbEmail.ItemID.String())
-	if err != nil {
-		return err
-	}
+// 	item, err := engine.GetItemByID(dbEmail.ItemID.String())
+// 	if err != nil {
+// 		return err
+// 	}
 
-	creator, err := engine.GetCreatorByID(dbEmail.CreatorID.String())
-	if err != nil {
-		return err
-	}
+// 	creator, err := engine.GetCreatorByID(dbEmail.CreatorID.String())
+// 	if err != nil {
+// 		return err
+// 	}
 
-	mintPass, err := CreateMintPassForNoCriteriaItem(dbEmail.ItemID.String())
-	if err != nil {
-		return err
-	}
+// 	mintPass, err := CreateMintPassForNoCriteriaItem(dbEmail.ItemID.String())
+// 	if err != nil {
+// 		return err
+// 	}
 
-	claimLink := utils.UseEnvOrDefault("FE_BASE_URL", "https://github.com/lucidconnect/inverse") + "/claim/" + item.ID.String() + "?requestId=" + *mintPass.PassID
-	err = emails.SendClaimNudgeEmail(dbEmail.EmailAddress, from, item.Name, claimLink, *creator.InverseUsername, item.Image)
-	if err != nil {
-		return err
-	}
-	return nil
-}
+// 	claimLink := utils.UseEnvOrDefault("FE_BASE_URL", "https://github.com/lucidconnect/inverse") + "/claim/" + item.ID.String() + "?requestId=" + *mintPass.PassID
+// 	err = emails.SendClaimNudgeEmail(dbEmail.EmailAddress, from, item.Name, claimLink, *creator.InverseUsername, item.Image)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }
 
-func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetails *internal.AuthDetails) (*model.Item, error) {
-	creator, err := engine.GetCreatorByAddress(authDetails.Address)
-	if err != nil {
-		return nil, errors.New("creator has not been onboarded to create a new drop")
-	}
+// func CreateEmailWhitelistForItem(input *model.NewEmailWhitelistInput, authDetails *internal.AuthDetails) (*model.Item, error) {
+// 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
+// 	if err != nil {
+// 		return nil, errors.New("creator has not been onboarded to create a new drop")
+// 	}
 
-	item, err := engine.GetItemByID(input.ItemID)
-	if err != nil {
-		return nil, errors.New("item not found")
-	}
+// 	item, err := engine.GetItemByID(input.ItemID)
+// 	if err != nil {
+// 		return nil, errors.New("item not found")
+// 	}
 
-	if item.Criteria != nil {
-		//Delete Existing criteria
-		err := engine.DeleteCriteriaIfExists(item)
-		if err != nil {
-			return nil, err
-		}
-	}
+// 	if item.Criteria != nil {
+// 		//Delete Existing criteria
+// 		err := engine.DeleteCriteriaIfExists(item)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	}
 
-	if len(input.AuthorizedEmails) == 0 {
-		return nil, errors.New("please passing in email list")
-	}
+// 	if len(input.AuthorizedEmails) == 0 {
+// 		return nil, errors.New("please passing in email list")
+// 	}
 
-	dbEmails := make([]*models.SingleEmailClaim, len(input.AuthorizedEmails))
-	for idx, email := range input.AuthorizedEmails {
-		dbEmails[idx] = &models.SingleEmailClaim{
-			CreatorID:    creator.ID,
-			ItemID:       item.ID,
-			EmailAddress: email,
-		}
-	}
+// 	dbEmails := make([]*models.SingleEmailClaim, len(input.AuthorizedEmails))
+// 	for idx, email := range input.AuthorizedEmails {
+// 		dbEmails[idx] = &models.SingleEmailClaim{
+// 			CreatorID:    creator.ID,
+// 			ItemID:       item.ID,
+// 			EmailAddress: email,
+// 		}
+// 	}
 
-	insertionErr := dbutils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbEmails, 100).Error
-	if insertionErr != nil {
-		return nil, insertionErr
-	}
+// 	insertionErr := dbutils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbEmails, 100).Error
+// 	if insertionErr != nil {
+// 		return nil, insertionErr
+// 	}
 
-	for _, dbEmail := range dbEmails {
-		if err = sendEmailOnCreate(dbEmail); err != nil {
-			continue
-		}
+// 	for _, dbEmail := range dbEmails {
+// 		if err = sendEmailOnCreate(dbEmail); err != nil {
+// 			continue
+// 		}
 
-		timeNow := time.Now()
+// 		timeNow := time.Now()
 
-		dbEmail.SentOutAt = &timeNow
+// 		dbEmail.SentOutAt = &timeNow
 
-		insertionErr := dbutils.DB.Save(dbEmail).Error
+// 		insertionErr := dbutils.DB.Save(dbEmail).Error
 
-		if insertionErr != nil {
-			continue
-		}
-	}
+// 		if insertionErr != nil {
+// 			continue
+// 		}
+// 	}
 
-	emailCriteria := model.ClaimCriteriaTypeEmailWhiteList
-	item.Criteria = &emailCriteria
-	itemUpdateErr := engine.SaveModel(item)
-	if itemUpdateErr != nil {
-		return nil, itemUpdateErr
-	}
+// 	emailCriteria := model.ClaimCriteriaTypeEmailWhiteList
+// 	item.Criteria = &emailCriteria
+// 	itemUpdateErr := engine.SaveModel(item)
+// 	if itemUpdateErr != nil {
+// 		return nil, itemUpdateErr
+// 	}
 
-	return item.ToGraphData(), nil
-}
+// 	return item.ToGraphData(), nil
+// }
 
 func FetchCriteriaAuthorizedEmails(itemID string) ([]string, error) {
 	var dbEmails []*models.SingleEmailClaim

@@ -117,7 +117,7 @@ func ValidateAddressCriteria(itemID, walletAddress string, authDetails *internal
 		return resp, errors.New("wallet address has claimed the item already")
 	}
 
-	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String())
+	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String(), walletAddress)
 	if err != nil {
 		return passResp, err
 	}

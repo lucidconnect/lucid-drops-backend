@@ -110,6 +110,7 @@ type Item struct {
 	Image                            string             `json:"image"`
 	Description                      string             `json:"description"`
 	DropID                           string             `json:"dropId"`
+	DropAddress                      string             `json:"dropAddress"`
 	ClaimCriteria                    *ClaimCriteriaType `json:"claimCriteria,omitempty"`
 	ClaimFee                         int                `json:"claimFee"`
 	Creator                          *CreatorDetails    `json:"creator"`
@@ -124,6 +125,7 @@ type Item struct {
 	CreatedAt                        time.Time          `json:"createdAt"`
 	Deadline                         *time.Time         `json:"deadline,omitempty"`
 	ClaimDetails                     []*ClaimDetails    `json:"claimDetails,omitempty"`
+	Holders                          []string           `json:"holders"`
 }
 
 type ItemInput struct {

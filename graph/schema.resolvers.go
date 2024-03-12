@@ -67,6 +67,15 @@ func (r *itemResolver) AuthorizedSubdomains(ctx context.Context, obj *model.Item
 	return subdomains, nil
 }
 
+// Holders is the resolver for the holders field.
+func (r *itemResolver) Holders(ctx context.Context, obj *model.Item) ([]string, error) {
+	nftHolders, err := drops.FetchNftHolders(obj) 
+	if err != nil {
+		return nil, err
+	}
+	return nftHolders, nil
+}
+
 // RegisterInverseUsername is the resolver for the registerInverseUsername field.
 func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
@@ -176,12 +185,12 @@ func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Contex
 
 // CreateEmailWhitelistForItem is the resolver for the createEmailWhitelistForItem field.
 func (r *mutationResolver) CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
+	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	// if err != nil {
+	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	// }
 
-	return whitelist.CreateEmailWhitelistForItem(&input, authenticationDetails)
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 // CreateWalletAddressWhitelistForItem is the resolver for the createWalletAddressWhitelistForItem field.
@@ -245,8 +254,8 @@ func (r *mutationResolver) CreateEmptyCriteriaForItem(ctx context.Context, input
 }
 
 // CreateMintPassForNoCriteriaItem is the resolver for the createMintPassForNoCriteriaItem field.
-func (r *mutationResolver) CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string) (*model.ValidationRespoonse, error) {
-	return whitelist.CreateMintPassForNoCriteriaItem(itemID)
+func (r *mutationResolver) CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error) {
+	return whitelist.CreateMintPassForNoCriteriaItem(itemID, "")
 }
 
 // ValidateTwitterCriteriaForItem is the resolver for the validateTwitterCriteriaForItem field.
@@ -264,7 +273,7 @@ func (r *mutationResolver) ValidateTelegramCriteriaForItem(ctx context.Context, 
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
 	}
 
-	return whitelist.ValidateTelegramClaimCriteria(itemID, *authID)
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 // ValidatePatreonCriteriaForItem is the resolver for the validatePatreonCriteriaForItem field.
@@ -273,7 +282,7 @@ func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, i
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
 	}
 
-	return whitelist.ValidatePatreonCriteriaForItem(itemID, authID)
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 // ValidateWalletCriteriaForItem is the resolver for the validateWalletCriteriaForItem field.
@@ -287,7 +296,7 @@ func (r *mutationResolver) ValidateWalletCriteriaForItem(ctx context.Context, it
 
 // ValidateQuestionnaireCriteriaForItem is the resolver for the validateQuestionnaireCriteriaForItem field.
 func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
-	return whitelist.ValidateQuestionnaireCriteriaForItem(itemID, input)
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 // CreateJWTToken is the resolver for the createJWTToken field.
@@ -312,7 +321,7 @@ func (r *mutationResolver) StartEmailVerificationForClaim(ctx context.Context, i
 
 // CompleteEmailVerificationForClaim is the resolver for the completeEmailVerificationForClaim field.
 func (r *mutationResolver) CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error) {
-	return whitelist.CompleteEmailVerificationForClaim(&input)
+	return nil, fmt.Errorf("Not Implemented")
 }
 
 // GenerateSignatureForClaim is the resolver for the generateSignatureForClaim field.

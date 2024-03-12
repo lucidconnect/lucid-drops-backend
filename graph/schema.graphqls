@@ -55,7 +55,7 @@ type Mutation {
   createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
   createPatreonCriteriaForItem(input: NewPatreonCriteriaInput!): Item!
   createEmptyCriteriaForItem(input: NewEmptyCriteriaInput!): Item!
-  createMintPassForNoCriteriaItem(itemID: String!): ValidationRespoonse
+  createMintPassForNoCriteriaItem(itemID: String!, walletAddress: String!): ValidationRespoonse
   validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   validatePatreonCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
@@ -290,6 +290,7 @@ type Item {
 	image: String!
 	description: String!
 	dropId: String!
+  dropAddress: String!
   claimCriteria: ClaimCriteriaType
   claimFee: Int!
   creator: CreatorDetails! @goField(forceResolver: true)
@@ -304,6 +305,7 @@ type Item {
   createdAt: Time!
   deadline: Time
   claimDetails: [ClaimDetails]
+  holders: [String!]! @goField(forceResolver: true)
 }
 
 type QuestionnaireType {
