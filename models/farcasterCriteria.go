@@ -12,4 +12,5 @@ type FarcasterCriteria struct {
 	CastUrl      string
 	CriteriaType model.ClaimCriteriaType
 	Interactions string
+	FarcasterID  string // fid of account to do verifications against
 }
