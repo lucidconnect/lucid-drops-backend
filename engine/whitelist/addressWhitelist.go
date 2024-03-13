@@ -34,7 +34,7 @@ func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistI
 	}
 
 	if len(input.AuthorizedWalletAddresses) == 0 {
-		return nil, errors.New("please passing in a wallet address list")
+		return nil, errors.New("please pass in a wallet address list")
 	}
 
 	dbWallets := make([]*models.WalletAddressClaim, len(input.AuthorizedWalletAddresses))
