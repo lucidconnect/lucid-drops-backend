@@ -66,17 +66,19 @@ type ComplexityRoot struct {
 	}
 
 	Drop struct {
-		ContractAddress func(childComplexity int) int
-		CreatedAt       func(childComplexity int) int
-		CreatorID       func(childComplexity int) int
-		Description     func(childComplexity int) int
-		ID              func(childComplexity int) int
-		Image           func(childComplexity int) int
-		Items           func(childComplexity int) int
-		MintURL         func(childComplexity int) int
-		Name            func(childComplexity int) int
-		Network         func(childComplexity int) int
-		Thumbnail       func(childComplexity int) int
+		ContractAddress       func(childComplexity int) int
+		CreatedAt             func(childComplexity int) int
+		CreatorID             func(childComplexity int) int
+		Description           func(childComplexity int) int
+		GasIsCreatorSponsored func(childComplexity int) int
+		ID                    func(childComplexity int) int
+		Image                 func(childComplexity int) int
+		Items                 func(childComplexity int) int
+		MintPrice             func(childComplexity int) int
+		MintURL               func(childComplexity int) int
+		Name                  func(childComplexity int) int
+		Network               func(childComplexity int) int
+		Thumbnail             func(childComplexity int) int
 	}
 
 	ImageResponse struct {
@@ -417,6 +419,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Drop.Description(childComplexity), true
 
+	case "Drop.gasIsCreatorSponsored":
+		if e.complexity.Drop.GasIsCreatorSponsored == nil {
+			break
+		}
+
+		return e.complexity.Drop.GasIsCreatorSponsored(childComplexity), true
+
 	case "Drop.ID":
 		if e.complexity.Drop.ID == nil {
 			break
@@ -437,6 +446,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Drop.Items(childComplexity), true
+
+	case "Drop.mintPrice":
+		if e.complexity.Drop.MintPrice == nil {
+			break
+		}
+
+		return e.complexity.Drop.MintPrice(childComplexity), true
 
 	case "Drop.mintUrl":
 		if e.complexity.Drop.MintURL == nil {
@@ -3370,6 +3386,91 @@ func (ec *executionContext) fieldContext_Drop_mintUrl(ctx context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Drop_mintPrice(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_mintPrice(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MintPrice, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*float64)
+	fc.Result = res
+	return ec.marshalOFloat2ᚖfloat64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_mintPrice(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Drop_gasIsCreatorSponsored(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.GasIsCreatorSponsored, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_gasIsCreatorSponsored(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ImageResponse_image(ctx context.Context, field graphql.CollectedField, obj *model.ImageResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ImageResponse_image(ctx, field)
 	if err != nil {
@@ -5257,6 +5358,10 @@ func (ec *executionContext) fieldContext_Mutation_createDrop(ctx context.Context
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "mintPrice":
+				return ec.fieldContext_Drop_mintPrice(ctx, field)
+			case "gasIsCreatorSponsored":
+				return ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5336,6 +5441,10 @@ func (ec *executionContext) fieldContext_Mutation_updateDrop(ctx context.Context
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "mintPrice":
+				return ec.fieldContext_Drop_mintPrice(ctx, field)
+			case "gasIsCreatorSponsored":
+				return ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5415,6 +5524,10 @@ func (ec *executionContext) fieldContext_Mutation_deleteDrop(ctx context.Context
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "mintPrice":
+				return ec.fieldContext_Drop_mintPrice(ctx, field)
+			case "gasIsCreatorSponsored":
+				return ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -8059,6 +8172,10 @@ func (ec *executionContext) fieldContext_Query_fetchDropById(ctx context.Context
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "mintPrice":
+				return ec.fieldContext_Drop_mintPrice(ctx, field)
+			case "gasIsCreatorSponsored":
+				return ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -8138,6 +8255,10 @@ func (ec *executionContext) fieldContext_Query_fetchCreatorDrops(ctx context.Con
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "mintPrice":
+				return ec.fieldContext_Drop_mintPrice(ctx, field)
+			case "gasIsCreatorSponsored":
+				return ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -8854,6 +8975,10 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedDrops(ctx context.Co
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "mintPrice":
+				return ec.fieldContext_Drop_mintPrice(ctx, field)
+			case "gasIsCreatorSponsored":
+				return ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -12039,6 +12164,10 @@ func (ec *executionContext) fieldContext_userProfileType_drops(ctx context.Conte
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "mintPrice":
+				return ec.fieldContext_Drop_mintPrice(ctx, field)
+			case "gasIsCreatorSponsored":
+				return ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -12397,7 +12526,7 @@ func (ec *executionContext) unmarshalInputDropInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "image", "thumbnail", "network", "deploymentHash", "contractAddress", "editionLimit", "claimFee"}
+	fieldsInOrder := [...]string{"name", "description", "image", "thumbnail", "network", "deploymentHash", "contractAddress", "editionLimit", "claimFee", "mintPrice", "gasIsCreatorSponsored"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12485,6 +12614,24 @@ func (ec *executionContext) unmarshalInputDropInput(ctx context.Context, obj int
 				return it, err
 			}
 			it.ClaimFee = data
+		case "mintPrice":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mintPrice"))
+			data, err := ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MintPrice = data
+		case "gasIsCreatorSponsored":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("gasIsCreatorSponsored"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.GasIsCreatorSponsored = data
 		}
 	}
 
@@ -13599,6 +13746,13 @@ func (ec *executionContext) _Drop(ctx context.Context, sel ast.SelectionSet, obj
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "mintUrl":
 			out.Values[i] = ec._Drop_mintUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "mintPrice":
+			out.Values[i] = ec._Drop_mintPrice(ctx, field, obj)
+		case "gasIsCreatorSponsored":
+			out.Values[i] = ec._Drop_gasIsCreatorSponsored(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -16573,6 +16727,22 @@ func (ec *executionContext) marshalODrop2ᚖgithubᚗcomᚋlucidconnectᚋinvers
 		return graphql.Null
 	}
 	return ec._Drop(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalFloatContext(*v)
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) marshalOImageResponse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐImageResponse(ctx context.Context, sel ast.SelectionSet, v *model.ImageResponse) graphql.Marshaler {

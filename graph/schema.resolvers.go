@@ -69,7 +69,7 @@ func (r *itemResolver) AuthorizedSubdomains(ctx context.Context, obj *model.Item
 
 // Holders is the resolver for the holders field.
 func (r *itemResolver) Holders(ctx context.Context, obj *model.Item) ([]string, error) {
-	nftHolders, err := drops.FetchNftHolders(obj) 
+	nftHolders, err := drops.FetchNftHolders(obj)
 	if err != nil {
 		return nil, err
 	}

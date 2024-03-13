@@ -157,6 +157,8 @@ input DropInput {
   contractAddress: String
   editionLimit: Int
   claimFee: Int
+  mintPrice: Float
+  gasIsCreatorSponsored: Boolean!
 }
 
 input ItemInput {
@@ -270,6 +272,8 @@ type Drop {
   network: BlockchainNetwork
   items: [Item!]! @goField(forceResolver: true)
   mintUrl: String!
+  mintPrice: Float
+  gasIsCreatorSponsored: Boolean!
 }
 
 type OnboardingProgress{

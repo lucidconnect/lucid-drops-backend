@@ -49,29 +49,33 @@ type DeploymentInfo struct {
 }
 
 type Drop struct {
-	ID              string             `json:"ID"`
-	CreatorID       string             `json:"creatorID"`
-	CreatedAt       time.Time          `json:"createdAt"`
-	Name            string             `json:"name"`
-	Description     string             `json:"description"`
-	Image           string             `json:"image"`
-	Thumbnail       string             `json:"thumbnail"`
-	ContractAddress *string            `json:"contractAddress,omitempty"`
-	Network         *BlockchainNetwork `json:"network,omitempty"`
-	Items           []*Item            `json:"items"`
-	MintURL         string             `json:"mintUrl"`
+	ID                    string             `json:"ID"`
+	CreatorID             string             `json:"creatorID"`
+	CreatedAt             time.Time          `json:"createdAt"`
+	Name                  string             `json:"name"`
+	Description           string             `json:"description"`
+	Image                 string             `json:"image"`
+	Thumbnail             string             `json:"thumbnail"`
+	ContractAddress       *string            `json:"contractAddress,omitempty"`
+	Network               *BlockchainNetwork `json:"network,omitempty"`
+	Items                 []*Item            `json:"items"`
+	MintURL               string             `json:"mintUrl"`
+	MintPrice             *float64           `json:"mintPrice,omitempty"`
+	GasIsCreatorSponsored bool               `json:"gasIsCreatorSponsored"`
 }
 
 type DropInput struct {
-	Name            *string            `json:"name,omitempty"`
-	Description     *string            `json:"description,omitempty"`
-	Image           *string            `json:"image,omitempty"`
-	Thumbnail       *string            `json:"thumbnail,omitempty"`
-	Network         *BlockchainNetwork `json:"network,omitempty"`
-	DeploymentHash  string             `json:"deploymentHash"`
-	ContractAddress *string            `json:"contractAddress,omitempty"`
-	EditionLimit    *int               `json:"editionLimit,omitempty"`
-	ClaimFee        *int               `json:"claimFee,omitempty"`
+	Name                  *string            `json:"name,omitempty"`
+	Description           *string            `json:"description,omitempty"`
+	Image                 *string            `json:"image,omitempty"`
+	Thumbnail             *string            `json:"thumbnail,omitempty"`
+	Network               *BlockchainNetwork `json:"network,omitempty"`
+	DeploymentHash        string             `json:"deploymentHash"`
+	ContractAddress       *string            `json:"contractAddress,omitempty"`
+	EditionLimit          *int               `json:"editionLimit,omitempty"`
+	ClaimFee              *int               `json:"claimFee,omitempty"`
+	MintPrice             *float64           `json:"mintPrice,omitempty"`
+	GasIsCreatorSponsored bool               `json:"gasIsCreatorSponsored"`
 }
 
 type EditUserProfileInputType struct {
