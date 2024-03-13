@@ -19,6 +19,8 @@ type Drop struct {
 	BlockchainNetwork      *model.BlockchainNetwork
 	Featured               bool `gorm:"default:false"`
 	MintUrl                string
+	MintPrice              *float64
+	GasIsCreatorSponsored  bool
 }
 
 type DeplyomenResponse struct {
@@ -88,20 +90,25 @@ type DeplyomenResponse struct {
 
 func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 	mappedDrop := &model.Drop{
-		ID:              c.ID.String(),
-		CreatorID:       c.CreatorID.String(),
-		CreatedAt:       c.CreatedAt,
-		Name:            c.Name,
-		Description:     c.Description,
-		Image:           c.Image,
-		Thumbnail:       c.Thumbnail,
-		ContractAddress: c.AAContractAddress,
-		Network:         c.BlockchainNetwork,
-		MintURL:         c.MintUrl,
+		ID:                    c.ID.String(),
+		CreatorID:             c.CreatorID.String(),
+		CreatedAt:             c.CreatedAt,
+		Name:                  c.Name,
+		Description:           c.Description,
+		Image:                 c.Image,
+		Thumbnail:             c.Thumbnail,
+		ContractAddress:       c.AAContractAddress,
+		Network:               c.BlockchainNetwork,
+		MintURL:               c.MintUrl,
+		GasIsCreatorSponsored: c.GasIsCreatorSponsored,
 	}
 
 	if c.AAContractAddress != nil {
 		mappedDrop.ContractAddress = c.AAContractAddress
+	}
+
+	if c.MintPrice != nil {
+		mappedDrop.MintPrice = c.MintPrice
 	}
 
 	if items != nil {

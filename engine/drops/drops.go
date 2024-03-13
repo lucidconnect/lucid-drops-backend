@@ -55,6 +55,8 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 		BlockchainNetwork:      input.Network,
 		AAWalletDeploymentHash: &input.DeploymentHash,
 		AAContractAddress:      &contractAdddress,
+		MintPrice:              input.MintPrice,
+		GasIsCreatorSponsored:  input.GasIsCreatorSponsored,
 	}
 
 	err = engine.CreateModel(newDrop)
