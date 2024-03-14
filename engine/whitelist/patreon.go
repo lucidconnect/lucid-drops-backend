@@ -1,120 +1,105 @@
 package whitelist
 
-import (
-	"encoding/json"
-	"errors"
-	"log"
-	"time"
+// func ProcessPatreonCallback(code *string, creator bool) (*string, []*structure.PatreonCampaignInfo, error) {
 
-	"github.com/lucidconnect/inverse/dbutils"
-	"github.com/lucidconnect/inverse/engine"
-	"github.com/lucidconnect/inverse/graph/model"
-	"github.com/lucidconnect/inverse/internal"
-	"github.com/lucidconnect/inverse/models"
-	"github.com/lucidconnect/inverse/services"
-	"github.com/lucidconnect/inverse/structure"
-)
+// 	patreonToken, err := services.FetchPatreonAccessToken(code, creator)
+// 	if err != nil {
+// 		return nil, nil, err
+// 	}
 
-func ProcessPatreonCallback(code *string, creator bool) (*string, []*structure.PatreonCampaignInfo, error) {
+// 	patreonDetails := &models.PatreonAuthDetails{
+// 		Code:         *code,
+// 		AccessToken:  patreonToken.AccessToken,
+// 		ExpiresAt:    time.Now().Add(time.Second * time.Duration(patreonToken.ExpiresIn)),
+// 		RefreshToken: patreonToken.RefreshToken,
+// 	}
 
-	patreonToken, err := services.FetchPatreonAccessToken(code, creator)
-	if err != nil {
-		return nil, nil, err
-	}
+// 	user, err := services.FetchPatreonUserLocal(patreonDetails)
+// 	if err != nil {
+// 		return nil, nil, err
+// 	}
 
-	patreonDetails := &models.PatreonAuthDetails{
-		Code:         *code,
-		AccessToken:  patreonToken.AccessToken,
-		ExpiresAt:    time.Now().Add(time.Second * time.Duration(patreonToken.ExpiresIn)),
-		RefreshToken: patreonToken.RefreshToken,
-	}
+// 	campaigns, err := services.FetchPatreonCampaignLocal(patreonDetails)
+// 	if err != nil {
+// 		return nil, nil, err
+// 	}
 
-	user, err := services.FetchPatreonUserLocal(patreonDetails)
-	if err != nil {
-		return nil, nil, err
-	}
+// 	patreonDetails.UserID = user.Id
+// 	jsonValues, _ := json.Marshal(user.MembershirUIDs)
+// 	patreonDetails.MembershipUIDs = string(jsonValues)
 
-	campaigns, err := services.FetchPatreonCampaignLocal(patreonDetails)
-	if err != nil {
-		return nil, nil, err
-	}
+// 	if len(campaigns) == 1 {
+// 		patreonDetails.CampaignID = campaigns[0].Id
+// 	}
 
-	patreonDetails.UserID = user.Id
-	jsonValues, _ := json.Marshal(user.MembershirUIDs)
-	patreonDetails.MembershipUIDs = string(jsonValues)
+// 	err = engine.SaveModel(patreonDetails)
+// 	if err != nil {
+// 		return nil, nil, err
+// 	}
 
-	if len(campaigns) == 1 {
-		patreonDetails.CampaignID = campaigns[0].Id
-	}
+// 	ID := patreonDetails.ID.String()
+// 	return &ID, campaigns, nil
+// }
 
-	err = engine.SaveModel(patreonDetails)
-	if err != nil {
-		return nil, nil, err
-	}
+// func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *internal.AuthDetails) (*model.Item, error) {
 
-	ID := patreonDetails.ID.String()
-	return &ID, campaigns, nil
-}
+// 	log.Print(authDetails.Address)
+// 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
+// 	if err != nil {
+// 		return nil, errors.New("creator has not been onboarded to create a new drop")
+// 	}
 
-func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *internal.AuthDetails) (*model.Item, error) {
+// 	item, err := engine.GetItemByID(input.ItemID)
+// 	if err != nil {
+// 		return nil, errors.New("item not found")
+// 	}
 
-	log.Print(authDetails.Address)
-	creator, err := engine.GetCreatorByAddress(authDetails.Address)
-	if err != nil {
-		return nil, errors.New("creator has not been onboarded to create a new drop")
-	}
+// 	if item.Criteria != nil {
+// 		//Delete Existing criteria
+// 		err := engine.DeleteCriteriaIfExists(item)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	}
 
-	item, err := engine.GetItemByID(input.ItemID)
-	if err != nil {
-		return nil, errors.New("item not found")
-	}
+// 	criteria := &models.PatreonCriteria{
+// 		ItemID:    item.ID.String(),
+// 		CreatorID: creator.ID.String(),
+// 		AuthID:    input.AuthID,
+// 	}
 
-	if item.Criteria != nil {
-		//Delete Existing criteria
-		err := engine.DeleteCriteriaIfExists(item)
-		if err != nil {
-			return nil, err
-		}
-	}
+// 	authdetails, err := engine.FetchPatreonAuthByID(input.AuthID)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	criteria := &models.PatreonCriteria{
-		ItemID:    item.ID.String(),
-		CreatorID: creator.ID.String(),
-		AuthID:    input.AuthID,
-	}
+// 	if input.CampaignID != nil {
 
-	authdetails, err := engine.FetchPatreonAuthByID(input.AuthID)
-	if err != nil {
-		return nil, err
-	}
+// 		authdetails.CampaignID = *input.CampaignID
+// 		err = engine.SaveModel(authdetails)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	}
 
-	if input.CampaignID != nil {
+// 	if input.CampaignName != nil {
+// 		criteria.CampaignName = *input.CampaignName
+// 	}
 
-		authdetails.CampaignID = *input.CampaignID
-		err = engine.SaveModel(authdetails)
-		if err != nil {
-			return nil, err
-		}
-	}
+// 	criteriaUpdateErr := engine.SaveModel(criteria)
+// 	if criteriaUpdateErr != nil {
+// 		return nil, criteriaUpdateErr
+// 	}
 
-	if input.CampaignName != nil {
-		criteria.CampaignName = *input.CampaignName
-	}
+// 	patreonCriteria := model.ClaimCriteriaTypePatreon
+// 	item.Criteria = &patreonCriteria
+// 	err = engine.SaveModel(item)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	criteriaUpdateErr := engine.SaveModel(criteria)
-	if criteriaUpdateErr != nil {
-		return nil, criteriaUpdateErr
-	}
-
-	patreonCriteria := model.ClaimCriteriaTypePatreon
-	item.Criteria = &patreonCriteria
-	err = engine.SaveModel(item)
-	if err != nil {
-		return nil, err
-	}
-
-	return item.ToGraphData(), nil
-}
+// 	return item.ToGraphData(), nil
+// }
 
 // func ValidatePatreonCriteriaForItem(itemID string, authID *string) (*model.ValidationRespoonse, error) {
 
@@ -184,32 +169,32 @@ func CreatePatreonCriteria(input model.NewPatreonCriteriaInput, authDetails *int
 // 	return nil, errors.New("user is not a valid patron")
 // }
 
-func createMintPassForPatreonMint(item *models.Item) (*string, error) {
-	drop, err := engine.GetDropByID(item.DropID.String())
-	if err != nil {
-		return nil, errors.New("drop not found")
-	}
+// func createMintPassForPatreonMint(item *models.Item) (*string, error) {
+// 	drop, err := engine.GetDropByID(item.DropID.String())
+// 	if err != nil {
+// 		return nil, errors.New("drop not found")
+// 	}
 
-	if drop.AAContractAddress == nil {
-		return nil, errors.New("drop contract address not found")
-	}
+// 	if drop.AAContractAddress == nil {
+// 		return nil, errors.New("drop contract address not found")
+// 	}
 
-	if item.TokenID == nil {
-		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
-	}
+// 	if item.TokenID == nil {
+// 		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
+// 	}
 
-	newMint := models.MintPass{
-		ItemId:              item.ID.String(),
-		ItemIdOnContract:    *item.TokenID,
-		DropContractAddress: *drop.AAContractAddress,
-		BlockchainNetwork:   drop.BlockchainNetwork,
-	}
+// 	newMint := models.MintPass{
+// 		ItemId:              item.ID.String(),
+// 		ItemIdOnContract:    *item.TokenID,
+// 		DropContractAddress: *drop.AAContractAddress,
+// 		BlockchainNetwork:   drop.BlockchainNetwork,
+// 	}
 
-	err = dbutils.DB.Create(&newMint).Error
-	if err != nil {
-		return nil, err
-	}
+// 	err = dbutils.DB.Create(&newMint).Error
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	passId := newMint.ID.String()
-	return &passId, nil
-}
+// 	passId := newMint.ID.String()
+// 	return &passId, nil
+// }

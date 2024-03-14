@@ -27,13 +27,13 @@ func CreateTelegramCriteria(input model.NewTelegramCriteriaInput, authDetails *i
 		return nil, errors.New("item not found")
 	}
 
-	if item.Criteria != nil {
-		//Delete Existing criteria
-		err := engine.DeleteCriteriaIfExists(item)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// if item.Criteria != nil {
+	// 	//Delete Existing criteria
+	// 	err := engine.DeleteCriteriaIfExists(item)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	if input.GroupID[0] != '-' {
 		input.GroupID = "-" + input.GroupID

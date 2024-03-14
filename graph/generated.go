@@ -66,17 +66,21 @@ type ComplexityRoot struct {
 	}
 
 	Drop struct {
-		ContractAddress func(childComplexity int) int
-		CreatedAt       func(childComplexity int) int
-		CreatorID       func(childComplexity int) int
-		Description     func(childComplexity int) int
-		ID              func(childComplexity int) int
-		Image           func(childComplexity int) int
-		Items           func(childComplexity int) int
-		MintURL         func(childComplexity int) int
-		Name            func(childComplexity int) int
-		Network         func(childComplexity int) int
-		Thumbnail       func(childComplexity int) int
+		CastURL                            func(childComplexity int) int
+		ClaimCriteria                      func(childComplexity int) int
+		ContractAddress                    func(childComplexity int) int
+		CreatedAt                          func(childComplexity int) int
+		CreatorID                          func(childComplexity int) int
+		Description                        func(childComplexity int) int
+		FarcasterClaimCriteriaInteractions func(childComplexity int) int
+		FarcasterProfileID                 func(childComplexity int) int
+		ID                                 func(childComplexity int) int
+		Image                              func(childComplexity int) int
+		Items                              func(childComplexity int) int
+		MintURL                            func(childComplexity int) int
+		Name                               func(childComplexity int) int
+		Network                            func(childComplexity int) int
+		Thumbnail                          func(childComplexity int) int
 	}
 
 	ImageResponse struct {
@@ -92,28 +96,26 @@ type ComplexityRoot struct {
 	}
 
 	Item struct {
-		AuthorizedSubdomains               func(childComplexity int) int
-		CampaignName                       func(childComplexity int) int
-		ClaimCriteria                      func(childComplexity int) int
-		ClaimDetails                       func(childComplexity int) int
-		ClaimFee                           func(childComplexity int) int
-		CreatedAt                          func(childComplexity int) int
-		Creator                            func(childComplexity int) int
-		Deadline                           func(childComplexity int) int
-		Description                        func(childComplexity int) int
-		DropAddress                        func(childComplexity int) int
-		DropID                             func(childComplexity int) int
-		EditionLimit                       func(childComplexity int) int
-		FarcasterClaimCriteriaInteractions func(childComplexity int) int
-		Holders                            func(childComplexity int) int
-		ID                                 func(childComplexity int) int
-		Image                              func(childComplexity int) int
-		Name                               func(childComplexity int) int
-		ProfileLink                        func(childComplexity int) int
-		TelegramGroupTitle                 func(childComplexity int) int
-		TokenID                            func(childComplexity int) int
-		TweetLink                          func(childComplexity int) int
-		TwitterClaimCriteriaInteractions   func(childComplexity int) int
+		AuthorizedSubdomains             func(childComplexity int) int
+		CampaignName                     func(childComplexity int) int
+		ClaimDetails                     func(childComplexity int) int
+		ClaimFee                         func(childComplexity int) int
+		CreatedAt                        func(childComplexity int) int
+		Creator                          func(childComplexity int) int
+		Deadline                         func(childComplexity int) int
+		Description                      func(childComplexity int) int
+		DropAddress                      func(childComplexity int) int
+		DropID                           func(childComplexity int) int
+		EditionLimit                     func(childComplexity int) int
+		Holders                          func(childComplexity int) int
+		ID                               func(childComplexity int) int
+		Image                            func(childComplexity int) int
+		Name                             func(childComplexity int) int
+		ProfileLink                      func(childComplexity int) int
+		TelegramGroupTitle               func(childComplexity int) int
+		TokenID                          func(childComplexity int) int
+		TweetLink                        func(childComplexity int) int
+		TwitterClaimCriteriaInteractions func(childComplexity int) int
 	}
 
 	JWTCreationResponse struct {
@@ -138,39 +140,21 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddItemDeadline                      func(childComplexity int, itemID string, deadline string) int
-		CompleteEmailVerificationForClaim    func(childComplexity int, input model.CompleteEmailVerificationInput) int
-		CreateDrop                           func(childComplexity int, input model.DropInput) int
-		CreateEmailDomainWhitelist           func(childComplexity int, input model.NewEmailDomainWhitelistInput) int
-		CreateEmailWhitelistForItem          func(childComplexity int, input model.NewEmailWhitelistInput) int
-		CreateEmptyCriteriaForItem           func(childComplexity int, input model.NewEmptyCriteriaInput) int
-		CreateItem                           func(childComplexity int, input model.ItemInput) int
-		CreateJWTToken                       func(childComplexity int, input *model.CreateJWTTokenInput) int
-		CreateMintPassForNoCriteriaItem      func(childComplexity int, itemID string, walletAddress string) int
-		CreatePatreonCriteriaForItem         func(childComplexity int, input model.NewPatreonCriteriaInput) int
-		CreatePaymentIntentSecretKey         func(childComplexity int, amount int) int
-		CreateQuestionnaireCriteriaForItem   func(childComplexity int, input model.QuestionnaireCriteriaInput) int
-		CreateTelegramCriteriaForItem        func(childComplexity int, input model.NewTelegramCriteriaInput) int
-		CreateTwitterCriteriaForItem         func(childComplexity int, input model.NewTwitterCriteriaInput) int
-		CreateWalletAddressWhitelistForItem  func(childComplexity int, input model.NewWalletAddressWhitelistInput) int
-		DeleteDrop                           func(childComplexity int, dropID string) int
-		DeleteItem                           func(childComplexity int, itemID string) int
-		EditUserProfile                      func(childComplexity int, input model.EditUserProfileInputType) int
-		GenerateMobileWalletConfigs          func(childComplexity int) int
-		GenerateSignatureForClaim            func(childComplexity int, input model.GenerateClaimSignatureInput) int
-		RegisterInverseUsername              func(childComplexity int, input model.NewUsernameRegisgration) int
-		StartEmailVerificationForClaim       func(childComplexity int, input model.EmailClaimInput) int
-		StoreHashForDeployment               func(childComplexity int, input model.DeploymentInfo) int
-		StoreSignerInfo                      func(childComplexity int, input model.SignerInfo) int
-		TempCreateItem                       func(childComplexity int, input model.ItemInput, creatorAddress string) int
-		UpdateDrop                           func(childComplexity int, dropID string, input model.DropInput) int
-		UpdateItem                           func(childComplexity int, itemID string, input model.ItemInput) int
-		ValidateFarcasterCriteriaForItem     func(childComplexity int, itemID string, farcasterAddress string) int
-		ValidatePatreonCriteriaForItem       func(childComplexity int, itemID string, authID *string) int
-		ValidateQuestionnaireCriteriaForItem func(childComplexity int, itemID string, input []*model.QuestionnaireAnswerInput) int
-		ValidateTelegramCriteriaForItem      func(childComplexity int, itemID string, authID *string) int
-		ValidateTwitterCriteriaForItem       func(childComplexity int, itemID string, authID *string) int
-		ValidateWalletCriteriaForItem        func(childComplexity int, itemID string, walletAddress string) int
+		CreateDrop                       func(childComplexity int, input model.DropInput) int
+		CreateEmptyCriteriaForItem       func(childComplexity int, input model.NewEmptyCriteriaInput) int
+		CreateFarcasterCriteriaForDrop   func(childComplexity int, input model.NewFarcasterCriteriaInput) int
+		CreateJWTToken                   func(childComplexity int, input *model.CreateJWTTokenInput) int
+		CreateMintPassForNoCriteriaItem  func(childComplexity int, itemID string, walletAddress string) int
+		CreatePaymentIntentSecretKey     func(childComplexity int, amount int) int
+		DeleteDrop                       func(childComplexity int, dropID string) int
+		EditUserProfile                  func(childComplexity int, input model.EditUserProfileInputType) int
+		GenerateMobileWalletConfigs      func(childComplexity int) int
+		GenerateSignatureForClaim        func(childComplexity int, input model.GenerateClaimSignatureInput) int
+		RegisterInverseUsername          func(childComplexity int, input model.NewUsernameRegisgration) int
+		StoreHashForDeployment           func(childComplexity int, input model.DeploymentInfo) int
+		StoreSignerInfo                  func(childComplexity int, input model.SignerInfo) int
+		UpdateDrop                       func(childComplexity int, dropID string, input model.DropInput) int
+		ValidateFarcasterCriteriaForDrop func(childComplexity int, dropID string, farcasterAddress string) int
 	}
 
 	OnboardingProgress struct {
@@ -270,30 +254,12 @@ type MutationResolver interface {
 	CreateDrop(ctx context.Context, input model.DropInput) (*model.Drop, error)
 	UpdateDrop(ctx context.Context, dropID string, input model.DropInput) (*model.Drop, error)
 	DeleteDrop(ctx context.Context, dropID string) (*model.Drop, error)
-	CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error)
-	TempCreateItem(ctx context.Context, input model.ItemInput, creatorAddress string) (*model.Item, error)
-	UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error)
-	DeleteItem(ctx context.Context, itemID string) (*model.Item, error)
-	AddItemDeadline(ctx context.Context, itemID string, deadline string) (*model.Item, error)
-	CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (*model.Item, error)
-	CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error)
-	CreateWalletAddressWhitelistForItem(ctx context.Context, input model.NewWalletAddressWhitelistInput) (*model.Item, error)
-	CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error)
-	CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error)
-	CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error)
-	CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error)
 	CreateEmptyCriteriaForItem(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Item, error)
+	CreateFarcasterCriteriaForDrop(ctx context.Context, input model.NewFarcasterCriteriaInput) (*model.Drop, error)
 	CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error)
-	ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
-	ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
-	ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error)
-	ValidateWalletCriteriaForItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error)
-	ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error)
-	ValidateFarcasterCriteriaForItem(ctx context.Context, itemID string, farcasterAddress string) (*model.ValidationRespoonse, error)
+	ValidateFarcasterCriteriaForDrop(ctx context.Context, dropID string, farcasterAddress string) (*model.ValidationRespoonse, error)
 	CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error)
 	CreatePaymentIntentSecretKey(ctx context.Context, amount int) (*string, error)
-	StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error)
-	CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error)
 	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
 	StoreSignerInfo(ctx context.Context, input model.SignerInfo) (bool, error)
 	GenerateMobileWalletConfigs(ctx context.Context) (*model.MobileWalletConfig, error)
@@ -392,6 +358,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.CreatorDetails.InverseUsername(childComplexity), true
 
+	case "Drop.castUrl":
+		if e.complexity.Drop.CastURL == nil {
+			break
+		}
+
+		return e.complexity.Drop.CastURL(childComplexity), true
+
+	case "Drop.claimCriteria":
+		if e.complexity.Drop.ClaimCriteria == nil {
+			break
+		}
+
+		return e.complexity.Drop.ClaimCriteria(childComplexity), true
+
 	case "Drop.contractAddress":
 		if e.complexity.Drop.ContractAddress == nil {
 			break
@@ -419,6 +399,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Drop.Description(childComplexity), true
+
+	case "Drop.farcasterClaimCriteriaInteractions":
+		if e.complexity.Drop.FarcasterClaimCriteriaInteractions == nil {
+			break
+		}
+
+		return e.complexity.Drop.FarcasterClaimCriteriaInteractions(childComplexity), true
+
+	case "Drop.farcasterProfileID":
+		if e.complexity.Drop.FarcasterProfileID == nil {
+			break
+		}
+
+		return e.complexity.Drop.FarcasterProfileID(childComplexity), true
 
 	case "Drop.ID":
 		if e.complexity.Drop.ID == nil {
@@ -525,13 +519,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Item.CampaignName(childComplexity), true
 
-	case "Item.claimCriteria":
-		if e.complexity.Item.ClaimCriteria == nil {
-			break
-		}
-
-		return e.complexity.Item.ClaimCriteria(childComplexity), true
-
 	case "Item.claimDetails":
 		if e.complexity.Item.ClaimDetails == nil {
 			break
@@ -594,13 +581,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.EditionLimit(childComplexity), true
-
-	case "Item.farcasterClaimCriteriaInteractions":
-		if e.complexity.Item.FarcasterClaimCriteriaInteractions == nil {
-			break
-		}
-
-		return e.complexity.Item.FarcasterClaimCriteriaInteractions(childComplexity), true
 
 	case "Item.holders":
 		if e.complexity.Item.Holders == nil {
@@ -749,30 +729,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.MobileWalletConfig.PublicKey(childComplexity), true
 
-	case "Mutation.addItemDeadline":
-		if e.complexity.Mutation.AddItemDeadline == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_addItemDeadline_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.AddItemDeadline(childComplexity, args["itemID"].(string), args["deadline"].(string)), true
-
-	case "Mutation.completeEmailVerificationForClaim":
-		if e.complexity.Mutation.CompleteEmailVerificationForClaim == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_completeEmailVerificationForClaim_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CompleteEmailVerificationForClaim(childComplexity, args["input"].(model.CompleteEmailVerificationInput)), true
-
 	case "Mutation.createDrop":
 		if e.complexity.Mutation.CreateDrop == nil {
 			break
@@ -784,30 +740,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateDrop(childComplexity, args["input"].(model.DropInput)), true
-
-	case "Mutation.createEmailDomainWhitelist":
-		if e.complexity.Mutation.CreateEmailDomainWhitelist == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createEmailDomainWhitelist_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateEmailDomainWhitelist(childComplexity, args["input"].(model.NewEmailDomainWhitelistInput)), true
-
-	case "Mutation.createEmailWhitelistForItem":
-		if e.complexity.Mutation.CreateEmailWhitelistForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createEmailWhitelistForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateEmailWhitelistForItem(childComplexity, args["input"].(model.NewEmailWhitelistInput)), true
 
 	case "Mutation.createEmptyCriteriaForItem":
 		if e.complexity.Mutation.CreateEmptyCriteriaForItem == nil {
@@ -821,17 +753,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateEmptyCriteriaForItem(childComplexity, args["input"].(model.NewEmptyCriteriaInput)), true
 
-	case "Mutation.createItem":
-		if e.complexity.Mutation.CreateItem == nil {
+	case "Mutation.createFarcasterCriteriaForDrop":
+		if e.complexity.Mutation.CreateFarcasterCriteriaForDrop == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createItem_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createFarcasterCriteriaForDrop_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateItem(childComplexity, args["input"].(model.ItemInput)), true
+		return e.complexity.Mutation.CreateFarcasterCriteriaForDrop(childComplexity, args["input"].(model.NewFarcasterCriteriaInput)), true
 
 	case "Mutation.createJWTToken":
 		if e.complexity.Mutation.CreateJWTToken == nil {
@@ -857,18 +789,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateMintPassForNoCriteriaItem(childComplexity, args["itemID"].(string), args["walletAddress"].(string)), true
 
-	case "Mutation.createPatreonCriteriaForItem":
-		if e.complexity.Mutation.CreatePatreonCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createPatreonCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreatePatreonCriteriaForItem(childComplexity, args["input"].(model.NewPatreonCriteriaInput)), true
-
 	case "Mutation.createPaymentIntentSecretKey":
 		if e.complexity.Mutation.CreatePaymentIntentSecretKey == nil {
 			break
@@ -881,54 +801,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreatePaymentIntentSecretKey(childComplexity, args["amount"].(int)), true
 
-	case "Mutation.createQuestionnaireCriteriaForItem":
-		if e.complexity.Mutation.CreateQuestionnaireCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createQuestionnaireCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateQuestionnaireCriteriaForItem(childComplexity, args["input"].(model.QuestionnaireCriteriaInput)), true
-
-	case "Mutation.createTelegramCriteriaForItem":
-		if e.complexity.Mutation.CreateTelegramCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createTelegramCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateTelegramCriteriaForItem(childComplexity, args["input"].(model.NewTelegramCriteriaInput)), true
-
-	case "Mutation.createTwitterCriteriaForItem":
-		if e.complexity.Mutation.CreateTwitterCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createTwitterCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateTwitterCriteriaForItem(childComplexity, args["input"].(model.NewTwitterCriteriaInput)), true
-
-	case "Mutation.createWalletAddressWhitelistForItem":
-		if e.complexity.Mutation.CreateWalletAddressWhitelistForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createWalletAddressWhitelistForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateWalletAddressWhitelistForItem(childComplexity, args["input"].(model.NewWalletAddressWhitelistInput)), true
-
 	case "Mutation.deleteDrop":
 		if e.complexity.Mutation.DeleteDrop == nil {
 			break
@@ -940,18 +812,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteDrop(childComplexity, args["dropID"].(string)), true
-
-	case "Mutation.deleteItem":
-		if e.complexity.Mutation.DeleteItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_deleteItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.DeleteItem(childComplexity, args["itemID"].(string)), true
 
 	case "Mutation.editUserProfile":
 		if e.complexity.Mutation.EditUserProfile == nil {
@@ -996,18 +856,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.RegisterInverseUsername(childComplexity, args["input"].(model.NewUsernameRegisgration)), true
 
-	case "Mutation.startEmailVerificationForClaim":
-		if e.complexity.Mutation.StartEmailVerificationForClaim == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_startEmailVerificationForClaim_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.StartEmailVerificationForClaim(childComplexity, args["input"].(model.EmailClaimInput)), true
-
 	case "Mutation.storeHashForDeployment":
 		if e.complexity.Mutation.StoreHashForDeployment == nil {
 			break
@@ -1032,18 +880,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.StoreSignerInfo(childComplexity, args["input"].(model.SignerInfo)), true
 
-	case "Mutation.tempCreateItem":
-		if e.complexity.Mutation.TempCreateItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_tempCreateItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.TempCreateItem(childComplexity, args["input"].(model.ItemInput), args["creatorAddress"].(string)), true
-
 	case "Mutation.updateDrop":
 		if e.complexity.Mutation.UpdateDrop == nil {
 			break
@@ -1056,89 +892,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateDrop(childComplexity, args["dropID"].(string), args["input"].(model.DropInput)), true
 
-	case "Mutation.updateItem":
-		if e.complexity.Mutation.UpdateItem == nil {
+	case "Mutation.validateFarcasterCriteriaForDrop":
+		if e.complexity.Mutation.ValidateFarcasterCriteriaForDrop == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_updateItem_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_validateFarcasterCriteriaForDrop_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateItem(childComplexity, args["itemID"].(string), args["input"].(model.ItemInput)), true
-
-	case "Mutation.validateFarcasterCriteriaForItem":
-		if e.complexity.Mutation.ValidateFarcasterCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_validateFarcasterCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ValidateFarcasterCriteriaForItem(childComplexity, args["itemID"].(string), args["farcasterAddress"].(string)), true
-
-	case "Mutation.validatePatreonCriteriaForItem":
-		if e.complexity.Mutation.ValidatePatreonCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_validatePatreonCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ValidatePatreonCriteriaForItem(childComplexity, args["itemID"].(string), args["authID"].(*string)), true
-
-	case "Mutation.validateQuestionnaireCriteriaForItem":
-		if e.complexity.Mutation.ValidateQuestionnaireCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_validateQuestionnaireCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ValidateQuestionnaireCriteriaForItem(childComplexity, args["itemID"].(string), args["input"].([]*model.QuestionnaireAnswerInput)), true
-
-	case "Mutation.validateTelegramCriteriaForItem":
-		if e.complexity.Mutation.ValidateTelegramCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_validateTelegramCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ValidateTelegramCriteriaForItem(childComplexity, args["itemID"].(string), args["authID"].(*string)), true
-
-	case "Mutation.validateTwitterCriteriaForItem":
-		if e.complexity.Mutation.ValidateTwitterCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_validateTwitterCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ValidateTwitterCriteriaForItem(childComplexity, args["itemID"].(string), args["authID"].(*string)), true
-
-	case "Mutation.validateWalletCriteriaForItem":
-		if e.complexity.Mutation.ValidateWalletCriteriaForItem == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_validateWalletCriteriaForItem_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ValidateWalletCriteriaForItem(childComplexity, args["itemID"].(string), args["walletAddress"].(string)), true
+		return e.complexity.Mutation.ValidateFarcasterCriteriaForDrop(childComplexity, args["dropID"].(string), args["farcasterAddress"].(string)), true
 
 	case "OnboardingProgress.creator":
 		if e.complexity.OnboardingProgress.Creator == nil {
@@ -1710,45 +1474,6 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_Mutation_addItemDeadline_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemID"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["deadline"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("deadline"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["deadline"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_completeEmailVerificationForClaim_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.CompleteEmailVerificationInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCompleteEmailVerificationInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐCompleteEmailVerificationInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_createDrop_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1756,36 +1481,6 @@ func (ec *executionContext) field_Mutation_createDrop_args(ctx context.Context, 
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNDropInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐDropInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createEmailDomainWhitelist_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewEmailDomainWhitelistInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewEmailDomainWhitelistInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewEmailDomainWhitelistInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createEmailWhitelistForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewEmailWhitelistInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewEmailWhitelistInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewEmailWhitelistInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1809,13 +1504,13 @@ func (ec *executionContext) field_Mutation_createEmptyCriteriaForItem_args(ctx c
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createFarcasterCriteriaForDrop_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 model.ItemInput
+	var arg0 model.NewFarcasterCriteriaInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNItemInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItemInput(ctx, tmp)
+		arg0, err = ec.unmarshalNNewFarcasterCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewFarcasterCriteriaInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1863,21 +1558,6 @@ func (ec *executionContext) field_Mutation_createMintPassForNoCriteriaItem_args(
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createPatreonCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewPatreonCriteriaInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewPatreonCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewPatreonCriteriaInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_createPaymentIntentSecretKey_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1893,66 +1573,6 @@ func (ec *executionContext) field_Mutation_createPaymentIntentSecretKey_args(ctx
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createQuestionnaireCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.QuestionnaireCriteriaInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNQuestionnaireCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireCriteriaInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createTelegramCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewTelegramCriteriaInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewTelegramCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewTelegramCriteriaInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createTwitterCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewTwitterCriteriaInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewTwitterCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewTwitterCriteriaInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_createWalletAddressWhitelistForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.NewWalletAddressWhitelistInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNNewWalletAddressWhitelistInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewWalletAddressWhitelistInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_deleteDrop_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1965,21 +1585,6 @@ func (ec *executionContext) field_Mutation_deleteDrop_args(ctx context.Context, 
 		}
 	}
 	args["dropID"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemID"] = arg0
 	return args, nil
 }
 
@@ -2028,21 +1633,6 @@ func (ec *executionContext) field_Mutation_registerInverseUsername_args(ctx cont
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_startEmailVerificationForClaim_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.EmailClaimInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNEmailClaimInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐEmailClaimInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_storeHashForDeployment_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2073,30 +1663,6 @@ func (ec *executionContext) field_Mutation_storeSignerInfo_args(ctx context.Cont
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_tempCreateItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 model.ItemInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNItemInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItemInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["creatorAddress"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("creatorAddress"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["creatorAddress"] = arg1
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_updateDrop_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2121,42 +1687,18 @@ func (ec *executionContext) field_Mutation_updateDrop_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_updateItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_validateFarcasterCriteriaForDrop_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+	if tmp, ok := rawArgs["dropID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dropID"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["itemID"] = arg0
-	var arg1 model.ItemInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNItemInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItemInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_validateFarcasterCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemID"] = arg0
+	args["dropID"] = arg0
 	var arg1 string
 	if tmp, ok := rawArgs["farcasterAddress"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("farcasterAddress"))
@@ -2166,126 +1708,6 @@ func (ec *executionContext) field_Mutation_validateFarcasterCriteriaForItem_args
 		}
 	}
 	args["farcasterAddress"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_validatePatreonCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemID"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["authID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authID"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authID"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_validateQuestionnaireCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemID"] = arg0
-	var arg1 []*model.QuestionnaireAnswerInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg1, err = ec.unmarshalNQuestionnaireAnswerInput2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireAnswerInputᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["input"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_validateTelegramCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemID"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["authID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authID"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authID"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_validateTwitterCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemID"] = arg0
-	var arg1 *string
-	if tmp, ok := rawArgs["authID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("authID"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["authID"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_validateWalletCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemID"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["walletAddress"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("walletAddress"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["walletAddress"] = arg1
 	return args, nil
 }
 
@@ -3336,8 +2758,6 @@ func (ec *executionContext) fieldContext_Drop_items(ctx context.Context, field g
 				return ec.fieldContext_Item_dropId(ctx, field)
 			case "dropAddress":
 				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
 				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
@@ -3346,8 +2766,6 @@ func (ec *executionContext) fieldContext_Drop_items(ctx context.Context, field g
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -3407,6 +2825,170 @@ func (ec *executionContext) _Drop_mintUrl(ctx context.Context, field graphql.Col
 }
 
 func (ec *executionContext) fieldContext_Drop_mintUrl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Drop_farcasterClaimCriteriaInteractions(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FarcasterClaimCriteriaInteractions, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.InteractionType)
+	fc.Result = res
+	return ec.marshalOInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐInteractionType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type InteractionType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Drop_claimCriteria(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_claimCriteria(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClaimCriteria, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.ClaimCriteriaType)
+	fc.Result = res
+	return ec.marshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_claimCriteria(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ClaimCriteriaType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Drop_castUrl(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_castUrl(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CastURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_castUrl(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Drop_farcasterProfileID(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FarcasterProfileID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_farcasterProfileID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Drop",
 		Field:      field,
@@ -3935,47 +3517,6 @@ func (ec *executionContext) fieldContext_Item_dropAddress(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_claimCriteria(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_claimCriteria(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ClaimCriteria, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ClaimCriteriaType)
-	fc.Result = res
-	return ec.marshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Item_claimCriteria(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Item",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ClaimCriteriaType does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Item_claimFee(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Item_claimFee(ctx, field)
 	if err != nil {
@@ -4151,47 +3692,6 @@ func (ec *executionContext) fieldContext_Item_twitterClaimCriteriaInteractions(c
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type InteractionType does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Item_farcasterClaimCriteriaInteractions(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.FarcasterClaimCriteriaInteractions, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.FarcasterInteractionType)
-	fc.Result = res
-	return ec.marshalOFarcasterInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Item_farcasterClaimCriteriaInteractions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Item",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type FarcasterInteractionType does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5347,6 +4847,14 @@ func (ec *executionContext) fieldContext_Mutation_createDrop(ctx context.Context
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Drop_claimCriteria(ctx, field)
+			case "castUrl":
+				return ec.fieldContext_Drop_castUrl(ctx, field)
+			case "farcasterProfileID":
+				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5426,6 +4934,14 @@ func (ec *executionContext) fieldContext_Mutation_updateDrop(ctx context.Context
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Drop_claimCriteria(ctx, field)
+			case "castUrl":
+				return ec.fieldContext_Drop_castUrl(ctx, field)
+			case "farcasterProfileID":
+				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5505,6 +5021,14 @@ func (ec *executionContext) fieldContext_Mutation_deleteDrop(ctx context.Context
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Drop_claimCriteria(ctx, field)
+			case "castUrl":
+				return ec.fieldContext_Drop_castUrl(ctx, field)
+			case "farcasterProfileID":
+				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5517,1218 +5041,6 @@ func (ec *executionContext) fieldContext_Mutation_deleteDrop(ctx context.Context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteDrop_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateItem(rctx, fc.Args["input"].(model.ItemInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_tempCreateItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_tempCreateItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().TempCreateItem(rctx, fc.Args["input"].(model.ItemInput), fc.Args["creatorAddress"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_tempCreateItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_tempCreateItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_updateItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_updateItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateItem(rctx, fc.Args["itemID"].(string), fc.Args["input"].(model.ItemInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_updateItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_updateItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_deleteItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_deleteItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteItem(rctx, fc.Args["itemID"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_deleteItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_deleteItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_addItemDeadline(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_addItemDeadline(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().AddItemDeadline(rctx, fc.Args["itemID"].(string), fc.Args["deadline"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_addItemDeadline(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_addItemDeadline_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createQuestionnaireCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createQuestionnaireCriteriaForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateQuestionnaireCriteriaForItem(rctx, fc.Args["input"].(model.QuestionnaireCriteriaInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createQuestionnaireCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createQuestionnaireCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createEmailWhitelistForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createEmailWhitelistForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateEmailWhitelistForItem(rctx, fc.Args["input"].(model.NewEmailWhitelistInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createEmailWhitelistForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createEmailWhitelistForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createWalletAddressWhitelistForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createWalletAddressWhitelistForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateWalletAddressWhitelistForItem(rctx, fc.Args["input"].(model.NewWalletAddressWhitelistInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createWalletAddressWhitelistForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createWalletAddressWhitelistForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createEmailDomainWhitelist(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createEmailDomainWhitelist(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateEmailDomainWhitelist(rctx, fc.Args["input"].(model.NewEmailDomainWhitelistInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createEmailDomainWhitelist(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createEmailDomainWhitelist_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createTwitterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createTwitterCriteriaForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateTwitterCriteriaForItem(rctx, fc.Args["input"].(model.NewTwitterCriteriaInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createTwitterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createTwitterCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createTelegramCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createTelegramCriteriaForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateTelegramCriteriaForItem(rctx, fc.Args["input"].(model.NewTelegramCriteriaInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createTelegramCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createTelegramCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createPatreonCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createPatreonCriteriaForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreatePatreonCriteriaForItem(rctx, fc.Args["input"].(model.NewPatreonCriteriaInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.Item)
-	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createPatreonCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createPatreonCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6786,8 +5098,6 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 				return ec.fieldContext_Item_dropId(ctx, field)
 			case "dropAddress":
 				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
 				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
@@ -6796,8 +5106,6 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -6830,6 +5138,93 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createEmptyCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createFarcasterCriteriaForDrop(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createFarcasterCriteriaForDrop(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateFarcasterCriteriaForDrop(rctx, fc.Args["input"].(model.NewFarcasterCriteriaInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Drop)
+	fc.Result = res
+	return ec.marshalNDrop2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐDrop(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createFarcasterCriteriaForDrop(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_Drop_ID(ctx, field)
+			case "creatorID":
+				return ec.fieldContext_Drop_creatorID(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Drop_createdAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Drop_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Drop_description(ctx, field)
+			case "image":
+				return ec.fieldContext_Drop_image(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Drop_thumbnail(ctx, field)
+			case "contractAddress":
+				return ec.fieldContext_Drop_contractAddress(ctx, field)
+			case "network":
+				return ec.fieldContext_Drop_network(ctx, field)
+			case "items":
+				return ec.fieldContext_Drop_items(ctx, field)
+			case "mintUrl":
+				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Drop_claimCriteria(ctx, field)
+			case "castUrl":
+				return ec.fieldContext_Drop_castUrl(ctx, field)
+			case "farcasterProfileID":
+				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createFarcasterCriteriaForDrop_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -6894,8 +5289,8 @@ func (ec *executionContext) fieldContext_Mutation_createMintPassForNoCriteriaIte
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_validateTwitterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_validateTwitterCriteriaForItem(ctx, field)
+func (ec *executionContext) _Mutation_validateFarcasterCriteriaForDrop(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_validateFarcasterCriteriaForDrop(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6908,7 +5303,7 @@ func (ec *executionContext) _Mutation_validateTwitterCriteriaForItem(ctx context
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ValidateTwitterCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["authID"].(*string))
+		return ec.resolvers.Mutation().ValidateFarcasterCriteriaForDrop(rctx, fc.Args["dropID"].(string), fc.Args["farcasterAddress"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6922,7 +5317,7 @@ func (ec *executionContext) _Mutation_validateTwitterCriteriaForItem(ctx context
 	return ec.marshalOValidationRespoonse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_validateTwitterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_validateFarcasterCriteriaForDrop(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -6945,291 +5340,7 @@ func (ec *executionContext) fieldContext_Mutation_validateTwitterCriteriaForItem
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_validateTwitterCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_validateTelegramCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_validateTelegramCriteriaForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ValidateTelegramCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["authID"].(*string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ValidationRespoonse)
-	fc.Result = res
-	return ec.marshalOValidationRespoonse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_validateTelegramCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "valid":
-				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
-			case "passID":
-				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_validateTelegramCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_validatePatreonCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_validatePatreonCriteriaForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ValidatePatreonCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["authID"].(*string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ValidationRespoonse)
-	fc.Result = res
-	return ec.marshalOValidationRespoonse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_validatePatreonCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "valid":
-				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
-			case "passID":
-				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_validatePatreonCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_validateWalletCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_validateWalletCriteriaForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ValidateWalletCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["walletAddress"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ValidationRespoonse)
-	fc.Result = res
-	return ec.marshalOValidationRespoonse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_validateWalletCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "valid":
-				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
-			case "passID":
-				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_validateWalletCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_validateQuestionnaireCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_validateQuestionnaireCriteriaForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ValidateQuestionnaireCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["input"].([]*model.QuestionnaireAnswerInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_validateQuestionnaireCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_validateQuestionnaireCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_validateFarcasterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_validateFarcasterCriteriaForItem(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ValidateFarcasterCriteriaForItem(rctx, fc.Args["itemID"].(string), fc.Args["farcasterAddress"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ValidationRespoonse)
-	fc.Result = res
-	return ec.marshalOValidationRespoonse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_validateFarcasterCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "valid":
-				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
-			case "passID":
-				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_validateFarcasterCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_validateFarcasterCriteriaForDrop_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -7341,124 +5452,6 @@ func (ec *executionContext) fieldContext_Mutation_createPaymentIntentSecretKey(c
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createPaymentIntentSecretKey_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_startEmailVerificationForClaim(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_startEmailVerificationForClaim(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().StartEmailVerificationForClaim(rctx, fc.Args["input"].(model.EmailClaimInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.StartEmailVerificationResponse)
-	fc.Result = res
-	return ec.marshalNStartEmailVerificationResponse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐStartEmailVerificationResponse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_startEmailVerificationForClaim(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "otpRequestID":
-				return ec.fieldContext_StartEmailVerificationResponse_otpRequestID(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type StartEmailVerificationResponse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_startEmailVerificationForClaim_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_completeEmailVerificationForClaim(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_completeEmailVerificationForClaim(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CompleteEmailVerificationForClaim(rctx, fc.Args["input"].(model.CompleteEmailVerificationInput))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*model.CompleteEmailVerificationResponse)
-	fc.Result = res
-	return ec.marshalNCompleteEmailVerificationResponse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐCompleteEmailVerificationResponse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_completeEmailVerificationForClaim(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "otpRequestID":
-				return ec.fieldContext_CompleteEmailVerificationResponse_otpRequestID(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type CompleteEmailVerificationResponse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_completeEmailVerificationForClaim_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -8124,8 +6117,6 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_dropId(ctx, field)
 			case "dropAddress":
 				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
 				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
@@ -8134,8 +6125,6 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -8235,6 +6224,14 @@ func (ec *executionContext) fieldContext_Query_fetchDropById(ctx context.Context
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Drop_claimCriteria(ctx, field)
+			case "castUrl":
+				return ec.fieldContext_Drop_castUrl(ctx, field)
+			case "farcasterProfileID":
+				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -8314,6 +6311,14 @@ func (ec *executionContext) fieldContext_Query_fetchCreatorDrops(ctx context.Con
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Drop_claimCriteria(ctx, field)
+			case "castUrl":
+				return ec.fieldContext_Drop_castUrl(ctx, field)
+			case "farcasterProfileID":
+				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -8372,8 +6377,6 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInDrop(ctx context.Cont
 				return ec.fieldContext_Item_dropId(ctx, field)
 			case "dropAddress":
 				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
 				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
@@ -8382,8 +6385,6 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInDrop(ctx context.Cont
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -8473,8 +6474,6 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_dropId(ctx, field)
 			case "dropAddress":
 				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
 				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
@@ -8483,8 +6482,6 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -8936,8 +6933,6 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_dropId(ctx, field)
 			case "dropAddress":
 				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
 				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
@@ -8946,8 +6941,6 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -9036,6 +7029,14 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedDrops(ctx context.Co
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Drop_claimCriteria(ctx, field)
+			case "castUrl":
+				return ec.fieldContext_Drop_castUrl(ctx, field)
+			case "farcasterProfileID":
+				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -12221,6 +10222,14 @@ func (ec *executionContext) fieldContext_userProfileType_drops(ctx context.Conte
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Drop_claimCriteria(ctx, field)
+			case "castUrl":
+				return ec.fieldContext_Drop_castUrl(ctx, field)
+			case "farcasterProfileID":
+				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -12276,8 +10285,6 @@ func (ec *executionContext) fieldContext_userProfileType_items(ctx context.Conte
 				return ec.fieldContext_Item_dropId(ctx, field)
 			case "dropAddress":
 				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
 				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
@@ -12286,8 +10293,6 @@ func (ec *executionContext) fieldContext_userProfileType_items(ctx context.Conte
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -12363,8 +10368,6 @@ func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx contex
 				return ec.fieldContext_Item_dropId(ctx, field)
 			case "dropAddress":
 				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimCriteria":
-				return ec.fieldContext_Item_claimCriteria(ctx, field)
 			case "claimFee":
 				return ec.fieldContext_Item_claimFee(ctx, field)
 			case "creator":
@@ -12373,8 +10376,6 @@ func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx contex
 				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
 			case "twitterClaimCriteriaInteractions":
 				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "farcasterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_farcasterClaimCriteriaInteractions(ctx, field)
 			case "telegramGroupTitle":
 				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
 			case "tweetLink":
@@ -13069,22 +11070,22 @@ func (ec *executionContext) unmarshalInputNewFarcasterCriteriaInput(ctx context.
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"itemID", "cast", "interaction", "criteriaType"}
+	fieldsInOrder := [...]string{"dropID", "cast", "interaction", "criteriaType"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "itemID":
+		case "dropID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dropID"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ItemID = data
+			it.DropID = data
 		case "cast":
 			var err error
 
@@ -13098,7 +11099,7 @@ func (ec *executionContext) unmarshalInputNewFarcasterCriteriaInput(ctx context.
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("interaction"))
-			data, err := ec.unmarshalOFarcasterInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx, v)
+			data, err := ec.unmarshalOInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐInteractionType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13844,6 +11845,14 @@ func (ec *executionContext) _Drop(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "farcasterClaimCriteriaInteractions":
+			out.Values[i] = ec._Drop_farcasterClaimCriteriaInteractions(ctx, field, obj)
+		case "claimCriteria":
+			out.Values[i] = ec._Drop_claimCriteria(ctx, field, obj)
+		case "castUrl":
+			out.Values[i] = ec._Drop_castUrl(ctx, field, obj)
+		case "farcasterProfileID":
+			out.Values[i] = ec._Drop_farcasterProfileID(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -13994,8 +12003,6 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
-		case "claimCriteria":
-			out.Values[i] = ec._Item_claimCriteria(ctx, field, obj)
 		case "claimFee":
 			out.Values[i] = ec._Item_claimFee(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -14072,8 +12079,6 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "twitterClaimCriteriaInteractions":
 			out.Values[i] = ec._Item_twitterClaimCriteriaInteractions(ctx, field, obj)
-		case "farcasterClaimCriteriaInteractions":
-			out.Values[i] = ec._Item_farcasterClaimCriteriaInteractions(ctx, field, obj)
 		case "telegramGroupTitle":
 			out.Values[i] = ec._Item_telegramGroupTitle(ctx, field, obj)
 		case "tweetLink":
@@ -14367,93 +12372,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "tempCreateItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_tempCreateItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "updateItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_updateItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "deleteItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_deleteItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "addItemDeadline":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_addItemDeadline(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createQuestionnaireCriteriaForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createQuestionnaireCriteriaForItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createEmailWhitelistForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createEmailWhitelistForItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createWalletAddressWhitelistForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createWalletAddressWhitelistForItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createEmailDomainWhitelist":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createEmailDomainWhitelist(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createTwitterCriteriaForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createTwitterCriteriaForItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createTelegramCriteriaForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createTelegramCriteriaForItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createPatreonCriteriaForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createPatreonCriteriaForItem(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createEmptyCriteriaForItem":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createEmptyCriteriaForItem(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createFarcasterCriteriaForDrop":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createFarcasterCriteriaForDrop(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -14462,29 +12390,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMintPassForNoCriteriaItem(ctx, field)
 			})
-		case "validateTwitterCriteriaForItem":
+		case "validateFarcasterCriteriaForDrop":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_validateTwitterCriteriaForItem(ctx, field)
-			})
-		case "validateTelegramCriteriaForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_validateTelegramCriteriaForItem(ctx, field)
-			})
-		case "validatePatreonCriteriaForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_validatePatreonCriteriaForItem(ctx, field)
-			})
-		case "validateWalletCriteriaForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_validateWalletCriteriaForItem(ctx, field)
-			})
-		case "validateQuestionnaireCriteriaForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_validateQuestionnaireCriteriaForItem(ctx, field)
-			})
-		case "validateFarcasterCriteriaForItem":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_validateFarcasterCriteriaForItem(ctx, field)
+				return ec._Mutation_validateFarcasterCriteriaForDrop(ctx, field)
 			})
 		case "createJWTToken":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -14497,20 +12405,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createPaymentIntentSecretKey(ctx, field)
 			})
-		case "startEmailVerificationForClaim":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_startEmailVerificationForClaim(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "completeEmailVerificationForClaim":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_completeEmailVerificationForClaim(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "generateSignatureForClaim":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_generateSignatureForClaim(ctx, field)
@@ -15784,25 +13678,6 @@ func (ec *executionContext) marshalNClaimCriteriaType2githubᚗcomᚋlucidconnec
 	return v
 }
 
-func (ec *executionContext) unmarshalNCompleteEmailVerificationInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐCompleteEmailVerificationInput(ctx context.Context, v interface{}) (model.CompleteEmailVerificationInput, error) {
-	res, err := ec.unmarshalInputCompleteEmailVerificationInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNCompleteEmailVerificationResponse2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐCompleteEmailVerificationResponse(ctx context.Context, sel ast.SelectionSet, v model.CompleteEmailVerificationResponse) graphql.Marshaler {
-	return ec._CompleteEmailVerificationResponse(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNCompleteEmailVerificationResponse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐCompleteEmailVerificationResponse(ctx context.Context, sel ast.SelectionSet, v *model.CompleteEmailVerificationResponse) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._CompleteEmailVerificationResponse(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNCreatorDetails2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐCreatorDetails(ctx context.Context, sel ast.SelectionSet, v model.CreatorDetails) graphql.Marshaler {
 	return ec._CreatorDetails(ctx, sel, &v)
 }
@@ -15887,11 +13762,6 @@ func (ec *executionContext) unmarshalNDropInput2githubᚗcomᚋlucidconnectᚋin
 
 func (ec *executionContext) unmarshalNEditUserProfileInputType2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐEditUserProfileInputType(ctx context.Context, v interface{}) (model.EditUserProfileInputType, error) {
 	res, err := ec.unmarshalInputEditUserProfileInputType(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNEmailClaimInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐEmailClaimInput(ctx context.Context, v interface{}) (model.EmailClaimInput, error) {
-	res, err := ec.unmarshalInputEmailClaimInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -16050,11 +13920,6 @@ func (ec *executionContext) marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinvers
 	return ec._Item(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNItemInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItemInput(ctx context.Context, v interface{}) (model.ItemInput, error) {
-	res, err := ec.unmarshalInputItemInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) marshalNJWTCreationResponse2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐJWTCreationResponse(ctx context.Context, sel ast.SelectionSet, v model.JWTCreationResponse) graphql.Marshaler {
 	return ec._JWTCreationResponse(ctx, sel, &v)
 }
@@ -16102,43 +13967,18 @@ func (ec *executionContext) unmarshalNMultiChoiceInputType2ᚖgithubᚗcomᚋluc
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewEmailDomainWhitelistInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewEmailDomainWhitelistInput(ctx context.Context, v interface{}) (model.NewEmailDomainWhitelistInput, error) {
-	res, err := ec.unmarshalInputNewEmailDomainWhitelistInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNewEmailWhitelistInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewEmailWhitelistInput(ctx context.Context, v interface{}) (model.NewEmailWhitelistInput, error) {
-	res, err := ec.unmarshalInputNewEmailWhitelistInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNNewEmptyCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewEmptyCriteriaInput(ctx context.Context, v interface{}) (model.NewEmptyCriteriaInput, error) {
 	res, err := ec.unmarshalInputNewEmptyCriteriaInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNNewPatreonCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewPatreonCriteriaInput(ctx context.Context, v interface{}) (model.NewPatreonCriteriaInput, error) {
-	res, err := ec.unmarshalInputNewPatreonCriteriaInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNewTelegramCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewTelegramCriteriaInput(ctx context.Context, v interface{}) (model.NewTelegramCriteriaInput, error) {
-	res, err := ec.unmarshalInputNewTelegramCriteriaInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNewTwitterCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewTwitterCriteriaInput(ctx context.Context, v interface{}) (model.NewTwitterCriteriaInput, error) {
-	res, err := ec.unmarshalInputNewTwitterCriteriaInput(ctx, v)
+func (ec *executionContext) unmarshalNNewFarcasterCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewFarcasterCriteriaInput(ctx context.Context, v interface{}) (model.NewFarcasterCriteriaInput, error) {
+	res, err := ec.unmarshalInputNewFarcasterCriteriaInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNNewUsernameRegisgration2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewUsernameRegisgration(ctx context.Context, v interface{}) (model.NewUsernameRegisgration, error) {
 	res, err := ec.unmarshalInputNewUsernameRegisgration(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNNewWalletAddressWhitelistInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐNewWalletAddressWhitelistInput(ctx context.Context, v interface{}) (model.NewWalletAddressWhitelistInput, error) {
-	res, err := ec.unmarshalInputNewWalletAddressWhitelistInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -16169,33 +14009,6 @@ func (ec *executionContext) unmarshalNQuestionType2githubᚗcomᚋlucidconnect�
 
 func (ec *executionContext) marshalNQuestionType2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionType(ctx context.Context, sel ast.SelectionSet, v model.QuestionType) graphql.Marshaler {
 	return v
-}
-
-func (ec *executionContext) unmarshalNQuestionnaireAnswerInput2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireAnswerInputᚄ(ctx context.Context, v interface{}) ([]*model.QuestionnaireAnswerInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.QuestionnaireAnswerInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNQuestionnaireAnswerInput2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireAnswerInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNQuestionnaireAnswerInput2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireAnswerInput(ctx context.Context, v interface{}) (*model.QuestionnaireAnswerInput, error) {
-	res, err := ec.unmarshalInputQuestionnaireAnswerInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalNQuestionnaireCriteriaInput2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireCriteriaInput(ctx context.Context, v interface{}) (model.QuestionnaireCriteriaInput, error) {
-	res, err := ec.unmarshalInputQuestionnaireCriteriaInput(ctx, v)
-	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNQuestionnaireType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.QuestionnaireType) graphql.Marshaler {
@@ -16265,20 +14078,6 @@ func (ec *executionContext) unmarshalNSignerProvider2githubᚗcomᚋlucidconnect
 
 func (ec *executionContext) marshalNSignerProvider2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐSignerProvider(ctx context.Context, sel ast.SelectionSet, v model.SignerProvider) graphql.Marshaler {
 	return v
-}
-
-func (ec *executionContext) marshalNStartEmailVerificationResponse2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐStartEmailVerificationResponse(ctx context.Context, sel ast.SelectionSet, v model.StartEmailVerificationResponse) graphql.Marshaler {
-	return ec._StartEmailVerificationResponse(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNStartEmailVerificationResponse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐStartEmailVerificationResponse(ctx context.Context, sel ast.SelectionSet, v *model.StartEmailVerificationResponse) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._StartEmailVerificationResponse(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -16821,83 +14620,6 @@ func (ec *executionContext) marshalODrop2ᚖgithubᚗcomᚋlucidconnectᚋinvers
 		return graphql.Null
 	}
 	return ec._Drop(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOFarcasterInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx context.Context, v interface{}) ([]*model.FarcasterInteractionType, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*model.FarcasterInteractionType, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalOFarcasterInteractionType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOFarcasterInteractionType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx context.Context, sel ast.SelectionSet, v []*model.FarcasterInteractionType) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOFarcasterInteractionType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) unmarshalOFarcasterInteractionType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx context.Context, v interface{}) (*model.FarcasterInteractionType, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(model.FarcasterInteractionType)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOFarcasterInteractionType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐFarcasterInteractionType(ctx context.Context, sel ast.SelectionSet, v *model.FarcasterInteractionType) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
 }
 
 func (ec *executionContext) marshalOImageResponse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐImageResponse(ctx context.Context, sel ast.SelectionSet, v *model.ImageResponse) graphql.Marshaler {

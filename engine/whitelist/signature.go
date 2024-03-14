@@ -47,7 +47,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	}
 
 	var passes int64
-	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id = ? AND minter_address = ? AND used_at <> NULL", mintPass.ItemId, input.ClaimingAddress).Count(&passes).Error
+	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id = ? AND minter_address = ? AND used_at <> NULL", mintPass.DropID, input.ClaimingAddress).Count(&passes).Error
 	if err == nil {
 		if passes != 0 {
 			return nil, errors.New("more than one mint pass found for this minter address")
@@ -59,7 +59,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	}
 
 	var addressClaiim models.WalletAddressClaim
-	err = dbutils.DB.Where("item_id = ? AND wallet_address = ?", mintPass.ItemId, input.ClaimingAddress).First(&addressClaiim).Error
+	err = dbutils.DB.Where("item_id = ? AND wallet_address = ?", mintPass.DropID, input.ClaimingAddress).First(&addressClaiim).Error
 	if err == nil {
 		addressClaiim.EmbeddedWalletAddress = embeddedWalletAddress
 		addressClaiim.SentOutAt = &now
@@ -71,25 +71,25 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	}
 
 	tx := dbutils.DB.Begin()
-	userID, err := engine.GetCCreatorIDFromWalletAddress(embeddedWalletAddress)
-	if err != nil {
-		tx.Rollback()
-		return nil, errors.New("claimer not found")
-	}
+	// userID, err := engine.GetCCreatorIDFromWalletAddress(embeddedWalletAddress)
+	// if err != nil {
+	// 	tx.Rollback()
+	// 	return nil, errors.New("claimer not found")
+	// }
 
-	item, err := engine.GetItemByID(mintPass.ItemId)
-	if err != nil {
-		tx.Rollback()
-		return nil, errors.New("item not found")
-	}
+	// item, err := engine.GetItemByID(mintPass.DropID)
+	// if err != nil {
+	// 	tx.Rollback()
+	// 	return nil, errors.New("item not found")
+	// }
 
-	if item.ClaimFee > 0 {
-		err = chargeClaimFee(*userID, item, tx)
-		if err != nil {
-			tx.Rollback()
-			return nil, err
-		}
-	}
+	// if item.ClaimFee > 0 {
+	// 	err = chargeClaimFee(*userID, item, tx)
+	// 	if err != nil {
+	// 		tx.Rollback()
+	// 		return nil, err
+	// 	}
+	// }
 
 	mintPass.MinterAddress = input.ClaimingAddress
 	mintPass.UsedAt = &now
@@ -105,39 +105,6 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		tx.Rollback()
 		return nil, err
 	}
-
-	// go func() {
-	// 	inverseAAServerURL := utils.UseEnvOrDefault("AA_SERVER", "https://inverse-aa.onrender.com")
-
-	// 	client := &http.Client{}
-
-	// 	itemData, err := json.Marshal(map[string]interface{}{
-	// 		"receiptientAddresses": []string{input.ClaimingAddress},
-	// 		"items":                []int64{mintPass.ItemIdOnContract},
-	// 		"contractAddress":      mintPass.DropContractAddress,
-	// 		"Network":              mintPass.BlockchainNetwork,
-	// 	})
-
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 		return
-	// 	}
-
-	// 	req, err := http.NewRequest(http.MethodPost, inverseAAServerURL+"/sendnfts", bytes.NewBuffer(itemData))
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 		return
-	// 	}
-
-	// 	req.Header.Add("Content-Type", "application/json")
-	// 	res, err := client.Do(req)
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 		return
-	// 	}
-
-	// 	defer res.Body.Close()
-	// }()
 
 	// TODO add back signature flow
 	// (claim_address+contract_address+chain_id+amount+number_of_mints)
@@ -229,7 +196,7 @@ func GenerateSignatureForFarcasterClaim(input *model.GenerateClaimSignatureInput
 	}
 
 	var passes int64
-	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id = ? AND minter_address = ? AND used_at <> NULL", mintPass.ItemId, input.ClaimingAddress).Count(&passes).Error
+	err = dbutils.DB.Model(&models.MintPass{}).Where("item_id = ? AND minter_address = ? AND used_at <> NULL", mintPass.DropID, input.ClaimingAddress).Count(&passes).Error
 	if err == nil {
 		if passes != 0 {
 			return nil, errors.New("more than one mint pass found for this minter address")

@@ -49,17 +49,21 @@ type DeploymentInfo struct {
 }
 
 type Drop struct {
-	ID              string             `json:"ID"`
-	CreatorID       string             `json:"creatorID"`
-	CreatedAt       time.Time          `json:"createdAt"`
-	Name            string             `json:"name"`
-	Description     string             `json:"description"`
-	Image           string             `json:"image"`
-	Thumbnail       string             `json:"thumbnail"`
-	ContractAddress *string            `json:"contractAddress,omitempty"`
-	Network         *BlockchainNetwork `json:"network,omitempty"`
-	Items           []*Item            `json:"items"`
-	MintURL         string             `json:"mintUrl"`
+	ID                                 string             `json:"ID"`
+	CreatorID                          string             `json:"creatorID"`
+	CreatedAt                          time.Time          `json:"createdAt"`
+	Name                               string             `json:"name"`
+	Description                        string             `json:"description"`
+	Image                              string             `json:"image"`
+	Thumbnail                          string             `json:"thumbnail"`
+	ContractAddress                    *string            `json:"contractAddress,omitempty"`
+	Network                            *BlockchainNetwork `json:"network,omitempty"`
+	Items                              []*Item            `json:"items"`
+	MintURL                            string             `json:"mintUrl"`
+	FarcasterClaimCriteriaInteractions []*InteractionType `json:"farcasterClaimCriteriaInteractions,omitempty"`
+	ClaimCriteria                      *ClaimCriteriaType `json:"claimCriteria,omitempty"`
+	CastURL                            *string            `json:"castUrl,omitempty"`
+	FarcasterProfileID                 *string            `json:"farcasterProfileID,omitempty"`
 }
 
 type DropInput struct {
@@ -105,28 +109,26 @@ type ImageStatusResponse struct {
 }
 
 type Item struct {
-	ID                                 string                      `json:"ID"`
-	Name                               string                      `json:"name"`
-	Image                              string                      `json:"image"`
-	Description                        string                      `json:"description"`
-	DropID                             string                      `json:"dropId"`
-	DropAddress                        string                      `json:"dropAddress"`
-	ClaimCriteria                      *ClaimCriteriaType          `json:"claimCriteria,omitempty"`
-	ClaimFee                           int                         `json:"claimFee"`
-	Creator                            *CreatorDetails             `json:"creator"`
-	AuthorizedSubdomains               []string                    `json:"authorizedSubdomains,omitempty"`
-	TwitterClaimCriteriaInteractions   []*InteractionType          `json:"twitterClaimCriteriaInteractions,omitempty"`
-	FarcasterClaimCriteriaInteractions []*FarcasterInteractionType `json:"farcasterClaimCriteriaInteractions,omitempty"`
-	TelegramGroupTitle                 *string                     `json:"telegramGroupTitle,omitempty"`
-	TweetLink                          *string                     `json:"tweetLink,omitempty"`
-	ProfileLink                        *string                     `json:"profileLink,omitempty"`
-	CampaignName                       *string                     `json:"campaignName,omitempty"`
-	EditionLimit                       *int                        `json:"editionLimit,omitempty"`
-	TokenID                            *int                        `json:"TokenID,omitempty"`
-	CreatedAt                          time.Time                   `json:"createdAt"`
-	Deadline                           *time.Time                  `json:"deadline,omitempty"`
-	ClaimDetails                       []*ClaimDetails             `json:"claimDetails,omitempty"`
-	Holders                            []string                    `json:"holders"`
+	ID                               string             `json:"ID"`
+	Name                             string             `json:"name"`
+	Image                            string             `json:"image"`
+	Description                      string             `json:"description"`
+	DropID                           string             `json:"dropId"`
+	DropAddress                      string             `json:"dropAddress"`
+	ClaimFee                         int                `json:"claimFee"`
+	Creator                          *CreatorDetails    `json:"creator"`
+	AuthorizedSubdomains             []string           `json:"authorizedSubdomains,omitempty"`
+	TwitterClaimCriteriaInteractions []*InteractionType `json:"twitterClaimCriteriaInteractions,omitempty"`
+	TelegramGroupTitle               *string            `json:"telegramGroupTitle,omitempty"`
+	TweetLink                        *string            `json:"tweetLink,omitempty"`
+	ProfileLink                      *string            `json:"profileLink,omitempty"`
+	CampaignName                     *string            `json:"campaignName,omitempty"`
+	EditionLimit                     *int               `json:"editionLimit,omitempty"`
+	TokenID                          *int               `json:"TokenID,omitempty"`
+	CreatedAt                        time.Time          `json:"createdAt"`
+	Deadline                         *time.Time         `json:"deadline,omitempty"`
+	ClaimDetails                     []*ClaimDetails    `json:"claimDetails,omitempty"`
+	Holders                          []string           `json:"holders"`
 }
 
 type ItemInput struct {
@@ -183,10 +185,10 @@ type NewEmptyCriteriaInput struct {
 }
 
 type NewFarcasterCriteriaInput struct {
-	ItemID       string                      `json:"itemID"`
-	Cast         *string                     `json:"cast,omitempty"`
-	Interaction  []*FarcasterInteractionType `json:"interaction,omitempty"`
-	CriteriaType ClaimCriteriaType           `json:"criteriaType"`
+	DropID       string             `json:"dropID"`
+	Cast         *string            `json:"cast,omitempty"`
+	Interaction  []*InteractionType `json:"interaction,omitempty"`
+	CriteriaType ClaimCriteriaType  `json:"criteriaType"`
 }
 
 type NewPatreonCriteriaInput struct {
@@ -478,49 +480,6 @@ func (e ClaimCriteriaType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type FarcasterInteractionType string
-
-const (
-	FarcasterInteractionTypeLikes   FarcasterInteractionType = "likes"
-	FarcasterInteractionTypeReplies FarcasterInteractionType = "replies"
-	FarcasterInteractionTypeRecasts FarcasterInteractionType = "recasts"
-)
-
-var AllFarcasterInteractionType = []FarcasterInteractionType{
-	FarcasterInteractionTypeLikes,
-	FarcasterInteractionTypeReplies,
-	FarcasterInteractionTypeRecasts,
-}
-
-func (e FarcasterInteractionType) IsValid() bool {
-	switch e {
-	case FarcasterInteractionTypeLikes, FarcasterInteractionTypeReplies, FarcasterInteractionTypeRecasts:
-		return true
-	}
-	return false
-}
-
-func (e FarcasterInteractionType) String() string {
-	return string(e)
-}
-
-func (e *FarcasterInteractionType) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = FarcasterInteractionType(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid FarcasterInteractionType", str)
-	}
-	return nil
-}
-
-func (e FarcasterInteractionType) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
 type ImageResolveFormaat string
 
 const (
@@ -568,17 +527,19 @@ const (
 	InteractionTypeLikes    InteractionType = "likes"
 	InteractionTypeRetweets InteractionType = "retweets"
 	InteractionTypeReplies  InteractionType = "replies"
+	InteractionTypeRecasts  InteractionType = "recasts"
 )
 
 var AllInteractionType = []InteractionType{
 	InteractionTypeLikes,
 	InteractionTypeRetweets,
 	InteractionTypeReplies,
+	InteractionTypeRecasts,
 }
 
 func (e InteractionType) IsValid() bool {
 	switch e {
-	case InteractionTypeLikes, InteractionTypeRetweets, InteractionTypeReplies:
+	case InteractionTypeLikes, InteractionTypeRetweets, InteractionTypeReplies, InteractionTypeRecasts:
 		return true
 	}
 	return false
