@@ -1,5 +1,12 @@
 package neynar
 
+type ErrorResponse struct {
+	Code     string `json:"code"`
+	Message  string `json:"message"`
+	Property string `json:"property"`
+	Status   int32  `json:"status"`
+}
+
 type FarcasterFollowers struct {
 	AllRelevantFollowersDehydrated []RelevantFollowersDehydrated `json:"all_relevant_followers_dehydrated"`
 }
@@ -15,10 +22,10 @@ type UserDehydrated struct {
 }
 
 type Cast struct {
-	Object    string     `json:"object"`
-	Hash      string     `json:"hash"`
+	Object    string   `json:"object"`
+	Hash      string   `json:"hash"`
 	Reactions Reaction `json:"reactions"`
-	Authour   Author     `json:"author"`
+	Authour   Author   `json:"author"`
 }
 
 type Author struct {
@@ -31,7 +38,7 @@ type Reaction struct {
 }
 
 type Interactor struct {
-	Fid   int32 `json:"fid"`
+	Fid   int32  `json:"fid"`
 	Fname string `json:"fname"`
 }
 
@@ -41,3 +48,16 @@ type ChannelFollowers struct {
 		Cursor string `json:"cursor"`
 	} `json:"next"`
 }
+
+type ThreadCastsResult struct {
+	Casts []Cast `json:"casts"`
+}
+
+type ThreadCasts struct {
+	Result ThreadCastsResult `json:"result"`
+}
+
+// type FarcasterUser struct {
+// 	Object string `json:"object"`
+// 	Fid    int32  `json:"fid"`
+// }
