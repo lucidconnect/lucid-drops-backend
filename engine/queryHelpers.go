@@ -394,62 +394,43 @@ func GetFeaturedDrops() ([]*models.Drop, error) {
 	return drops, nil
 }
 
-func DeleteCriteriaIfExists(item *models.Item) error {
+func DeleteCriteriaIfExists(drop *models.Drop) error {
 
 	var err error
-	switch *item.Criteria {
-	case model.ClaimCriteriaTypeDirectAnswerQuestionnaire, model.ClaimCriteriaTypeClaimCode:
-		//Delete existing questionnaire criteria
-		err = dbutils.DB.Unscoped().Delete(&models.DirectAnswerCriteria{}, "item_id = ?", item.ID).Error
-		if err != nil {
-			return errors.New("an error occured while updating updating questionnaire criteria")
-		}
-
-	case model.ClaimCriteriaTypeMutliChoiceQuestionnaire:
-		err = dbutils.DB.Unscoped().Delete(&models.MultiChoiceCriteria{}, "item_id = ?", item.ID).Error
-		if err != nil {
-			return errors.New("an error occured while updating updating questionnaire criteria")
-		}
-
+	switch *drop.Criteria {
 	case model.ClaimCriteriaTypeTwitterInteractions:
 		//Delete existing twitter criteria
-		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "drop_id = ?", drop.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating twitter criteria")
 		}
 	case model.ClaimCriteriaTypeTwitterFollowers:
 		//Delete existing twitter criteria
-		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "drop_id = ?", drop.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating twitter criteria")
 		}
-	case model.ClaimCriteriaTypePatreon:
-		//Delete existing patreon criteria
-		err = dbutils.DB.Delete(&models.PatreonCriteria{}, "item_id = ?", item.ID).Error
-		if err != nil {
-			return errors.New("an error occured while updating updating patreon criteria")
-		}
 	case model.ClaimCriteriaTypeTelegram:
 		//Delete existing telegram criteria
-		err = dbutils.DB.Unscoped().Delete(&models.TelegramCriteria{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.TelegramCriteria{}, "drop_id = ?", drop.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating telegram criteria")
 		}
 	case model.ClaimCriteriaTypeEmailDomain:
 		//Delete existing email domain criteria
-		err = dbutils.DB.Unscoped().Delete(&models.EmailDomainWhiteList{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.EmailDomainWhiteList{}, "drop_id = ?", drop.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating email domain criteria")
 		}
 	case model.ClaimCriteriaTypeEmailWhiteList:
 		//Delete existing email domain criteria
-		err = dbutils.DB.Unscoped().Delete(&models.SingleEmailClaim{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.SingleEmailClaim{}, "drop_id = ?", drop.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating email domain criteria")
 		}
 	case model.ClaimCriteriaTypeWalletAddress:
 		//Delete existing email domain criteria
-		err = dbutils.DB.Unscoped().Delete(&models.WalletAddressClaim{}, "item_id = ?", item.ID).Error
+		err = dbutils.DB.Unscoped().Delete(&models.WalletAddressClaim{}, "drop_id = ?", drop.ID).Error
 		if err != nil {
 			return errors.New("an error occured while updating updating email domain criteria")
 		}

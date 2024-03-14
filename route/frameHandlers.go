@@ -10,9 +10,9 @@ import (
 )
 
 func CreateMintPassForNoCriteriaItem(w http.ResponseWriter, r *http.Request) {
-	itemId := r.URL.Query().Get("itemId")
+	dropId := r.URL.Query().Get("dropId")
 	walletAddress := r.URL.Query().Get("wallet")
-	pass, err := whitelist.CreateMintPassForNoCriteriaItem(itemId, walletAddress)
+	pass, err := whitelist.CreateMintPassForNoCriteriaDrop(dropId, walletAddress)
 	if err != nil {
 		log.Err(err).Caller().Msg("GenerateSignatureForClaim")
 		w.WriteHeader(http.StatusInternalServerError)

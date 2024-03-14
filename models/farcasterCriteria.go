@@ -7,11 +7,11 @@ import (
 
 type FarcasterCriteria struct {
 	Base
-	DropId       uuid.UUID `gorm:"unique;not null"`
-	CreatorID    uuid.UUID
-	CastUrl      string
-	CriteriaType model.ClaimCriteriaType
-	Interactions string
-	ChannelID    string
-	FarcasterID  string // fid of account to do verifications against
+	DropId             uuid.UUID `gorm:"unique;not null"`
+	CreatorID          uuid.UUID
+	CastUrl            string
+	CriteriaType       model.ClaimCriteriaType
+	Interactions       string
+	ChannelID          string
+	FarcasterProfileID string // fid of account to do verifications against
 }

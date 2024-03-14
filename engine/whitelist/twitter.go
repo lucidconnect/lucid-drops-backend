@@ -26,13 +26,13 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 		return nil, errors.New("item not found")
 	}
 
-	if item.Criteria != nil {
-		//Delete Existing criteria
-		err := engine.DeleteCriteriaIfExists(item)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// if item.Criteria != nil {
+	// 	//Delete Existing criteria
+	// 	err := engine.DeleteCriteriaIfExists(item)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	var interactions string
 	for i := range input.Interaction {
@@ -377,13 +377,13 @@ func createMintPassForTwitterMint(item *models.Item) (*string, error) {
 		return nil, errors.New("drop contract address not found")
 	}
 
-	if item.TokenID == nil {
-		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
-	}
+	// if item.TokenID == nil {
+	// 	return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
+	// }
 
 	newMint := models.MintPass{
-		ItemId:              item.ID.String(),
-		ItemIdOnContract:    *item.TokenID,
+		DropID:              item.ID.String(),
+		// ItemIdOnContract:    *item.TokenID,
 		DropContractAddress: *drop.AAContractAddress,
 		BlockchainNetwork:   drop.BlockchainNetwork,
 	}
