@@ -61,7 +61,7 @@ func WithNeynarApiKey(key string) Option {
 }
 
 // Returns a list of relevant followers for a given fid
-func (nc *NeynarClient) FetchRelvantFollowers(fid uint32) ([]RelevantFollowersDehydrated, error) {
+func (nc *NeynarClient) FetchRelvantFollowers(fid int32) ([]RelevantFollowersDehydrated, error) {
 	url, err := url.Parse(fmt.Sprintf("%v/v2/farcaster/followers/relevant", nc.neynarUrl))
 	if err != nil {
 		return nil, err
@@ -109,10 +109,10 @@ func (nc *NeynarClient) RetrieveCastByUrl(castUrl string) (Cast, error) {
 	return cast, nil
 }
 
-func (nc *NeynarClient) RetrieveCastByThreadHash(hash string) (Cast, error) {
+func (nc *NeynarClient) RetrieveCastsByThreadHash(hash string) ([]Cast, error) {
 	url, err := url.Parse(fmt.Sprintf("%v/v1/farcaster/all-casts-in-thread", nc.neynarUrl))
 	if err != nil {
-		return Cast{}, err
+		return nil, err
 	}
 	query := url.Query()
 	query.Add("threadHash", hash)
@@ -120,13 +120,13 @@ func (nc *NeynarClient) RetrieveCastByThreadHash(hash string) (Cast, error) {
 	url.RawQuery = query.Encode()
 	response, err := nc.makeRequest(http.MethodGet, url.String(), "", nil)
 	if err != nil {
-		return Cast{}, err
+		return nil, err
 	}
 	defer response.Body.Close()
 
-	cast, err := decodeCastObject(response.Body)
+	cast, err := decodeThreadCasts(response.Body)
 	if err != nil {
-		return Cast{}, err
+		return nil, err
 	}
 
 	return cast, nil
@@ -160,6 +160,29 @@ func (nc *NeynarClient) RetrieveChannelFollowers(channelID string, fid int32, cu
 	return followers, nil
 }
 
+func (nc *NeynarClient) FetchFarcasterUserFidByEthAddress(address string) (int32, error) {
+	url, err := url.Parse(fmt.Sprintf("%v/v2/farcaster/user/bulk-by-address", nc.neynarUrl))
+	if err != nil {
+		return 0, err
+	}
+	query := url.Query()
+	query.Add("addresses", address)
+
+	url.RawQuery = query.Encode()
+	response, err := nc.makeRequest(http.MethodGet, url.String(), "", nil)
+	if err != nil {
+		return 0, err
+	}
+	defer response.Body.Close()
+
+	user, err := decodeFarcasterUser(response.Body, address)
+	if err != nil {
+		return 0, err
+	}
+
+	return user.Fid, err
+}
+
 func (nc *NeynarClient) makeRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {
 	httpRequest, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -172,6 +195,15 @@ func (nc *NeynarClient) makeRequest(method, url, contentType string, body io.Rea
 
 	resp, err := nc.client.Do(httpRequest)
 	if err != nil {
+		return nil, err
+	}
+
+	var errResponse ErrorResponse
+	if resp.StatusCode != 200 {
+		if err = json.NewDecoder(resp.Body).Decode(&errResponse); err != nil {
+			return nil, err
+		}
+		err = errors.New(errResponse.Message)
 		return nil, err
 	}
 
@@ -210,4 +242,36 @@ func decodeChannelFollowers(response io.ReadCloser) (ChannelFollowers, error) {
 		return ChannelFollowers{}, err
 	}
 	return followers, nil
+}
+
+func decodeThreadCasts(response io.ReadCloser) ([]Cast, error) {
+	var err error
+	cast := ThreadCasts{}
+
+	if err = json.NewDecoder(response).Decode(&cast); err != nil {
+		err = fmt.Errorf("failed to decode response body: %v", err)
+		return nil, err
+	}
+
+	return cast.Result.Casts, nil
+}
+
+func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated, error) {
+	var err error
+
+	responseBody := map[string][]any{}
+	if err = json.NewDecoder(response).Decode(&responseBody); err != nil {
+		err = fmt.Errorf("failed to decode response body: %v", err)
+		return UserDehydrated{}, err
+	}
+
+	userI := responseBody[address][0]
+
+	user, ok := userI.(UserDehydrated)
+	if !ok {
+		err = errors.New("error casting user object")
+		return UserDehydrated{}, err
+	}
+
+	return user, nil
 }

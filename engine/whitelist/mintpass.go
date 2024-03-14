@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"time"
 
 	"github.com/lucidconnect/inverse/dbutils"
 	"github.com/lucidconnect/inverse/engine"
@@ -26,71 +25,69 @@ func IsThisAValidEthAddress(maybeAddress string) bool {
 	return re.MatchString(maybeAddress)
 }
 
-func CreateMintPassForNoCriteriaItem(itemID, walletAddress string) (*model.ValidationRespoonse, error) {
-	if WalletLimitReached(walletAddress, itemID) {
-		return &model.ValidationRespoonse{
-			Valid: false,
-		}, nil
-	}
+// func CreateMintPassForNoCriteriaItem(itemID, walletAddress string) (*model.ValidationRespoonse, error) {
+// 	if WalletLimitReached(walletAddress, itemID) {
+// 		return &model.ValidationRespoonse{
+// 			Valid:  false,
+// 		}, nil
+// 	}
 
-	item, err := engine.GetItemByID(itemID)
-	if err != nil {
-		return nil, err
-	}
+// 	item, err := engine.GetItemByID(itemID)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	if ItemOverEditionLimit(item) {
-		return &model.ValidationRespoonse{
-			Valid: false,
-		}, nil
-	}
+// 	if item.ClaimDeadline != nil {
+// 		if time.Now().After(*item.ClaimDeadline) {
+// 			return nil, errors.New("the item is no longer available to be claimed")
+// 		}
+// 	}
 
-	if item.ClaimDeadline != nil {
-		if time.Now().After(*item.ClaimDeadline) {
-			return nil, errors.New("the item is no longer available to be claimed")
-		}
-	}
+// 	// if item.Criteria == nil || *item.Criteria != model.ClaimCriteriaTypeEmptyCriteria {
+// 	// 	return nil, errors.New("unable to generate mintpass for this item")
+// 	// }
 
-	// if item.Criteria == nil || *item.Criteria != model.ClaimCriteriaTypeEmptyCriteria {
-	// 	return nil, errors.New("unable to generate mintpass for this item")
-	// }
+// 	drop, err := engine.GetDropByID(item.DropID.String())
+// 	if err != nil {
+// 		return nil, errors.New("drop not found")
+// 	}
 
-	drop, err := engine.GetDropByID(item.DropID.String())
-	if err != nil {
-		return nil, errors.New("drop not found")
-	}
+// 	if drop.AAContractAddress == nil {
+// 		return nil, errors.New("drop contract address not found")
+// 	}
 
-	if drop.AAContractAddress == nil {
-		return nil, errors.New("drop contract address not found")
-	}
+// 	if item.TokenID == nil {
+// 		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
+// 	}
 
-	if item.TokenID == nil {
-		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
-	}
+// 	if ItemOverEditionLimit(item) {
+// 		return nil, errors.New("item edition limit reached")
+// 	}
 
-	tx := dbutils.DB.Begin()
-	newMint := models.MintPass{
-		ItemId:              item.ID.String(),
-		ItemIdOnContract:    *item.TokenID,
-		DropContractAddress: *drop.AAContractAddress,
-		BlockchainNetwork:   drop.BlockchainNetwork,
-	}
+// 	tx := dbutils.DB.Begin()
+// 	newMint := models.MintPass{
+// 		DropID:              item.ID.String(),
+// 		ItemIdOnContract:    *item.TokenID,
+// 		DropContractAddress: *drop.AAContractAddress,
+// 		BlockchainNetwork:   drop.BlockchainNetwork,
+// 	}
 
-	err = tx.Create(&newMint).Error
-	if err != nil {
-		tx.Rollback()
-		return nil, err
-	}
+// 	err = tx.Create(&newMint).Error
+// 	if err != nil {
+// 		tx.Rollback()
+// 		return nil, err
+// 	}
 
-	err = tx.Commit().Error
-	if err != nil {
-		return nil, err
-	}
+// 	err = tx.Commit().Error
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &model.ValidationRespoonse{
-		Valid:  true,
-		PassID: utils.GetStrPtr(newMint.ID.String()),
-	}, nil
-}
+// 	return &model.ValidationRespoonse{
+// 		Valid:  true,
+// 		PassID: utils.GetStrPtr(newMint.ID.String()),
+// 	}, nil
+// }
 
 func chargeClaimFee(userID string, item *models.Item, tx *gorm.DB) error {
 
@@ -148,46 +145,48 @@ func chargeClaimFee(userID string, item *models.Item, tx *gorm.DB) error {
 	return nil
 }
 
-func CreateMintPassForValidatedCriteriaItem(itemID, walletAddress string) (*model.ValidationRespoonse, error) {
-	if WalletLimitReached(walletAddress, itemID) {
+func CreateMintPassForValidatedCriteriaDrop(dropID, walletAddress string) (*model.ValidationRespoonse, error) {
+	if WalletLimitReached(walletAddress, dropID) {
 		return nil, errors.New("wallet limit reached")
 	}
 
-	item, err := engine.GetItemByID(itemID)
+	drop, err := engine.GetDropByID(dropID)
 	if err != nil {
 		return nil, err
 	}
 
-	if item.ClaimDeadline != nil {
-		if time.Now().After(*item.ClaimDeadline) {
-			return nil, errors.New("the item is no longer available to be claimed")
-		}
-	}
+	// if item.ClaimDeadline != nil {
+	// 	if time.Now().After(*item.ClaimDeadline) {
+	// 		return nil, errors.New("the item is no longer available to be claimed")
+	// 	}
+	// }
 
-	if item.Criteria == nil {
+	if drop.Criteria == nil {
 		return nil, errors.New("unable to generate mintpass for this item")
 	}
 
-	drop, err := engine.GetDropByID(item.DropID.String())
-	if err != nil {
-		return nil, errors.New("drop not found")
-	}
+	// drop, err := engine.GetDropByID(item.DropID.String())
+	// if err != nil {
+	// 	return nil, errors.New("drop not found")
+	// }
 
 	if drop.AAContractAddress == nil {
 		return nil, errors.New("drop contract address not found")
 	}
 
-	if item.TokenID == nil {
-		return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
-	}
+	// if item.TokenID == nil {
+	// 	return nil, errors.New("The requested item is not ready to be claimed, please try again in a few minutes")
+	// }
 
-	if ItemOverEditionLimit(item) {
-		return nil, errors.New("item edition limit reached")
-	}
+	// if ItemOverEditionLimit(item) {
+	// 	return nil, errors.New("item edition limit reached")
+	// }
 
+	if DropOverEditionLimit(drop) {
+		return nil, errors.New("drop edition limit reached")
+	}
 	newMint := models.MintPass{
-		ItemId:              item.ID.String(),
-		ItemIdOnContract:    *item.TokenID,
+		DropID:              drop.ID.String(),
 		DropContractAddress: *drop.AAContractAddress,
 		BlockchainNetwork:   drop.BlockchainNetwork,
 	}
@@ -203,6 +202,69 @@ func CreateMintPassForValidatedCriteriaItem(itemID, walletAddress string) (*mode
 	}, nil
 }
 
+func CreateMintPassForNoCriteriaDrop(dropID, walletAddress string) (*model.ValidationRespoonse, error) {
+	if WalletLimitReached(walletAddress, dropID) {
+		return &model.ValidationRespoonse{
+			Valid: false,
+		}, nil
+	}
+
+	// item, err := engine.GetItemByID(dropID)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// if item.ClaimDeadline != nil {
+	// 	if time.Now().After(*item.ClaimDeadline) {
+	// 		return nil, errors.New("the item is no longer available to be claimed")
+	// 	}
+	// }
+
+	// if item.Criteria == nil || *item.Criteria != model.ClaimCriteriaTypeEmptyCriteria {
+	// 	return nil, errors.New("unable to generate mintpass for this item")
+	// }
+
+	drop, err := engine.GetDropByID(dropID)
+	if err != nil {
+		return nil, errors.New("drop not found")
+	}
+
+	if drop.AAContractAddress == nil {
+		return nil, errors.New("drop contract address not found")
+	}
+
+	// if ItemOverEditionLimit(item) {
+	// 	return nil, errors.New("item edition limit reached")
+	// }
+
+	if DropOverEditionLimit(drop) {
+		return nil, errors.New("item edition limit reached")
+	}
+
+	tx := dbutils.DB.Begin()
+	newMint := models.MintPass{
+		DropID:              dropID,
+		// ItemId:              item.ID.String(),
+		DropContractAddress: *drop.AAContractAddress,
+		BlockchainNetwork:   drop.BlockchainNetwork,
+	}
+
+	err = tx.Create(&newMint).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &model.ValidationRespoonse{
+		Valid:  true,
+		PassID: utils.GetStrPtr(newMint.ID.String()),
+	}, nil
+}
 func ItemOverEditionLimit(item *models.Item) bool {
 
 	if item.EditionLimit != nil {
@@ -216,10 +278,21 @@ func ItemOverEditionLimit(item *models.Item) bool {
 	return false
 }
 
-func WalletLimitReached(walletAddress, itemId string) bool {
+func DropOverEditionLimit(drop *models.Drop) bool {
+	if drop.EditionLimit != nil {
+		var editionCount int64
+		err := dbutils.DB.Model(&models.MintPass{}).Where("drop_id = ?", drop.ID).Count(&editionCount).Error
+		if err == nil {
+			return int(editionCount) >= *drop.EditionLimit
+		}
+	}
+	return false
+}
+
+func WalletLimitReached(walletAddress, dropID string) bool {
 	// set default claim limit to 1
 	var mintsByAddress int64
-	err := dbutils.DB.Model(&models.MintPass{}).Where("item_id = ?", itemId).Where("minter_address = ?", walletAddress).Count(&mintsByAddress).Error
+	err := dbutils.DB.Model(&models.MintPass{}).Where("drop_id = ?", dropID).Where("minter_address = ?", walletAddress).Count(&mintsByAddress).Error
 	if err == nil {
 		return mintsByAddress >= 1
 	}
