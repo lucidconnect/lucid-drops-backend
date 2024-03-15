@@ -5304,7 +5304,9 @@ func (ec *executionContext) fieldContext_Mutation_createFarcasterCriteriaForDrop
 				return ec.fieldContext_Drop_createdAt(ctx, field)
 			case "name":
 				return ec.fieldContext_Drop_name(ctx, field)
+				return ec.fieldContext_Drop_name(ctx, field)
 			case "description":
+				return ec.fieldContext_Drop_description(ctx, field)
 				return ec.fieldContext_Drop_description(ctx, field)
 			case "image":
 				return ec.fieldContext_Drop_image(ctx, field)
