@@ -68,21 +68,21 @@ type ComplexityRoot struct {
 	Drop struct {
 		CastURL                            func(childComplexity int) int
 		ClaimCriteria                      func(childComplexity int) int
-		ContractAddress                          func(childComplexity int) int
-		CreatedAt                                func(childComplexity int) int
-		CreatorID                                func(childComplexity int) int
-		Description                              func(childComplexity int) int
-		GasIsCreatorSponsored func(childComplexity int) int
+		ContractAddress                    func(childComplexity int) int
+		CreatedAt                          func(childComplexity int) int
+		CreatorID                          func(childComplexity int) int
+		Description                        func(childComplexity int) int
 		FarcasterClaimCriteriaInteractions func(childComplexity int) int
 		FarcasterProfileID                 func(childComplexity int) int
-		ID                                       func(childComplexity int) int
-		Image                                    func(childComplexity int) int
-		Items                 func(childComplexity int) int
-		MintPrice                                func(childComplexity int) int
-		MintURL                                  func(childComplexity int) int
-		Name                                     func(childComplexity int) int
-		Network                                  func(childComplexity int) int
-		Thumbnail                                func(childComplexity int) int
+		GasIsCreatorSponsored              func(childComplexity int) int
+		ID                                 func(childComplexity int) int
+		Image                              func(childComplexity int) int
+		Items                              func(childComplexity int) int
+		MintPrice                          func(childComplexity int) int
+		MintURL                            func(childComplexity int) int
+		Name                               func(childComplexity int) int
+		Network                            func(childComplexity int) int
+		Thumbnail                          func(childComplexity int) int
 	}
 
 	ImageResponse struct {
@@ -402,13 +402,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Drop.Description(childComplexity), true
 
-	case "Drop.gasIsCreatorSponsored":
-		if e.complexity.Drop.GasIsCreatorSponsored == nil {
-			break
-		}
-
-		return e.complexity.Drop.GasIsCreatorSponsored(childComplexity), true
-
 	case "Drop.farcasterClaimCriteriaInteractions":
 		if e.complexity.Drop.FarcasterClaimCriteriaInteractions == nil {
 			break
@@ -422,6 +415,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Drop.FarcasterProfileID(childComplexity), true
+
+	case "Drop.gasIsCreatorSponsored":
+		if e.complexity.Drop.GasIsCreatorSponsored == nil {
+			break
+		}
+
+		return e.complexity.Drop.GasIsCreatorSponsored(childComplexity), true
 
 	case "Drop.ID":
 		if e.complexity.Drop.ID == nil {
@@ -5318,6 +5318,10 @@ func (ec *executionContext) fieldContext_Mutation_createFarcasterCriteriaForDrop
 				return ec.fieldContext_Drop_items(ctx, field)
 			case "mintUrl":
 				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "mintPrice":
+				return ec.fieldContext_Drop_mintPrice(ctx, field)
+			case "gasIsCreatorSponsored":
+				return ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
 			case "farcasterClaimCriteriaInteractions":
 				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
 			case "claimCriteria":
@@ -14774,6 +14778,22 @@ func (ec *executionContext) marshalODrop2ᚖgithubᚗcomᚋlucidconnectᚋinvers
 		return graphql.Null
 	}
 	return ec._Drop(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel ast.SelectionSet, v *float64) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalFloatContext(*v)
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) marshalOImageResponse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐImageResponse(ctx context.Context, sel ast.SelectionSet, v *model.ImageResponse) graphql.Marshaler {

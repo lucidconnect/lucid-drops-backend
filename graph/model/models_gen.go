@@ -49,19 +49,19 @@ type DeploymentInfo struct {
 }
 
 type Drop struct {
-	ID                                       string             `json:"ID"`
-	CreatorID                                string             `json:"creatorID"`
-	CreatedAt                                time.Time          `json:"createdAt"`
-	Name                                     string             `json:"name"`
-	Description                              string             `json:"description"`
-	Image                                    string             `json:"image"`
-	Thumbnail                                string             `json:"thumbnail"`
-	ContractAddress                          *string            `json:"contractAddress,omitempty"`
-	Network                                  *BlockchainNetwork `json:"network,omitempty"`
-	Items                                    []*Item            `json:"items"`
-	MintURL                                  string             `json:"mintUrl"`
-	MintPrice             *float64           `json:"mintPrice,omitempty"`
-	GasIsCreatorSponsored bool               `json:"gasIsCreatorSponsored"`
+	ID                                 string             `json:"ID"`
+	CreatorID                          string             `json:"creatorID"`
+	CreatedAt                          time.Time          `json:"createdAt"`
+	Name                               string             `json:"name"`
+	Description                        string             `json:"description"`
+	Image                              string             `json:"image"`
+	Thumbnail                          string             `json:"thumbnail"`
+	ContractAddress                    *string            `json:"contractAddress,omitempty"`
+	Network                            *BlockchainNetwork `json:"network,omitempty"`
+	Items                              []*Item            `json:"items"`
+	MintURL                            string             `json:"mintUrl"`
+	MintPrice                          *float64           `json:"mintPrice,omitempty"`
+	GasIsCreatorSponsored              bool               `json:"gasIsCreatorSponsored"`
 	FarcasterClaimCriteriaInteractions []*InteractionType `json:"farcasterClaimCriteriaInteractions,omitempty"`
 	ClaimCriteria                      *ClaimCriteriaType `json:"claimCriteria,omitempty"`
 	CastURL                            *string            `json:"castUrl,omitempty"`
