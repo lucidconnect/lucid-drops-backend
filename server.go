@@ -69,7 +69,7 @@ func main() {
 	// router.Handle("/patreon/callback/", http.HandlerFunc(route.PatreonCallBack))
 	// router.Handle("/whitelist/patreon/callback/", http.HandlerFunc(route.PatreonWhitelistCallBack))
 	router.Handle("/handle-stripe-webhook", http.HandlerFunc(route.HandleStripeWebhook))
-	router.HandleFunc("/mintPass", route.CreateMintPassForNoCriteriaItem)
+	router.HandleFunc("/mintPass", route.CreateMintPass)
 	router.HandleFunc("/claim", route.GenerateSignatureForClaim)
 	router.HandleFunc("/fetchTokenUri", route.FetchTokenUri)
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
