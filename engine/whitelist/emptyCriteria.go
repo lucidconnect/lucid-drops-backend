@@ -21,13 +21,13 @@ func CreateEmptyCriteria(input model.NewEmptyCriteriaInput, authDetails *interna
 		return nil, errors.New("item not found")
 	}
 
-	if item.Criteria != nil {
-		//Delete Existing criteria
-		err := engine.DeleteCriteriaIfExists(item)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// if item.Criteria != nil {
+	// 	//Delete Existing criteria
+	// 	err := engine.DeleteCriteriaIfExists(item)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	criteria := &models.EmptyCriteria{
 		ItemID:    item.ID.String(),

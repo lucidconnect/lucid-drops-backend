@@ -25,16 +25,16 @@ func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistI
 		return nil, errors.New("item not found")
 	}
 
-	if item.Criteria != nil {
-		//Delete Existing criteria
-		err := engine.DeleteCriteriaIfExists(item)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// if item.Criteria != nil {
+	// 	//Delete Existing criteria
+	// 	err := engine.DeleteCriteriaIfExists(item)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	if len(input.AuthorizedWalletAddresses) == 0 {
-		return nil, errors.New("please passing in a wallet address list")
+		return nil, errors.New("please pass in a wallet address list")
 	}
 
 	dbWallets := make([]*models.WalletAddressClaim, len(input.AuthorizedWalletAddresses))
@@ -117,12 +117,12 @@ func ValidateAddressCriteria(itemID, walletAddress string, authDetails *internal
 		return resp, errors.New("wallet address has claimed the item already")
 	}
 
-	passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String(), walletAddress)
-	if err != nil {
-		return passResp, err
-	}
+	// passResp, err := CreateMintPassForValidatedCriteriaItem(item.ID.String(), walletAddress)
+	// if err != nil {
+	// 	return passResp, err
+	// }
 
-	return passResp, nil
+	return resp, nil
 }
 
 func resolveENSToAddress(AddressList []string) ([]string, error) {

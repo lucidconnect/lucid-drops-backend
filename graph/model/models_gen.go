@@ -49,19 +49,23 @@ type DeploymentInfo struct {
 }
 
 type Drop struct {
-	ID                    string             `json:"ID"`
-	CreatorID             string             `json:"creatorID"`
-	CreatedAt             time.Time          `json:"createdAt"`
-	Name                  string             `json:"name"`
-	Description           string             `json:"description"`
-	Image                 string             `json:"image"`
-	Thumbnail             string             `json:"thumbnail"`
-	ContractAddress       *string            `json:"contractAddress,omitempty"`
-	Network               *BlockchainNetwork `json:"network,omitempty"`
-	Items                 []*Item            `json:"items"`
-	MintURL               string             `json:"mintUrl"`
-	MintPrice             *float64           `json:"mintPrice,omitempty"`
-	GasIsCreatorSponsored bool               `json:"gasIsCreatorSponsored"`
+	ID                                 string             `json:"ID"`
+	CreatorID                          string             `json:"creatorID"`
+	CreatedAt                          time.Time          `json:"createdAt"`
+	Name                               string             `json:"name"`
+	Description                        string             `json:"description"`
+	Image                              string             `json:"image"`
+	Thumbnail                          string             `json:"thumbnail"`
+	ContractAddress                    *string            `json:"contractAddress,omitempty"`
+	Network                            *BlockchainNetwork `json:"network,omitempty"`
+	Items                              []*Item            `json:"items"`
+	MintURL                            string             `json:"mintUrl"`
+	MintPrice                          *float64           `json:"mintPrice,omitempty"`
+	GasIsCreatorSponsored              bool               `json:"gasIsCreatorSponsored"`
+	FarcasterClaimCriteriaInteractions []*InteractionType `json:"farcasterClaimCriteriaInteractions,omitempty"`
+	ClaimCriteria                      *ClaimCriteriaType `json:"claimCriteria,omitempty"`
+	CastURL                            *string            `json:"castUrl,omitempty"`
+	FarcasterProfileID                 *string            `json:"farcasterProfileID,omitempty"`
 }
 
 type DropInput struct {
@@ -115,7 +119,6 @@ type Item struct {
 	Description                      string             `json:"description"`
 	DropID                           string             `json:"dropId"`
 	DropAddress                      string             `json:"dropAddress"`
-	ClaimCriteria                    *ClaimCriteriaType `json:"claimCriteria,omitempty"`
 	ClaimFee                         int                `json:"claimFee"`
 	Creator                          *CreatorDetails    `json:"creator"`
 	AuthorizedSubdomains             []string           `json:"authorizedSubdomains,omitempty"`
@@ -183,6 +186,13 @@ type NewEmailWhitelistInput struct {
 
 type NewEmptyCriteriaInput struct {
 	ItemID string `json:"itemID"`
+}
+
+type NewFarcasterCriteriaInput struct {
+	DropID       string             `json:"dropID"`
+	Cast         *string            `json:"cast,omitempty"`
+	Interaction  []*InteractionType `json:"interaction,omitempty"`
+	CriteriaType ClaimCriteriaType  `json:"criteriaType"`
 }
 
 type NewPatreonCriteriaInput struct {
@@ -423,6 +433,9 @@ const (
 	ClaimCriteriaTypeEmptyCriteria             ClaimCriteriaType = "emptyCriteria"
 	ClaimCriteriaTypeWalletAddress             ClaimCriteriaType = "walletAddress"
 	ClaimCriteriaTypeClaimCode                 ClaimCriteriaType = "claimCode"
+	ClaimCriteriaTypeFarcasterChannel          ClaimCriteriaType = "farcasterChannel"
+	ClaimCriteriaTypeFarcasterFollowing        ClaimCriteriaType = "farcasterFollowing"
+	ClaimCriteriaTypeFarcasterInteractions     ClaimCriteriaType = "farcasterInteractions"
 )
 
 var AllClaimCriteriaType = []ClaimCriteriaType{
@@ -437,11 +450,14 @@ var AllClaimCriteriaType = []ClaimCriteriaType{
 	ClaimCriteriaTypeEmptyCriteria,
 	ClaimCriteriaTypeWalletAddress,
 	ClaimCriteriaTypeClaimCode,
+	ClaimCriteriaTypeFarcasterChannel,
+	ClaimCriteriaTypeFarcasterFollowing,
+	ClaimCriteriaTypeFarcasterInteractions,
 }
 
 func (e ClaimCriteriaType) IsValid() bool {
 	switch e {
-	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire, ClaimCriteriaTypeEmptyCriteria, ClaimCriteriaTypeWalletAddress, ClaimCriteriaTypeClaimCode:
+	case ClaimCriteriaTypeEmailWhiteList, ClaimCriteriaTypeEmailDomain, ClaimCriteriaTypeTwitterInteractions, ClaimCriteriaTypeTwitterFollowers, ClaimCriteriaTypeTelegram, ClaimCriteriaTypePatreon, ClaimCriteriaTypeDirectAnswerQuestionnaire, ClaimCriteriaTypeMutliChoiceQuestionnaire, ClaimCriteriaTypeEmptyCriteria, ClaimCriteriaTypeWalletAddress, ClaimCriteriaTypeClaimCode, ClaimCriteriaTypeFarcasterChannel, ClaimCriteriaTypeFarcasterFollowing, ClaimCriteriaTypeFarcasterInteractions:
 		return true
 	}
 	return false
@@ -515,17 +531,19 @@ const (
 	InteractionTypeLikes    InteractionType = "likes"
 	InteractionTypeRetweets InteractionType = "retweets"
 	InteractionTypeReplies  InteractionType = "replies"
+	InteractionTypeRecasts  InteractionType = "recasts"
 )
 
 var AllInteractionType = []InteractionType{
 	InteractionTypeLikes,
 	InteractionTypeRetweets,
 	InteractionTypeReplies,
+	InteractionTypeRecasts,
 }
 
 func (e InteractionType) IsValid() bool {
 	switch e {
-	case InteractionTypeLikes, InteractionTypeRetweets, InteractionTypeReplies:
+	case InteractionTypeLikes, InteractionTypeRetweets, InteractionTypeReplies, InteractionTypeRecasts:
 		return true
 	}
 	return false

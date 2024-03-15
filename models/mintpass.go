@@ -9,11 +9,12 @@ import (
 type MintPass struct {
 	Base
 	ItemId        string
+	DropID        string
 	MinterAddress string
 	TokenID       string
 	UsedAt        *time.Time `gorm:"default:null"`
 
-	ItemIdOnContract    int64
+	// ItemIdOnContract    int64
 	DropContractAddress string
 	BlockchainNetwork   *model.BlockchainNetwork `gorm:"default:base"`
 }
