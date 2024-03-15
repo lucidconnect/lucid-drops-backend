@@ -143,7 +143,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateDrop                       func(childComplexity int, input model.DropInput) int
-		CreateEmptyCriteriaForItem       func(childComplexity int, input model.NewEmptyCriteriaInput) int
+		CreateEmptyCriteriaForDrop       func(childComplexity int, input model.NewEmptyCriteriaInput) int
 		CreateFarcasterCriteriaForDrop   func(childComplexity int, input model.NewFarcasterCriteriaInput) int
 		CreateJWTToken                   func(childComplexity int, input *model.CreateJWTTokenInput) int
 		CreateMintPassForNoCriteriaItem  func(childComplexity int, itemID string, walletAddress string) int
@@ -256,7 +256,7 @@ type MutationResolver interface {
 	CreateDrop(ctx context.Context, input model.DropInput) (*model.Drop, error)
 	UpdateDrop(ctx context.Context, dropID string, input model.DropInput) (*model.Drop, error)
 	DeleteDrop(ctx context.Context, dropID string) (*model.Drop, error)
-	CreateEmptyCriteriaForItem(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Item, error)
+	CreateEmptyCriteriaForDrop(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Drop, error)
 	CreateFarcasterCriteriaForDrop(ctx context.Context, input model.NewFarcasterCriteriaInput) (*model.Drop, error)
 	CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error)
 	ValidateFarcasterCriteriaForDrop(ctx context.Context, dropID string, farcasterAddress string) (*model.ValidationRespoonse, error)
@@ -757,17 +757,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateDrop(childComplexity, args["input"].(model.DropInput)), true
 
-	case "Mutation.createEmptyCriteriaForItem":
-		if e.complexity.Mutation.CreateEmptyCriteriaForItem == nil {
+	case "Mutation.createEmptyCriteriaForDrop":
+		if e.complexity.Mutation.CreateEmptyCriteriaForDrop == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createEmptyCriteriaForItem_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createEmptyCriteriaForDrop_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateEmptyCriteriaForItem(childComplexity, args["input"].(model.NewEmptyCriteriaInput)), true
+		return e.complexity.Mutation.CreateEmptyCriteriaForDrop(childComplexity, args["input"].(model.NewEmptyCriteriaInput)), true
 
 	case "Mutation.createFarcasterCriteriaForDrop":
 		if e.complexity.Mutation.CreateFarcasterCriteriaForDrop == nil {
@@ -1505,7 +1505,7 @@ func (ec *executionContext) field_Mutation_createDrop_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createEmptyCriteriaForItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createEmptyCriteriaForDrop_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 model.NewEmptyCriteriaInput
@@ -5160,8 +5160,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteDrop(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createEmptyCriteriaForItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createEmptyCriteriaForItem(ctx, field)
+func (ec *executionContext) _Mutation_createEmptyCriteriaForDrop(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createEmptyCriteriaForDrop(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5174,7 +5174,7 @@ func (ec *executionContext) _Mutation_createEmptyCriteriaForItem(ctx context.Con
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateEmptyCriteriaForItem(rctx, fc.Args["input"].(model.NewEmptyCriteriaInput))
+		return ec.resolvers.Mutation().CreateEmptyCriteriaForDrop(rctx, fc.Args["input"].(model.NewEmptyCriteriaInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5186,12 +5186,12 @@ func (ec *executionContext) _Mutation_createEmptyCriteriaForItem(ctx context.Con
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Item)
+	res := resTmp.(*model.Drop)
 	fc.Result = res
-	return ec.marshalNItem2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐItem(ctx, field.Selections, res)
+	return ec.marshalNDrop2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐDrop(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForDrop(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -5200,47 +5200,41 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "ID":
-				return ec.fieldContext_Item_ID(ctx, field)
-			case "name":
-				return ec.fieldContext_Item_name(ctx, field)
-			case "image":
-				return ec.fieldContext_Item_image(ctx, field)
-			case "description":
-				return ec.fieldContext_Item_description(ctx, field)
-			case "dropId":
-				return ec.fieldContext_Item_dropId(ctx, field)
-			case "dropAddress":
-				return ec.fieldContext_Item_dropAddress(ctx, field)
-			case "claimFee":
-				return ec.fieldContext_Item_claimFee(ctx, field)
-			case "creator":
-				return ec.fieldContext_Item_creator(ctx, field)
-			case "authorizedSubdomains":
-				return ec.fieldContext_Item_authorizedSubdomains(ctx, field)
-			case "twitterClaimCriteriaInteractions":
-				return ec.fieldContext_Item_twitterClaimCriteriaInteractions(ctx, field)
-			case "telegramGroupTitle":
-				return ec.fieldContext_Item_telegramGroupTitle(ctx, field)
-			case "tweetLink":
-				return ec.fieldContext_Item_tweetLink(ctx, field)
-			case "profileLink":
-				return ec.fieldContext_Item_profileLink(ctx, field)
-			case "campaignName":
-				return ec.fieldContext_Item_campaignName(ctx, field)
-			case "editionLimit":
-				return ec.fieldContext_Item_editionLimit(ctx, field)
-			case "TokenID":
-				return ec.fieldContext_Item_TokenID(ctx, field)
+				return ec.fieldContext_Drop_ID(ctx, field)
+			case "creatorID":
+				return ec.fieldContext_Drop_creatorID(ctx, field)
 			case "createdAt":
-				return ec.fieldContext_Item_createdAt(ctx, field)
-			case "deadline":
-				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
-			case "holders":
-				return ec.fieldContext_Item_holders(ctx, field)
+				return ec.fieldContext_Drop_createdAt(ctx, field)
+			case "name":
+				return ec.fieldContext_Drop_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Drop_description(ctx, field)
+			case "image":
+				return ec.fieldContext_Drop_image(ctx, field)
+			case "thumbnail":
+				return ec.fieldContext_Drop_thumbnail(ctx, field)
+			case "contractAddress":
+				return ec.fieldContext_Drop_contractAddress(ctx, field)
+			case "network":
+				return ec.fieldContext_Drop_network(ctx, field)
+			case "items":
+				return ec.fieldContext_Drop_items(ctx, field)
+			case "mintUrl":
+				return ec.fieldContext_Drop_mintUrl(ctx, field)
+			case "mintPrice":
+				return ec.fieldContext_Drop_mintPrice(ctx, field)
+			case "gasIsCreatorSponsored":
+				return ec.fieldContext_Drop_gasIsCreatorSponsored(ctx, field)
+			case "farcasterClaimCriteriaInteractions":
+				return ec.fieldContext_Drop_farcasterClaimCriteriaInteractions(ctx, field)
+			case "claimCriteria":
+				return ec.fieldContext_Drop_claimCriteria(ctx, field)
+			case "castUrl":
+				return ec.fieldContext_Drop_castUrl(ctx, field)
+			case "farcasterProfileID":
+				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Item", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
 	}
 	defer func() {
@@ -5250,7 +5244,7 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForItem(ctx
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createEmptyCriteriaForItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createEmptyCriteriaForDrop_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -11192,22 +11186,22 @@ func (ec *executionContext) unmarshalInputNewEmptyCriteriaInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"itemID"}
+	fieldsInOrder := [...]string{"dropID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "itemID":
+		case "dropID":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dropID"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ItemID = data
+			it.DropID = data
 		}
 	}
 
@@ -12530,9 +12524,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createEmptyCriteriaForItem":
+		case "createEmptyCriteriaForDrop":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createEmptyCriteriaForItem(ctx, field)
+				return ec._Mutation_createEmptyCriteriaForDrop(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

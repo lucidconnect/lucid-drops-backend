@@ -126,8 +126,8 @@ func (r *mutationResolver) DeleteDrop(ctx context.Context, dropID string) (*mode
 	return drops.DeleteDrop(dropID, authenticationDetails)
 }
 
-// CreateEmptyCriteriaForItem is the resolver for the createEmptyCriteriaForItem field.
-func (r *mutationResolver) CreateEmptyCriteriaForItem(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Item, error) {
+// CreateEmptyCriteriaForDrop is the resolver for the createEmptyCriteriaForDrop field.
+func (r *mutationResolver) CreateEmptyCriteriaForDrop(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Drop, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)

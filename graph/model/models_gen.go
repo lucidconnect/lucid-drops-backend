@@ -185,7 +185,7 @@ type NewEmailWhitelistInput struct {
 }
 
 type NewEmptyCriteriaInput struct {
-	ItemID string `json:"itemID"`
+	DropID string `json:"dropID"`
 }
 
 type NewFarcasterCriteriaInput struct {
