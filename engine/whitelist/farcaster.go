@@ -48,11 +48,18 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 	criteria := &models.FarcasterCriteria{
 		DropId:             drop.ID,
 		CreatorID:          creator.ID,
-		CastUrl:            *input.CastURL,
-		ChannelID:          *input.ChannelID,
-		FarcasterProfileID: *input.FarcasterProfileID,
 		CriteriaType:       input.CriteriaType,
 	}
+	if input.CastURL != nil {
+		criteria.CastUrl = *input.CastURL
+	}
+	if input.ChannelID != nil {
+		criteria.CastUrl = *input.ChannelID
+	}
+	if input.FarcasterProfileID != nil {
+		criteria.CastUrl = *input.FarcasterProfileID
+	}
+	
 	drop.Criteria = &input.CriteriaType
 	if err = engine.SaveModel(drop); err != nil {
 		return nil, err
