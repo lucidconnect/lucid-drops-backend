@@ -54,10 +54,10 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 		criteria.CastUrl = *input.CastURL
 	}
 	if input.ChannelID != nil {
-		criteria.CastUrl = *input.ChannelID
+		criteria.ChannelID = *input.ChannelID
 	}
 	if input.FarcasterProfileID != nil {
-		criteria.CastUrl = *input.FarcasterProfileID
+		criteria.FarcasterProfileID = *input.FarcasterProfileID
 	}
 	
 	drop.Criteria = &input.CriteriaType
