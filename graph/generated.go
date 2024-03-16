@@ -72,6 +72,7 @@ type ComplexityRoot struct {
 		CreatedAt                          func(childComplexity int) int
 		CreatorID                          func(childComplexity int) int
 		Description                        func(childComplexity int) int
+		FarcasterChannelID                 func(childComplexity int) int
 		FarcasterClaimCriteriaInteractions func(childComplexity int) int
 		FarcasterProfileID                 func(childComplexity int) int
 		GasIsCreatorSponsored              func(childComplexity int) int
@@ -401,6 +402,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Drop.Description(childComplexity), true
+
+	case "Drop.farcasterChannelId":
+		if e.complexity.Drop.FarcasterChannelID == nil {
+			break
+		}
+
+		return e.complexity.Drop.FarcasterChannelID(childComplexity), true
 
 	case "Drop.farcasterClaimCriteriaInteractions":
 		if e.complexity.Drop.FarcasterClaimCriteriaInteractions == nil {
@@ -3102,6 +3110,47 @@ func (ec *executionContext) fieldContext_Drop_farcasterProfileID(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _Drop_farcasterChannelId(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FarcasterChannelID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_farcasterChannelId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ImageResponse_image(ctx context.Context, field graphql.CollectedField, obj *model.ImageResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ImageResponse_image(ctx, field)
 	if err != nil {
@@ -4960,6 +5009,8 @@ func (ec *executionContext) fieldContext_Mutation_createDrop(ctx context.Context
 				return ec.fieldContext_Drop_castUrl(ctx, field)
 			case "farcasterProfileID":
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			case "farcasterChannelId":
+				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5051,6 +5102,8 @@ func (ec *executionContext) fieldContext_Mutation_updateDrop(ctx context.Context
 				return ec.fieldContext_Drop_castUrl(ctx, field)
 			case "farcasterProfileID":
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			case "farcasterChannelId":
+				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5142,6 +5195,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteDrop(ctx context.Context
 				return ec.fieldContext_Drop_castUrl(ctx, field)
 			case "farcasterProfileID":
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			case "farcasterChannelId":
+				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5233,6 +5288,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForDrop(ctx
 				return ec.fieldContext_Drop_castUrl(ctx, field)
 			case "farcasterProfileID":
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			case "farcasterChannelId":
+				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5324,6 +5381,8 @@ func (ec *executionContext) fieldContext_Mutation_createFarcasterCriteriaForDrop
 				return ec.fieldContext_Drop_castUrl(ctx, field)
 			case "farcasterProfileID":
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			case "farcasterChannelId":
+				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -6347,6 +6406,8 @@ func (ec *executionContext) fieldContext_Query_fetchDropById(ctx context.Context
 				return ec.fieldContext_Drop_castUrl(ctx, field)
 			case "farcasterProfileID":
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			case "farcasterChannelId":
+				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -6438,6 +6499,8 @@ func (ec *executionContext) fieldContext_Query_fetchCreatorDrops(ctx context.Con
 				return ec.fieldContext_Drop_castUrl(ctx, field)
 			case "farcasterProfileID":
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			case "farcasterChannelId":
+				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -7160,6 +7223,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedDrops(ctx context.Co
 				return ec.fieldContext_Drop_castUrl(ctx, field)
 			case "farcasterProfileID":
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			case "farcasterChannelId":
+				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -10357,6 +10422,8 @@ func (ec *executionContext) fieldContext_userProfileType_drops(ctx context.Conte
 				return ec.fieldContext_Drop_castUrl(ctx, field)
 			case "farcasterProfileID":
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
+			case "farcasterChannelId":
+				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -12023,6 +12090,8 @@ func (ec *executionContext) _Drop(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Drop_castUrl(ctx, field, obj)
 		case "farcasterProfileID":
 			out.Values[i] = ec._Drop_farcasterProfileID(ctx, field, obj)
+		case "farcasterChannelId":
+			out.Values[i] = ec._Drop_farcasterChannelId(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

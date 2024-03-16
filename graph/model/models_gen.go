@@ -66,6 +66,7 @@ type Drop struct {
 	ClaimCriteria                      *ClaimCriteriaType `json:"claimCriteria,omitempty"`
 	CastURL                            *string            `json:"castUrl,omitempty"`
 	FarcasterProfileID                 *string            `json:"farcasterProfileID,omitempty"`
+	FarcasterChannelID                 *string            `json:"farcasterChannelId,omitempty"`
 }
 
 type DropInput struct {

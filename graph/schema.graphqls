@@ -281,6 +281,7 @@ type Drop {
   claimCriteria: ClaimCriteriaType
   castUrl: String
   farcasterProfileID: String
+  farcasterChannelId: String
 }
 
 type OnboardingProgress{
