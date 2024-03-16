@@ -402,21 +402,22 @@ func DeleteCriteriaIfExists(drop *models.Drop) error {
 	switch *drop.Criteria {
 	case model.ClaimCriteriaTypeFarcasterChannel:
 		fmt.Println("delete stuff", drop.ID)
-		err = dbutils.DB.Where("drop_id = ?", drop.ID).Unscoped().Delete(&models.FarcasterCriteria{}).Error
+		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID.String()).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Msg("some error")
 			return errors.New("an error occured while updating updating farcaster criteria")
 		}
 	case model.ClaimCriteriaTypeFarcasterFollowing:
 		fmt.Println("delete stuff", drop.ID)
-		err = dbutils.DB.Where("drop_id = ?", drop.ID).Unscoped().Delete(&models.FarcasterCriteria{}).Error
+
+		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Msg("some error")
 			return errors.New("an error occured while updating updating farcaster criteria")
 		}
 	case model.ClaimCriteriaTypeFarcasterInteractions:
 		fmt.Println("delete stuff", drop.ID)
-		err = dbutils.DB.Where("drop_id = ?", drop.ID).Unscoped().Delete(&models.FarcasterCriteria{}).Error
+		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Msg("some error")
 			return errors.New("an error occured while updating updating farcaster criteria")
