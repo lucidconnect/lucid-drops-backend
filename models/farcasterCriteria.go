@@ -7,7 +7,7 @@ import (
 
 type FarcasterCriteria struct {
 	Base
-	DropId             uuid.UUID `gorm:"index:idx_drop_id;not null"`
+	DropId             uuid.UUID `gorm:"not null"`
 	CreatorID          uuid.UUID
 	CastUrl            string
 	CriteriaType       model.ClaimCriteriaType
