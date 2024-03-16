@@ -40,9 +40,6 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 		}
 	}
 
-	if len(input.Interaction) == 0 {
-		return nil, errors.New("please pass in some farcaster interaction type")
-	}
 	var interactions string
 	for _, interaction := range input.Interaction {
 		interactions += fmt.Sprintf("%v,", interaction.String())
