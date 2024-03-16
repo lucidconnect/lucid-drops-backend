@@ -10,6 +10,7 @@ import (
 	"github.com/lucidconnect/inverse/graph/model"
 	"github.com/lucidconnect/inverse/models"
 	"github.com/lucidconnect/inverse/utils"
+	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -398,6 +399,24 @@ func DeleteCriteriaIfExists(drop *models.Drop) error {
 
 	var err error
 	switch *drop.Criteria {
+	case (model.ClaimCriteriaTypeFarcasterChannel):
+		err = dbutils.DB.Unscoped().Delete(&models.FarcasterCriteria{}, "drop_id = ?", drop.ID).Error
+		if err != nil {
+			log.Err(err).Caller().Send()
+			return errors.New("an error occured while updating updating farcaster criteria")
+		}
+	case model.ClaimCriteriaTypeFarcasterFollowing:
+		err = dbutils.DB.Unscoped().Delete(&models.FarcasterCriteria{}, "drop_id = ?", drop.ID).Error
+		if err != nil {
+			log.Err(err).Caller().Send()
+			return errors.New("an error occured while updating updating farcaster criteria")
+		}
+	case model.ClaimCriteriaTypeFarcasterInteractions:
+		err = dbutils.DB.Unscoped().Delete(&models.FarcasterCriteria{}, "drop_id = ?", drop.ID).Error
+		if err != nil {
+			log.Err(err).Caller().Send()
+			return errors.New("an error occured while updating updating farcaster criteria")
+		}
 	case model.ClaimCriteriaTypeTwitterInteractions:
 		//Delete existing twitter criteria
 		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "drop_id = ?", drop.ID).Error
