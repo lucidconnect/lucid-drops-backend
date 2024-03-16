@@ -11215,7 +11215,7 @@ func (ec *executionContext) unmarshalInputNewFarcasterCriteriaInput(ctx context.
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"dropID", "cast", "interaction", "criteriaType"}
+	fieldsInOrder := [...]string{"dropID", "castUrl", "channelId", "farcasterProfileId", "interaction", "criteriaType"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -11231,15 +11231,33 @@ func (ec *executionContext) unmarshalInputNewFarcasterCriteriaInput(ctx context.
 				return it, err
 			}
 			it.DropID = data
-		case "cast":
+		case "castUrl":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cast"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("castUrl"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.Cast = data
+			it.CastURL = data
+		case "channelId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("channelId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ChannelID = data
+		case "farcasterProfileId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("farcasterProfileId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.FarcasterProfileID = data
 		case "interaction":
 			var err error
 
