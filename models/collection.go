@@ -22,7 +22,7 @@ type Drop struct {
 	MintPrice              *float64
 	GasIsCreatorSponsored  bool
 	Criteria               *model.ClaimCriteriaType
-	FarcasterCriteria      *FarcasterCriteria
+	FarcasterCriteria      *FarcasterCriteria `gorm:"foreignKey:DropId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	UserLimit              *int `gorm:"default:null"`
 	EditionLimit           *int `gorm:"default:null"`
 }
