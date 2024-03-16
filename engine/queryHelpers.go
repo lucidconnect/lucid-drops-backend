@@ -398,6 +398,7 @@ func GetFeaturedDrops() ([]*models.Drop, error) {
 func DeleteCriteriaIfExists(drop *models.Drop) error {
 
 	var err error
+	fmt.Println(drop.Criteria)
 	switch *drop.Criteria {
 	case model.ClaimCriteriaTypeFarcasterChannel:
 		err = dbutils.DB.Unscoped().Delete(&models.FarcasterCriteria{}, "drop_id = ?", drop.ID).Error
