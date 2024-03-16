@@ -47,7 +47,7 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 	}
 
 	criteria := &models.FarcasterCriteria{
-		DropID:       drop.ID,
+		DropId:       drop.ID,
 		CreatorID:    creator.ID,
 		CriteriaType: input.CriteriaType,
 	}
