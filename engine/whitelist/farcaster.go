@@ -29,7 +29,7 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 
 	drop, err := engine.GetDropByID(input.DropID)
 	if err != nil {
-		return nil, errors.New("item not found")
+		return nil, errors.New("drop not found")
 	}
 
 	if drop.Criteria != nil {
