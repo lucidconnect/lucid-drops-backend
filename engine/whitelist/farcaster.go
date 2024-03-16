@@ -32,6 +32,7 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 		return nil, errors.New("drop not found")
 	}
 
+	fmt.Println("drop", drop)
 	if drop.Criteria != nil {
 		//Delete Existing criteria
 		err := engine.DeleteCriteriaIfExists(drop)
@@ -46,9 +47,9 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 	}
 
 	criteria := &models.FarcasterCriteria{
-		DropId:             drop.ID,
-		CreatorID:          creator.ID,
-		CriteriaType:       input.CriteriaType,
+		DropId:       drop.ID,
+		CreatorID:    creator.ID,
+		CriteriaType: input.CriteriaType,
 	}
 	if input.CastURL != nil {
 		criteria.CastUrl = *input.CastURL
@@ -59,7 +60,7 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 	if input.FarcasterProfileID != nil {
 		criteria.FarcasterProfileID = *input.FarcasterProfileID
 	}
-	
+
 	drop.Criteria = &input.CriteriaType
 	if err = engine.SaveModel(drop); err != nil {
 		return nil, err
