@@ -108,7 +108,7 @@ func GetCreatorByInverseUsername(inverseUsername string) (*models.Creator, error
 func GetDropByID(dropID string) (*models.Drop, error) {
 	var drop models.Drop
 
-	err := dbutils.DB.Where("id=?", dropID).First(&drop).Error
+	err := dbutils.DB.Where("id=?", dropID).Preload("FarcasterCriteria").First(&drop).Error
 	if err != nil {
 		return nil, errors.New("drop not found")
 	}
