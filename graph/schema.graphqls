@@ -173,7 +173,7 @@ input NewFarcasterCriteriaInput {
   dropID: String!
   castUrl: String
   channelId: String
-  farcasterProfileI: String
+  farcasterProfileId: String
   interaction: [InteractionType]
   criteriaType: ClaimCriteriaType!
 }
