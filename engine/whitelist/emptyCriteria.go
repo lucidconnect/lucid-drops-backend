@@ -9,14 +9,14 @@ import (
 	"github.com/lucidconnect/inverse/models"
 )
 
-func CreateEmptyCriteria(input model.NewEmptyCriteriaInput, authDetails *internal.AuthDetails) (*model.Item, error) {
+func CreateEmptyCriteria(input model.NewEmptyCriteriaInput, authDetails *internal.AuthDetails) (*model.Drop, error) {
 
 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
 	if err != nil {
 		return nil, errors.New("creator has not been onboarded to create a new drop")
 	}
 
-	item, err := engine.GetItemByID(input.ItemID)
+	drop, err := engine.GetDropByID(input.DropID)
 	if err != nil {
 		return nil, errors.New("item not found")
 	}
@@ -30,14 +30,14 @@ func CreateEmptyCriteria(input model.NewEmptyCriteriaInput, authDetails *interna
 	// }
 
 	criteria := &models.EmptyCriteria{
-		ItemID:    item.ID.String(),
+		DropID:    drop.ID.String(),
 		CreatorID: creator.ID.String(),
 	}
 
 	emptyCriteria := model.ClaimCriteriaTypeEmptyCriteria
-	item.Criteria = &emptyCriteria
+	drop.Criteria = &emptyCriteria
 
-	itemUpdateErr := engine.SaveModel(item)
+	itemUpdateErr := engine.SaveModel(drop)
 	if itemUpdateErr != nil {
 		return nil, itemUpdateErr
 	}
@@ -47,5 +47,5 @@ func CreateEmptyCriteria(input model.NewEmptyCriteriaInput, authDetails *interna
 		return nil, criteriaUpdateErr
 	}
 
-	return item.ToGraphData(), nil
+	return drop.ToGraphData(nil), nil
 }

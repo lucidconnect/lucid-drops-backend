@@ -50,7 +50,7 @@ type Mutation {
   # createWalletAddressWhitelistForItem(input: NewWalletAddressWhitelistInput!): Item!
   # createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
   # createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
-  createEmptyCriteriaForItem(input: NewEmptyCriteriaInput!): Item!
+  createEmptyCriteriaForDrop(input: NewEmptyCriteriaInput!): Drop!
   createFarcasterCriteriaForDrop(input: NewFarcasterCriteriaInput!): Drop!
   createMintPassForNoCriteriaItem(itemID: String!, walletAddress: String!): ValidationRespoonse
   # validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
@@ -195,8 +195,7 @@ input NewTelegramCriteriaInput {
 }
 
 input NewEmptyCriteriaInput {
-	itemID: String!
-
+	dropID: String!
 }
 
 input NewPatreonCriteriaInput {
