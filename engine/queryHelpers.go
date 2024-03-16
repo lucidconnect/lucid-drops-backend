@@ -401,7 +401,8 @@ func DeleteCriteriaIfExists(drop *models.Drop) error {
 	fmt.Println(drop.Criteria)
 	switch *drop.Criteria {
 	case model.ClaimCriteriaTypeFarcasterChannel:
-		err = dbutils.DB.Unscoped().Delete(&models.FarcasterCriteria{}, "drop_id = ?", drop.ID).Error
+		fmt.Println("delete stuff")
+		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Send()
 			return errors.New("an error occured while updating updating farcaster criteria")
@@ -414,7 +415,8 @@ func DeleteCriteriaIfExists(drop *models.Drop) error {
 			return errors.New("an error occured while updating updating farcaster criteria")
 		}
 	case model.ClaimCriteriaTypeFarcasterInteractions:
-		err = dbutils.DB.Unscoped().Delete(&models.FarcasterCriteria{}, "drop_id = ?", drop.ID).Error
+		fmt.Println("delete stuff")
+		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Send()
 			return errors.New("an error occured while updating updating farcaster criteria")
