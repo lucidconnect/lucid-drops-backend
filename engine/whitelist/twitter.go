@@ -65,14 +65,14 @@ func CreateTwitterCriteria(input model.NewTwitterCriteriaInput, authDetails *int
 		ProfileID:    profileID,
 		TweetLink:    tweetLink,
 		TweetID:      *tweetID,
-		CriteriaType: input.CriteriaType,
+		// CriteriaType: input.CriteriaType,
 		Interactions: interactions,
 		AuthID:       input.TwitterAuthID,
 		CutOffDate:   date,
 	}
 
-	twitterCriteria := input.CriteriaType
-	item.Criteria = &twitterCriteria
+	// twitterCriteria := input.CriteriaType
+	// item.Criteria = &twitterCriteria
 	itemUpdateErr := engine.SaveModel(item)
 	if itemUpdateErr != nil {
 		return nil, itemUpdateErr

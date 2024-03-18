@@ -161,9 +161,9 @@ func CreateMintPassForValidatedCriteriaDrop(dropID, walletAddress string) (*mode
 	// 	}
 	// }
 
-	if drop.Criteria == nil {
-		return nil, errors.New("unable to generate mintpass for this item")
-	}
+	// if drop.Criteria == nil {
+	// 	return nil, errors.New("unable to generate mintpass for this item")
+	// }
 
 	// drop, err := engine.GetDropByID(item.DropID.String())
 	// if err != nil {

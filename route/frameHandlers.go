@@ -7,6 +7,7 @@ import (
 	"github.com/lucidconnect/inverse/engine"
 	"github.com/lucidconnect/inverse/engine/whitelist"
 	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/models"
 	"github.com/rs/zerolog/log"
 )
 
@@ -17,7 +18,7 @@ func CreateMintPass(w http.ResponseWriter, r *http.Request) {
 
 	var pass *model.ValidationRespoonse
 	var err error
-	if drop.FarcasterCriteria != nil {
+	if drop.FarcasterCriteria != (models.FarcasterCriteria{}) {
 		pass, err = whitelist.ValidateFarcasterCriteriaForDrop(walletAddress, dropId)
 		if err != nil {
 			log.Err(err).Caller().Msg("GenerateSignatureForClaim")

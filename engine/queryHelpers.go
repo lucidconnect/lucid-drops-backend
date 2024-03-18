@@ -396,39 +396,17 @@ func GetFeaturedDrops() ([]*models.Drop, error) {
 }
 
 func DeleteCriteriaIfExists(drop *models.Drop) error {
-
 	var err error
 	fmt.Println(drop.Criteria)
 	switch *drop.Criteria {
-	case model.ClaimCriteriaTypeFarcasterChannel:
+	case model.ClaimCriteriaTypeFarcasterChannel, model.ClaimCriteriaTypeFarcasterFollowing, model.ClaimCriteriaTypeFarcasterInteractions:
 		fmt.Println("delete stuff", drop.ID)
 		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID.String()).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Msg("some error")
 			return errors.New("an error occured while updating updating farcaster criteria")
 		}
-	case model.ClaimCriteriaTypeFarcasterFollowing:
-		fmt.Println("delete stuff", drop.ID)
-
-		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID).Delete(&models.FarcasterCriteria{}).Error
-		if err != nil {
-			log.Err(err).Caller().Msg("some error")
-			return errors.New("an error occured while updating updating farcaster criteria")
-		}
-	case model.ClaimCriteriaTypeFarcasterInteractions:
-		fmt.Println("delete stuff", drop.ID)
-		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID).Delete(&models.FarcasterCriteria{}).Error
-		if err != nil {
-			log.Err(err).Caller().Msg("some error")
-			return errors.New("an error occured while updating updating farcaster criteria")
-		}
-	case model.ClaimCriteriaTypeTwitterInteractions:
-		//Delete existing twitter criteria
-		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "drop_id = ?", drop.ID).Error
-		if err != nil {
-			return errors.New("an error occured while updating updating twitter criteria")
-		}
-	case model.ClaimCriteriaTypeTwitterFollowers:
+	case model.ClaimCriteriaTypeTwitterInteractions, model.ClaimCriteriaTypeTwitterFollowers:
 		//Delete existing twitter criteria
 		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "drop_id = ?", drop.ID).Error
 		if err != nil {
