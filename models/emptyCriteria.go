@@ -2,6 +2,6 @@ package models
 
 type EmptyCriteria struct {
 	Base
-	ItemID       string `gorm:"index"`
+	DropID       string `gorm:"index"`
 	CreatorID    string `gorm:"index"`
 }

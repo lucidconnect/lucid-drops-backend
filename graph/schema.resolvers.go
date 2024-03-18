@@ -69,7 +69,7 @@ func (r *itemResolver) AuthorizedSubdomains(ctx context.Context, obj *model.Item
 
 // Holders is the resolver for the holders field.
 func (r *itemResolver) Holders(ctx context.Context, obj *model.Item) ([]string, error) {
-	nftHolders, err := drops.FetchNftHolders(obj) 
+	nftHolders, err := drops.FetchNftHolders(obj)
 	if err != nil {
 		return nil, err
 	}
@@ -126,125 +126,8 @@ func (r *mutationResolver) DeleteDrop(ctx context.Context, dropID string) (*mode
 	return drops.DeleteDrop(dropID, authenticationDetails)
 }
 
-// CreateItem is the resolver for the createItem field.
-func (r *mutationResolver) CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return drops.CreateItem(&input, authenticationDetails)
-}
-
-// TempCreateItem is the resolver for the tempCreateItem field.
-func (r *mutationResolver) TempCreateItem(ctx context.Context, input model.ItemInput, creatorAddress string) (*model.Item, error) {
-	return drops.TempCreateItem(&input, &internal.AuthDetails{
-		Address: common.HexToAddress(creatorAddress),
-	})
-}
-
-// UpdateItem is the resolver for the updateItem field.
-func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return drops.UpdateItem(itemID, &input, authenticationDetails)
-}
-
-// DeleteItem is the resolver for the deleteItem field.
-func (r *mutationResolver) DeleteItem(ctx context.Context, itemID string) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return drops.DeleteItem(itemID, authenticationDetails)
-}
-
-// AddItemDeadline is the resolver for the addItemDeadline field.
-func (r *mutationResolver) AddItemDeadline(ctx context.Context, itemID string, deadline string) (*model.Item, error) {
-	return drops.SetItemClaimDeadline(itemID, deadline)
-}
-
-// CreateQuestionnaireCriteriaForItem is the resolver for the createQuestionnaireCriteriaForItem field.
-func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	created, err := whitelist.CreateQuestionnaireCriteriaForItem(authenticationDetails, &input)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return created, nil
-}
-
-// CreateEmailWhitelistForItem is the resolver for the createEmailWhitelistForItem field.
-func (r *mutationResolver) CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error) {
-	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	// if err != nil {
-	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	// }
-
-	return nil, fmt.Errorf("Not Implemented")
-}
-
-// CreateWalletAddressWhitelistForItem is the resolver for the createWalletAddressWhitelistForItem field.
-func (r *mutationResolver) CreateWalletAddressWhitelistForItem(ctx context.Context, input model.NewWalletAddressWhitelistInput) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return whitelist.CreateWalletAddressWhitelistForItem(&input, authenticationDetails)
-}
-
-// CreateEmailDomainWhitelist is the resolver for the createEmailDomainWhitelist field.
-func (r *mutationResolver) CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return whitelist.CreateEmailDomainWhitelist(&input, authenticationDetails)
-}
-
-// CreateTwitterCriteriaForItem is the resolver for the createTwitterCriteriaForItem field.
-func (r *mutationResolver) CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return whitelist.CreateTwitterCriteria(input, authenticationDetails)
-}
-
-// CreateTelegramCriteriaForItem is the resolver for the createTelegramCriteriaForItem field.
-func (r *mutationResolver) CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return whitelist.CreateTelegramCriteria(input, authenticationDetails)
-}
-
-// CreatePatreonCriteriaForItem is the resolver for the createPatreonCriteriaForItem field.
-func (r *mutationResolver) CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
-
-	return whitelist.CreatePatreonCriteria(input, authenticationDetails)
-}
-
-// CreateEmptyCriteriaForItem is the resolver for the createEmptyCriteriaForItem field.
-func (r *mutationResolver) CreateEmptyCriteriaForItem(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Item, error) {
+// CreateEmptyCriteriaForDrop is the resolver for the createEmptyCriteriaForDrop field.
+func (r *mutationResolver) CreateEmptyCriteriaForDrop(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Drop, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
@@ -253,50 +136,23 @@ func (r *mutationResolver) CreateEmptyCriteriaForItem(ctx context.Context, input
 	return whitelist.CreateEmptyCriteria(input, authenticationDetails)
 }
 
+// CreateFarcasterCriteriaForDrop is the resolver for the createFarcasterCriteriaForDrop field.
+func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, input model.NewFarcasterCriteriaInput) (*model.Drop, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+	return whitelist.CreateFarcasterWhitelistForDrop(input, authenticationDetails)
+}
+
 // CreateMintPassForNoCriteriaItem is the resolver for the createMintPassForNoCriteriaItem field.
 func (r *mutationResolver) CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error) {
-	return whitelist.CreateMintPassForNoCriteriaItem(itemID, "")
+	return whitelist.CreateMintPassForNoCriteriaDrop(itemID, walletAddress)
 }
 
-// ValidateTwitterCriteriaForItem is the resolver for the validateTwitterCriteriaForItem field.
-func (r *mutationResolver) ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
-	if authID == nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
-	}
-
-	return whitelist.ValidateTwitterCriteriaForItem(itemID, *authID)
-}
-
-// ValidateTelegramCriteriaForItem is the resolver for the validateTelegramCriteriaForItem field.
-func (r *mutationResolver) ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
-	if authID == nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
-	}
-
-	return nil, fmt.Errorf("Not Implemented")
-}
-
-// ValidatePatreonCriteriaForItem is the resolver for the validatePatreonCriteriaForItem field.
-func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
-	if authID == nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
-	}
-
-	return nil, fmt.Errorf("Not Implemented")
-}
-
-// ValidateWalletCriteriaForItem is the resolver for the validateWalletCriteriaForItem field.
-func (r *mutationResolver) ValidateWalletCriteriaForItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error) {
-	if walletAddress == "" {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "wallet address is required", ctx)
-	}
-
-	return whitelist.ValidateAddressCriteria(itemID, walletAddress, nil)
-}
-
-// ValidateQuestionnaireCriteriaForItem is the resolver for the validateQuestionnaireCriteriaForItem field.
-func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
-	return nil, fmt.Errorf("Not Implemented")
+// ValidateFarcasterCriteriaForDrop is the resolver for the validateFarcasterCriteriaForDrop field.
+func (r *mutationResolver) ValidateFarcasterCriteriaForDrop(ctx context.Context, dropID string, farcasterAddress string) (*model.ValidationRespoonse, error) {
+	return whitelist.ValidateFarcasterCriteriaForDrop(farcasterAddress, dropID)
 }
 
 // CreateJWTToken is the resolver for the createJWTToken field.
@@ -312,16 +168,6 @@ func (r *mutationResolver) CreatePaymentIntentSecretKey(ctx context.Context, amo
 	}
 
 	return wallet.GenerateCreatorPaymentIntentSecret(authenticationDetails, int64(amount))
-}
-
-// StartEmailVerificationForClaim is the resolver for the startEmailVerificationForClaim field.
-func (r *mutationResolver) StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error) {
-	return whitelist.StartEmailVerificationForClaim(&input)
-}
-
-// CompleteEmailVerificationForClaim is the resolver for the completeEmailVerificationForClaim field.
-func (r *mutationResolver) CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error) {
-	return nil, fmt.Errorf("Not Implemented")
 }
 
 // GenerateSignatureForClaim is the resolver for the generateSignatureForClaim field.
@@ -562,6 +408,134 @@ type queryResolver struct{ *Resolver }
 //   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *mutationResolver) CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return drops.CreateItem(&input, authenticationDetails)
+}
+func (r *mutationResolver) TempCreateItem(ctx context.Context, input model.ItemInput, creatorAddress string) (*model.Item, error) {
+	return drops.TempCreateItem(&input, &internal.AuthDetails{
+		Address: common.HexToAddress(creatorAddress),
+	})
+}
+func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return drops.UpdateItem(itemID, &input, authenticationDetails)
+}
+func (r *mutationResolver) DeleteItem(ctx context.Context, itemID string) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return drops.DeleteItem(itemID, authenticationDetails)
+}
+func (r *mutationResolver) AddItemDeadline(ctx context.Context, itemID string, deadline string) (*model.Item, error) {
+	return drops.SetItemClaimDeadline(itemID, deadline)
+}
+func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (*model.Item, error) {
+	_, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return nil, fmt.Errorf("not implemented")
+}
+func (r *mutationResolver) CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error) {
+	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	// if err != nil {
+	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	// }
+
+	return nil, fmt.Errorf("not implemented")
+}
+func (r *mutationResolver) CreateWalletAddressWhitelistForItem(ctx context.Context, input model.NewWalletAddressWhitelistInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return whitelist.CreateWalletAddressWhitelistForItem(&input, authenticationDetails)
+}
+func (r *mutationResolver) CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return whitelist.CreateEmailDomainWhitelist(&input, authenticationDetails)
+}
+func (r *mutationResolver) CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return whitelist.CreateTwitterCriteria(input, authenticationDetails)
+}
+func (r *mutationResolver) CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error) {
+	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return whitelist.CreateTelegramCriteria(input, authenticationDetails)
+}
+func (r *mutationResolver) CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error) {
+	_, err := internal.GetAuthDetailsFromContext(ctx)
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	}
+
+	return nil, fmt.Errorf("not implemented")
+}
+func (r *mutationResolver) ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
+	if authID == nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+	}
+
+	return whitelist.ValidateTwitterCriteriaForItem(itemID, *authID)
+}
+func (r *mutationResolver) ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
+	if authID == nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+	}
+
+	return nil, fmt.Errorf("Not Implemented")
+}
+func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
+	if authID == nil {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+	}
+
+	return nil, fmt.Errorf("Not Implemented")
+}
+func (r *mutationResolver) ValidateWalletCriteriaForItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error) {
+	if walletAddress == "" {
+		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "wallet address is required", ctx)
+	}
+
+	return whitelist.ValidateAddressCriteria(itemID, walletAddress, nil)
+}
+func (r *mutationResolver) ValidateQuestionnaireCriteriaForItem(ctx context.Context, itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
+	return nil, fmt.Errorf("Not Implemented")
+}
+func (r *mutationResolver) StartEmailVerificationForClaim(ctx context.Context, input model.EmailClaimInput) (*model.StartEmailVerificationResponse, error) {
+	return whitelist.StartEmailVerificationForClaim(&input)
+}
+func (r *mutationResolver) CompleteEmailVerificationForClaim(ctx context.Context, input model.CompleteEmailVerificationInput) (*model.CompleteEmailVerificationResponse, error) {
+	return nil, fmt.Errorf("Not Implemented")
+}
+func (r *mutationResolver) ValidateFarcasterCriteriaForItem(ctx context.Context, itemID string, farcasterAddress string) (*model.ValidationRespoonse, error) {
+	panic(fmt.Errorf("not implemented: ValidateFarcasterCriteriaForItem - validateFarcasterCriteriaForItem"))
+}
 func (r *queryResolver) FetchCtiretiaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error) {
 	panic(fmt.Errorf("not implemented: FetchCtiretiaAuthorizedEmails - fetchCtiretiaAuthorizedEmails"))
 }

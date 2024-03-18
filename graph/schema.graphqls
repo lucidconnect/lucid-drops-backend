@@ -41,32 +41,27 @@ type Mutation {
   updateDrop(dropID: String!,input: DropInput!): Drop!
   deleteDrop(dropID: String!): Drop!
 
-  createItem(input: ItemInput!): Item!
-  tempCreateItem(input: ItemInput!, creatorAddress: String!): Item!
-  updateItem(itemID: String!,input: ItemInput!): Item!
-  deleteItem(itemID: String!): Item!
-  addItemDeadline(itemID: String!, deadline: String!): Item!
+  # createItem(input: ItemInput!): Item!
+  # tempCreateItem(input: ItemInput!, creatorAddress: String!): Item!
+  # updateItem(itemID: String!,input: ItemInput!): Item!
+  # deleteItem(itemID: String!): Item!
+  # addItemDeadline(itemID: String!, deadline: String!): Item!
 
-  createQuestionnaireCriteriaForItem( input:QuestionnaireCriteriaInput!): Item!
-  createEmailWhitelistForItem(input: NewEmailWhitelistInput!): Item!
-  createWalletAddressWhitelistForItem(input: NewWalletAddressWhitelistInput!): Item!
-  createEmailDomainWhitelist(input: NewEmailDomainWhitelistInput!): Item!
-  createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
-  createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
-  createPatreonCriteriaForItem(input: NewPatreonCriteriaInput!): Item!
-  createEmptyCriteriaForItem(input: NewEmptyCriteriaInput!): Item!
+  # createWalletAddressWhitelistForItem(input: NewWalletAddressWhitelistInput!): Item!
+  # createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
+  # createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
+  createEmptyCriteriaForDrop(input: NewEmptyCriteriaInput!): Drop!
+  createFarcasterCriteriaForDrop(input: NewFarcasterCriteriaInput!): Drop!
   createMintPassForNoCriteriaItem(itemID: String!, walletAddress: String!): ValidationRespoonse
-  validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
-  validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
-  validatePatreonCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
-  validateWalletCriteriaForItem(itemID: String!, walletAddress: String!): ValidationRespoonse
-  validateQuestionnaireCriteriaForItem(itemID: String!, input: [QuestionnaireAnswerInput!]!): String
-
+  # validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
+  # validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
+  # validateWalletCriteriaForItem(itemID: String!, walletAddress: String!): ValidationRespoonse
+  validateFarcasterCriteriaForDrop(dropID: String!, farcasterAddress: String!): ValidationRespoonse
   createJWTToken(input: CreateJWTTokenInput): JWTCreationResponse!
   createPaymentIntentSecretKey(amount: Int!): String
 
-  startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
-  completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
+  # startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
+  # completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
   generateSignatureForClaim(input: GenerateClaimSignatureInput!): MintAuthorizationResponse!
 
   storeSignerInfo(input: SignerInfo!): Boolean!
@@ -157,6 +152,8 @@ input DropInput {
   contractAddress: String
   editionLimit: Int
   claimFee: Int
+  mintPrice: Float
+  gasIsCreatorSponsored: Boolean!
 }
 
 input ItemInput {
@@ -170,6 +167,15 @@ input ItemInput {
   This should typically be in cents
   """
   claimFee: Int
+}
+
+input NewFarcasterCriteriaInput {
+  dropID: String!
+  castUrl: String
+  channelId: String
+  farcasterProfileId: String
+  interaction: [InteractionType]
+  criteriaType: ClaimCriteriaType!
 }
 
 input NewTwitterCriteriaInput {
@@ -191,8 +197,7 @@ input NewTelegramCriteriaInput {
 }
 
 input NewEmptyCriteriaInput {
-	itemID: String!
-
+	dropID: String!
 }
 
 input NewPatreonCriteriaInput {
@@ -270,6 +275,13 @@ type Drop {
   network: BlockchainNetwork
   items: [Item!]! @goField(forceResolver: true)
   mintUrl: String!
+  mintPrice: Float
+  gasIsCreatorSponsored: Boolean!
+  farcasterClaimCriteriaInteractions: [InteractionType]
+  claimCriteria: ClaimCriteriaType
+  castUrl: String
+  farcasterProfileID: String
+  farcasterChannelId: String
 }
 
 type OnboardingProgress{
@@ -291,7 +303,6 @@ type Item {
 	description: String!
 	dropId: String!
   dropAddress: String!
-  claimCriteria: ClaimCriteriaType
   claimFee: Int!
   creator: CreatorDetails! @goField(forceResolver: true)
   authorizedSubdomains: [String!] @goField(forceResolver: true)
@@ -396,6 +407,9 @@ enum ClaimCriteriaType{
   emptyCriteria
   walletAddress
   claimCode
+  farcasterChannel
+  farcasterFollowing
+  farcasterInteractions
 }
 
 enum AiImageStyle{
@@ -421,7 +435,14 @@ enum InteractionType {
   likes
   retweets
   replies
+  recasts
 }
+
+# enum FarcasterInteractionType {
+#   likes
+#   replies
+#   recasts
+# }
 
 enum SignerProvider {
   dynamic

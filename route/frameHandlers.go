@@ -4,15 +4,46 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/lucidconnect/inverse/engine"
 	"github.com/lucidconnect/inverse/engine/whitelist"
 	"github.com/lucidconnect/inverse/graph/model"
 	"github.com/rs/zerolog/log"
 )
 
-func CreateMintPassForNoCriteriaItem(w http.ResponseWriter, r *http.Request) {
-	itemId := r.URL.Query().Get("itemId")
+func CreateMintPass(w http.ResponseWriter, r *http.Request) {
+	dropId := r.URL.Query().Get("dropId")
 	walletAddress := r.URL.Query().Get("wallet")
-	pass, err := whitelist.CreateMintPassForNoCriteriaItem(itemId, walletAddress)
+	drop, _ := engine.GetDropByID(dropId)
+
+	var pass *model.ValidationRespoonse
+	var err error
+	if drop.FarcasterCriteria != nil {
+		pass, err = whitelist.ValidateFarcasterCriteriaForDrop(walletAddress, dropId)
+		if err != nil {
+			log.Err(err).Caller().Msg("GenerateSignatureForClaim")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	} else {
+		pass, err = whitelist.CreateMintPassForNoCriteriaDrop(dropId, walletAddress)
+		if err != nil {
+			log.Err(err).Caller().Msg("GenerateSignatureForClaim")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if err = json.NewEncoder(w).Encode(pass); err != nil {
+		log.Err(err).Caller().Send()
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func CreateMintPassForNoCriteriaItem(w http.ResponseWriter, r *http.Request) {
+	dropId := r.URL.Query().Get("dropId")
+	walletAddress := r.URL.Query().Get("wallet")
+	pass, err := whitelist.CreateMintPassForNoCriteriaDrop(dropId, walletAddress)
 	if err != nil {
 		log.Err(err).Caller().Msg("GenerateSignatureForClaim")
 		w.WriteHeader(http.StatusInternalServerError)

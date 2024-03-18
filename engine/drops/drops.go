@@ -55,6 +55,8 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 		BlockchainNetwork:      input.Network,
 		AAWalletDeploymentHash: &input.DeploymentHash,
 		AAContractAddress:      &contractAdddress,
+		MintPrice:              input.MintPrice,
+		GasIsCreatorSponsored:  input.GasIsCreatorSponsored,
 	}
 
 	err = engine.CreateModel(newDrop)
@@ -83,7 +85,7 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 		return nil, errors.New("couldn't create new drop")
 	}
 
-	url, err := createMintUrl(newItem.ID.String(), newItem.Image, *newDrop.AAContractAddress)
+	url, err := createMintUrl(newDrop.ID.String(), newItem.Image, *newDrop.AAContractAddress)
 	if err != nil {
 		log.Err(err).Caller().Send()
 		return newDrop.ToGraphData(nil), errors.New("failed to create item in drop")
@@ -216,13 +218,13 @@ func createMintUrl(item, imagUrl, contract string) (string, error) {
 	url := fmt.Sprintf("%v/createframe", baseurl)
 
 	type createFrameRequest struct {
-		ItemId     string `json:"itemId"`
+		DropId     string `json:"dropId"`
 		ImageUrl   string `json:"imageUrl"`
 		Collection string `json:"collection"`
 	}
 
 	request := createFrameRequest{
-		ItemId:     item,
+		DropId:     item,
 		ImageUrl:   imagUrl,
 		Collection: contract,
 	}

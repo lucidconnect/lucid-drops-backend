@@ -57,17 +57,16 @@ func (i *Item) ToGraphData() *model.Item {
 	}
 
 	item := &model.Item{
-		ID:            i.ID.String(),
-		Name:          i.Name,
-		Image:         i.Image,
-		Description:   i.Description,
-		DropID:        i.DropID.String(),
-		ClaimCriteria: i.Criteria,
-		ClaimFee:      i.ClaimFee,
-		CreatedAt:     i.CreatedAt,
-		Deadline:      i.ClaimDeadline,
-		EditionLimit:  i.EditionLimit,
-		TokenID:       tokenID,
+		ID:           i.ID.String(),
+		Name:         i.Name,
+		Image:        i.Image,
+		Description:  i.Description,
+		DropID:       i.DropID.String(),
+		ClaimFee:     i.ClaimFee,
+		CreatedAt:    i.CreatedAt,
+		Deadline:     i.ClaimDeadline,
+		EditionLimit: i.EditionLimit,
+		TokenID:      tokenID,
 	}
 
 	if i.TwitterCriteria != nil {

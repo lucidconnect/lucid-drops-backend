@@ -22,13 +22,13 @@ func CreateEmailDomainWhitelist(input *model.NewEmailDomainWhitelistInput, authD
 		return nil, errors.New("item not found")
 	}
 
-	if item.Criteria != nil {
-		//Delete Existing criteria
-		err := engine.DeleteCriteriaIfExists(item)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// if item.Criteria != nil {
+	// 	//Delete Existing criteria
+	// 	err := engine.DeleteCriteriaIfExists(item)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 
 	dbEmails := make([]*models.EmailDomainWhiteList, len(input.AuthorizedSubdomains))
 

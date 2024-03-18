@@ -1,131 +1,117 @@
 package whitelist
 
-import (
-	"encoding/json"
-	"errors"
-	"strings"
+// func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input *model.QuestionnaireCriteriaInput) (*model.Item, error) {
+// 	creator, err := engine.GetCreatorByAddress(authDetails.Address)
+// 	if err != nil {
+// 		return nil, errors.New("creator has not been onboarded to create a new drop")
+// 	}
 
-	"github.com/lucidconnect/inverse/dbutils"
-	"github.com/lucidconnect/inverse/engine"
-	"github.com/lucidconnect/inverse/graph/model"
-	"github.com/lucidconnect/inverse/internal"
-	"github.com/lucidconnect/inverse/models"
-	uuid "github.com/satori/go.uuid"
-	"gorm.io/gorm/clause"
-)
+// 	item, err := engine.GetItemByID(input.ItemID)
+// 	if err != nil {
+// 		return nil, errors.New("item not found")
+// 	}
 
-func CreateQuestionnaireCriteriaForItem(authDetails *internal.AuthDetails, input *model.QuestionnaireCriteriaInput) (*model.Item, error) {
-	creator, err := engine.GetCreatorByAddress(authDetails.Address)
-	if err != nil {
-		return nil, errors.New("creator has not been onboarded to create a new drop")
-	}
+// 	if item.Criteria != nil {
+// 		//Delete Existing criteria
+// 		err := engine.DeleteCriteriaIfExists(item)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 	}
 
-	item, err := engine.GetItemByID(input.ItemID)
-	if err != nil {
-		return nil, errors.New("item not found")
-	}
+// 	switch input.QuestionType {
+// 	case model.QuestionTypeDirectAnswer:
+// 		if input.OpenEndedInput == nil || len(input.OpenEndedInput) == 0 {
+// 			return nil, errors.New("questionTypeDirectAnswer should contain at least one OpenEndedInput")
+// 		}
 
-	if item.Criteria != nil {
-		//Delete Existing criteria
-		err := engine.DeleteCriteriaIfExists(item)
-		if err != nil {
-			return nil, err
-		}
-	}
+// 		dbQuestions := make([]*models.DirectAnswerCriteria, len(input.OpenEndedInput))
+// 		for idx, questionInput := range input.OpenEndedInput {
+// 			mappedChoices := make(map[string]bool)
+// 			for _, choice := range questionInput.Answers {
+// 				mappedChoices[strings.ToLower(choice)] = true
+// 			}
 
-	switch input.QuestionType {
-	case model.QuestionTypeDirectAnswer:
-		if input.OpenEndedInput == nil || len(input.OpenEndedInput) == 0 {
-			return nil, errors.New("questionTypeDirectAnswer should contain at least one OpenEndedInput")
-		}
+// 			answerBytes, err := json.Marshal(mappedChoices)
+// 			if err != nil {
+// 				return nil, err
+// 			}
 
-		dbQuestions := make([]*models.DirectAnswerCriteria, len(input.OpenEndedInput))
-		for idx, questionInput := range input.OpenEndedInput {
-			mappedChoices := make(map[string]bool)
-			for _, choice := range questionInput.Answers {
-				mappedChoices[strings.ToLower(choice)] = true
-			}
+// 			dbQuestions[idx] = &models.DirectAnswerCriteria{
+// 				CreatorID:  creator.ID,
+// 				ItemID:     item.ID,
+// 				Question:   questionInput.Question,
+// 				Answers:    string(answerBytes),
+// 				QuestionID: uuid.NewV4(),
+// 			}
 
-			answerBytes, err := json.Marshal(mappedChoices)
-			if err != nil {
-				return nil, err
-			}
+// 			if input.ClaimCode != nil && *input.ClaimCode {
+// 				dbQuestions[idx].ClaimCode = *input.ClaimCode
+// 			}
+// 		}
 
-			dbQuestions[idx] = &models.DirectAnswerCriteria{
-				CreatorID:  creator.ID,
-				ItemID:     item.ID,
-				Question:   questionInput.Question,
-				Answers:    string(answerBytes),
-				QuestionID: uuid.NewV4(),
-			}
+// 		insertionErr := dbutils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbQuestions, 100).Error
+// 		if insertionErr != nil {
+// 			return nil, insertionErr
+// 		}
 
-			if input.ClaimCode != nil && *input.ClaimCode {
-				dbQuestions[idx].ClaimCode = *input.ClaimCode
-			}
-		}
+// 		claimCodeType := model.ClaimCriteriaTypeClaimCode
+// 		directAnswerQuestionnaireType := model.ClaimCriteriaTypeDirectAnswerQuestionnaire
+// 		item.Criteria = &directAnswerQuestionnaireType
+// 		if input.ClaimCode != nil && *input.ClaimCode {
+// 			item.Criteria = &claimCodeType
+// 		}
+// 		itemUpdateErr := engine.SaveModel(item)
+// 		if itemUpdateErr != nil {
+// 			return nil, itemUpdateErr
+// 		}
 
-		insertionErr := dbutils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbQuestions, 100).Error
-		if insertionErr != nil {
-			return nil, insertionErr
-		}
+// 		return item.ToGraphData(), nil
 
-		claimCodeType := model.ClaimCriteriaTypeClaimCode
-		directAnswerQuestionnaireType := model.ClaimCriteriaTypeDirectAnswerQuestionnaire
-		item.Criteria = &directAnswerQuestionnaireType
-		if input.ClaimCode != nil && *input.ClaimCode {
-			item.Criteria = &claimCodeType
-		}
-		itemUpdateErr := engine.SaveModel(item)
-		if itemUpdateErr != nil {
-			return nil, itemUpdateErr
-		}
+// 	case model.QuestionTypeMultiChoice:
+// 		if input.MultiChoiceInput == nil || len(input.MultiChoiceInput) == 0 {
+// 			return nil, errors.New("questionTypeMultiChoice should contain at least have MultiChoiceInput")
+// 		}
 
-		return item.ToGraphData(), nil
+// 		dbQuestions := make([]*models.MultiChoiceCriteria, len(input.MultiChoiceInput))
+// 		for idx, questionInput := range input.MultiChoiceInput {
+// 			mappedChoices := make(map[string]bool)
+// 			for _, choice := range questionInput.Choices {
+// 				mappedChoices[strings.ToLower(choice)] = (choice == questionInput.CorrectChoice)
+// 			}
 
-	case model.QuestionTypeMultiChoice:
-		if input.MultiChoiceInput == nil || len(input.MultiChoiceInput) == 0 {
-			return nil, errors.New("questionTypeMultiChoice should contain at least have MultiChoiceInput")
-		}
+// 			choicesBytes, err := json.Marshal(mappedChoices)
+// 			if err != nil {
+// 				return nil, err
+// 			}
 
-		dbQuestions := make([]*models.MultiChoiceCriteria, len(input.MultiChoiceInput))
-		for idx, questionInput := range input.MultiChoiceInput {
-			mappedChoices := make(map[string]bool)
-			for _, choice := range questionInput.Choices {
-				mappedChoices[strings.ToLower(choice)] = (choice == questionInput.CorrectChoice)
-			}
+// 			dbQuestions[idx] = &models.MultiChoiceCriteria{
+// 				CreatorID:     creator.ID,
+// 				ItemID:        item.ID,
+// 				Question:      questionInput.Question,
+// 				QuestionID:    uuid.NewV4(),
+// 				Choices:       string(choicesBytes),
+// 				CorrectChoice: questionInput.CorrectChoice,
+// 			}
+// 		}
 
-			choicesBytes, err := json.Marshal(mappedChoices)
-			if err != nil {
-				return nil, err
-			}
+// 		insertionErr := dbutils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbQuestions, 100).Error
+// 		if insertionErr != nil {
+// 			return nil, insertionErr
+// 		}
 
-			dbQuestions[idx] = &models.MultiChoiceCriteria{
-				CreatorID:     creator.ID,
-				ItemID:        item.ID,
-				Question:      questionInput.Question,
-				QuestionID:    uuid.NewV4(),
-				Choices:       string(choicesBytes),
-				CorrectChoice: questionInput.CorrectChoice,
-			}
-		}
+// 		multiChoiceQuestionnaireType := model.ClaimCriteriaTypeMutliChoiceQuestionnaire
+// 		item.Criteria = &multiChoiceQuestionnaireType
+// 		itemUpdateErr := engine.SaveModel(item)
+// 		if itemUpdateErr != nil {
+// 			return nil, itemUpdateErr
+// 		}
 
-		insertionErr := dbutils.DB.Clauses(clause.OnConflict{DoNothing: true}).CreateInBatches(dbQuestions, 100).Error
-		if insertionErr != nil {
-			return nil, insertionErr
-		}
+// 		return item.ToGraphData(), nil
+// 	}
 
-		multiChoiceQuestionnaireType := model.ClaimCriteriaTypeMutliChoiceQuestionnaire
-		item.Criteria = &multiChoiceQuestionnaireType
-		itemUpdateErr := engine.SaveModel(item)
-		if itemUpdateErr != nil {
-			return nil, itemUpdateErr
-		}
-
-		return item.ToGraphData(), nil
-	}
-
-	return nil, nil
-}
+// 	return nil, nil
+// }
 
 // func ValidateQuestionnaireCriteriaForItem(itemID string, input []*model.QuestionnaireAnswerInput) (*string, error) {
 // 	item, err := engine.GetItemByID(itemID)

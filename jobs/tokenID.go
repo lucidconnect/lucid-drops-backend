@@ -70,7 +70,6 @@ func fetchItemsWithUnresolvedTokenIDs() (*[]models.Item, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Debug().Msgf("items with unresolved token ids %v", items)
 
 	return &items, nil
 }
