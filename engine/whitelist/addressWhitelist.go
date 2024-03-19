@@ -54,7 +54,7 @@ func CreateWalletAddressWhitelistForItem(input *model.NewWalletAddressWhitelistI
 
 		dbWallets[idx] = &models.WalletAddressClaim{
 			CreatorID:     creator.ID,
-			ItemID:        item.ID,
+			DropID:        item.DropID,
 			ENS:           ENS,
 			WalletAddress: address,
 		}

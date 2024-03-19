@@ -147,14 +147,14 @@ func GetClaimedItemsByEOAAddress(address string) ([]*models.Item, error) {
 		return nil, errors.New("claimed items not found")
 	}
 
-	itemsIds := make([]string, len(walletAddressClaims))
+	dropIds := make([]string, len(walletAddressClaims))
 
 	for idx, pass := range walletAddressClaims {
-		itemsIds[idx] = pass.ItemID.String()
+		dropIds[idx] = pass.DropID.String()
 	}
 
 	var claimedItems []*models.Item
-	err = dbutils.DB.Where("id IN (?)", itemsIds).Find(&claimedItems).Error
+	err = dbutils.DB.Where("drop_id IN (?)", dropIds).Find(&claimedItems).Error
 	if err != nil {
 		return nil, errors.New("claimed items no longer exists")
 	}

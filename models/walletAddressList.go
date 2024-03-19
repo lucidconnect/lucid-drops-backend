@@ -9,7 +9,7 @@ import (
 type WalletAddressClaim struct {
 	BaseWithoutPrimaryKey
 	CreatorID             uuid.UUID `gorm:"primaryKey"`
-	ItemID                uuid.UUID `gorm:"primaryKey"`
+	DropID                uuid.UUID `gorm:"primaryKey"`
 	WalletAddress         string    `gorm:"primaryKey"`
 	ENS                   *string
 	EmbeddedWalletAddress string     `gorm:"default:null"`
