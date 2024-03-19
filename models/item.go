@@ -27,7 +27,7 @@ type Item struct {
 	Featured             bool              `gorm:"default:false"`
 	UserLimit            *int              `gorm:"default:null"`
 	EditionLimit         *int              `gorm:"default:null"`
-	MintPasses           []MintPass        `gorm:"foreignKey:ItemId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	// MintPasses           []MintPass        `gorm:"foreignKey:ItemId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 // Ref : https://docs.opensea.io/docs/metadata-standards
@@ -83,12 +83,12 @@ func (i *Item) ToGraphData() *model.Item {
 		item.TelegramGroupTitle = &i.TelegramCriteria.GroupTitle
 	}
 
-	var mintPasses []*model.ClaimDetails
-	for j := range i.MintPasses {
-		mintPasses = append(mintPasses, i.MintPasses[j].ToGraphData())
-	}
+	// var mintPasses []*model.ClaimDetails
+	// for j := range i.MintPasses {
+	// 	mintPasses = append(mintPasses, i.MintPasses[j].ToGraphData())
+	// }
 
-	item.ClaimDetails = mintPasses
+	// item.ClaimDetails = mintPasses
 	return item
 }
 
