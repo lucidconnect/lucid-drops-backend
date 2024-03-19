@@ -25,6 +25,7 @@ type Drop struct {
 	FarcasterCriteria      *FarcasterCriteria `gorm:"foreignKey:DropId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	UserLimit              *int               `gorm:"default:null"`
 	EditionLimit           *int               `gorm:"default:null"`
+	MintPasses             []MintPass         `gorm:"foreignKey:DropID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
 type DeplyomenResponse struct {
@@ -69,9 +70,15 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		mappedDrop.FarcasterChannelID = &c.FarcasterCriteria.ChannelID
 	}
 
+	var mintPasses []*model.ClaimDetails
+	for j := range c.MintPasses {
+		mintPasses = append(mintPasses, c.MintPasses[j].ToGraphData())
+	}
+
 	if items != nil {
 		for _, item := range items {
 			item.DropAddress = *c.AAContractAddress
+			item.ClaimDetails = mintPasses
 		}
 		mappedDrop.Items = items
 	}
