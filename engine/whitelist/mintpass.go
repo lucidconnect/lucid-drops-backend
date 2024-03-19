@@ -3,6 +3,7 @@ package whitelist
 import (
 	"errors"
 	"fmt"
+	"os"
 	"regexp"
 
 	"github.com/lucidconnect/inverse/dbutils"
@@ -10,7 +11,9 @@ import (
 	"github.com/lucidconnect/inverse/graph/model"
 	"github.com/lucidconnect/inverse/ledger"
 	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/services"
 	"github.com/lucidconnect/inverse/utils"
+	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
@@ -243,7 +246,7 @@ func CreateMintPassForNoCriteriaDrop(dropID, walletAddress string) (*model.Valid
 
 	tx := dbutils.DB.Begin()
 	newMint := models.MintPass{
-		DropID:              dropID,
+		DropID: dropID,
 		// ItemId:              item.ID.String(),
 		DropContractAddress: *drop.AAContractAddress,
 		BlockchainNetwork:   drop.BlockchainNetwork,
@@ -291,10 +294,34 @@ func DropOverEditionLimit(drop *models.Drop) bool {
 
 func WalletLimitReached(walletAddress, dropID string) bool {
 	// set default claim limit to 1
-	var mintsByAddress int64
-	err := dbutils.DB.Model(&models.MintPass{}).Where("drop_id = ?", dropID).Where("minter_address = ?", walletAddress).Count(&mintsByAddress).Error
-	if err == nil {
-		return mintsByAddress >= 1
+	// var mintsByAddress int64
+	var pass models.MintPass
+	err := dbutils.DB.Model(&models.MintPass{}).Where("drop_id = ?", dropID).Where("minter_address = ?", walletAddress).First(&pass).Error
+	if err != nil {
+		return false
+	} else {
+		var alchemyOpts []services.Option
+		apiKeyOpt := services.WithApiKey(os.Getenv("ALCHEMY_API_KEY"))
+		urlOpt := services.WithUrl(os.Getenv("ALCHEMY_URL"))
+		alchemyOpts = append(alchemyOpts, apiKeyOpt, urlOpt)
+		alchemyClient, err := services.NewAlchemyClient(alchemyOpts...)
+		if err != nil {
+			log.Err(err).Send()
+			return false
+		}
+
+		holders, err := alchemyClient.GetOwnersForNft(pass.DropContractAddress, "1")
+		if err != nil {
+			log.Err(err).Send()
+			return false
+		}
+
+		for _, address := range holders {
+			if address == walletAddress{
+				return true
+			}
+		}
 	}
+
 	return false
 }
