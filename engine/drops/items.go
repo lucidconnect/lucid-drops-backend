@@ -285,8 +285,8 @@ func FetchDropItems(dropID string, includeDelelted bool, authDetails *internal.A
 
 	mappedItems := make([]*model.Item, len(items))
 	for idx, item := range items {
-		mintPasses, _ := FetchMintPassesForItems(item.ID.String())
-		item.MintPasses = mintPasses
+		// mintPasses, _ := FetchMintPassesForItems(item.ID.String())
+		// item.MintPasses = mintPasses
 		mappedItems[idx] = item.ToGraphData()
 	}
 
@@ -299,8 +299,8 @@ func FetchItemByID(itemID string) (*model.Item, error) {
 		return nil, errors.New("item not found")
 	}
 
-	mintPasses, _ := FetchMintPassesForItems(item.ID.String())
-	item.MintPasses = mintPasses
+	// mintPasses, _ := FetchMintPassesForItems(item.ID.String())
+	// item.MintPasses = mintPasses
 
 	return item.ToGraphData(), nil
 }
