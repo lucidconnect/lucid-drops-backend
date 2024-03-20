@@ -177,7 +177,7 @@ func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input 
 	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	// }
 
-	return whitelist.GenerateSignatureForClaim(&input)
+	return whitelist.GenerateSignatureForFarcasterClaim(&input)
 }
 
 // StoreSignerInfo is the resolver for the storeSignerInfo field.
