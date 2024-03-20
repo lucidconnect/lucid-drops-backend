@@ -21,7 +21,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embeddedWalletAddress string) (*model.MintAuthorizationResponse, error) {
+func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error) {
 
 	now := time.Now()
 	mintPass, err := engine.GetMintPassById(input.OtpRequestID)
@@ -29,9 +29,9 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 		return nil, errors.New("mint pass not found")
 	}
 
-	if embeddedWalletAddress == "" {
-		return nil, errors.New("embedded wallet address is required")
-	}
+	// if embeddedWalletAddress == "" {
+	// 	return nil, errors.New("embedded wallet address is required")
+	// }
 
 	if strings.Contains(input.ClaimingAddress, ".eth") {
 		resolvedAddress, err := utils.ResolveENSName(input.ClaimingAddress)
@@ -61,7 +61,7 @@ func GenerateSignatureForClaim(input *model.GenerateClaimSignatureInput, embedde
 	var addressClaiim models.WalletAddressClaim
 	err = dbutils.DB.Where("item_id = ? AND wallet_address = ?", mintPass.DropID, input.ClaimingAddress).First(&addressClaiim).Error
 	if err == nil {
-		addressClaiim.EmbeddedWalletAddress = embeddedWalletAddress
+		// addressClaiim.EmbeddedWalletAddress = embeddedWalletAddress
 		addressClaiim.SentOutAt = &now
 		addressClaimError := engine.SaveModel(&addressClaiim)
 		if addressClaimError != nil {
