@@ -202,6 +202,7 @@ func FetchDropByID(dropID string) (*model.Drop, error) {
 			log.Err(err).Send()
 		}
 		item.Holders = holders
+		log.Info().Msgf("holders %v", items[0].Holders)
 	}
 	log.Info().Msgf("holders %v", items[0].Holders)
 	return drop.ToGraphData(items), nil
