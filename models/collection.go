@@ -90,6 +90,6 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		fmt.Println("items -- ", &items)
 		mappedDrop.Items = items
 	}
-
+	fmt.Println(mappedDrop.Items[0].ClaimDetails[0].ClaimerAddress)
 	return mappedDrop
 }
