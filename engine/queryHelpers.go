@@ -112,6 +112,7 @@ func GetDropByID(dropID string) (*models.Drop, error) {
 	if err != nil {
 		return nil, errors.New("drop not found")
 	}
+	fmt.Println("....", drop.MintPasses)
 
 	return &drop, nil
 }
