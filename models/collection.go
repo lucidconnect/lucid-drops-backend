@@ -83,7 +83,7 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 			item.DropAddress = *c.AAContractAddress
 			item.ClaimDetails = mintPasses
 		}
-		fmt.Println("items -- ", items)
+		fmt.Println("items -- ", &items)
 		mappedDrop.Items = items
 	}
 
