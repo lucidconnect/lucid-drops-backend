@@ -265,20 +265,7 @@ func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated
 		err = fmt.Errorf("failed to decode response body: %v", err)
 		return UserDehydrated{}, err
 	}
-	fmt.Println("---", responseBody)
-
 	userI := responseBody[address][0]
-
-	fmt.Println("---", userI)
-	// user, ok := userI.(map[string]UserDehydrated)
-	// if !ok {
-	// 	err = errors.New("error casting user object")
-	// 	return UserDehydrated{}, err
-	// }
-	fmt.Println("fid --- ", userI)
-	// fid := user["fid"]
-
-	// u.Fid = fid.(int32)
 	return userI, nil
 }
 
