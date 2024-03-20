@@ -397,7 +397,6 @@ func GetFeaturedDrops() ([]*models.Drop, error) {
 
 func DeleteCriteriaIfExists(drop *models.Drop) error {
 	var err error
-	fmt.Println(drop.Criteria)
 	switch *drop.Criteria {
 	case model.ClaimCriteriaTypeFarcasterChannel, model.ClaimCriteriaTypeFarcasterFollowing, model.ClaimCriteriaTypeFarcasterInteractions:
 		fmt.Println("delete stuff", drop.ID)

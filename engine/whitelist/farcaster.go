@@ -52,7 +52,6 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 		return nil, errors.New("drop not found")
 	}
 
-	fmt.Println("drop", drop)
 	if drop.Criteria != nil {
 		//Delete Existing criteria
 		err := engine.DeleteCriteriaIfExists(drop)

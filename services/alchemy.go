@@ -63,7 +63,6 @@ func (ac *AlchemyClient) GetOwnersForNft(contractAddress, tokenId string) ([]str
 	query.Add("tokenId", tokenId)
 
 	reqUrl.RawQuery = query.Encode()
-	fmt.Println(reqUrl.String())
 	httpRequest, err := http.NewRequest(http.MethodGet, reqUrl.String(), nil)
 	if err != nil {
 		err = fmt.Errorf("GetOwnersForNft(): %v", err)
