@@ -276,7 +276,8 @@ func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated
 		return UserDehydrated{}, err
 	}
 	fmt.Println("fid --- ", user["fid"])
-
+	fid := user["fid"]
+	u.Fid = fid.(int32)
 	return *u, nil
 }
 
