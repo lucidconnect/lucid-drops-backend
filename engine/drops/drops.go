@@ -57,6 +57,8 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 		AAContractAddress:      &contractAdddress,
 		MintPrice:              input.MintPrice,
 		GasIsCreatorSponsored:  input.GasIsCreatorSponsored,
+		UserLimit:              input.UserLimit,
+		EditionLimit:           input.EditionLimit,
 	}
 
 	err = engine.CreateModel(newDrop)
@@ -66,11 +68,11 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 
 	// create item
 	newItem := &models.Item{
-		Name:        *input.Name,
-		Image:       *input.Image,
-		Description: *input.Description,
-		DropID:      newDrop.ID,
-		// UserLimit:    input.EditionLimit,
+		Name:         *input.Name,
+		Image:        *input.Image,
+		Description:  *input.Description,
+		DropID:       newDrop.ID,
+		UserLimit:    input.UserLimit,
 		EditionLimit: input.EditionLimit,
 	}
 
