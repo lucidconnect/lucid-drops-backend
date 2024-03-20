@@ -259,8 +259,8 @@ func decodeThreadCasts(response io.ReadCloser) ([]Cast, error) {
 func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated, error) {
 	var err error
 
-	responseBody := map[string][]any{}
-	u := &UserDehydrated{}
+	responseBody := map[string][]UserDehydrated{}
+	// u := &UserDehydrated{}
 	if err = json.NewDecoder(response).Decode(&responseBody); err != nil {
 		err = fmt.Errorf("failed to decode response body: %v", err)
 		return UserDehydrated{}, err
@@ -270,15 +270,16 @@ func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated
 	userI := responseBody[address][0]
 
 	fmt.Println("---", userI)
-	user, ok := userI.(map[string]any)
-	if !ok {
-		err = errors.New("error casting user object")
-		return UserDehydrated{}, err
-	}
-	fmt.Println("fid --- ", user["fid"])
-	fid := user["fid"]
-	u.Fid = fid.(int32)
-	return *u, nil
+	// user, ok := userI.(map[string]UserDehydrated)
+	// if !ok {
+	// 	err = errors.New("error casting user object")
+	// 	return UserDehydrated{}, err
+	// }
+	fmt.Println("fid --- ", userI)
+	// fid := user["fid"]
+
+	// u.Fid = fid.(int32)
+	return userI, nil
 }
 
 /** map[
