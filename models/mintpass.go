@@ -27,7 +27,6 @@ func (m *MintPass) ToGraphData() *model.ClaimDetails {
 	// if err == nil && creator.InverseUsername != nil {
 	// 	username = creator.InverseUsername
 	// }
-
 	return &model.ClaimDetails{
 		ClaimerAddress: &m.MinterAddress,
 		ClaimTime:      &m.CreatedAt,

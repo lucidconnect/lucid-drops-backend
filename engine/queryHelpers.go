@@ -108,7 +108,7 @@ func GetCreatorByInverseUsername(inverseUsername string) (*models.Creator, error
 func GetDropByID(dropID string) (*models.Drop, error) {
 	var drop models.Drop
 
-	err := dbutils.DB.Where("id=?", dropID).Preload("FarcasterCriteria").First(&drop).Error
+	err := dbutils.DB.Where("id=?", dropID).Preload("FarcasterCriteria").Preload("MintPasses").First(&drop).Error
 	if err != nil {
 		return nil, errors.New("drop not found")
 	}
@@ -398,25 +398,20 @@ func GetFeaturedDrops() ([]*models.Drop, error) {
 func DeleteCriteriaIfExists(drop *models.Drop) error {
 
 	var err error
-	fmt.Println(drop.Criteria)
 	switch *drop.Criteria {
 	case model.ClaimCriteriaTypeFarcasterChannel:
-		fmt.Println("delete stuff", drop.ID)
 		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID.String()).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Msg("some error")
 			return errors.New("an error occured while updating updating farcaster criteria")
 		}
 	case model.ClaimCriteriaTypeFarcasterFollowing:
-		fmt.Println("delete stuff", drop.ID)
-
 		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Msg("some error")
 			return errors.New("an error occured while updating updating farcaster criteria")
 		}
 	case model.ClaimCriteriaTypeFarcasterInteractions:
-		fmt.Println("delete stuff", drop.ID)
 		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Msg("some error")

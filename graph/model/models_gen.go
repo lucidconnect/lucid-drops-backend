@@ -67,6 +67,7 @@ type Drop struct {
 	CastURL                            *string            `json:"castUrl,omitempty"`
 	FarcasterProfileID                 *string            `json:"farcasterProfileID,omitempty"`
 	FarcasterChannelID                 *string            `json:"farcasterChannelId,omitempty"`
+	ClaimDetails                       []*ClaimDetails    `json:"claimDetails,omitempty"`
 }
 
 type DropInput struct {
@@ -78,6 +79,7 @@ type DropInput struct {
 	DeploymentHash        string             `json:"deploymentHash"`
 	ContractAddress       *string            `json:"contractAddress,omitempty"`
 	EditionLimit          *int               `json:"editionLimit,omitempty"`
+	UserLimit             *int               `json:"userLimit,omitempty"`
 	ClaimFee              *int               `json:"claimFee,omitempty"`
 	MintPrice             *float64           `json:"mintPrice,omitempty"`
 	GasIsCreatorSponsored bool               `json:"gasIsCreatorSponsored"`
@@ -132,7 +134,6 @@ type Item struct {
 	TokenID                          *int               `json:"TokenID,omitempty"`
 	CreatedAt                        time.Time          `json:"createdAt"`
 	Deadline                         *time.Time         `json:"deadline,omitempty"`
-	ClaimDetails                     []*ClaimDetails    `json:"claimDetails,omitempty"`
 	Holders                          []string           `json:"holders"`
 }
 

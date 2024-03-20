@@ -57,6 +57,8 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 		AAContractAddress:      &contractAdddress,
 		MintPrice:              input.MintPrice,
 		GasIsCreatorSponsored:  input.GasIsCreatorSponsored,
+		UserLimit:              input.UserLimit,
+		EditionLimit:           input.EditionLimit,
 	}
 
 	err = engine.CreateModel(newDrop)
@@ -66,11 +68,12 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 
 	// create item
 	newItem := &models.Item{
-		Name:        *input.Name,
-		Image:       *input.Image,
-		Description: *input.Description,
-		DropID:      newDrop.ID,
-		// UserLimit:    input.EditionLimit,
+		Name:         *input.Name,
+		Image:        *input.Image,
+		Description:  *input.Description,
+		DropID:       newDrop.ID,
+		DropAddress:  contractAdddress,
+		UserLimit:    input.UserLimit,
 		EditionLimit: input.EditionLimit,
 	}
 
@@ -194,7 +197,13 @@ func FetchDropByID(dropID string) (*model.Drop, error) {
 	}
 
 	items, _ := FetchDropItems(dropID, false, nil)
-
+	for _, item := range items {
+		holders, err := FetchNftHolders(item)
+		if err != nil {
+			log.Err(err).Send()
+		}
+		item.Holders = holders
+	}
 	return drop.ToGraphData(items), nil
 }
 

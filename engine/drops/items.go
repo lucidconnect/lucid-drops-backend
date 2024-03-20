@@ -285,7 +285,7 @@ func FetchDropItems(dropID string, includeDelelted bool, authDetails *internal.A
 
 	mappedItems := make([]*model.Item, len(items))
 	for idx, item := range items {
-		// mintPasses, _ := FetchMintPassesForItems(item.ID.String())
+		// mintPasses, _ := FetchMintPassesForDrops(dropID)
 		// item.MintPasses = mintPasses
 		mappedItems[idx] = item.ToGraphData()
 	}
@@ -354,10 +354,10 @@ func SetItemClaimDeadline(itemID string, deadline string) (*model.Item, error) {
 	return item.ToGraphData(), nil
 }
 
-func FetchMintPassesForItems(itemID string) ([]models.MintPass, error) {
+func FetchMintPassesForDrops(dropId string) ([]models.MintPass, error) {
 
 	var mintPasses []models.MintPass
-	err := dbutils.DB.Model(&models.MintPass{}).Where("item_id = ?", itemID).Find(&mintPasses).Error
+	err := dbutils.DB.Model(&models.MintPass{}).Where("drop_id = ?", dropId).Find(&mintPasses).Error
 	if err != nil {
 		return nil, err
 	}
@@ -419,6 +419,8 @@ func FetchNftHolders(item *model.Item) ([]string, error) {
 		log.Err(err).Send()
 		return nil, err
 	}
+
+	fmt.Println("nft holders", holders)
 
 	return holders, nil
 }

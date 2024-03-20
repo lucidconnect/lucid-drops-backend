@@ -68,6 +68,7 @@ type ComplexityRoot struct {
 	Drop struct {
 		CastURL                            func(childComplexity int) int
 		ClaimCriteria                      func(childComplexity int) int
+		ClaimDetails                       func(childComplexity int) int
 		ContractAddress                    func(childComplexity int) int
 		CreatedAt                          func(childComplexity int) int
 		CreatorID                          func(childComplexity int) int
@@ -101,7 +102,6 @@ type ComplexityRoot struct {
 	Item struct {
 		AuthorizedSubdomains             func(childComplexity int) int
 		CampaignName                     func(childComplexity int) int
-		ClaimDetails                     func(childComplexity int) int
 		ClaimFee                         func(childComplexity int) int
 		CreatedAt                        func(childComplexity int) int
 		Creator                          func(childComplexity int) int
@@ -375,6 +375,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Drop.ClaimCriteria(childComplexity), true
 
+	case "Drop.claimDetails":
+		if e.complexity.Drop.ClaimDetails == nil {
+			break
+		}
+
+		return e.complexity.Drop.ClaimDetails(childComplexity), true
+
 	case "Drop.contractAddress":
 		if e.complexity.Drop.ContractAddress == nil {
 			break
@@ -542,13 +549,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Item.CampaignName(childComplexity), true
-
-	case "Item.claimDetails":
-		if e.complexity.Item.ClaimDetails == nil {
-			break
-		}
-
-		return e.complexity.Item.ClaimDetails(childComplexity), true
 
 	case "Item.claimFee":
 		if e.complexity.Item.ClaimFee == nil {
@@ -2806,8 +2806,6 @@ func (ec *executionContext) fieldContext_Drop_items(ctx context.Context, field g
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
 				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
 			case "holders":
 				return ec.fieldContext_Item_holders(ctx, field)
 			}
@@ -3146,6 +3144,55 @@ func (ec *executionContext) fieldContext_Drop_farcasterChannelId(ctx context.Con
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Drop_claimDetails(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_claimDetails(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ClaimDetails, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ClaimDetails)
+	fc.Result = res
+	return ec.marshalOClaimDetails2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimDetails(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_claimDetails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "claimTime":
+				return ec.fieldContext_ClaimDetails_claimTime(ctx, field)
+			case "claimerUsername":
+				return ec.fieldContext_ClaimDetails_claimerUsername(ctx, field)
+			case "claimerAddress":
+				return ec.fieldContext_ClaimDetails_claimerAddress(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ClaimDetails", field.Name)
 		},
 	}
 	return fc, nil
@@ -4178,55 +4225,6 @@ func (ec *executionContext) fieldContext_Item_deadline(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Item_claimDetails(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Item_claimDetails(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ClaimDetails, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*model.ClaimDetails)
-	fc.Result = res
-	return ec.marshalOClaimDetails2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimDetails(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Item_claimDetails(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Item",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "claimTime":
-				return ec.fieldContext_ClaimDetails_claimTime(ctx, field)
-			case "claimerUsername":
-				return ec.fieldContext_ClaimDetails_claimerUsername(ctx, field)
-			case "claimerAddress":
-				return ec.fieldContext_ClaimDetails_claimerAddress(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ClaimDetails", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Item_holders(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Item_holders(ctx, field)
 	if err != nil {
@@ -5011,6 +5009,8 @@ func (ec *executionContext) fieldContext_Mutation_createDrop(ctx context.Context
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			case "farcasterChannelId":
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5104,6 +5104,8 @@ func (ec *executionContext) fieldContext_Mutation_updateDrop(ctx context.Context
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			case "farcasterChannelId":
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5197,6 +5199,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteDrop(ctx context.Context
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			case "farcasterChannelId":
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5290,6 +5294,8 @@ func (ec *executionContext) fieldContext_Mutation_createEmptyCriteriaForDrop(ctx
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			case "farcasterChannelId":
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5383,6 +5389,8 @@ func (ec *executionContext) fieldContext_Mutation_createFarcasterCriteriaForDrop
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			case "farcasterChannelId":
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -6311,8 +6319,6 @@ func (ec *executionContext) fieldContext_Query_fetchClaimedItems(ctx context.Con
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
 				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
 			case "holders":
 				return ec.fieldContext_Item_holders(ctx, field)
 			}
@@ -6408,6 +6414,8 @@ func (ec *executionContext) fieldContext_Query_fetchDropById(ctx context.Context
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			case "farcasterChannelId":
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -6501,6 +6509,8 @@ func (ec *executionContext) fieldContext_Query_fetchCreatorDrops(ctx context.Con
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			case "farcasterChannelId":
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -6583,8 +6593,6 @@ func (ec *executionContext) fieldContext_Query_fetchItemsInDrop(ctx context.Cont
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
 				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
 			case "holders":
 				return ec.fieldContext_Item_holders(ctx, field)
 			}
@@ -6680,8 +6688,6 @@ func (ec *executionContext) fieldContext_Query_fetchItemById(ctx context.Context
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
 				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
 			case "holders":
 				return ec.fieldContext_Item_holders(ctx, field)
 			}
@@ -7139,8 +7145,6 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedItems(ctx context.Co
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
 				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
 			case "holders":
 				return ec.fieldContext_Item_holders(ctx, field)
 			}
@@ -7225,6 +7229,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedDrops(ctx context.Co
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			case "farcasterChannelId":
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -10424,6 +10430,8 @@ func (ec *executionContext) fieldContext_userProfileType_drops(ctx context.Conte
 				return ec.fieldContext_Drop_farcasterProfileID(ctx, field)
 			case "farcasterChannelId":
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
+			case "claimDetails":
+				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -10503,8 +10511,6 @@ func (ec *executionContext) fieldContext_userProfileType_items(ctx context.Conte
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
 				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
 			case "holders":
 				return ec.fieldContext_Item_holders(ctx, field)
 			}
@@ -10586,8 +10592,6 @@ func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx contex
 				return ec.fieldContext_Item_createdAt(ctx, field)
 			case "deadline":
 				return ec.fieldContext_Item_deadline(ctx, field)
-			case "claimDetails":
-				return ec.fieldContext_Item_claimDetails(ctx, field)
 			case "holders":
 				return ec.fieldContext_Item_holders(ctx, field)
 			}
@@ -10778,7 +10782,7 @@ func (ec *executionContext) unmarshalInputDropInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "image", "thumbnail", "network", "deploymentHash", "contractAddress", "editionLimit", "claimFee", "mintPrice", "gasIsCreatorSponsored"}
+	fieldsInOrder := [...]string{"name", "description", "image", "thumbnail", "network", "deploymentHash", "contractAddress", "editionLimit", "userLimit", "claimFee", "mintPrice", "gasIsCreatorSponsored"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10857,6 +10861,15 @@ func (ec *executionContext) unmarshalInputDropInput(ctx context.Context, obj int
 				return it, err
 			}
 			it.EditionLimit = data
+		case "userLimit":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userLimit"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserLimit = data
 		case "claimFee":
 			var err error
 
@@ -12092,6 +12105,8 @@ func (ec *executionContext) _Drop(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Drop_farcasterProfileID(ctx, field, obj)
 		case "farcasterChannelId":
 			out.Values[i] = ec._Drop_farcasterChannelId(ctx, field, obj)
+		case "claimDetails":
+			out.Values[i] = ec._Drop_claimDetails(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -12337,8 +12352,6 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "deadline":
 			out.Values[i] = ec._Item_deadline(ctx, field, obj)
-		case "claimDetails":
-			out.Values[i] = ec._Item_claimDetails(ctx, field, obj)
 		case "holders":
 			field := field
 

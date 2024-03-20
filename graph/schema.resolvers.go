@@ -172,12 +172,12 @@ func (r *mutationResolver) CreatePaymentIntentSecretKey(ctx context.Context, amo
 
 // GenerateSignatureForClaim is the resolver for the generateSignatureForClaim field.
 func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
-	}
+	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
+	// if err != nil {
+	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	// }
 
-	return whitelist.GenerateSignatureForClaim(&input, authenticationDetails.Address.Hex())
+	return whitelist.GenerateSignatureForFarcasterClaim(&input)
 }
 
 // StoreSignerInfo is the resolver for the storeSignerInfo field.

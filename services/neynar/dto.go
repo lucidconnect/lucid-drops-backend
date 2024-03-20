@@ -17,8 +17,8 @@ type RelevantFollowersDehydrated struct {
 }
 
 type UserDehydrated struct {
-	Object string `json:"object"`
-	Fid    int32  `json:"fid"`
+	// Object string `json:"object"`
+	Fid int32 `json:"fid"`
 }
 
 type Cast struct {
