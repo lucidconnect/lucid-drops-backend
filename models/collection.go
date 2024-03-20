@@ -79,10 +79,14 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 	}
 
 	if items != nil {
-		for _, item := range items {
-			item.DropAddress = *c.AAContractAddress
-			item.ClaimDetails = mintPasses
+		for i := 0; i < len(items); i++ {
+			items[i].DropAddress = *c.AAContractAddress
+			items[i].ClaimDetails = mintPasses
 		}
+		// for _, item := range items {
+		// 	item.DropAddress = *c.AAContractAddress
+		// 	item.ClaimDetails = mintPasses
+		// }
 		fmt.Println("items -- ", &items)
 		mappedDrop.Items = items
 	}
