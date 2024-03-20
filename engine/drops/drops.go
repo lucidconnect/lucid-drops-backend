@@ -196,7 +196,14 @@ func FetchDropByID(dropID string) (*model.Drop, error) {
 	}
 
 	items, _ := FetchDropItems(dropID, false, nil)
-
+	for _, item := range items {
+		holders, err := FetchNftHolders(item)
+		if err != nil {
+			log.Err(err).Send()
+		}
+		item.Holders = holders
+	}
+	log.Info().Msgf("holders", items[0].Holders)
 	return drop.ToGraphData(items), nil
 }
 
