@@ -1,8 +1,6 @@
 package models
 
 import (
-	"fmt"
-
 	"github.com/lucidconnect/inverse/graph/model"
 	uuid "github.com/satori/go.uuid"
 )
@@ -76,7 +74,6 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 	for j := range c.MintPasses {
 		mintPasses = append(mintPasses, c.MintPasses[j].ToGraphData())
 	}
-	fmt.Println("claimer 1", mintPasses[0].ClaimerAddress)
 	mappedDrop.ClaimDetails = mintPasses
 	if items != nil {
 		for i := 0; i < len(items); i++ {

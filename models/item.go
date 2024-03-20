@@ -62,6 +62,7 @@ func (i *Item) ToGraphData() *model.Item {
 		Image:        i.Image,
 		Description:  i.Description,
 		DropID:       i.DropID.String(),
+		DropAddress:  i.DropAddress,
 		ClaimFee:     i.ClaimFee,
 		CreatedAt:    i.CreatedAt,
 		Deadline:     i.ClaimDeadline,

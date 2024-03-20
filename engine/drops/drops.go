@@ -72,6 +72,7 @@ func CreateDrop(input *model.DropInput, authDetails *internal.AuthDetails) (*mod
 		Image:        *input.Image,
 		Description:  *input.Description,
 		DropID:       newDrop.ID,
+		DropAddress:  contractAdddress,
 		UserLimit:    input.UserLimit,
 		EditionLimit: input.EditionLimit,
 	}
