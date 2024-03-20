@@ -77,19 +77,15 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 	for j := range c.MintPasses {
 		mintPasses = append(mintPasses, c.MintPasses[j].ToGraphData())
 	}
-
+	fmt.Println("claimer 1", mintPasses[0].ClaimerAddress)
+	mappedDrop.ClaimDetails = mintPasses
 	if items != nil {
 		for i := 0; i < len(items); i++ {
 			items[i].DropAddress = *c.AAContractAddress
-			items[i].ClaimDetails = mintPasses
+			// items[i].ClaimDetails = mintPasses
 		}
-		// for _, item := range items {
-		// 	item.DropAddress = *c.AAContractAddress
-		// 	item.ClaimDetails = mintPasses
-		// }
-		fmt.Println("items -- ", &items)
 		mappedDrop.Items = items
 	}
-	fmt.Println(mappedDrop.Items[0].ClaimDetails[0].ClaimerAddress)
+	// fmt.Println(mappedDrop.Items[0].ClaimDetails[0].ClaimerAddress)
 	return mappedDrop
 }
