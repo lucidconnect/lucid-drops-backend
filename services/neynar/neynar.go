@@ -266,7 +266,7 @@ func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated
 	}
 
 	userI := responseBody[address][0]
-
+	fmt.Println("---", userI)
 	user, ok := userI.(UserDehydrated)
 	if !ok {
 		err = errors.New("error casting user object")
