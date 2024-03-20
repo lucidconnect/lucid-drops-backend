@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+
 	"github.com/lucidconnect/inverse/graph/model"
 	uuid "github.com/satori/go.uuid"
 )
@@ -81,6 +83,7 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 			item.DropAddress = *c.AAContractAddress
 			item.ClaimDetails = mintPasses
 		}
+		fmt.Println("items -- ", items)
 		mappedDrop.Items = items
 	}
 
