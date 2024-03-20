@@ -259,21 +259,39 @@ func decodeThreadCasts(response io.ReadCloser) ([]Cast, error) {
 func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated, error) {
 	var err error
 
-	// responseBody := map[string][]any{}
-	u := UserDehydrated{}
-	if err = json.NewDecoder(response).Decode(&u); err != nil {
+	responseBody := map[string][]any{}
+	u := &UserDehydrated{}
+	if err = json.NewDecoder(response).Decode(&responseBody); err != nil {
 		err = fmt.Errorf("failed to decode response body: %v", err)
 		return UserDehydrated{}, err
 	}
+	fmt.Println("---", responseBody)
 
-	// userI := responseBody[address][0]
-	fmt.Println("---", u)
-	// user, ok := userI.(UserDehydrated)
-	// if !ok {
-	// 	err = errors.New("error casting user object")
-	// 	return UserDehydrated{}, err
-	// }
+	userI := responseBody[address][0]
 
-	return u, nil
+	fmt.Println("---", userI)
+	user, ok := userI.(map[string]any)
+	if !ok {
+		err = errors.New("error casting user object")
+		return UserDehydrated{}, err
+	}
+	fmt.Println("fid --- ", user["fid"])
+
+	return *u, nil
 }
-// map[active_status:inactive custody_address:0x9f2246e50e285b571117ad024f79a0609124b209 display_name:Gb  fid:2037 follower_count:236 following_count:234 object:user pfp_url:https://ipfs.decentralized-content.com/ipfs/bafybeia7rlf5p2ghv4cabub3gvsyq4zs4qrxee3tx7d4scm3oa76dis3ni profile:map[bio:map[text:Building lucidconnect.xyz]] username:tezza verifications:[0xccb9f5faf66f15684a6154785f6ae524db6132e5] verified_addresses:map[eth_addresses:[0xccb9f5faf66f15684a6154785f6ae524db6132e5] sol_addresses:[]]]
+
+/** map[
+active_status:inactive
+custody_address:0x9f2246e50e285b571117ad024f79a0609124b209
+display_name:Gb
+fid:2037
+follower_count:236
+following_count:234
+object:user
+pfp_url:https://ipfs.decentralized-content.com/ipfs/bafybeia7rlf5p2ghv4cabub3gvsyq4zs4qrxee3tx7d4scm3oa76dis3ni profile:map[
+	bio:map[text:Building lucidconnect.xyz]]
+	username:tezza
+	verifications:[0xccb9f5faf66f15684a6154785f6ae524db6132e5]
+	verified_addresses:map[eth_addresses:[0xccb9f5faf66f15684a6154785f6ae524db6132e5] sol_addresses:[]]
+]
+*/
