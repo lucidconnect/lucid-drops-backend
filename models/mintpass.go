@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/lucidconnect/inverse/graph/model"
@@ -27,7 +28,7 @@ func (m *MintPass) ToGraphData() *model.ClaimDetails {
 	// if err == nil && creator.InverseUsername != nil {
 	// 	username = creator.InverseUsername
 	// }
-
+	fmt.Println("minter address ", m.MinterAddress)
 	return &model.ClaimDetails{
 		ClaimerAddress: &m.MinterAddress,
 		ClaimTime:      &m.CreatedAt,
