@@ -140,6 +140,7 @@ input NewEmailDomainWhitelistInput {
 input NewUsernameRegisgration {
   aaWallet: String!
   inverseUsername: String!
+  externalWalletAddress: String
 }
 
 input DropInput {
