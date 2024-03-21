@@ -218,13 +218,12 @@ func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDe
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	creatorInfo, err := onboarding.CreateCreatorProfileIfAddressIsMissing(authenticationDetails.Address)
+	creator, err := engine.GetCreatorByAddress(authenticationDetails.Address)
 	if err != nil {
-		log.Println("creator profile: ", err)
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	return creatorInfo.ToGraphData(), nil
+	return creator.ToGraphData(), nil
 }
 
 // GetWallet is the resolver for the getWallet field.

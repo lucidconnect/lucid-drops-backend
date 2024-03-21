@@ -223,8 +223,9 @@ type NewTwitterCriteriaInput struct {
 }
 
 type NewUsernameRegisgration struct {
-	AaWallet        string `json:"aaWallet"`
-	InverseUsername string `json:"inverseUsername"`
+	AaWallet              string  `json:"aaWallet"`
+	InverseUsername       string  `json:"inverseUsername"`
+	ExternalWalletAddress *string `json:"externalWalletAddress,omitempty"`
 }
 
 type NewWalletAddressWhitelistInput struct {
