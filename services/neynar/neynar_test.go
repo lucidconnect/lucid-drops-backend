@@ -16,8 +16,8 @@ func TestNeynarClient_FetchFarcasterUserByUsername(t *testing.T) {
 		t.FailNow()
 	}
 
-	fid := neynarClient.FetchFarcasterUserByUsername("tezza")
-	if !assert.NoError(t, neynarClient.Error()) {
+	fid, err := neynarClient.FetchFarcasterUserByUsername("tezza")
+	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
 	if !assert.Equal(t, int32(2037), fid) {
