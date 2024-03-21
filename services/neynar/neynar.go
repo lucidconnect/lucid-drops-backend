@@ -61,10 +61,6 @@ func WithNeynarApiKey(key string) Option {
 	}
 }
 
-func (nc *NeynarClient) Error() error {
-	return nc.errMsg
-}
-
 // Returns a list of relevant followers for a given fid
 func (nc *NeynarClient) FetchRelvantFollowers(fid int32) ([]RelevantFollowersDehydrated, error) {
 	url, err := url.Parse(fmt.Sprintf("%v/v2/farcaster/followers/relevant", nc.neynarUrl))
