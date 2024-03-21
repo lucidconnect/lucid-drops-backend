@@ -65,8 +65,8 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 			return nil, err
 		}
 
-		fid := neynarClient.FetchFarcasterUserByUsername(*input.FarcasterUserName)
-		if neynarClient.Error() != nil {
+		fid, err := neynarClient.FetchFarcasterUserByUsername(*input.FarcasterUserName)
+		if err != nil {
 			return nil, err
 		}
 		criteria.FarcasterProfileID = fmt.Sprint(fid)
