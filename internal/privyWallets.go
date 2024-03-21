@@ -92,12 +92,10 @@ retry:
 			embededWallet = &parsedAddress
 		}
 	}
-	fmt.Println("embedded wallet", embededWallet)
 	if embededWallet == nil {
 		// retry
 		if retryCount < 10 {
 			time.Sleep(1 * time.Second)
-			fmt.Println("rertries:", retryCount)
 			retryCount++
 			goto retry
 		}
