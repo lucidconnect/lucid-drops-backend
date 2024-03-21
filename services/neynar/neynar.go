@@ -30,7 +30,7 @@ type NeynarClient struct {
 	apiKey       string
 	neynarUrl    string
 	farcasterHub string
-	// errMsg       error
+	errMsg       error
 }
 
 type Option func(*NeynarClient)
@@ -59,6 +59,10 @@ func WithNeynarApiKey(key string) Option {
 	return func(c *NeynarClient) {
 		c.apiKey = key
 	}
+}
+
+func (nc *NeynarClient) Error() error {
+	return nc.errMsg
 }
 
 // Returns a list of relevant followers for a given fid
