@@ -11546,7 +11546,7 @@ func (ec *executionContext) unmarshalInputNewUsernameRegisgration(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"aaWallet", "inverseUsername"}
+	fieldsInOrder := [...]string{"aaWallet", "inverseUsername", "externalWalletAddress"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -11571,6 +11571,15 @@ func (ec *executionContext) unmarshalInputNewUsernameRegisgration(ctx context.Co
 				return it, err
 			}
 			it.InverseUsername = data
+		case "externalWalletAddress":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalWalletAddress"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalWalletAddress = data
 		}
 	}
 

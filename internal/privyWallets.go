@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -69,13 +70,15 @@ func FetchPrivyUser(userDid string) (*PrivyUserResponse, error) {
 
 // format "did:privy:<userid>"
 func GetPrivyWalletsFromSubKey(privySubKey string) (*common.Address, error) {
+	retryCount := 0
+
 	parts := strings.Split(privySubKey, ":")
 	if len(parts) != 3 {
 		return nil, errors.New("invalid Privy Token Supplied")
 	}
 
 	userDid := parts[2]
-
+retry:
 	userResponse, err := FetchPrivyUser(userDid)
 	if err != nil {
 		return nil, errors.New("couldn't get privy user details")
@@ -89,8 +92,13 @@ func GetPrivyWalletsFromSubKey(privySubKey string) (*common.Address, error) {
 			embededWallet = &parsedAddress
 		}
 	}
-
 	if embededWallet == nil {
+		// retry
+		if retryCount < 10 {
+			time.Sleep(1 * time.Second)
+			retryCount++
+			goto retry
+		}
 		return nil, errors.New("user lacks an embedded wallet")
 	}
 
