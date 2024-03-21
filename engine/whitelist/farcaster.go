@@ -80,8 +80,20 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 	if input.ChannelID != nil {
 		criteria.ChannelID = *input.ChannelID
 	}
-	if input.FarcasterProfileID != nil {
-		criteria.FarcasterProfileID = *input.FarcasterProfileID
+	if input.FarcasterUserName != nil {
+		// resolve farcaster id by username
+		apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
+		neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
+		if err != nil {
+			log.Err(err).Send()
+			return nil, err
+		}
+
+		fid := neynarClient.FetchFarcasterUserByUsername(*input.FarcasterUserName)
+		if neynarClient.Error() != nil {
+			return nil, err
+		}
+		criteria.FarcasterProfileID = fmt.Sprint(fid)
 	}
 
 	// drop.Criteria = &input.CriteriaType

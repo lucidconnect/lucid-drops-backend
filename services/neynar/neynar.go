@@ -30,6 +30,7 @@ type NeynarClient struct {
 	apiKey       string
 	neynarUrl    string
 	farcasterHub string
+	errMsg       error
 }
 
 type Option func(*NeynarClient)
@@ -58,6 +59,10 @@ func WithNeynarApiKey(key string) Option {
 	return func(c *NeynarClient) {
 		c.apiKey = key
 	}
+}
+
+func (nc *NeynarClient) Error() error {
+	return nc.errMsg
 }
 
 // Returns a list of relevant followers for a given fid
@@ -181,6 +186,33 @@ func (nc *NeynarClient) FetchFarcasterUserFidByEthAddress(address string) (int32
 	}
 
 	return user.Fid, err
+}
+
+func (nc *NeynarClient) FetchFarcasterUserByUsername(username string) int32 {
+	url, err := url.Parse(fmt.Sprintf("%v/v1/farcaster/user-by-username", nc.neynarUrl))
+	if err != nil {
+		nc.errMsg = fmt.Errorf("error parsing url %v", err)
+		return 0
+	}
+	query := url.Query()
+	query.Add("username", username)
+	url.RawQuery = query.Encode()
+	response, err := nc.makeRequest(http.MethodGet, url.String(), "", nil)
+	if err != nil {
+		nc.errMsg = err
+		return 0
+	}
+	defer response.Body.Close()
+
+	responseObj := map[string]map[string]map[string]any{}
+	if err = json.NewDecoder(response.Body).Decode(&responseObj); err != nil {
+		nc.errMsg = err
+		return 0
+	}
+
+	fid := (responseObj["result"]["user"]["fid"]).(float64)
+
+	return int32(fid)
 }
 
 func (nc *NeynarClient) makeRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {

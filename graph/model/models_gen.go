@@ -191,12 +191,12 @@ type NewEmptyCriteriaInput struct {
 }
 
 type NewFarcasterCriteriaInput struct {
-	DropID             string               `json:"dropID"`
-	CastURL            *string              `json:"castUrl,omitempty"`
-	ChannelID          *string              `json:"channelId,omitempty"`
-	FarcasterProfileID *string              `json:"farcasterProfileId,omitempty"`
-	Interaction        []*InteractionType   `json:"interaction,omitempty"`
-	CriteriaType       []*ClaimCriteriaType `json:"criteriaType"`
+	DropID            string               `json:"dropID"`
+	CastURL           *string              `json:"castUrl,omitempty"`
+	ChannelID         *string              `json:"channelId,omitempty"`
+	FarcasterUserName *string              `json:"farcasterUserName,omitempty"`
+	Interaction       []*InteractionType   `json:"interaction,omitempty"`
+	CriteriaType      []*ClaimCriteriaType `json:"criteriaType"`
 }
 
 type NewPatreonCriteriaInput struct {
