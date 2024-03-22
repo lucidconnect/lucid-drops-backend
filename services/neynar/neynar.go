@@ -30,7 +30,7 @@ type NeynarClient struct {
 	apiKey       string
 	neynarUrl    string
 	farcasterHub string
-	errMsg       error
+	// errMsg       error
 }
 
 type Option func(*NeynarClient)

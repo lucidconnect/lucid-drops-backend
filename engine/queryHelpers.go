@@ -399,7 +399,6 @@ func DeleteCriteriaIfExists(drop *models.Drop) error {
 	var err error
 	switch *drop.Criteria {
 	case model.ClaimCriteriaTypeFarcasterChannel, model.ClaimCriteriaTypeFarcasterFollowing, model.ClaimCriteriaTypeFarcasterInteractions:
-		fmt.Println("delete stuff", drop.ID)
 		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID.String()).Delete(&models.FarcasterCriteria{}).Error
 		if err != nil {
 			log.Err(err).Caller().Msg("some error")
