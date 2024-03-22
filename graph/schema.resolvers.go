@@ -145,9 +145,9 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 	return whitelist.CreateFarcasterWhitelistForDrop(input, authenticationDetails)
 }
 
-// CreateMintPassForNoCriteriaItem is the resolver for the createMintPassForNoCriteriaItem field.
-func (r *mutationResolver) CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error) {
-	return whitelist.CreateMintPassForNoCriteriaDrop(itemID, walletAddress)
+// CreateMintPass is the resolver for the createMintPass field.
+func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, walletAddress string) (*model.ValidationRespoonse, error) {
+	return whitelist.CreateMintPass(dropID, walletAddress)
 }
 
 // ValidateFarcasterCriteriaForDrop is the resolver for the validateFarcasterCriteriaForDrop field.
