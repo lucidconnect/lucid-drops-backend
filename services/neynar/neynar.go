@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 /** TODO
@@ -187,7 +188,7 @@ func (nc *NeynarClient) FetchFarcasterUserFidByEthAddress(address string) (int32
 func (nc *NeynarClient) FetchFarcasterUserByUsername(username string) (int32, error) {
 	url, err := url.Parse(fmt.Sprintf("%v/v1/farcaster/user-by-username", nc.neynarUrl))
 	if err != nil {
-		return 0,  err
+		return 0, err
 	}
 
 	query := url.Query()
@@ -291,7 +292,11 @@ func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated
 		err = fmt.Errorf("failed to decode response body: %v", err)
 		return UserDehydrated{}, err
 	}
-	userI := responseBody[address][0]
+	fmt.Println(responseBody)
+	if len(responseBody) == 0 {
+		return UserDehydrated{}, fmt.Errorf("user with address %v not found", address)
+	}
+	userI := responseBody[strings.ToLower(address)][0]
 	return userI, nil
 }
 
