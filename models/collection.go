@@ -22,7 +22,7 @@ type Drop struct {
 	MintPrice              *float64
 	GasIsCreatorSponsored  bool
 	Criteria               *model.ClaimCriteriaType
-	FarcasterCriteria      *FarcasterCriteria `gorm:"foreignKey:DropId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	FarcasterCriteria      FarcasterCriteria `gorm:"foreignKey:DropId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	UserLimit              *int               `gorm:"default:null"`
 	EditionLimit           *int               `gorm:"default:null"`
 	MintPasses             []MintPass         `gorm:"foreignKey:DropID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
@@ -52,7 +52,7 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		Network:               c.BlockchainNetwork,
 		MintURL:               c.MintUrl,
 		GasIsCreatorSponsored: c.GasIsCreatorSponsored,
-		ClaimCriteria:         c.Criteria,
+		// ClaimCriteria:         c.Criteria,
 	}
 
 	if c.AAContractAddress != nil {
@@ -63,11 +63,12 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		mappedDrop.MintPrice = c.MintPrice
 	}
 
-	if c.FarcasterCriteria != nil {
-		mappedDrop.FarcasterClaimCriteriaInteractions = InteractionsToArr(c.FarcasterCriteria.Interactions)
-		mappedDrop.CastURL = &c.FarcasterCriteria.CastUrl
-		mappedDrop.FarcasterProfileID = &c.FarcasterCriteria.FarcasterProfileID
-		mappedDrop.FarcasterChannelID = &c.FarcasterCriteria.ChannelID
+	if c.FarcasterCriteria.ID != uuid.Nil {
+
+	// 	mappedDrop.FarcasterClaimCriteriaInteractions = InteractionsToArr(c.FarcasterCriteria.Interactions)
+	// 	mappedDrop.CastURL = &c.FarcasterCriteria.CastUrl
+	// 	mappedDrop.FarcasterProfileID = &c.FarcasterCriteria.FarcasterProfileID
+	// 	mappedDrop.FarcasterChannelID = &c.FarcasterCriteria.ChannelID
 	}
 
 	var mintPasses []*model.ClaimDetails

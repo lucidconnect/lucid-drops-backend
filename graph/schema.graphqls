@@ -178,7 +178,7 @@ input NewFarcasterCriteriaInput {
   channelId: String
   farcasterUserName: String
   interaction: [InteractionType]
-  criteriaType: ClaimCriteriaType!
+  criteriaType: [ClaimCriteriaType]!
 }
 
 input NewTwitterCriteriaInput {
@@ -186,7 +186,7 @@ input NewTwitterCriteriaInput {
 	profileID: String
 	tweetLink: String
 	interaction: [InteractionType]
-  criteriaType: ClaimCriteriaType!
+  criteriaType: [ClaimCriteriaType]!
   twitterAuthID: String!
   """
   Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
@@ -281,7 +281,7 @@ type Drop {
   mintPrice: Float
   gasIsCreatorSponsored: Boolean!
   farcasterClaimCriteriaInteractions: [InteractionType]
-  claimCriteria: ClaimCriteriaType
+  claimCriteria: [ClaimCriteriaType]
   castUrl: String
   farcasterProfileID: String
   farcasterChannelId: String
