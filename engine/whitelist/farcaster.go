@@ -142,15 +142,15 @@ func ValidateFarcasterCriteriaForDrop(farcasterAddress string, dropId string) (*
 			for _, interaction := range models.InteractionsToArr(criteria.Interactions) {
 				switch *interaction {
 				case model.InteractionTypeReplies:
-					if !validateFarcasterReplyCriteria(int32(userFid), criteria) {
+					if !validateFarcasterReplyCriteria(int32(userFid), *criteria) {
 						return resp, errors.New("farcaster account does not meet the reply criteria")
 					}
 				case model.InteractionTypeRecasts:
-					if !validateFarcasterRecastCriteria(int32(userFid), criteria) {
+					if !validateFarcasterRecastCriteria(int32(userFid), *criteria) {
 						return resp, errors.New("farcaster account does not meet the recast criteria")
 					}
 				case model.InteractionTypeLikes:
-					if !validateFarcasterLikeCriteria(int32(userFid), criteria) {
+					if !validateFarcasterLikeCriteria(int32(userFid), *criteria) {
 						return resp, errors.New("farcaster account does not meet the like criteria")
 					}
 				}
@@ -158,13 +158,13 @@ func ValidateFarcasterCriteriaForDrop(farcasterAddress string, dropId string) (*
 		}
 
 		if criteriaType == model.ClaimCriteriaTypeFarcasterFollowing.String() {
-			if !validateFarcasterAccountFollowerCriteria(int32(userFid), criteria) {
+			if !validateFarcasterAccountFollowerCriteria(int32(userFid), *criteria) {
 				return nil, errors.New("farcaster account does not meet the follower criteria")
 			}
 		}
 
 		if criteriaType == model.ClaimCriteriaTypeFarcasterChannel.String() {
-			if !validateFarcasterChannelFollowerCriteria(int32(userFid), criteria) {
+			if !validateFarcasterChannelFollowerCriteria(int32(userFid), *criteria) {
 				return nil, errors.New("farcaster account does not meet the channel follower criteria")
 			}
 		}

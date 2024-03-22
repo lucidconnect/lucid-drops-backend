@@ -67,8 +67,7 @@ type Drop struct {
 	CastURL                            *string              `json:"castUrl,omitempty"`
 	FarcasterProfileID                 *string              `json:"farcasterProfileID,omitempty"`
 	FarcasterChannelID                 *string              `json:"farcasterChannelId,omitempty"`
-	ClaimDetails                       []*ClaimDetails    `json:"claimDetails,omitempty"`
-	ClaimDetails                       []*ClaimDetails    `json:"claimDetails,omitempty"`
+	ClaimDetails                       []*ClaimDetails      `json:"claimDetails,omitempty"`
 }
 
 type DropInput struct {
