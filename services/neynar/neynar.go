@@ -294,7 +294,7 @@ func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated
 	}
 	fmt.Println(responseBody)
 	if len(responseBody) == 0 {
-		return UserDehydrated{}, fmt.Errorf("user with address %v not found", address)
+		return UserDehydrated{}, fmt.Errorf("address %v is not connected with a farcaster account", address)
 	}
 	userI := responseBody[strings.ToLower(address)][0]
 	return userI, nil
