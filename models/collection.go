@@ -52,7 +52,7 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		Network:               c.BlockchainNetwork,
 		MintURL:               c.MintUrl,
 		GasIsCreatorSponsored: c.GasIsCreatorSponsored,
-		// ClaimCriteria:         c.Criteria,
+		ClaimCriteria:         c.Criteria,
 	}
 
 	if c.AAContractAddress != nil {
