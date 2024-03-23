@@ -178,7 +178,7 @@ input NewFarcasterCriteriaInput {
   channelId: String
   farcasterUserName: String
   interaction: [InteractionType]
-  criteriaType: [ClaimCriteriaType]!
+  criteriaType: ClaimCriteriaType
 }
 
 input NewTwitterCriteriaInput {

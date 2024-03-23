@@ -11351,7 +11351,7 @@ func (ec *executionContext) unmarshalInputNewFarcasterCriteriaInput(ctx context.
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("criteriaType"))
-			data, err := ec.unmarshalNClaimCriteriaType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, v)
+			data, err := ec.unmarshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, v)
 			if err != nil {
 				return it, err
 			}
