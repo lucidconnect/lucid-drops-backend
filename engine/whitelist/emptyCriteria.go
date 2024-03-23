@@ -34,8 +34,8 @@ func CreateEmptyCriteria(input model.NewEmptyCriteriaInput, authDetails *interna
 		CreatorID: creator.ID.String(),
 	}
 
-	emptyCriteria := model.ClaimCriteriaTypeEmptyCriteria
-	drop.Criteria = &emptyCriteria
+	// emptyCriteria := model.ClaimCriteriaTypeEmptyCriteria
+	// drop.Criteria = &emptyCriteria
 
 	itemUpdateErr := engine.SaveModel(drop)
 	if itemUpdateErr != nil {

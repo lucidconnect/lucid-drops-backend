@@ -52,7 +52,7 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		Network:               c.BlockchainNetwork,
 		MintURL:               c.MintUrl,
 		GasIsCreatorSponsored: c.GasIsCreatorSponsored,
-		ClaimCriteria:         c.Criteria,
+		// ClaimCriteria:         c.Criteria,
 	}
 
 	if c.AAContractAddress != nil {
@@ -63,7 +63,8 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		mappedDrop.MintPrice = c.MintPrice
 	}
 
-	if c.FarcasterCriteria != nil {
+	if c.FarcasterCriteria.ID != uuid.Nil {
+
 		mappedDrop.FarcasterClaimCriteriaInteractions = InteractionsToArr(c.FarcasterCriteria.Interactions)
 		mappedDrop.CastURL = &c.FarcasterCriteria.CastUrl
 		mappedDrop.FarcasterProfileID = &c.FarcasterCriteria.FarcasterProfileID

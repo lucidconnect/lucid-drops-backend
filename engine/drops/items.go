@@ -419,8 +419,5 @@ func FetchNftHolders(item *model.Item) ([]string, error) {
 		log.Err(err).Send()
 		return nil, err
 	}
-
-	fmt.Println("nft holders", holders)
-
 	return holders, nil
 }

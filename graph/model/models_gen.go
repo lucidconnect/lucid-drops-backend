@@ -49,25 +49,25 @@ type DeploymentInfo struct {
 }
 
 type Drop struct {
-	ID                                 string             `json:"ID"`
-	CreatorID                          string             `json:"creatorID"`
-	CreatedAt                          time.Time          `json:"createdAt"`
-	Name                               string             `json:"name"`
-	Description                        string             `json:"description"`
-	Image                              string             `json:"image"`
-	Thumbnail                          string             `json:"thumbnail"`
-	ContractAddress                    *string            `json:"contractAddress,omitempty"`
-	Network                            *BlockchainNetwork `json:"network,omitempty"`
-	Items                              []*Item            `json:"items"`
-	MintURL                            string             `json:"mintUrl"`
-	MintPrice                          *float64           `json:"mintPrice,omitempty"`
-	GasIsCreatorSponsored              bool               `json:"gasIsCreatorSponsored"`
-	FarcasterClaimCriteriaInteractions []*InteractionType `json:"farcasterClaimCriteriaInteractions,omitempty"`
-	ClaimCriteria                      *ClaimCriteriaType `json:"claimCriteria,omitempty"`
-	CastURL                            *string            `json:"castUrl,omitempty"`
-	FarcasterProfileID                 *string            `json:"farcasterProfileID,omitempty"`
-	FarcasterChannelID                 *string            `json:"farcasterChannelId,omitempty"`
-	ClaimDetails                       []*ClaimDetails    `json:"claimDetails,omitempty"`
+	ID                                 string               `json:"ID"`
+	CreatorID                          string               `json:"creatorID"`
+	CreatedAt                          time.Time            `json:"createdAt"`
+	Name                               string               `json:"name"`
+	Description                        string               `json:"description"`
+	Image                              string               `json:"image"`
+	Thumbnail                          string               `json:"thumbnail"`
+	ContractAddress                    *string              `json:"contractAddress,omitempty"`
+	Network                            *BlockchainNetwork   `json:"network,omitempty"`
+	Items                              []*Item              `json:"items"`
+	MintURL                            string               `json:"mintUrl"`
+	MintPrice                          *float64             `json:"mintPrice,omitempty"`
+	GasIsCreatorSponsored              bool                 `json:"gasIsCreatorSponsored"`
+	FarcasterClaimCriteriaInteractions []*InteractionType   `json:"farcasterClaimCriteriaInteractions,omitempty"`
+	ClaimCriteria                      []*ClaimCriteriaType `json:"claimCriteria,omitempty"`
+	CastURL                            *string              `json:"castUrl,omitempty"`
+	FarcasterProfileID                 *string              `json:"farcasterProfileID,omitempty"`
+	FarcasterChannelID                 *string              `json:"farcasterChannelId,omitempty"`
+	ClaimDetails                       []*ClaimDetails      `json:"claimDetails,omitempty"`
 }
 
 type DropInput struct {
@@ -196,7 +196,7 @@ type NewFarcasterCriteriaInput struct {
 	ChannelID         *string            `json:"channelId,omitempty"`
 	FarcasterUserName *string            `json:"farcasterUserName,omitempty"`
 	Interaction       []*InteractionType `json:"interaction,omitempty"`
-	CriteriaType      ClaimCriteriaType  `json:"criteriaType"`
+	CriteriaType      *ClaimCriteriaType `json:"criteriaType,omitempty"`
 }
 
 type NewPatreonCriteriaInput struct {
@@ -212,12 +212,12 @@ type NewTelegramCriteriaInput struct {
 }
 
 type NewTwitterCriteriaInput struct {
-	ItemID        string             `json:"itemID"`
-	ProfileID     *string            `json:"profileID,omitempty"`
-	TweetLink     *string            `json:"tweetLink,omitempty"`
-	Interaction   []*InteractionType `json:"interaction,omitempty"`
-	CriteriaType  ClaimCriteriaType  `json:"criteriaType"`
-	TwitterAuthID string             `json:"twitterAuthID"`
+	ItemID        string               `json:"itemID"`
+	ProfileID     *string              `json:"profileID,omitempty"`
+	TweetLink     *string              `json:"tweetLink,omitempty"`
+	Interaction   []*InteractionType   `json:"interaction,omitempty"`
+	CriteriaType  []*ClaimCriteriaType `json:"criteriaType"`
+	TwitterAuthID string               `json:"twitterAuthID"`
 	// Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
 	CutOffDate *string `json:"cutOffDate,omitempty"`
 }

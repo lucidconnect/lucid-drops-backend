@@ -147,7 +147,7 @@ type ComplexityRoot struct {
 		CreateEmptyCriteriaForDrop       func(childComplexity int, input model.NewEmptyCriteriaInput) int
 		CreateFarcasterCriteriaForDrop   func(childComplexity int, input model.NewFarcasterCriteriaInput) int
 		CreateJWTToken                   func(childComplexity int, input *model.CreateJWTTokenInput) int
-		CreateMintPassForNoCriteriaItem  func(childComplexity int, itemID string, walletAddress string) int
+		CreateMintPass                   func(childComplexity int, dropID string, walletAddress string) int
 		CreatePaymentIntentSecretKey     func(childComplexity int, amount int) int
 		DeleteDrop                       func(childComplexity int, dropID string) int
 		EditUserProfile                  func(childComplexity int, input model.EditUserProfileInputType) int
@@ -259,7 +259,7 @@ type MutationResolver interface {
 	DeleteDrop(ctx context.Context, dropID string) (*model.Drop, error)
 	CreateEmptyCriteriaForDrop(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Drop, error)
 	CreateFarcasterCriteriaForDrop(ctx context.Context, input model.NewFarcasterCriteriaInput) (*model.Drop, error)
-	CreateMintPassForNoCriteriaItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error)
+	CreateMintPass(ctx context.Context, dropID string, walletAddress string) (*model.ValidationRespoonse, error)
 	ValidateFarcasterCriteriaForDrop(ctx context.Context, dropID string, farcasterAddress string) (*model.ValidationRespoonse, error)
 	CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error)
 	CreatePaymentIntentSecretKey(ctx context.Context, amount int) (*string, error)
@@ -801,17 +801,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateJWTToken(childComplexity, args["input"].(*model.CreateJWTTokenInput)), true
 
-	case "Mutation.createMintPassForNoCriteriaItem":
-		if e.complexity.Mutation.CreateMintPassForNoCriteriaItem == nil {
+	case "Mutation.createMintPass":
+		if e.complexity.Mutation.CreateMintPass == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_createMintPassForNoCriteriaItem_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createMintPass_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateMintPassForNoCriteriaItem(childComplexity, args["itemID"].(string), args["walletAddress"].(string)), true
+		return e.complexity.Mutation.CreateMintPass(childComplexity, args["dropID"].(string), args["walletAddress"].(string)), true
 
 	case "Mutation.createPaymentIntentSecretKey":
 		if e.complexity.Mutation.CreatePaymentIntentSecretKey == nil {
@@ -1558,18 +1558,18 @@ func (ec *executionContext) field_Mutation_createJWTToken_args(ctx context.Conte
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createMintPassForNoCriteriaItem_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_createMintPass_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["itemID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemID"))
+	if tmp, ok := rawArgs["dropID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dropID"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["itemID"] = arg0
+	args["dropID"] = arg0
 	var arg1 string
 	if tmp, ok := rawArgs["walletAddress"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("walletAddress"))
@@ -3008,9 +3008,9 @@ func (ec *executionContext) _Drop_claimCriteria(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.ClaimCriteriaType)
+	res := resTmp.([]*model.ClaimCriteriaType)
 	fc.Result = res
-	return ec.marshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, field.Selections, res)
+	return ec.marshalOClaimCriteriaType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Drop_claimCriteria(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5409,8 +5409,8 @@ func (ec *executionContext) fieldContext_Mutation_createFarcasterCriteriaForDrop
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createMintPassForNoCriteriaItem(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createMintPassForNoCriteriaItem(ctx, field)
+func (ec *executionContext) _Mutation_createMintPass(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createMintPass(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5423,7 +5423,7 @@ func (ec *executionContext) _Mutation_createMintPassForNoCriteriaItem(ctx contex
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateMintPassForNoCriteriaItem(rctx, fc.Args["itemID"].(string), fc.Args["walletAddress"].(string))
+		return ec.resolvers.Mutation().CreateMintPass(rctx, fc.Args["dropID"].(string), fc.Args["walletAddress"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5437,7 +5437,7 @@ func (ec *executionContext) _Mutation_createMintPassForNoCriteriaItem(ctx contex
 	return ec.marshalOValidationRespoonse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_createMintPassForNoCriteriaItem(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_createMintPass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
@@ -5460,7 +5460,7 @@ func (ec *executionContext) fieldContext_Mutation_createMintPassForNoCriteriaIte
 		}
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createMintPassForNoCriteriaItem_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+	if fc.Args, err = ec.field_Mutation_createMintPass_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -11351,7 +11351,7 @@ func (ec *executionContext) unmarshalInputNewFarcasterCriteriaInput(ctx context.
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("criteriaType"))
-			data, err := ec.unmarshalNClaimCriteriaType2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, v)
+			data, err := ec.unmarshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11510,7 +11510,7 @@ func (ec *executionContext) unmarshalInputNewTwitterCriteriaInput(ctx context.Co
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("criteriaType"))
-			data, err := ec.unmarshalNClaimCriteriaType2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, v)
+			data, err := ec.unmarshalNClaimCriteriaType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12647,9 +12647,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createMintPassForNoCriteriaItem":
+		case "createMintPass":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createMintPassForNoCriteriaItem(ctx, field)
+				return ec._Mutation_createMintPass(ctx, field)
 			})
 		case "validateFarcasterCriteriaForDrop":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -13929,14 +13929,59 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNClaimCriteriaType2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, v interface{}) (model.ClaimCriteriaType, error) {
-	var res model.ClaimCriteriaType
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
+func (ec *executionContext) unmarshalNClaimCriteriaType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, v interface{}) ([]*model.ClaimCriteriaType, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ClaimCriteriaType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
 }
 
-func (ec *executionContext) marshalNClaimCriteriaType2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, sel ast.SelectionSet, v model.ClaimCriteriaType) graphql.Marshaler {
-	return v
+func (ec *executionContext) marshalNClaimCriteriaType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, sel ast.SelectionSet, v []*model.ClaimCriteriaType) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
 }
 
 func (ec *executionContext) marshalNCreatorDetails2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐCreatorDetails(ctx context.Context, sel ast.SelectionSet, v model.CreatorDetails) graphql.Marshaler {
@@ -14754,6 +14799,67 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOClaimCriteriaType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, v interface{}) ([]*model.ClaimCriteriaType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.ClaimCriteriaType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOClaimCriteriaType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, sel ast.SelectionSet, v []*model.ClaimCriteriaType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOClaimCriteriaType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐClaimCriteriaType(ctx context.Context, v interface{}) (*model.ClaimCriteriaType, error) {
