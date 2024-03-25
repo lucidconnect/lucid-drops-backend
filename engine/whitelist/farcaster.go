@@ -64,11 +64,10 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 	for _, interaction := range input.Interaction {
 		interactions += fmt.Sprintf("%v,", interaction.String())
 	}
-	// var criteriaTypes string
-	// for _, criteriaType := range input.CriteriaType {
-	// criteriaTypes += fmt.Sprintf("%v,", criteriaType.String())
-	// }
-	criteriaTypes := input.CriteriaType.String()
+	var criteriaTypes string
+	for _, criteriaType := range input.CriteriaType {
+		criteriaTypes += fmt.Sprintf("%v,", criteriaType.String())
+	}
 	criteria := &models.FarcasterCriteria{
 		DropId:       drop.ID,
 		CreatorID:    creator.ID,
