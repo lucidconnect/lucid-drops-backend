@@ -63,8 +63,7 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		mappedDrop.MintPrice = c.MintPrice
 	}
 
-	if c.FarcasterCriteria.ID != uuid.Nil {
-
+	if c.FarcasterCriteria != nil {
 		mappedDrop.FarcasterClaimCriteriaInteractions = InteractionsToArr(c.FarcasterCriteria.Interactions)
 		mappedDrop.CastURL = &c.FarcasterCriteria.CastUrl
 		mappedDrop.FarcasterProfileID = &c.FarcasterCriteria.FarcasterProfileID
