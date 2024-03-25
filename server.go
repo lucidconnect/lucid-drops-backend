@@ -12,6 +12,7 @@ import (
 	"github.com/lucidconnect/inverse/dbutils"
 	"github.com/lucidconnect/inverse/engine/whitelist"
 	"github.com/lucidconnect/inverse/graph"
+	"github.com/lucidconnect/inverse/internal"
 	"github.com/lucidconnect/inverse/jobs"
 	"github.com/lucidconnect/inverse/route"
 	"github.com/lucidconnect/inverse/services"
@@ -58,7 +59,7 @@ func main() {
 	router := chi.NewRouter()
 	loadCORS(router)
 
-	// router.Use(internal.UserAuthMiddleWare())
+	router.Use(internal.UserAuthMiddleWare())
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/health", http.HandlerFunc(route.HealthCheckHandler))
 	router.Handle("/query", srv)
