@@ -1,6 +1,8 @@
 package models
 
 import (
+	"strings"
+
 	"github.com/lucidconnect/inverse/graph/model"
 	uuid "github.com/satori/go.uuid"
 )
@@ -21,7 +23,7 @@ type Drop struct {
 	MintUrl                string
 	MintPrice              *float64
 	GasIsCreatorSponsored  bool
-	Criteria               *model.ClaimCriteriaType
+	Criteria               string
 	FarcasterCriteria      *FarcasterCriteria `gorm:"foreignKey:DropId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	UserLimit              *int               `gorm:"default:null"`
 	EditionLimit           *int               `gorm:"default:null"`
@@ -52,7 +54,17 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		Network:               c.BlockchainNetwork,
 		MintURL:               c.MintUrl,
 		GasIsCreatorSponsored: c.GasIsCreatorSponsored,
-		ClaimCriteria:         c.Criteria,
+		// ClaimCriteria:         c.Criteria,
+	}
+
+	var claimCriterias []*model.ClaimCriteriaType
+	if c.Criteria != "" {
+		criterias := strings.Split(c.Criteria, ",")
+		for _, criteria := range criterias {
+			cr := model.ClaimCriteriaType(criteria)
+			claimCriterias = append(claimCriterias, &cr)
+		}
+		mappedDrop.ClaimCriteria = claimCriterias
 	}
 
 	if c.AAContractAddress != nil {

@@ -397,42 +397,16 @@ func GetFeaturedDrops() ([]*models.Drop, error) {
 
 func DeleteCriteriaIfExists(drop *models.Drop) error {
 	var err error
-	switch *drop.Criteria {
-	case model.ClaimCriteriaTypeFarcasterChannel, model.ClaimCriteriaTypeFarcasterFollowing, model.ClaimCriteriaTypeFarcasterInteractions:
-		err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID.String()).Delete(&models.FarcasterCriteria{}).Error
-		if err != nil {
-			log.Err(err).Caller().Msg("some error")
-			return errors.New("an error occured while updating updating farcaster criteria")
-		}
-	case model.ClaimCriteriaTypeTwitterInteractions, model.ClaimCriteriaTypeTwitterFollowers:
-		//Delete existing twitter criteria
-		err = dbutils.DB.Unscoped().Delete(&models.TwitterCriteria{}, "drop_id = ?", drop.ID).Error
-		if err != nil {
-			return errors.New("an error occured while updating updating twitter criteria")
-		}
-	case model.ClaimCriteriaTypeTelegram:
-		//Delete existing telegram criteria
-		err = dbutils.DB.Unscoped().Delete(&models.TelegramCriteria{}, "drop_id = ?", drop.ID).Error
-		if err != nil {
-			return errors.New("an error occured while updating updating telegram criteria")
-		}
-	case model.ClaimCriteriaTypeEmailDomain:
-		//Delete existing email domain criteria
-		err = dbutils.DB.Unscoped().Delete(&models.EmailDomainWhiteList{}, "drop_id = ?", drop.ID).Error
-		if err != nil {
-			return errors.New("an error occured while updating updating email domain criteria")
-		}
-	case model.ClaimCriteriaTypeEmailWhiteList:
-		//Delete existing email domain criteria
-		err = dbutils.DB.Unscoped().Delete(&models.SingleEmailClaim{}, "drop_id = ?", drop.ID).Error
-		if err != nil {
-			return errors.New("an error occured while updating updating email domain criteria")
-		}
-	case model.ClaimCriteriaTypeWalletAddress:
-		//Delete existing email domain criteria
-		err = dbutils.DB.Unscoped().Delete(&models.WalletAddressClaim{}, "drop_id = ?", drop.ID).Error
-		if err != nil {
-			return errors.New("an error occured while updating updating email domain criteria")
+
+	criterias := strings.Split(drop.Criteria, ",")
+	for _, criteria := range criterias {
+		switch criteria {
+		case model.ClaimCriteriaTypeFarcasterChannel.String(), model.ClaimCriteriaTypeFarcasterFollowing.String(), model.ClaimCriteriaTypeFarcasterInteractions.String():
+			err = dbutils.DB.Unscoped().Where("drop_id = ?", drop.ID.String()).Delete(&models.FarcasterCriteria{}).Error
+			if err != nil {
+				log.Err(err).Caller().Msg("some error")
+				return errors.New("an error occured while updating updating farcaster criteria")
+			}
 		}
 	}
 

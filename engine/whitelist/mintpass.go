@@ -94,7 +94,7 @@ func createMintPassForValidatedCriteriaDrop(dropID, walletAddress string) (*mode
 		return nil, err
 	}
 
-	if drop.Criteria == nil {
+	if drop.Criteria == "" {
 		return nil, errors.New("unable to generate mintpass for this item")
 	}
 
@@ -134,7 +134,7 @@ func CreateMintPass(dropID, walletAddress string) (*model.ValidationRespoonse, e
 		return nil, errors.New("drop not found")
 	}
 
-	if drop.Criteria == nil {
+	if drop.Criteria == "" {
 		return CreateMintPassForNoCriteriaDrop(dropID, walletAddress)
 	}
 
