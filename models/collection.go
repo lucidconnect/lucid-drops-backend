@@ -57,14 +57,24 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		// ClaimCriteria:         c.Criteria,
 	}
 
-	var claimCriterias []*model.ClaimCriteriaType
 	if c.Criteria != "" {
+		var claimCriterias []*model.ClaimCriteriaType
 		criterias := strings.Split(c.Criteria, ",")
 		for _, criteria := range criterias {
 			cr := model.ClaimCriteriaType(criteria)
 			claimCriterias = append(claimCriterias, &cr)
 		}
 		mappedDrop.ClaimCriteria = claimCriterias
+	}
+
+	if c.FarcasterCriteria != nil {
+		var claimCriteriaInteractions []*model.InteractionType
+		interactions := strings.Split(c.FarcasterCriteria.Interactions, ",")
+		for _, interaction := range interactions {
+			i := model.InteractionType(interaction)
+			claimCriteriaInteractions = append(claimCriteriaInteractions, &i)
+		}
+		mappedDrop.FarcasterClaimCriteriaInteractions = claimCriteriaInteractions
 	}
 
 	if c.AAContractAddress != nil {
