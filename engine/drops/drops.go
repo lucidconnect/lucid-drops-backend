@@ -183,7 +183,11 @@ func FetchCreatorDrops(authDetails *internal.AuthDetails) ([]*model.Drop, error)
 	mappedDrops := make([]*model.Drop, len(drops))
 
 	for idx, drop := range drops {
-		items, _ := FetchDropItems(drop.ID.String(), false, nil)
+		items, err := FetchDropItems(drop.ID.String(), false, nil)
+		if err != nil {
+			log.Err(err).Caller().Send()
+			continue
+		}
 		mappedDrops[idx] = drop.ToGraphData(items)
 	}
 

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"strings"
+
 	"github.com/lucidconnect/inverse/graph/model"
 	uuid "github.com/satori/go.uuid"
 )
@@ -21,7 +23,7 @@ type Drop struct {
 	MintUrl                string
 	MintPrice              *float64
 	GasIsCreatorSponsored  bool
-	Criteria               *model.ClaimCriteriaType
+	Criteria               string
 	FarcasterCriteria      *FarcasterCriteria `gorm:"foreignKey:DropId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	UserLimit              *int               `gorm:"default:null"`
 	EditionLimit           *int               `gorm:"default:null"`
@@ -52,7 +54,27 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		Network:               c.BlockchainNetwork,
 		MintURL:               c.MintUrl,
 		GasIsCreatorSponsored: c.GasIsCreatorSponsored,
-		ClaimCriteria:         c.Criteria,
+		// ClaimCriteria:         c.Criteria,
+	}
+
+	if c.Criteria != "" {
+		var claimCriterias []*model.ClaimCriteriaType
+		criterias := strings.Split(c.Criteria, ",")
+		for _, criteria := range criterias {
+			cr := model.ClaimCriteriaType(criteria)
+			claimCriterias = append(claimCriterias, &cr)
+		}
+		mappedDrop.ClaimCriteria = claimCriterias
+	}
+
+	if c.FarcasterCriteria != nil {
+		var claimCriteriaInteractions []*model.InteractionType
+		interactions := strings.Split(c.FarcasterCriteria.Interactions, ",")
+		for _, interaction := range interactions {
+			i := model.InteractionType(interaction)
+			claimCriteriaInteractions = append(claimCriteriaInteractions, &i)
+		}
+		mappedDrop.FarcasterClaimCriteriaInteractions = claimCriteriaInteractions
 	}
 
 	if c.AAContractAddress != nil {
@@ -63,8 +85,7 @@ func (c *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		mappedDrop.MintPrice = c.MintPrice
 	}
 
-	if c.FarcasterCriteria.ID != uuid.Nil {
-
+	if c.FarcasterCriteria != nil {
 		mappedDrop.FarcasterClaimCriteriaInteractions = InteractionsToArr(c.FarcasterCriteria.Interactions)
 		mappedDrop.CastURL = &c.FarcasterCriteria.CastUrl
 		mappedDrop.FarcasterProfileID = &c.FarcasterCriteria.FarcasterProfileID

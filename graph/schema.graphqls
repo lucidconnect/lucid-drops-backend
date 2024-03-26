@@ -281,7 +281,7 @@ type Drop {
   mintPrice: Float
   gasIsCreatorSponsored: Boolean!
   farcasterClaimCriteriaInteractions: [InteractionType]
-  claimCriteria: ClaimCriteriaType
+  claimCriteria: [ClaimCriteriaType]
   castUrl: String
   farcasterProfileID: String
   farcasterChannelId: String

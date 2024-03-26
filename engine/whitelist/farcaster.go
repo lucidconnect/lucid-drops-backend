@@ -52,7 +52,7 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 		return nil, errors.New("drop not found")
 	}
 
-	if drop.Criteria != nil {
+	if drop.Criteria != "" {
 		//Delete Existing criteria
 		err := engine.DeleteCriteriaIfExists(drop)
 		if err != nil {
@@ -95,10 +95,10 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 		criteria.FarcasterProfileID = fmt.Sprint(fid)
 	}
 
-	// drop.Criteria = &input.CriteriaType
-	// if err = engine.SaveModel(drop); err != nil {
-	// 	return nil, err
-	// }
+	drop.Criteria = criteriaTypes
+	if err = engine.SaveModel(drop); err != nil {
+		return nil, err
+	}
 
 	if err = engine.SaveModel(criteria); err != nil {
 		return nil, err
