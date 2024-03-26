@@ -6,16 +6,20 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ethereum/go-ethereum/common"
+	drps "github.com/lucidconnect/inverse/drops"
 	"github.com/lucidconnect/inverse/engine"
 	"github.com/lucidconnect/inverse/engine/aiimages"
 	"github.com/lucidconnect/inverse/engine/auth"
 	"github.com/lucidconnect/inverse/engine/claimers"
 	"github.com/lucidconnect/inverse/engine/drops"
+	"github.com/lucidconnect/inverse/utils"
+
 	"github.com/lucidconnect/inverse/engine/mobile"
 	"github.com/lucidconnect/inverse/engine/onboarding"
 	"github.com/lucidconnect/inverse/engine/wallet"
@@ -83,7 +87,29 @@ func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input mo
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	return onboarding.RegisterInverseUsername(authenticationDetails.Address, &input)
+	_, err = r.CreatorRepository.FindCreatorByUsername(input.InverseUsername)
+	if err == nil {
+		return nil, errors.New("inverse name isn't available")
+	}
+	// cachedCreator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
+	newCreator := drps.NewCreator(authenticationDetails.Address.Hex())
+	newCreator.InverseUsername = utils.GetStrPtr(input.InverseUsername)
+	newCreator.AAWalletAddress = input.AaWallet
+	if input.ExternalWalletAddress != nil {
+		newCreator.ExternalWalletAddress = *input.ExternalWalletAddress
+	}
+
+	// TODO: CreateWallet
+
+	altSigner := &drps.SignerInfo{
+		WalletAddress: input.AaWallet,
+		Provider:      model.SignerProviderConnectKit,
+	}
+	if err = r.CreatorRepository.CreateProfile(newCreator, altSigner); err != nil {
+		return nil, err
+	}
+
+	return newCreator.ToGraphData(), nil
 }
 
 // EditUserProfile is the resolver for the editUserProfile field.
@@ -93,7 +119,51 @@ func (r *mutationResolver) EditUserProfile(ctx context.Context, input model.Edit
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
 
-	return onboarding.EditUserProfile(input, authenticationDetails)
+	creator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
+	if err != nil {
+		return nil, err
+	}
+
+	if input.InverseUsername != nil {
+		creator.InverseUsername = input.InverseUsername
+	}
+
+	if input.Bio != nil {
+		creator.Bio = input.Bio
+	}
+
+	if input.Image != nil {
+		creator.Image = input.Image
+	}
+
+	if input.Thumbnail != nil {
+		creator.Thumbnail = input.Thumbnail
+	}
+
+	if input.Socials != nil {
+		if input.Socials.Twitter != nil {
+			creator.Twitter = input.Socials.Twitter
+		}
+
+		if input.Socials.Instagram != nil {
+			creator.Instagram = input.Socials.Instagram
+		}
+
+		if input.Socials.Github != nil {
+			creator.Github = input.Socials.Github
+		}
+
+		if input.Socials.Warpcast != nil {
+			creator.Warpcast = input.Socials.Warpcast
+		}
+	}
+
+	err = r.CreatorRepository.UpdateCreatorProfile(creator)
+	if err != nil {
+		return nil, err
+	}
+
+	return creator.CreatorToProfileData(), nil
 }
 
 // CreateDrop is the resolver for the createDrop field.
@@ -263,10 +333,12 @@ func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input mode
 
 // GetUserProfileDetails is the resolver for the getUserProfileDetails field.
 func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName string) (*model.UserProfileType, error) {
-	profileData, address, err := engine.GetUserProfileDetails(userName)
+	creator, err := r.CreatorRepository.FindCreatorByUsername(userName)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}
+	profileData := creator.CreatorToProfileData()
+	address := creator.WalletAddress
 
 	creatorDrops, err := engine.GetCreatorDrops(*profileData.CreatorID)
 	if err != nil {
@@ -290,7 +362,7 @@ func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName stri
 		allItems = append(allItems, items...)
 	}
 
-	claimedItems, err := claimers.FetchClaimedItems(*address)
+	claimedItems, err := claimers.FetchClaimedItems(address)
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
 	}

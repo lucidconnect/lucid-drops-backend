@@ -9,6 +9,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
+	"github.com/lucidconnect/inverse/database"
 	"github.com/lucidconnect/inverse/dbutils"
 	"github.com/lucidconnect/inverse/engine/whitelist"
 	"github.com/lucidconnect/inverse/graph"
@@ -50,7 +51,11 @@ func main() {
 	SetupCronJobs()
 	dbutils.SetupDB(dsn)
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	db := database.SetupDB(dsn)
+
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		CreatorRepository: db,
+	}}))
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.Options{})
