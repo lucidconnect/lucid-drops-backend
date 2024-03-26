@@ -8,7 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ethereum/go-ethereum/common"
@@ -19,6 +19,7 @@ import (
 	"github.com/lucidconnect/inverse/engine/claimers"
 	"github.com/lucidconnect/inverse/engine/drops"
 	"github.com/lucidconnect/inverse/utils"
+	"github.com/rs/zerolog/log"
 
 	"github.com/lucidconnect/inverse/engine/mobile"
 	"github.com/lucidconnect/inverse/engine/onboarding"
@@ -84,7 +85,7 @@ func (r *itemResolver) Holders(ctx context.Context, obj *model.Item) ([]string, 
 func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input model.NewUsernameRegisgration) (*model.CreatorDetails, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	_, err = r.CreatorRepository.FindCreatorByUsername(input.InverseUsername)
@@ -116,7 +117,7 @@ func (r *mutationResolver) RegisterInverseUsername(ctx context.Context, input mo
 func (r *mutationResolver) EditUserProfile(ctx context.Context, input model.EditUserProfileInputType) (*model.UserProfileType, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	creator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
@@ -170,17 +171,92 @@ func (r *mutationResolver) EditUserProfile(ctx context.Context, input model.Edit
 func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput) (*model.Drop, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
-	return drops.CreateDrop(&input, authenticationDetails)
+	creator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
+	if err != nil {
+		log.Err(err).Send()
+		return nil, customError.ErrToGraphQLError(structure.InvalidRequestError, err.Error(), ctx)
+	}
+	if input.Name == nil || input.Image == nil || input.Thumbnail == nil || input.Description == nil {
+		return nil, errors.New("pass in all Fields inorder to create a new drop")
+	}
+
+	signerInfo, err := r.CreatorRepository.FindSignerByCreatorId(creator.ID.String())
+	if err != nil {
+		log.Err(err).Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
+
+	var contractAdddress string
+	if input.ContractAddress == nil {
+		// Introduce an artificial delay for before fethcing the actual contract address
+		time.Sleep(time.Second * 3)
+
+		contractAdddress, err = drops.GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
+		if err != nil {
+			log.Err(err)
+		}
+
+	} else {
+		contractAdddress = *input.ContractAddress
+	}
+
+	newDrop := &drps.Drop{
+		CreatorID:              creator.ID,
+		CreatorAddress:         signerInfo.WalletAddress,
+		Name:                   *input.Name,
+		Image:                  *input.Image,
+		Thumbnail:              *input.Thumbnail,
+		Description:            *input.Description,
+		BlockchainNetwork:      input.Network,
+		AAWalletDeploymentHash: &input.DeploymentHash,
+		AAContractAddress:      &contractAdddress,
+		MintPrice:              input.MintPrice,
+		GasIsCreatorSponsored:  input.GasIsCreatorSponsored,
+		UserLimit:              input.UserLimit,
+		EditionLimit:           input.EditionLimit,
+	}
+
+	newItem := &drps.Item{
+		Name:        *input.Name,
+		Image:       *input.Image,
+		Description: *input.Description,
+		// DropID:       newDrop.ID
+		TokenID:      int64(1),
+		DropAddress:  contractAdddress,
+		UserLimit:    input.UserLimit,
+		EditionLimit: input.EditionLimit,
+	}
+
+	if err = r.NFTRepository.CreateDrop(newDrop, newItem); err != nil {
+		log.Err(err).Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
+
+	url, err := createMintUrl(newDrop.ID.String(), newItem.Image, *newDrop.AAContractAddress)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, "generating frame url failed", ctx)
+	}
+	newDrop.MintUrl = url
+	if err = r.NFTRepository.UpdateDropDetails(newDrop); err != nil {
+		log.Err(err).Send()
+		return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
+
+	var items []*model.Item
+	item := newItem.ToGraphData()
+	items = append(items, item)
+	return newDrop.ToGraphData(items), nil
 }
 
 // UpdateDrop is the resolver for the updateDrop field.
 func (r *mutationResolver) UpdateDrop(ctx context.Context, dropID string, input model.DropInput) (*model.Drop, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return drops.UpdateDrop(dropID, &input, authenticationDetails)
@@ -190,7 +266,7 @@ func (r *mutationResolver) UpdateDrop(ctx context.Context, dropID string, input 
 func (r *mutationResolver) DeleteDrop(ctx context.Context, dropID string) (*model.Drop, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return drops.DeleteDrop(dropID, authenticationDetails)
@@ -200,7 +276,7 @@ func (r *mutationResolver) DeleteDrop(ctx context.Context, dropID string) (*mode
 func (r *mutationResolver) CreateEmptyCriteriaForDrop(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Drop, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return whitelist.CreateEmptyCriteria(input, authenticationDetails)
@@ -210,7 +286,7 @@ func (r *mutationResolver) CreateEmptyCriteriaForDrop(ctx context.Context, input
 func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, input model.NewFarcasterCriteriaInput) (*model.Drop, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 	return whitelist.CreateFarcasterWhitelistForDrop(input, authenticationDetails)
 }
@@ -234,7 +310,7 @@ func (r *mutationResolver) CreateJWTToken(ctx context.Context, input *model.Crea
 func (r *mutationResolver) CreatePaymentIntentSecretKey(ctx context.Context, amount int) (*string, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return wallet.GenerateCreatorPaymentIntentSecret(authenticationDetails, int64(amount))
@@ -244,7 +320,7 @@ func (r *mutationResolver) CreatePaymentIntentSecretKey(ctx context.Context, amo
 func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error) {
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	// if err != nil {
-	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	// 	return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	// }
 
 	return whitelist.GenerateSignatureForFarcasterClaim(&input)
@@ -254,7 +330,7 @@ func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input 
 func (r *mutationResolver) StoreSignerInfo(ctx context.Context, input model.SignerInfo) (bool, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return false, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return false, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return onboarding.StoreUserAccountSignerAddress(input, authenticationDetails)
@@ -264,7 +340,7 @@ func (r *mutationResolver) StoreSignerInfo(ctx context.Context, input model.Sign
 func (r *mutationResolver) GenerateMobileWalletConfigs(ctx context.Context) (*model.MobileWalletConfig, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return mobile.GenerateMobileWalletConfigs(authenticationDetails)
@@ -274,7 +350,7 @@ func (r *mutationResolver) GenerateMobileWalletConfigs(ctx context.Context) (*mo
 func (r *mutationResolver) StoreHashForDeployment(ctx context.Context, input model.DeploymentInfo) (*bool, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return drops.StoreHashForDeployment(authenticationDetails, &input)
@@ -284,13 +360,13 @@ func (r *mutationResolver) StoreHashForDeployment(ctx context.Context, input mod
 func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		log.Println("auth details: ", err)
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		log.Err(err).Msg("auth details returned an error")
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	creator, err := engine.GetCreatorByAddress(authenticationDetails.Address)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return creator.ToGraphData(), nil
@@ -300,12 +376,12 @@ func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDe
 func (r *queryResolver) GetWallet(ctx context.Context) (*model.Wallet, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	creatorID, err := engine.GetCCreatorIDFromWalletAddress(authenticationDetails.Address.Hex())
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return engine.GetUserInverseWallet(*creatorID)
@@ -315,12 +391,12 @@ func (r *queryResolver) GetWallet(ctx context.Context) (*model.Wallet, error) {
 func (r *queryResolver) GetOnboardinProgress(ctx context.Context) (*model.OnboardingProgress, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	onbaordingInfo, err := onboarding.GetOnboardinProgress(authenticationDetails.Address)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return onbaordingInfo, nil
@@ -335,14 +411,14 @@ func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input mode
 func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName string) (*model.UserProfileType, error) {
 	creator, err := r.CreatorRepository.FindCreatorByUsername(userName)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 	profileData := creator.CreatorToProfileData()
 	address := creator.WalletAddress
 
 	creatorDrops, err := engine.GetCreatorDrops(*profileData.CreatorID)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 	mappedDrops := make([]*model.Drop, len(creatorDrops))
 	for idx, drop := range creatorDrops {
@@ -364,7 +440,7 @@ func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName stri
 
 	claimedItems, err := claimers.FetchClaimedItems(address)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 	profileData.ClaimedItems = claimedItems
 	profileData.Items = allItems
@@ -386,7 +462,7 @@ func (r *queryResolver) FetchDropByID(ctx context.Context, dropID string) (*mode
 func (r *queryResolver) FetchCreatorDrops(ctx context.Context) ([]*model.Drop, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return drops.FetchCreatorDrops(authenticationDetails)
@@ -396,7 +472,7 @@ func (r *queryResolver) FetchCreatorDrops(ctx context.Context) ([]*model.Drop, e
 func (r *queryResolver) FetchItemsInDrop(ctx context.Context, dropID string) ([]*model.Item, error) {
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	// if err != nil {
-	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	// 	return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	// }
 
 	return drops.FetchDropItems(dropID, false, nil)
@@ -421,7 +497,7 @@ func (r *queryResolver) FetchCriteriaAuthorizedWalletAddresses(ctx context.Conte
 func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error) {
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	// if err != nil {
-	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	// 	return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	// }
 	return aiimages.GetImageSuggestions(prompt, preset)
 }
@@ -482,7 +558,7 @@ type queryResolver struct{ *Resolver }
 func (r *mutationResolver) CreateItem(ctx context.Context, input model.ItemInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return drops.CreateItem(&input, authenticationDetails)
@@ -495,7 +571,7 @@ func (r *mutationResolver) TempCreateItem(ctx context.Context, input model.ItemI
 func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input model.ItemInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return drops.UpdateItem(itemID, &input, authenticationDetails)
@@ -503,7 +579,7 @@ func (r *mutationResolver) UpdateItem(ctx context.Context, itemID string, input 
 func (r *mutationResolver) DeleteItem(ctx context.Context, itemID string) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return drops.DeleteItem(itemID, authenticationDetails)
@@ -514,7 +590,7 @@ func (r *mutationResolver) AddItemDeadline(ctx context.Context, itemID string, d
 func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Context, input model.QuestionnaireCriteriaInput) (*model.Item, error) {
 	_, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return nil, fmt.Errorf("not implemented")
@@ -522,7 +598,7 @@ func (r *mutationResolver) CreateQuestionnaireCriteriaForItem(ctx context.Contex
 func (r *mutationResolver) CreateEmailWhitelistForItem(ctx context.Context, input model.NewEmailWhitelistInput) (*model.Item, error) {
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	// if err != nil {
-	// 	return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+	// 	return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	// }
 
 	return nil, fmt.Errorf("not implemented")
@@ -530,7 +606,7 @@ func (r *mutationResolver) CreateEmailWhitelistForItem(ctx context.Context, inpu
 func (r *mutationResolver) CreateWalletAddressWhitelistForItem(ctx context.Context, input model.NewWalletAddressWhitelistInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return whitelist.CreateWalletAddressWhitelistForItem(&input, authenticationDetails)
@@ -538,7 +614,7 @@ func (r *mutationResolver) CreateWalletAddressWhitelistForItem(ctx context.Conte
 func (r *mutationResolver) CreateEmailDomainWhitelist(ctx context.Context, input model.NewEmailDomainWhitelistInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return whitelist.CreateEmailDomainWhitelist(&input, authenticationDetails)
@@ -546,7 +622,7 @@ func (r *mutationResolver) CreateEmailDomainWhitelist(ctx context.Context, input
 func (r *mutationResolver) CreateTwitterCriteriaForItem(ctx context.Context, input model.NewTwitterCriteriaInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return whitelist.CreateTwitterCriteria(input, authenticationDetails)
@@ -554,7 +630,7 @@ func (r *mutationResolver) CreateTwitterCriteriaForItem(ctx context.Context, inp
 func (r *mutationResolver) CreateTelegramCriteriaForItem(ctx context.Context, input model.NewTelegramCriteriaInput) (*model.Item, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return whitelist.CreateTelegramCriteria(input, authenticationDetails)
@@ -562,35 +638,35 @@ func (r *mutationResolver) CreateTelegramCriteriaForItem(ctx context.Context, in
 func (r *mutationResolver) CreatePatreonCriteriaForItem(ctx context.Context, input model.NewPatreonCriteriaInput) (*model.Item, error) {
 	_, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, err.Error(), ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
 	return nil, fmt.Errorf("not implemented")
 }
 func (r *mutationResolver) ValidateTwitterCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
 	if authID == nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, "authID is required", ctx)
 	}
 
 	return whitelist.ValidateTwitterCriteriaForItem(itemID, *authID)
 }
 func (r *mutationResolver) ValidateTelegramCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
 	if authID == nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, "authID is required", ctx)
 	}
 
 	return nil, fmt.Errorf("Not Implemented")
 }
 func (r *mutationResolver) ValidatePatreonCriteriaForItem(ctx context.Context, itemID string, authID *string) (*model.ValidationRespoonse, error) {
 	if authID == nil {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "authID is required", ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, "authID is required", ctx)
 	}
 
 	return nil, fmt.Errorf("Not Implemented")
 }
 func (r *mutationResolver) ValidateWalletCriteriaForItem(ctx context.Context, itemID string, walletAddress string) (*model.ValidationRespoonse, error) {
 	if walletAddress == "" {
-		return nil, customError.ErrToGraphQLError(structure.InverseInternalError, "wallet address is required", ctx)
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, "wallet address is required", ctx)
 	}
 
 	return whitelist.ValidateAddressCriteria(itemID, walletAddress, nil)
