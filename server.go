@@ -55,6 +55,7 @@ func main() {
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
 		CreatorRepository: db,
+		NFTRepository:     db,
 	}}))
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})

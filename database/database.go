@@ -77,6 +77,7 @@ func (db *DB) CreateProfile(creator *drops.Creator, signer *drops.SignerInfo) er
 		return err
 	}
 
+	tx.Commit()
 	return nil
 }
 
@@ -133,3 +134,44 @@ func (db *DB) FindSignerByEthereumAddress(address string) (*drops.SignerInfo, er
 func (db *DB) UpdateCreatorProfile(creator *drops.Creator) error {
 	return db.database.Save(creator).Error
 }
+
+func (db *DB) CreateDrop(drop *drops.Drop, item *drops.Item) error {
+	tx := db.database.Begin()
+	if err := tx.Create(drop).Error; err != nil {
+		return err
+	}
+
+	item.DropID = drop.ID
+	if err := tx.Create(item).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	return nil
+}
+func (db *DB) FindDropById(dropId string) (*drops.Drop, error) {
+	var drop drops.Drop
+
+	if err := db.database.Where("id = ?", dropId).Preload("FarcasterCriteria").Preload("MintPasses").First(&drop).Error; err != nil {
+		return nil, err
+	}
+
+	return &drop, nil
+}
+
+func (db *DB) UpdateDropDetails(drop *drops.Drop) error {
+	return db.database.Save(drop).Error
+}
+
+func (db *DB) DeleteDrop(drop *drops.Drop) error {
+	return db.database.Delete(drop).Error
+}
+
+func (db *DB) AddFarcasterCriteriaToDrop(drop *drops.Drop, criteria *drops.FarcasterCriteria) error {
+	return nil
+}
+func (db *DB) UpdateFarcasterCriteria(dropId, criteriaUpdate *drops.FarcasterCriteria) error {
+	return nil
+}
+func (db *DB) RemoveFarcasterCriteria(dropId *drops.Drop) error { return nil }

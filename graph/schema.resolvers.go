@@ -259,7 +259,44 @@ func (r *mutationResolver) UpdateDrop(ctx context.Context, dropID string, input 
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
-	return drops.UpdateDrop(dropID, &input, authenticationDetails)
+	creator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
+
+	drop, err := r.NFTRepository.FindDropById(dropID)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, "drop  not found", ctx)
+	}
+
+	if creator.ID != drop.CreatorID {
+		return nil, errors.New("the drop doesn't belong to this creator")
+	}
+
+	if input.Name != nil {
+		drop.Name = *input.Name
+	}
+
+	if input.Image != nil {
+		drop.Image = *input.Image
+	}
+
+	if input.Thumbnail != nil {
+		drop.Image = *input.Thumbnail
+	}
+
+	if input.Description != nil {
+		drop.Description = *input.Description
+	}
+
+	if err = r.NFTRepository.UpdateDropDetails(drop); err != nil {
+		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, "drop update failed", ctx)
+	}
+
+	return drop.ToGraphData(nil), nil
 }
 
 // DeleteDrop is the resolver for the deleteDrop field.
@@ -269,7 +306,28 @@ func (r *mutationResolver) DeleteDrop(ctx context.Context, dropID string) (*mode
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
-	return drops.DeleteDrop(dropID, authenticationDetails)
+	creator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
+
+	drop, err := r.NFTRepository.FindDropById(dropID)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
+
+	if creator.ID != drop.CreatorID {
+		return nil, customError.ErrToGraphQLError(structure.InvalidRequestError, "drop doesn't belong to this creator", ctx)
+	}
+
+	if err = r.NFTRepository.DeleteDrop(drop); err != nil {
+		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, "delete action failed", ctx)
+	}
+
+	return drop.ToGraphData(nil), nil
 }
 
 // CreateEmptyCriteriaForDrop is the resolver for the createEmptyCriteriaForDrop field.

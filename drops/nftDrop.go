@@ -11,8 +11,9 @@ import (
 
 type NFTRepository interface {
 	CreateDrop(drop *Drop, items *Item) error
+	FindDropById(dropId string) (*Drop, error)
 	UpdateDropDetails(drop *Drop) error
-	DeleteDrop(dropId string) error
+	DeleteDrop(drop *Drop) error
 	AddFarcasterCriteriaToDrop(drop *Drop, criteria *FarcasterCriteria) error
 	UpdateFarcasterCriteria(dropId, criteriaUpdate *FarcasterCriteria) error
 	RemoveFarcasterCriteria(dropId *Drop) error
