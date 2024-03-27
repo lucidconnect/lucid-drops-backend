@@ -13,4 +13,5 @@ type FarcasterCriteria struct {
 	Interactions       string
 	ChannelID          string
 	FarcasterProfileID string // fid of account to do verifications against
+	FarcasterUsername  string
 }
