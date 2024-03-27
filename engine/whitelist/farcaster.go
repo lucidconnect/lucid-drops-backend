@@ -93,6 +93,7 @@ func CreateFarcasterWhitelistForDrop(input model.NewFarcasterCriteriaInput, auth
 			return nil, err
 		}
 		criteria.FarcasterProfileID = fmt.Sprint(fid)
+		criteria.FarcasterUsername = *input.FarcasterUserName
 	}
 
 	drop.Criteria = criteriaTypes
