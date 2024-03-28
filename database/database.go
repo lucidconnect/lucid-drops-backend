@@ -169,9 +169,59 @@ func (db *DB) DeleteDrop(drop *drops.Drop) error {
 }
 
 func (db *DB) AddFarcasterCriteriaToDrop(drop *drops.Drop, criteria *drops.FarcasterCriteria) error {
+	tx := db.database.Begin()
+	if err := tx.Save(drop).Error; err != nil {
+		return err
+	}
+	if err := tx.Create(criteria).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
 	return nil
 }
-func (db *DB) UpdateFarcasterCriteria(dropId, criteriaUpdate *drops.FarcasterCriteria) error {
+
+func (db *DB) UpdateFarcasterCriteria(dropId string, criteriaUpdate *drops.FarcasterCriteria) error {
 	return nil
 }
-func (db *DB) RemoveFarcasterCriteria(dropId *drops.Drop) error { return nil }
+
+func (db *DB) RemoveFarcasterCriteria(dropId *drops.Drop) error {
+	if err := db.database.Unscoped().Where("drop_id = ?", dropId).Delete(&drops.FarcasterCriteria{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *DB) FetchDropItems(dropId string, includeDeleted bool) ([]drops.Item, error) {
+	var items []drops.Item
+
+	if includeDeleted {
+		if err := db.database.Unscoped().Where("drop_id = ?", dropId).Find(&items).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		if err := db.database.Where("drop_id=?", dropId).Find(&items).Error; err != nil {
+			return nil, err
+		}
+	}
+	return items, nil
+}
+
+func (db *DB) FindDropByCreatorId(creatorId string) ([]drops.Drop, error) {
+	var drops []drops.Drop
+
+	if err := db.database.Where("creator_id=?", creatorId).Find(&drops).Error; err != nil {
+		return nil, err
+	}
+	return drops, nil
+}
+
+func (db *DB) FindFeaturedDrops() ([]drops.Drop, error) {
+	var drops []drops.Drop
+
+	if err := db.database.Where("featured=?", true).Find(&drops).Error; err != nil {
+		return nil, err
+	}
+
+	return drops, nil
+}

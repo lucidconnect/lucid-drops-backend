@@ -143,21 +143,19 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateDrop                       func(childComplexity int, input model.DropInput) int
-		CreateEmptyCriteriaForDrop       func(childComplexity int, input model.NewEmptyCriteriaInput) int
-		CreateFarcasterCriteriaForDrop   func(childComplexity int, input model.NewFarcasterCriteriaInput) int
-		CreateJWTToken                   func(childComplexity int, input *model.CreateJWTTokenInput) int
-		CreateMintPass                   func(childComplexity int, dropID string, walletAddress string) int
-		CreatePaymentIntentSecretKey     func(childComplexity int, amount int) int
-		DeleteDrop                       func(childComplexity int, dropID string) int
-		EditUserProfile                  func(childComplexity int, input model.EditUserProfileInputType) int
-		GenerateMobileWalletConfigs      func(childComplexity int) int
-		GenerateSignatureForClaim        func(childComplexity int, input model.GenerateClaimSignatureInput) int
-		RegisterInverseUsername          func(childComplexity int, input model.NewUsernameRegisgration) int
-		StoreHashForDeployment           func(childComplexity int, input model.DeploymentInfo) int
-		StoreSignerInfo                  func(childComplexity int, input model.SignerInfo) int
-		UpdateDrop                       func(childComplexity int, dropID string, input model.DropInput) int
-		ValidateFarcasterCriteriaForDrop func(childComplexity int, dropID string, farcasterAddress string) int
+		CreateDrop                     func(childComplexity int, input model.DropInput) int
+		CreateEmptyCriteriaForDrop     func(childComplexity int, input model.NewEmptyCriteriaInput) int
+		CreateFarcasterCriteriaForDrop func(childComplexity int, input model.NewFarcasterCriteriaInput) int
+		CreateJWTToken                 func(childComplexity int, input *model.CreateJWTTokenInput) int
+		CreateMintPass                 func(childComplexity int, dropID string, walletAddress string) int
+		DeleteDrop                     func(childComplexity int, dropID string) int
+		EditUserProfile                func(childComplexity int, input model.EditUserProfileInputType) int
+		GenerateMobileWalletConfigs    func(childComplexity int) int
+		GenerateSignatureForClaim      func(childComplexity int, input model.GenerateClaimSignatureInput) int
+		RegisterInverseUsername        func(childComplexity int, input model.NewUsernameRegisgration) int
+		StoreHashForDeployment         func(childComplexity int, input model.DeploymentInfo) int
+		StoreSignerInfo                func(childComplexity int, input model.SignerInfo) int
+		UpdateDrop                     func(childComplexity int, dropID string, input model.DropInput) int
 	}
 
 	OnboardingProgress struct {
@@ -260,13 +258,11 @@ type MutationResolver interface {
 	CreateEmptyCriteriaForDrop(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Drop, error)
 	CreateFarcasterCriteriaForDrop(ctx context.Context, input model.NewFarcasterCriteriaInput) (*model.Drop, error)
 	CreateMintPass(ctx context.Context, dropID string, walletAddress string) (*model.ValidationRespoonse, error)
-	ValidateFarcasterCriteriaForDrop(ctx context.Context, dropID string, farcasterAddress string) (*model.ValidationRespoonse, error)
 	CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error)
-	CreatePaymentIntentSecretKey(ctx context.Context, amount int) (*string, error)
 	GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error)
 	StoreSignerInfo(ctx context.Context, input model.SignerInfo) (bool, error)
 	GenerateMobileWalletConfigs(ctx context.Context) (*model.MobileWalletConfig, error)
-	StoreHashForDeployment(ctx context.Context, input model.DeploymentInfo) (*bool, error)
+	StoreHashForDeployment(ctx context.Context, input model.DeploymentInfo) (bool, error)
 }
 type QueryResolver interface {
 	GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error)
@@ -813,18 +809,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.CreateMintPass(childComplexity, args["dropID"].(string), args["walletAddress"].(string)), true
 
-	case "Mutation.createPaymentIntentSecretKey":
-		if e.complexity.Mutation.CreatePaymentIntentSecretKey == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createPaymentIntentSecretKey_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreatePaymentIntentSecretKey(childComplexity, args["amount"].(int)), true
-
 	case "Mutation.deleteDrop":
 		if e.complexity.Mutation.DeleteDrop == nil {
 			break
@@ -915,18 +899,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateDrop(childComplexity, args["dropID"].(string), args["input"].(model.DropInput)), true
-
-	case "Mutation.validateFarcasterCriteriaForDrop":
-		if e.complexity.Mutation.ValidateFarcasterCriteriaForDrop == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_validateFarcasterCriteriaForDrop_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.ValidateFarcasterCriteriaForDrop(childComplexity, args["dropID"].(string), args["farcasterAddress"].(string)), true
 
 	case "OnboardingProgress.creator":
 		if e.complexity.OnboardingProgress.Creator == nil {
@@ -1582,21 +1554,6 @@ func (ec *executionContext) field_Mutation_createMintPass_args(ctx context.Conte
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createPaymentIntentSecretKey_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 int
-	if tmp, ok := rawArgs["amount"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("amount"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["amount"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_deleteDrop_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1708,30 +1665,6 @@ func (ec *executionContext) field_Mutation_updateDrop_args(ctx context.Context, 
 		}
 	}
 	args["input"] = arg1
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_validateFarcasterCriteriaForDrop_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["dropID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dropID"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["dropID"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["farcasterAddress"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("farcasterAddress"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["farcasterAddress"] = arg1
 	return args, nil
 }
 
@@ -5467,64 +5400,6 @@ func (ec *executionContext) fieldContext_Mutation_createMintPass(ctx context.Con
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_validateFarcasterCriteriaForDrop(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_validateFarcasterCriteriaForDrop(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ValidateFarcasterCriteriaForDrop(rctx, fc.Args["dropID"].(string), fc.Args["farcasterAddress"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*model.ValidationRespoonse)
-	fc.Result = res
-	return ec.marshalOValidationRespoonse2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐValidationRespoonse(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_validateFarcasterCriteriaForDrop(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "valid":
-				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
-			case "passID":
-				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_validateFarcasterCriteriaForDrop_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_createJWTToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createJWTToken(ctx, field)
 	if err != nil {
@@ -5578,58 +5453,6 @@ func (ec *executionContext) fieldContext_Mutation_createJWTToken(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createJWTToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Mutation_createPaymentIntentSecretKey(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_createPaymentIntentSecretKey(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreatePaymentIntentSecretKey(rctx, fc.Args["amount"].(int))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createPaymentIntentSecretKey(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createPaymentIntentSecretKey_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5837,11 +5660,14 @@ func (ec *executionContext) _Mutation_storeHashForDeployment(ctx context.Context
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*bool)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOBoolean2ᚖbool(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_storeHashForDeployment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12651,10 +12477,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMintPass(ctx, field)
 			})
-		case "validateFarcasterCriteriaForDrop":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_validateFarcasterCriteriaForDrop(ctx, field)
-			})
 		case "createJWTToken":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createJWTToken(ctx, field)
@@ -12662,10 +12484,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
-		case "createPaymentIntentSecretKey":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createPaymentIntentSecretKey(ctx, field)
-			})
 		case "generateSignatureForClaim":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_generateSignatureForClaim(ctx, field)
@@ -12691,6 +12509,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_storeHashForDeployment(ctx, field)
 			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

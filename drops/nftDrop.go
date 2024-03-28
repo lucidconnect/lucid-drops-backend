@@ -13,10 +13,13 @@ type NFTRepository interface {
 	CreateDrop(drop *Drop, items *Item) error
 	FindDropById(dropId string) (*Drop, error)
 	UpdateDropDetails(drop *Drop) error
+	FindDropByCreatorId(creatorId string) ([]Drop, error)
 	DeleteDrop(drop *Drop) error
 	AddFarcasterCriteriaToDrop(drop *Drop, criteria *FarcasterCriteria) error
-	UpdateFarcasterCriteria(dropId, criteriaUpdate *FarcasterCriteria) error
-	RemoveFarcasterCriteria(dropId *Drop) error
+	UpdateFarcasterCriteria(dropId string, criteriaUpdate *FarcasterCriteria) error
+	RemoveFarcasterCriteria(drop *Drop) error
+	FetchDropItems(dropId string, includeDeleted bool) ([]Item, error)
+	FindFeaturedDrops() ([]Drop, error)
 }
 
 type Drop struct {

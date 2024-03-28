@@ -1,18 +1,12 @@
-package drops
+package services
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/lucidconnect/inverse/addresswatcher"
-	"github.com/lucidconnect/inverse/engine"
-	"github.com/lucidconnect/inverse/graph/model"
-	"github.com/lucidconnect/inverse/internal"
-	"github.com/rs/zerolog/log"
 )
 
 type JiffyscanResponse struct {
@@ -59,7 +53,26 @@ type JiffyscanResponse struct {
 	} `json:"userOps"`
 }
 
-func FetchOpsFromJiffyscan(transactionHash string) (*JiffyscanResponse, error) {
+func GetOnchainContractAddressFromDeploymentHash(aaHash string) (string, error) {
+	resp, err := fetchOpsFromJiffyscan(aaHash)
+	if err != nil {
+		return "", err
+	}
+
+	var bloomHash string
+	for _, bloom := range resp.UserOps {
+		bloomHash = bloom.TransactionHash
+	}
+
+	contractAddress, err := addresswatcher.GetContractAddressFromParentHash(bloomHash)
+	if err != nil {
+		return "", err
+	}
+
+	return contractAddress, nil
+}
+
+func fetchOpsFromJiffyscan(transactionHash string) (*JiffyscanResponse, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.jiffyscan.xyz/v0/getUserOp?hash=%s", transactionHash), nil)
 	if err != nil {
 		return nil, err
@@ -95,54 +108,4 @@ func FetchOpsFromJiffyscan(transactionHash string) (*JiffyscanResponse, error) {
 	}
 
 	return &response, err
-}
-
-func GetOnchainContractAddressFromDeploymentHash(aaHash string) (string, error) {
-	resp, err := FetchOpsFromJiffyscan(aaHash)
-	if err != nil {
-		return "", err
-	}
-
-	var bloomHash string
-	for _, bloom := range resp.UserOps {
-		bloomHash = bloom.TransactionHash
-	}
-
-	contractAddress, err := addresswatcher.GetContractAddressFromParentHash(bloomHash)
-	if err != nil {
-		return "", err
-	}
-
-	return contractAddress, nil
-}
-
-func StoreHashForDeployment(authDetails *internal.AuthDetails, input *model.DeploymentInfo) (*bool, error) {
-	drop, err := engine.GetDropByID(input.DropID)
-	if err != nil {
-		return nil, errors.New("drop not found")
-	}
-
-	drop.AAWalletDeploymentHash = &input.DeploymentHash
-	log.Info().Msgf("deployment info: %v", input)
-	if input.ContractAddress == nil {
-		// Introduce an artificial delay for before fethcing the actual contract address
-		time.Sleep(time.Second * 3)
-
-		contractAdddress, err := GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
-		if err != nil {
-			log.Err(err)
-		}
-
-		drop.AAContractAddress = &contractAdddress
-	} else {
-		drop.AAContractAddress = input.ContractAddress
-	}
-
-	err = engine.SaveModel(drop)
-	if err != nil {
-		return nil, err
-	}
-
-	t := true
-	return &t, nil
 }

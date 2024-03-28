@@ -57,9 +57,9 @@ type Mutation {
   # validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   # validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
   # validateWalletCriteriaForItem(itemID: String!, walletAddress: String!): ValidationRespoonse
-  validateFarcasterCriteriaForDrop(dropID: String!, farcasterAddress: String!): ValidationRespoonse
+  # validateFarcasterCriteriaForDrop(dropID: String!, farcasterAddress: String!): ValidationRespoonse
   createJWTToken(input: CreateJWTTokenInput): JWTCreationResponse!
-  createPaymentIntentSecretKey(amount: Int!): String
+  # createPaymentIntentSecretKey(amount: Int!): String
 
   # startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
   # completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
@@ -67,7 +67,7 @@ type Mutation {
 
   storeSignerInfo(input: SignerInfo!): Boolean!
   generateMobileWalletConfigs: MobileWalletConfig!
-  storeHashForDeployment(input: DeploymentInfo!): Boolean
+  storeHashForDeployment(input: DeploymentInfo!): Boolean!
 }
 """ Time formated in the time.RFC3339Nano Format """
 scalar Time

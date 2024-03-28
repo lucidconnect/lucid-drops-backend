@@ -1,43 +1,36 @@
 package jobs
 
 import (
-	"fmt"
-
 	"github.com/lucidconnect/inverse/dbutils"
-	"github.com/lucidconnect/inverse/engine"
-	"github.com/lucidconnect/inverse/engine/drops"
 	"github.com/lucidconnect/inverse/models"
-	"github.com/lucidconnect/inverse/notifier"
-	"github.com/lucidconnect/inverse/structure"
-	"github.com/rs/zerolog/log"
 )
 
-func FillOutContractAddresses() {
-	deployments, err := fetchAllMissingContractAddressesDeployments()
-	if err != nil {
-		log.Error().Msg(err.Error())
-		return
-	}
+// func FillOutContractAddresses() {
+// 	deployments, err := fetchAllMissingContractAddressesDeployments()
+// 	if err != nil {
+// 		log.Error().Msg(err.Error())
+// 		return
+// 	}
 
-	for _, deployment := range deployments {
-		contractAdddress, err := drops.GetOnchainContractAddressFromDeploymentHash(*deployment.AAWalletDeploymentHash)
-		if err != nil {
-			log.Error().Msg(err.Error())
-			notifier.NotifyTelegram(fmt.Sprintf("👺 Drop deployment failed (%s)", err), structure.EngineeringTeam)
-			continue
-		}
+// 	for _, deployment := range deployments {
+// 		contractAdddress, err := drops.GetOnchainContractAddressFromDeploymentHash(*deployment.AAWalletDeploymentHash)
+// 		if err != nil {
+// 			log.Error().Msg(err.Error())
+// 			notifier.NotifyTelegram(fmt.Sprintf("👺 Drop deployment failed (%s)", err), structure.EngineeringTeam)
+// 			continue
+// 		}
 
-		notifier.NotifyTelegram("🪼 New Drop deployed at "+contractAdddress, structure.EngineeringTeam)
+// 		notifier.NotifyTelegram("🪼 New Drop deployed at "+contractAdddress, structure.EngineeringTeam)
 
-		deployment.AAContractAddress = &contractAdddress
+// 		deployment.AAContractAddress = &contractAdddress
 
-		err = engine.SaveModel(deployment)
-		if err != nil {
-			notifier.NotifyTelegram(fmt.Sprintf("👺 Drop (%s )Saving failed (%s)", contractAdddress, err), structure.EngineeringTeam)
-			continue
-		}
-	}
-}
+// 		err = engine.SaveModel(deployment)
+// 		if err != nil {
+// 			notifier.NotifyTelegram(fmt.Sprintf("👺 Drop (%s )Saving failed (%s)", contractAdddress, err), structure.EngineeringTeam)
+// 			continue
+// 		}
+// 	}
+// }
 
 func fetchAllMissingContractAddressesDeployments() ([]models.Drop, error) {
 	var drops []models.Drop
