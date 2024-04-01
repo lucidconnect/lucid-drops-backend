@@ -1,14 +1,27 @@
 package drops
 
-import uuid "github.com/satori/go.uuid"
+import (
+	"time"
+
+	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
+)
 
 type FarcasterCriteria struct {
-	Base
-	DropId             uuid.UUID `gorm:"not null"`
+	ID                 uuid.UUID      `gorm:"type:uuid;primary_key;"`
+	CreatedAt          time.Time      `gorm:"not null"`
+	UpdatedAt          time.Time      `gorm:"not null"`
+	DeletedAt          gorm.DeletedAt `gorm:"index"`
+	DropId             uuid.UUID      `gorm:"not null"`
 	CreatorID          uuid.UUID
 	CastUrl            string
 	CriteriaType       string
 	Interactions       string
 	ChannelID          string
 	FarcasterProfileID string // fid of account to do verifications against
+}
+
+func (fc *FarcasterCriteria) BeforeCreate(scope *gorm.DB) error {
+	fc.ID = uuid.NewV4()
+	return nil
 }

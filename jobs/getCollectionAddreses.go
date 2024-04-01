@@ -1,10 +1,5 @@
 package jobs
 
-import (
-	"github.com/lucidconnect/inverse/dbutils"
-	"github.com/lucidconnect/inverse/models"
-)
-
 // func FillOutContractAddresses() {
 // 	deployments, err := fetchAllMissingContractAddressesDeployments()
 // 	if err != nil {
@@ -32,12 +27,12 @@ import (
 // 	}
 // }
 
-func fetchAllMissingContractAddressesDeployments() ([]models.Drop, error) {
-	var drops []models.Drop
-	err := dbutils.DB.Where("aa_wallet_deployment_hash IS NOT NULL AND aa_wallet_deployment_hash !='' AND aa_contract_address IS NULL").Find(&drops).Error
-	if err != nil {
-		return nil, err
-	}
+// func fetchAllMissingContractAddressesDeployments() ([]models.Drop, error) {
+// 	var drops []models.Drop
+// 	err := dbutils.DB.Where("aa_wallet_deployment_hash IS NOT NULL AND aa_wallet_deployment_hash !='' AND aa_contract_address IS NULL").Find(&drops).Error
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return drops, nil
-}
+// 	return drops, nil
+// }

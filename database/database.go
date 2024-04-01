@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/lucidconnect/inverse/drops"
+	"github.com/lucidconnect/inverse/ledger"
 	"github.com/lucidconnect/inverse/utils"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
@@ -59,7 +60,7 @@ func SetupDB(dsn string) *DB {
 	log.Print("Successfully connected!")
 	db.AutoMigrate(
 		&drops.Creator{},
-		&drops.Wallet{},
+		&ledger.Wallet{},
 		&drops.SignerInfo{},
 	)
 	return &DB{database: db}
@@ -224,4 +225,107 @@ func (db *DB) FindFeaturedDrops() ([]drops.Drop, error) {
 	}
 
 	return drops, nil
+}
+
+func (db *DB) FindClaimedDropsByAddress(addresss string) ([]drops.Item, error) {
+	var mintPasses []drops.MintPass
+	var claimedItems []drops.Item
+
+	err := db.database.Model(&drops.MintPass{}).Where("minter_address=?", addresss).Find(&mintPasses).Error
+	if err != nil {
+		return nil, err
+	}
+
+	itemIds := make([]string, len(mintPasses))
+
+	for i, pass := range mintPasses {
+		itemIds[i] = pass.ItemId
+	}
+
+	err = db.database.Where("id IN (?)", itemIds).Find(&claimedItems).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return claimedItems, nil
+}
+
+func (db *DB) CreateMintPass(mintPass *drops.MintPass) error {
+	return db.database.Create(mintPass).Error
+}
+
+func (db *DB) GetMintPassById(passId string) (*drops.MintPass, error) {
+	var pass drops.MintPass
+
+	err := db.database.Where("id=?", passId).First(&pass).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &pass, nil
+}
+
+func (db *DB) GetMintPassForWallet(dropId, walletAddress string) (*drops.MintPass, error) {
+	var pass drops.MintPass
+
+	err := db.database.Where("drop_id = ?", dropId).Where("minter_address = ?", walletAddress).First(&pass).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &pass, nil
+}
+
+func (db *DB) CountMintPassesForAddress(dropId, address string) (int64, error) {
+	var passes int64
+	err := db.database.Model(&drops.MintPass{}).Where("drop_id = ? AND minter_address = ? AND used_at <> NULL", dropId, address).Count(&passes).Error
+	if err != nil {
+		return 0, err
+	}
+	return passes, nil
+}
+
+func (db *DB) UpdateMintPass(mintPass *drops.MintPass) error {
+	return db.database.Save(mintPass).Error
+}
+
+func (db *DB) FetchMintPassesForItems(itemID string) ([]drops.MintPass, error) {
+
+	var mintPasses []drops.MintPass
+	err := db.database.Model(&drops.MintPass{}).Where("item_id = ?", itemID).Find(&mintPasses).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return mintPasses, nil
+}
+
+func (db *DB) FindItemsWithUnresolvesTokenIDs() ([]drops.Item, error) {
+	var items []drops.Item
+	oneHourAgo := time.Now().Add(-1 * time.Hour)
+	err := db.database.Where("token_id is NULL and created_at BETWEEN ? AND ?", oneHourAgo, time.Now()).Find(&items).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return items, nil
+}
+
+func (db *DB) FindItemById(itemId string) (*drops.Item, error) {
+	var item drops.Item
+
+	if err := db.database.Where("id = ?", itemId).First(&item).Error; err != nil {
+		return nil, err
+	}
+
+	return &item, nil
+}
+
+func (db *DB) CountMintPassesForDrop(dropId string) (int64, error) {
+	var editionCount int64
+	err := db.database.Model(&drops.MintPass{}).Where("drop_id = ? AND used_at <> NULL", dropId).Count(&editionCount).Error
+	if err != nil {
+		return 0, err
+	}
+	return editionCount, nil
 }

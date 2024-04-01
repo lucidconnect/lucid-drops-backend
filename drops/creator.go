@@ -1,8 +1,12 @@
 package drops
 
 import (
+	"time"
+
 	"github.com/lucidconnect/inverse/graph/model"
 	"github.com/lucidconnect/inverse/utils"
+	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 )
 
 type CreatorRepository interface {
@@ -16,8 +20,11 @@ type CreatorRepository interface {
 }
 
 type Creator struct {
-	Base
-	WalletAddress         string // embedded wallet address
+	ID                    uuid.UUID      `gorm:"type:uuid;primary_key;"`
+	CreatedAt             time.Time      `gorm:"not null"`
+	UpdatedAt             time.Time      `gorm:"not null"`
+	DeletedAt             gorm.DeletedAt `gorm:"index"`
+	WalletAddress         string         // embedded wallet address
 	ExternalWalletAddress string
 	AAWalletAddress       string
 	InverseUsername       *string      `gorm:"default:null"`
@@ -33,12 +40,9 @@ type Creator struct {
 	SignerInfo            []SignerInfo `gorm:"foreignKey:CreatorID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
-type Wallet struct {
-	Base
-	CreatorID     string `gorm:"type:uuid;index:idx_wallet_creatorId,unique;not null" json:"creator_id"`
-	BalanceBase   int64  `gorm:"type:bigint;default:0" json:"balance_base"`
-	CanBeNegative bool   `gorm:"default:false"`
-	// Currency      CurrencyType `gorm:"default:USD" json:"currency"`
+func (c *Creator) BeforeCreate(scope *gorm.DB) error {
+	c.ID = uuid.NewV4()
+	return nil
 }
 
 func NewCreator(walletAddress string) *Creator {

@@ -5,16 +5,58 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/lucidconnect/inverse/models"
+	"github.com/lucidconnect/inverse/drops"
 	"github.com/lucidconnect/inverse/utils"
 	uuid "github.com/satori/go.uuid"
 	"gorm.io/gorm"
 )
 
+type BaseWithoutPrimaryKey struct {
+	CreatedAt time.Time      `gorm:"not null"`
+	UpdatedAt time.Time      `gorm:"not null"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+type DoubleEntryLedger struct {
+	ID                   uuid.UUID      `gorm:"type:uuid;primary_key;"`
+	CreatedAt            time.Time      `gorm:"not null"`
+	UpdatedAt            time.Time      `gorm:"not null"`
+	DeletedAt            gorm.DeletedAt `gorm:"index"`
+	TransactionReference string         `gorm:"not null" json:"transaction_reference"`
+	SourceAccoountID     uuid.UUID
+	DestinationAccountID uuid.UUID
+	Amount               int64  `gorm:"not null" json:"amount"`
+	TransactionType      string `gorm:"not null" json:"transaction_type"`
+	//ID of the corresponding double entry row
+	PartnerID *string `json:"partner_id"`
+	LedgerID  *string `json:"ledger_id"`
+}
+
+func (del *DoubleEntryLedger) BeforeCreate(scope *gorm.DB) error {
+	del.ID = uuid.NewV4()
+	return nil
+}
+
+type Wallet struct {
+	ID            uuid.UUID      `gorm:"type:uuid;primary_key;"`
+	CreatedAt     time.Time      `gorm:"not null"`
+	UpdatedAt     time.Time      `gorm:"not null"`
+	DeletedAt     gorm.DeletedAt `gorm:"index"`
+	CreatorID     string         `gorm:"type:uuid;index:idx_wallet_creatorId,unique;not null" json:"creator_id"`
+	BalanceBase   int64          `gorm:"type:bigint;default:0" json:"balance_base"`
+	CanBeNegative bool           `gorm:"default:false"`
+	// Currency      CurrencyType `gorm:"default:USD" json:"currency"`
+}
+
+func (w *Wallet) BeforeCreate(scope *gorm.DB) error {
+	w.ID = uuid.NewV4()
+	return nil
+}
+
 type Ledger struct {
 	DB             *gorm.DB
-	SysAccount     *models.Wallet
-	CollectAccount *models.Wallet
+	SysAccount     *Wallet
+	CollectAccount *Wallet
 }
 
 func New(db *gorm.DB) *Ledger {
@@ -38,19 +80,17 @@ func New(db *gorm.DB) *Ledger {
 	}
 }
 
-func confirmOrSeedNewSysAccount(db *gorm.DB) (*models.Wallet, error) {
-	var sysAccount models.Wallet
+func confirmOrSeedNewSysAccount(db *gorm.DB) (*Wallet, error) {
+	var sysAccount Wallet
 
 	err := db.Where("can_be_negative = ?", "true").First(&sysAccount).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			sysUserID := uuid.FromStringOrNil("8288925B-9AD8-431D-AAF0-1A6655727CDC")
-			sysUser := models.Creator{
-				Base: models.Base{
-					ID:        sysUserID,
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
-				},
+			sysUser := drops.Creator{
+				ID:              sysUserID,
+				CreatedAt:       time.Now(),
+				UpdatedAt:       time.Now(),
 				InverseUsername: utils.GetStrPtr("SystemAccount"),
 				WalletAddress:   "sambankmanfried@tippr.com",
 			}
@@ -60,16 +100,13 @@ func confirmOrSeedNewSysAccount(db *gorm.DB) (*models.Wallet, error) {
 				return nil, err
 			}
 
-			sysAccount = models.Wallet{
-				Base: models.Base{
-					ID:        uuid.NewV4(),
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
-				},
+			sysAccount = Wallet{
+				ID:            uuid.NewV4(),
+				CreatedAt:     time.Now(),
+				UpdatedAt:     time.Now(),
 				CreatorID:     sysUser.ID.String(),
 				BalanceBase:   0,
 				CanBeNegative: true,
-				Currency:      models.USD,
 			}
 
 			err = db.Create(&sysAccount).Error
@@ -84,21 +121,19 @@ func confirmOrSeedNewSysAccount(db *gorm.DB) (*models.Wallet, error) {
 	return &sysAccount, nil
 }
 
-func confirmOrSeedNewDropsAccount(db *gorm.DB) (*models.Wallet, error) {
-	var dropsAccount models.Wallet
-	var dropsAccountUser models.Creator
+func confirmOrSeedNewDropsAccount(db *gorm.DB) (*Wallet, error) {
+	var dropsAccount Wallet
+	var dropsAccountUser drops.Creator
 	collectUserID := uuid.FromStringOrNil("97B91EAF-3EE1-4F9A-836B-6B49E7B0AC9E")
-	collectUser := models.Creator{
-		Base: models.Base{
-			ID:        collectUserID,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		},
+	collectUser := drops.Creator{
+		ID:              collectUserID,
+		CreatedAt:       time.Now(),
+		UpdatedAt:       time.Now(),
 		InverseUsername: utils.GetStrPtr("DropAccount"),
 		WalletAddress:   "warrenbuffetcollects@inverse.wtf",
 	}
 
-	err := db.Model(&models.Creator{}).Where("wallet_address = ?", "warrenbuffetcollects@inverse.wtf").First(&dropsAccountUser).Error
+	err := db.Model(&drops.Creator{}).Where("wallet_address = ?", "warrenbuffetcollects@inverse.wtf").First(&dropsAccountUser).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 
@@ -111,20 +146,17 @@ func confirmOrSeedNewDropsAccount(db *gorm.DB) (*models.Wallet, error) {
 		}
 	}
 
-	err = db.Model(&models.Wallet{}).Where("creator_id = ?", collectUser.ID.String()).First(&dropsAccount).Error
+	err = db.Model(&Wallet{}).Where("creator_id = ?", collectUser.ID.String()).First(&dropsAccount).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 
-			dropsAccount = models.Wallet{
-				Base: models.Base{
-					ID:        uuid.NewV4(),
-					CreatedAt: time.Now(),
-					UpdatedAt: time.Now(),
-				},
+			dropsAccount = Wallet{
+				ID:            uuid.NewV4(),
+				CreatedAt:     time.Now(),
+				UpdatedAt:     time.Now(),
 				CreatorID:     collectUser.ID.String(),
 				BalanceBase:   0,
 				CanBeNegative: false,
-				Currency:      models.USD,
 			}
 
 			err = db.Create(&dropsAccount).Error

@@ -173,7 +173,6 @@ type ComplexityRoot struct {
 		FetchFeaturedItems                     func(childComplexity int) int
 		FetchItemByID                          func(childComplexity int, itemID string) int
 		FetchItemsInDrop                       func(childComplexity int, dropID string) int
-		FetchQuestionsByItemID                 func(childComplexity int, itemID string) int
 		GetCreatorDetails                      func(childComplexity int) int
 		GetImageSuggestions                    func(childComplexity int, prompt string, preset *model.AiImageStyle) int
 		GetOnboardinProgress                   func(childComplexity int) int
@@ -280,7 +279,6 @@ type QueryResolver interface {
 	GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error)
 	GetTweetDetails(ctx context.Context, tweetLink string) (*model.TweetDetails, error)
 	GetTwitterUserDetails(ctx context.Context, userName string) (*model.UserDetails, error)
-	FetchQuestionsByItemID(ctx context.Context, itemID string) ([]*model.QuestionnaireType, error)
 	FetchFeaturedItems(ctx context.Context) ([]*model.Item, error)
 	FetchFeaturedDrops(ctx context.Context) ([]*model.Drop, error)
 	QueryImageStatus(ctx context.Context, taskID string, position *int) (*model.ImageStatusResponse, error)
@@ -1006,18 +1004,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.FetchItemsInDrop(childComplexity, args["dropID"].(string)), true
-
-	case "Query.fetchQuestionsByItemId":
-		if e.complexity.Query.FetchQuestionsByItemID == nil {
-			break
-		}
-
-		args, err := ec.field_Query_fetchQuestionsByItemId_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.FetchQuestionsByItemID(childComplexity, args["itemId"].(string)), true
 
 	case "Query.getCreatorDetails":
 		if e.complexity.Query.GetCreatorDetails == nil {
@@ -1770,21 +1756,6 @@ func (ec *executionContext) field_Query_fetchItemsInDrop_args(ctx context.Contex
 		}
 	}
 	args["dropID"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_fetchQuestionsByItemId_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["itemId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("itemId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["itemId"] = arg0
 	return args, nil
 }
 
@@ -6823,73 +6794,6 @@ func (ec *executionContext) fieldContext_Query_getTwitterUserDetails(ctx context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_getTwitterUserDetails_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_fetchQuestionsByItemId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_fetchQuestionsByItemId(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().FetchQuestionsByItemID(rctx, fc.Args["itemId"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*model.QuestionnaireType)
-	fc.Result = res
-	return ec.marshalNQuestionnaireType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireTypeᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_fetchQuestionsByItemId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "choices":
-				return ec.fieldContext_QuestionnaireType_choices(ctx, field)
-			case "question":
-				return ec.fieldContext_QuestionnaireType_question(ctx, field)
-			case "questionId":
-				return ec.fieldContext_QuestionnaireType_questionId(ctx, field)
-			case "questionType":
-				return ec.fieldContext_QuestionnaireType_questionType(ctx, field)
-			case "claimCode":
-				return ec.fieldContext_QuestionnaireType_claimCode(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type QuestionnaireType", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_fetchQuestionsByItemId_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -12916,28 +12820,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
-		case "fetchQuestionsByItemId":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_fetchQuestionsByItemId(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx,
-					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "fetchFeaturedItems":
 			field := field
 
@@ -14136,60 +14018,6 @@ func (ec *executionContext) unmarshalNQuestionType2githubᚗcomᚋlucidconnect�
 
 func (ec *executionContext) marshalNQuestionType2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionType(ctx context.Context, sel ast.SelectionSet, v model.QuestionType) graphql.Marshaler {
 	return v
-}
-
-func (ec *executionContext) marshalNQuestionnaireType2ᚕᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.QuestionnaireType) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNQuestionnaireType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireType(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNQuestionnaireType2ᚖgithubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐQuestionnaireType(ctx context.Context, sel ast.SelectionSet, v *model.QuestionnaireType) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._QuestionnaireType(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSignerInfo2githubᚗcomᚋlucidconnectᚋinverseᚋgraphᚋmodelᚐSignerInfo(ctx context.Context, v interface{}) (model.SignerInfo, error) {

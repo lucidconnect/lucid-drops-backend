@@ -26,7 +26,6 @@ type Query {
   getTweetDetails(tweetLink: String!): TweetDetails!
   getTwitterUserDetails(userName: String!): UserDetails!
 
-  fetchQuestionsByItemId(itemId: String!): [QuestionnaireType!]!
   fetchFeaturedItems: [Item!]!
   fetchFeaturedDrops: [Drop!]!
 

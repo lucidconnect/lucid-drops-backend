@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/lucidconnect/inverse/graph/model"
-	"github.com/lucidconnect/inverse/utils"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 )
 
 type NFTRepository interface {
@@ -14,16 +14,29 @@ type NFTRepository interface {
 	FindDropById(dropId string) (*Drop, error)
 	UpdateDropDetails(drop *Drop) error
 	FindDropByCreatorId(creatorId string) ([]Drop, error)
+	FindItemById(itemId string) (*Item, error)
 	DeleteDrop(drop *Drop) error
 	AddFarcasterCriteriaToDrop(drop *Drop, criteria *FarcasterCriteria) error
 	UpdateFarcasterCriteria(dropId string, criteriaUpdate *FarcasterCriteria) error
 	RemoveFarcasterCriteria(drop *Drop) error
 	FetchDropItems(dropId string, includeDeleted bool) ([]Item, error)
 	FindFeaturedDrops() ([]Drop, error)
+	FindClaimedDropsByAddress(addresss string) ([]Item, error)
+	CreateMintPass(mintPass *MintPass) error
+	UpdateMintPass(mintPass *MintPass) error
+	GetMintPassById(passId string) (*MintPass, error)
+	GetMintPassForWallet(dropId, walletAddress string) (*MintPass, error)
+	CountMintPassesForAddress(dropId, address string) (int64, error)
+	CountMintPassesForDrop(dropId string) (int64, error)
+	FetchMintPassesForItems(itemID string) ([]MintPass, error)
+	FindItemsWithUnresolvesTokenIDs() ([]Item, error)
 }
 
 type Drop struct {
-	Base
+	ID                     uuid.UUID      `gorm:"type:uuid;primary_key;"`
+	CreatedAt              time.Time      `gorm:"not null"`
+	UpdatedAt              time.Time      `gorm:"not null"`
+	DeletedAt              gorm.DeletedAt `gorm:"index"`
 	CreatorID              uuid.UUID
 	CreatorAddress         string
 	Name                   string
@@ -45,25 +58,9 @@ type Drop struct {
 	MintPasses             []MintPass         `gorm:"foreignKey:DropID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
-type Item struct {
-	Base
-	Name          string
-	DropID        uuid.UUID `gorm:"index"`
-	DropAddress   string
-	TokenID       int64  `gorm:"index"`
-	Image         string `json:"image"`
-	Description   string `json:"description"`
-	ClaimFee      int    `gorm:"default:0"`
-	Criteria      *model.ClaimCriteriaType
-	ClaimDeadline *time.Time `gorm:"default:null"`
-	// TwitterCriteria      *TwitterCriteria  `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	// TelegramCriteria     *TelegramCriteria `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	// PatreonCriteria      *PatreonCriteria  `gorm:"foreignKey:ItemID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
-	ShowEmailDomainHints bool `gorm:"default:false"`
-	Featured             bool `gorm:"default:false"`
-	UserLimit            *int `gorm:"default:null"`
-	EditionLimit         *int `gorm:"default:null"`
-	// MintPasses           []MintPass        `gorm:"foreignKey:ItemId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+func (d *Drop) BeforeCreate(scope *gorm.DB) error {
+	d.ID = uuid.NewV4()
+	return nil
 }
 
 // Ref : https://docs.opensea.io/docs/metadata-standards
@@ -129,32 +126,6 @@ func (d *Drop) ToGraphData(items []*model.Item) *model.Drop {
 	}
 	// fmt.Println(mappedDrop.Items[0].ClaimDetails[0].ClaimerAddress)
 	return mappedDrop
-}
-
-func (i *Item) ToGraphData() *model.Item {
-	tokenID := utils.GetIntPtr(int(i.TokenID))
-
-	item := &model.Item{
-		ID:           i.ID.String(),
-		Name:         i.Name,
-		Image:        i.Image,
-		Description:  i.Description,
-		DropID:       i.DropID.String(),
-		DropAddress:  i.DropAddress,
-		ClaimFee:     i.ClaimFee,
-		CreatedAt:    i.CreatedAt,
-		Deadline:     i.ClaimDeadline,
-		EditionLimit: i.EditionLimit,
-		TokenID:      tokenID,
-	}
-
-	// var mintPasses []*model.ClaimDetails
-	// for j := range i.MintPasses {
-	// 	mintPasses = append(mintPasses, i.MintPasses[j].ToGraphData())
-	// }
-
-	// item.ClaimDetails = mintPasses
-	return item
 }
 
 func InteractionsToArr(interaction string) []*model.InteractionType {
