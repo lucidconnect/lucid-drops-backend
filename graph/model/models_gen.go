@@ -15,37 +15,11 @@ type ClaimDetails struct {
 	ClaimerAddress  *string    `json:"claimerAddress,omitempty"`
 }
 
-type CompleteEmailClaimInput struct {
-	Otp          string `json:"otp"`
-	OtpRequestID string `json:"otpRequestID"`
-}
-
-type CompleteEmailVerificationInput struct {
-	Otp          string `json:"otp"`
-	OtpRequestID string `json:"otpRequestID"`
-}
-
-type CompleteEmailVerificationResponse struct {
-	OtpRequestID string `json:"otpRequestID"`
-}
-
-type CreateJWTTokenInput struct {
-	Address   string `json:"address"`
-	AaWallet  string `json:"aaWallet"`
-	Signature string `json:"signature"`
-}
-
 type CreatorDetails struct {
 	CreatorID       string  `json:"creatorID"`
 	Address         string  `json:"address"`
 	InverseUsername *string `json:"inverseUsername,omitempty"`
 	FirstPayment    bool    `json:"firstPayment"`
-}
-
-type DeploymentInfo struct {
-	DropID          string  `json:"dropId"`
-	DeploymentHash  string  `json:"deploymentHash"`
-	ContractAddress *string `json:"contractAddress,omitempty"`
 }
 
 type Drop struct {
@@ -93,11 +67,6 @@ type EditUserProfileInputType struct {
 	Socials         *SocialsInput `json:"socials,omitempty"`
 }
 
-type EmailClaimInput struct {
-	ItemID       string `json:"itemID"`
-	EmailAddress string `json:"emailAddress"`
-}
-
 type GenerateClaimSignatureInput struct {
 	OtpRequestID    string `json:"otpRequestID"`
 	ClaimingAddress string `json:"claimingAddress"`
@@ -137,17 +106,6 @@ type Item struct {
 	Holders                          []string           `json:"holders"`
 }
 
-type ItemInput struct {
-	Name         *string `json:"name,omitempty"`
-	Image        *string `json:"image,omitempty"`
-	Description  *string `json:"description,omitempty"`
-	DropID       *string `json:"dropID,omitempty"`
-	UserLimit    *int    `json:"userLimit,omitempty"`
-	EditionLimit *int    `json:"editionLimit,omitempty"`
-	// This should typically be in cents
-	ClaimFee *int `json:"claimFee,omitempty"`
-}
-
 type JWTCreationResponse struct {
 	Token string `json:"token"`
 }
@@ -163,33 +121,6 @@ type MintAuthorizationResponse struct {
 	SmartContractAddress string `json:"smartContractAddress"`
 }
 
-type MobileWalletConfig struct {
-	PublicKey  string `json:"publicKey"`
-	PrivateKey string `json:"privateKey"`
-	AaWallet   string `json:"aaWallet"`
-}
-
-type MultiChoiceInputType struct {
-	Question      string   `json:"question"`
-	Choices       []string `json:"choices"`
-	CorrectChoice string   `json:"correctChoice"`
-}
-
-type NewEmailDomainWhitelistInput struct {
-	ItemID               string   `json:"itemID"`
-	Visible              bool     `json:"visible"`
-	AuthorizedSubdomains []string `json:"authorizedSubdomains"`
-}
-
-type NewEmailWhitelistInput struct {
-	ItemID           string   `json:"itemID"`
-	AuthorizedEmails []string `json:"authorizedEmails"`
-}
-
-type NewEmptyCriteriaInput struct {
-	DropID string `json:"dropID"`
-}
-
 type NewFarcasterCriteriaInput struct {
 	DropID            string               `json:"dropID"`
 	CastURL           *string              `json:"castUrl,omitempty"`
@@ -199,76 +130,10 @@ type NewFarcasterCriteriaInput struct {
 	CriteriaType      []*ClaimCriteriaType `json:"criteriaType"`
 }
 
-type NewPatreonCriteriaInput struct {
-	ItemID       string  `json:"itemID"`
-	AuthID       string  `json:"authID"`
-	CampaignID   *string `json:"campaignID,omitempty"`
-	CampaignName *string `json:"campaignName,omitempty"`
-}
-
-type NewTelegramCriteriaInput struct {
-	ItemID  string `json:"itemID"`
-	GroupID string `json:"groupID"`
-}
-
-type NewTwitterCriteriaInput struct {
-	ItemID        string               `json:"itemID"`
-	ProfileID     *string              `json:"profileID,omitempty"`
-	TweetLink     *string              `json:"tweetLink,omitempty"`
-	Interaction   []*InteractionType   `json:"interaction,omitempty"`
-	CriteriaType  []*ClaimCriteriaType `json:"criteriaType"`
-	TwitterAuthID string               `json:"twitterAuthID"`
-	// Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
-	CutOffDate *string `json:"cutOffDate,omitempty"`
-}
-
 type NewUsernameRegisgration struct {
 	AaWallet              string  `json:"aaWallet"`
 	InverseUsername       string  `json:"inverseUsername"`
 	ExternalWalletAddress *string `json:"externalWalletAddress,omitempty"`
-}
-
-type NewWalletAddressWhitelistInput struct {
-	ItemID                    string   `json:"itemID"`
-	AuthorizedWalletAddresses []string `json:"authorizedWalletAddresses"`
-}
-
-type OnboardingProgress struct {
-	Creator                  *CreatorDetails `json:"creator,omitempty"`
-	RegisterdInverseUsername bool            `json:"registerdInverseUsername"`
-}
-
-type OpenEndedInputType struct {
-	Question string   `json:"question"`
-	Answers  []string `json:"answers"`
-}
-
-type QuestionnaireAnswerInput struct {
-	Answer     string `json:"answer"`
-	QuestionID string `json:"questionId"`
-}
-
-type QuestionnaireCriteriaInput struct {
-	ItemID           string                  `json:"itemID"`
-	QuestionType     QuestionType            `json:"questionType"`
-	OpenEndedInput   []*OpenEndedInputType   `json:"openEndedInput,omitempty"`
-	MultiChoiceInput []*MultiChoiceInputType `json:"multiChoiceInput,omitempty"`
-	ClaimCode        *bool                   `json:"claimCode,omitempty"`
-}
-
-type QuestionnaireType struct {
-	//  Choices will only contain a list of potential answers when the `questionType` is `multiChoice`
-	Choices      []string     `json:"choices,omitempty"`
-	Question     string       `json:"question"`
-	QuestionID   string       `json:"questionId"`
-	QuestionType QuestionType `json:"questionType"`
-	ClaimCode    *bool        `json:"claimCode,omitempty"`
-}
-
-type SignerInfo struct {
-	Address   string         `json:"address"`
-	Signature *string        `json:"signature,omitempty"`
-	Provider  SignerProvider `json:"provider"`
 }
 
 type Socials struct {
@@ -283,23 +148,6 @@ type SocialsInput struct {
 	Instagram *string `json:"instagram,omitempty"`
 	Github    *string `json:"github,omitempty"`
 	Warpcast  *string `json:"warpcast,omitempty"`
-}
-
-type StartEmailVerificationResponse struct {
-	OtpRequestID string `json:"otpRequestID"`
-}
-
-type TweetDetails struct {
-	ProfilePhoto  string `json:"profilePhoto"`
-	ProfileName   string `json:"profileName"`
-	ProfileHandle string `json:"profileHandle"`
-	TweetText     string `json:"tweetText"`
-}
-
-type UserDetails struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Username string `json:"username"`
 }
 
 type ValidationRespoonse struct {
@@ -572,47 +420,6 @@ func (e *InteractionType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e InteractionType) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type QuestionType string
-
-const (
-	QuestionTypeMultiChoice  QuestionType = "multiChoice"
-	QuestionTypeDirectAnswer QuestionType = "directAnswer"
-)
-
-var AllQuestionType = []QuestionType{
-	QuestionTypeMultiChoice,
-	QuestionTypeDirectAnswer,
-}
-
-func (e QuestionType) IsValid() bool {
-	switch e {
-	case QuestionTypeMultiChoice, QuestionTypeDirectAnswer:
-		return true
-	}
-	return false
-}
-
-func (e QuestionType) String() string {
-	return string(e)
-}
-
-func (e *QuestionType) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = QuestionType(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid QuestionType", str)
-	}
-	return nil
-}
-
-func (e QuestionType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

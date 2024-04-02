@@ -12,20 +12,17 @@ import (
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/lucidconnect/inverse/drops"
 	"github.com/lucidconnect/inverse/engine/aiimages"
 	"github.com/lucidconnect/inverse/graph/model"
 	"github.com/lucidconnect/inverse/internal"
 	"github.com/lucidconnect/inverse/internal/customError"
-	"github.com/lucidconnect/inverse/magic"
 	"github.com/lucidconnect/inverse/services"
 	"github.com/lucidconnect/inverse/services/neynar"
 	"github.com/lucidconnect/inverse/structure"
 	"github.com/lucidconnect/inverse/utils"
 	"github.com/lucidconnect/inverse/whitelist"
 	"github.com/rs/zerolog/log"
-	"gorm.io/gorm"
 )
 
 // Items is the resolver for the items field.
@@ -353,21 +350,6 @@ func (r *mutationResolver) DeleteDrop(ctx context.Context, dropID string) (*mode
 	return drop.ToGraphData(nil), nil
 }
 
-// CreateEmptyCriteriaForDrop is the resolver for the createEmptyCriteriaForDrop field.
-func (r *mutationResolver) CreateEmptyCriteriaForDrop(ctx context.Context, input model.NewEmptyCriteriaInput) (*model.Drop, error) {
-	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	// if err != nil {
-	// 	return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
-	// }
-
-	drop, err := r.NFTRepository.FindDropById(input.DropID)
-	if err != nil {
-		return nil, err
-	}
-
-	return drop.ToGraphData(nil), nil
-}
-
 // CreateFarcasterCriteriaForDrop is the resolver for the createFarcasterCriteriaForDrop field.
 func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, input model.NewFarcasterCriteriaInput) (*model.Drop, error) {
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
@@ -504,51 +486,6 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 	return resp, nil
 }
 
-// // CreateJWTToken is the resolver for the createJWTToken field.
-func (r *mutationResolver) CreateJWTToken(ctx context.Context, input *model.CreateJWTTokenInput) (*model.JWTCreationResponse, error) {
-	InverseAuthSignatureMessage := "Authorize Inverse Authentication"
-
-	message := "\x19Ethereum Signed Message:\n32" + string(InverseAuthSignatureMessage)
-	signer, err := magic.GetMeTheSignerOfThisMessage(message, input.Signature)
-	if err != nil {
-		return nil, err
-	}
-
-	castedAddress := common.HexToAddress(input.Address)
-	if *signer != castedAddress {
-		return nil, errors.New("the signature provided is invalid")
-	}
-
-	jwt, err := internal.GenerateJWT(input.Address)
-	if err != nil {
-		return nil, errors.New("jwt creation has failed")
-	}
-
-	// parsedAddress := common.HexToAddress(input.Address)
-	creatorInfo, err := r.CreatorRepository.FindCreatorByEthereumAddress(input.Address)
-	// creatorInfo, err := onboarding.CreateCreatorProfileIfAddressIsMissing(parsedAddress)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			newCreator := &drops.Creator{WalletAddress: input.Address}
-			aaWallet := common.HexToAddress(input.AaWallet)
-			altSigner := &drops.SignerInfo{
-				CreatorID:     creatorInfo.ID.String(),
-				WalletAddress: aaWallet.String(),
-				Provider:      model.SignerProviderConnectKit,
-			}
-			err = r.CreatorRepository.CreateProfile(newCreator, altSigner)
-			if err != nil {
-				return nil, err
-			}
-		}
-		return nil, err
-	}
-
-	return &model.JWTCreationResponse{
-		Token: jwt,
-	}, nil
-}
-
 // GenerateSignatureForClaim is the resolver for the generateSignatureForClaim field.
 func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input model.GenerateClaimSignatureInput) (*model.MintAuthorizationResponse, error) {
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
@@ -587,53 +524,6 @@ func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input 
 	return whitelist.GenerateSignatureForClaim(*mintPass)
 }
 
-// StoreSignerInfo is the resolver for the storeSignerInfo field.
-func (r *mutationResolver) StoreSignerInfo(ctx context.Context, input model.SignerInfo) (bool, error) {
-	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	// if err != nil {
-	// 	return false, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
-	// }
-
-	// return onboarding.StoreUserAccountSignerAddress(input, authenticationDetails)
-	return false, fmt.Errorf("not implemented")
-}
-
-// GenerateMobileWalletConfigs is the resolver for the generateMobileWalletConfigs field.
-func (r *mutationResolver) GenerateMobileWalletConfigs(ctx context.Context) (*model.MobileWalletConfig, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
-// StoreHashForDeployment is the resolver for the storeHashForDeployment field.
-func (r *mutationResolver) StoreHashForDeployment(ctx context.Context, input model.DeploymentInfo) (bool, error) {
-	drop, err := r.NFTRepository.FindDropById(input.DropID)
-	if err != nil {
-		return false, err
-	}
-
-	drop.AAWalletDeploymentHash = &input.DeploymentHash
-	log.Info().Msgf("deployment info: %v", input)
-	if input.ContractAddress == nil {
-		// Introduce an artificial delay for before fethcing the actual contract address
-		time.Sleep(time.Second * 3)
-
-		contractAdddress, err := services.GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
-		if err != nil {
-			log.Err(err)
-			return false, err
-		}
-
-		drop.AAContractAddress = &contractAdddress
-	} else {
-		drop.AAContractAddress = input.ContractAddress
-	}
-
-	if err = r.NFTRepository.UpdateDropDetails(drop); err != nil {
-		return false, err
-	}
-
-	return true, nil
-}
-
 // GetCreatorDetails is the resolver for the getCreatorDetails field.
 func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDetails, error) {
 	// var creator drops.Creator
@@ -666,27 +556,6 @@ func (r *queryResolver) GetWallet(ctx context.Context) (*model.Wallet, error) {
 	return nil, fmt.Errorf("not implemented")
 }
 
-// GetOnboardinProgress is the resolver for the getOnboardinProgress field.
-func (r *queryResolver) GetOnboardinProgress(ctx context.Context) (*model.OnboardingProgress, error) {
-	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
-	}
-
-	cachedCreator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
-	if err != nil {
-		return &model.OnboardingProgress{
-			Creator:                  nil,
-			RegisterdInverseUsername: false,
-		}, nil
-	}
-
-	return &model.OnboardingProgress{
-		Creator:                  cachedCreator.ToGraphData(),
-		RegisterdInverseUsername: cachedCreator.InverseUsername != nil,
-	}, nil
-}
-
 // IsInverseNameIsAvailable is the resolver for the isInverseNameIsAvailable field.
 func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input model.NewUsernameRegisgration) (bool, error) {
 	_, err := r.CreatorRepository.FindCreatorByUsername(input.InverseUsername)
@@ -695,82 +564,6 @@ func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input mode
 	}
 
 	return true, nil
-}
-
-// GetUserProfileDetails is the resolver for the getUserProfileDetails field.
-func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName string) (*model.UserProfileType, error) {
-	creator, err := r.CreatorRepository.FindCreatorByUsername(userName)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
-	}
-	profileData := creator.CreatorToProfileData()
-	// address := creator.WalletAddress
-	creatorDrops, err := r.NFTRepository.FindDropByCreatorId(*profileData.CreatorID)
-	if err != nil {
-		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
-	}
-	mappedDrops := make([]*model.Drop, len(creatorDrops))
-	for idx, drop := range creatorDrops {
-		var itemArr []*model.Item
-		items, err := r.NFTRepository.FetchDropItems(drop.ID.String(), false)
-		if err != nil {
-			log.Err(err).Send()
-		} else {
-			mappedItems := make([]*model.Item, len(items))
-			for i, item := range items {
-				mappedItems[i] = item.ToGraphData()
-			}
-			itemArr = mappedItems
-		}
-
-		mappedDrops[idx] = drop.ToGraphData(itemArr)
-	}
-	profileData.Drops = mappedDrops
-
-	var allItems []*model.Item
-	for _, drop := range mappedDrops {
-		items, err := r.NFTRepository.FetchDropItems(drop.ID, false)
-		if err != nil {
-			continue
-		} else {
-			mappedItems := make([]*model.Item, len(items))
-			for i, item := range items {
-				mappedItems[i] = item.ToGraphData()
-			}
-			allItems = append(allItems, mappedItems...)
-		}
-	}
-	profileData.Items = allItems
-
-	return profileData, nil
-}
-
-// WIP FetchClaimedItems is the resolver for the fetchClaimedItems field.
-func (r *queryResolver) FetchClaimedItems(ctx context.Context, address string) ([]*model.Item, error) {
-	creator, err := r.CreatorRepository.FindCreatorByEthereumAddress(address)
-	if err != nil {
-		return nil, err
-	}
-	signer, err := r.CreatorRepository.FindSignerByCreatorId(creator.ID.String())
-	// aaAddress, err := fetchAAAddressFromSignerInfo(address)
-	if err != nil {
-		return nil, err
-	}
-
-	address = signer.WalletAddress
-
-	items, err := r.NFTRepository.FindClaimedDropsByAddress(address)
-	if err != nil {
-		return nil, err
-	}
-
-	mappedItems := make([]*model.Item, len(items))
-
-	for idx, item := range items {
-		mappedItems[idx] = item.ToGraphData()
-	}
-
-	return mappedItems, nil
 }
 
 // FetchDropByID is the resolver for the fetchDropById field.
@@ -833,46 +626,6 @@ func (r *queryResolver) FetchCreatorDrops(ctx context.Context) ([]*model.Drop, e
 	return mappedDrops, nil
 }
 
-// FetchItemsInDrop is the resolver for the fetchItemsInDrop field.
-func (r *queryResolver) FetchItemsInDrop(ctx context.Context, dropID string) ([]*model.Item, error) {
-	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
-	// if err != nil {
-	// 	return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
-	// }
-	items, err := r.NFTRepository.FetchDropItems(dropID, false)
-	if err != nil {
-		log.Err(err).Send()
-		return nil, err
-	}
-	mappedItems := make([]*model.Item, len(items))
-	for i, item := range items {
-		mappedItems[i] = item.ToGraphData()
-	}
-
-	return mappedItems, nil
-}
-
-// FetchItemByID is the resolver for the fetchItemById field.
-func (r *queryResolver) FetchItemByID(ctx context.Context, itemID string) (*model.Item, error) {
-	item, err := r.NFTRepository.FindItemById(itemID)
-	if err != nil {
-		log.Err(err).Send()
-		return nil, err
-	}
-
-	return item.ToGraphData(), nil
-}
-
-// FetchCriteriaAuthorizedEmails is the resolver for the fetchCriteriaAuthorizedEmails field.
-func (r *queryResolver) FetchCriteriaAuthorizedEmails(ctx context.Context, itemID string) ([]string, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
-// FetchCriteriaAuthorizedWalletAddresses is the resolver for the fetchCriteriaAuthorizedWalletAddresses field.
-func (r *queryResolver) FetchCriteriaAuthorizedWalletAddresses(ctx context.Context, itemID string) ([]string, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
 // GetImageSuggestions is the resolver for the getImageSuggestions field.
 func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, preset *model.AiImageStyle) ([]*model.ImageResponse, error) {
 	// authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
@@ -880,23 +633,6 @@ func (r *queryResolver) GetImageSuggestions(ctx context.Context, prompt string, 
 	// 	return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	// }
 	return aiimages.GetImageSuggestions(prompt, preset)
-}
-
-// GetTweetDetails is the resolver for the getTweetDetails field.
-func (r *queryResolver) GetTweetDetails(ctx context.Context, tweetLink string) (*model.TweetDetails, error) {
-	return services.FetchTweetDetails(tweetLink)
-}
-
-// GetTwitterUserDetails is the resolver for the getTwitterUserDetails field.
-func (r *queryResolver) GetTwitterUserDetails(ctx context.Context, userName string) (*model.UserDetails, error) {
-	return services.FetchUserDetails(userName)
-}
-
-// FetchFeaturedItems is the resolver for the fetchFeaturedItems field.
-func (r *queryResolver) FetchFeaturedItems(ctx context.Context) ([]*model.Item, error) {
-	r.NFTRepository.FindFeaturedDrops()
-
-	return nil, errors.New("not implemented")
 }
 
 // FetchFeaturedDrops is the resolver for the fetchFeaturedDrops field.
@@ -911,11 +647,6 @@ func (r *queryResolver) FetchFeaturedDrops(ctx context.Context) ([]*model.Drop, 
 	}
 
 	return mappedDrops, nil
-}
-
-// QueryImageStatus is the resolver for the queryImageStatus field.
-func (r *queryResolver) QueryImageStatus(ctx context.Context, taskID string, position *int) (*model.ImageStatusResponse, error) {
-	return aiimages.QueryMidJourneyTaskID(taskID, position)
 }
 
 // Drop returns DropResolver implementation.
@@ -934,13 +665,3 @@ type dropResolver struct{ *Resolver }
 type itemResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) FetchQuestionsByItemID(ctx context.Context, itemID string) ([]*model.QuestionnaireType, error) {
-	return nil, nil
-}
