@@ -55,6 +55,7 @@ type ComplexityRoot struct {
 	}
 
 	CreatorDetails struct {
+		AaWallet        func(childComplexity int) int
 		Address         func(childComplexity int) int
 		CreatorID       func(childComplexity int) int
 		FirstPayment    func(childComplexity int) int
@@ -171,6 +172,7 @@ type ComplexityRoot struct {
 	}
 
 	UserProfileType struct {
+		AaWallet        func(childComplexity int) int
 		Bio             func(childComplexity int) int
 		ClaimedItems    func(childComplexity int) int
 		CreatorID       func(childComplexity int) int
@@ -247,6 +249,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ClaimDetails.ClaimerUsername(childComplexity), true
+
+	case "CreatorDetails.aaWallet":
+		if e.complexity.CreatorDetails.AaWallet == nil {
+			break
+		}
+
+		return e.complexity.CreatorDetails.AaWallet(childComplexity), true
 
 	case "CreatorDetails.address":
 		if e.complexity.CreatorDetails.Address == nil {
@@ -862,6 +871,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Wallet.Currency(childComplexity), true
+
+	case "userProfileType.aaWallet":
+		if e.complexity.UserProfileType.AaWallet == nil {
+			break
+		}
+
+		return e.complexity.UserProfileType.AaWallet(childComplexity), true
 
 	case "userProfileType.bio":
 		if e.complexity.UserProfileType.Bio == nil {
@@ -1592,6 +1608,47 @@ func (ec *executionContext) fieldContext_CreatorDetails_firstPayment(ctx context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CreatorDetails_aaWallet(ctx context.Context, field graphql.CollectedField, obj *model.CreatorDetails) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CreatorDetails_aaWallet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AaWallet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CreatorDetails_aaWallet(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CreatorDetails",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -3061,6 +3118,8 @@ func (ec *executionContext) fieldContext_Item_creator(ctx context.Context, field
 				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
 			case "firstPayment":
 				return ec.fieldContext_CreatorDetails_firstPayment(ctx, field)
+			case "aaWallet":
+				return ec.fieldContext_CreatorDetails_aaWallet(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
 		},
@@ -3968,6 +4027,8 @@ func (ec *executionContext) fieldContext_Mutation_registerInverseUsername(ctx co
 				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
 			case "firstPayment":
 				return ec.fieldContext_CreatorDetails_firstPayment(ctx, field)
+			case "aaWallet":
+				return ec.fieldContext_CreatorDetails_aaWallet(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
 		},
@@ -4040,6 +4101,8 @@ func (ec *executionContext) fieldContext_Mutation_editUserProfile(ctx context.Co
 				return ec.fieldContext_userProfileType_items(ctx, field)
 			case "claimedItems":
 				return ec.fieldContext_userProfileType_claimedItems(ctx, field)
+			case "aaWallet":
+				return ec.fieldContext_userProfileType_aaWallet(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type userProfileType", field.Name)
 		},
@@ -4616,6 +4679,8 @@ func (ec *executionContext) fieldContext_Query_getCreatorDetails(ctx context.Con
 				return ec.fieldContext_CreatorDetails_inverseUsername(ctx, field)
 			case "firstPayment":
 				return ec.fieldContext_CreatorDetails_firstPayment(ctx, field)
+			case "aaWallet":
+				return ec.fieldContext_CreatorDetails_aaWallet(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CreatorDetails", field.Name)
 		},
@@ -7788,6 +7853,47 @@ func (ec *executionContext) fieldContext_userProfileType_claimedItems(ctx contex
 	return fc, nil
 }
 
+func (ec *executionContext) _userProfileType_aaWallet(ctx context.Context, field graphql.CollectedField, obj *model.UserProfileType) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_userProfileType_aaWallet(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AaWallet, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_userProfileType_aaWallet(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "userProfileType",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
@@ -7927,7 +8033,7 @@ func (ec *executionContext) unmarshalInputEditUserProfileInputType(ctx context.C
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"thumbnail", "image", "inverseUsername", "bio", "socials"}
+	fieldsInOrder := [...]string{"thumbnail", "image", "inverseUsername", "bio", "socials", "aaWallet"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -7979,6 +8085,15 @@ func (ec *executionContext) unmarshalInputEditUserProfileInputType(ctx context.C
 				return it, err
 			}
 			it.Socials = data
+		case "aaWallet":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("aaWallet"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AaWallet = data
 		}
 	}
 
@@ -8276,6 +8391,8 @@ func (ec *executionContext) _CreatorDetails(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "aaWallet":
+			out.Values[i] = ec._CreatorDetails_aaWallet(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -9600,6 +9717,8 @@ func (ec *executionContext) _userProfileType(ctx context.Context, sel ast.Select
 			out.Values[i] = ec._userProfileType_items(ctx, field, obj)
 		case "claimedItems":
 			out.Values[i] = ec._userProfileType_claimedItems(ctx, field, obj)
+		case "aaWallet":
+			out.Values[i] = ec._userProfileType_aaWallet(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

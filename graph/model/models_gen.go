@@ -20,6 +20,7 @@ type CreatorDetails struct {
 	Address         string  `json:"address"`
 	InverseUsername *string `json:"inverseUsername,omitempty"`
 	FirstPayment    bool    `json:"firstPayment"`
+	AaWallet        *string `json:"aaWallet,omitempty"`
 }
 
 type Drop struct {
@@ -65,6 +66,7 @@ type EditUserProfileInputType struct {
 	InverseUsername *string       `json:"inverseUsername,omitempty"`
 	Bio             *string       `json:"bio,omitempty"`
 	Socials         *SocialsInput `json:"socials,omitempty"`
+	AaWallet        *string       `json:"aaWallet,omitempty"`
 }
 
 type GenerateClaimSignatureInput struct {
@@ -170,6 +172,7 @@ type UserProfileType struct {
 	Drops           []*Drop  `json:"drops,omitempty"`
 	Items           []*Item  `json:"items,omitempty"`
 	ClaimedItems    []*Item  `json:"claimedItems,omitempty"`
+	AaWallet        *string  `json:"aaWallet,omitempty"`
 }
 
 type AiImageStyle string

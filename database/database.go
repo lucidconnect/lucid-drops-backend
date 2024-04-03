@@ -69,6 +69,7 @@ func SetupDB(dsn string) *DB {
 func (db *DB) CreateProfile(creator *drops.Creator, signer *drops.SignerInfo) error {
 	tx := db.database.Begin()
 	if err := tx.Create(creator).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -78,7 +79,11 @@ func (db *DB) CreateProfile(creator *drops.Creator, signer *drops.SignerInfo) er
 		return err
 	}
 
-	tx.Commit()
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	return nil
 }
 
@@ -132,13 +137,30 @@ func (db *DB) FindSignerByEthereumAddress(address string) (*drops.SignerInfo, er
 	return &altSigner, nil
 }
 
-func (db *DB) UpdateCreatorProfile(creator *drops.Creator) error {
-	return db.database.Save(creator).Error
+func (db *DB) UpdateCreatorProfile(creator *drops.Creator, signer *drops.SignerInfo) error {
+	tx := db.database.Begin()
+	if err := tx.Save(creator).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Save(signer).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
 }
 
 func (db *DB) CreateDrop(drop *drops.Drop, item *drops.Item) error {
 	tx := db.database.Begin()
 	if err := tx.Create(drop).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
@@ -148,7 +170,11 @@ func (db *DB) CreateDrop(drop *drops.Drop, item *drops.Item) error {
 		return err
 	}
 
-	tx.Commit()
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	return nil
 }
 func (db *DB) FindDropById(dropId string) (*drops.Drop, error) {
@@ -178,7 +204,10 @@ func (db *DB) AddFarcasterCriteriaToDrop(drop *drops.Drop, criteria *drops.Farca
 		tx.Rollback()
 		return err
 	}
-	tx.Commit()
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
 	return nil
 }
 

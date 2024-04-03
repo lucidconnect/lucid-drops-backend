@@ -16,7 +16,7 @@ type CreatorRepository interface {
 	FindCreatorByEthereumAddress(address string) (*Creator, error)
 	FindSignerByCreatorId(creatorId string) (*SignerInfo, error)
 	FindSignerByEthereumAddress(address string) (*SignerInfo, error)
-	UpdateCreatorProfile(creator *Creator) error
+	UpdateCreatorProfile(creator *Creator, signer *SignerInfo) error
 }
 
 type Creator struct {
@@ -71,5 +71,6 @@ func (c *Creator) CreatorToProfileData() *model.UserProfileType {
 			Github:    c.Github,
 			Warpcast:  c.Warpcast,
 		},
+		AaWallet: &c.AAWalletAddress,
 	}
 }

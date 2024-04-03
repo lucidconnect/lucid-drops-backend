@@ -145,6 +145,11 @@ func (r *mutationResolver) EditUserProfile(ctx context.Context, input model.Edit
 		return nil, err
 	}
 
+	signer, err := r.CreatorRepository.FindSignerByCreatorId(creator.ID.String())
+	if err != nil {
+		return nil, err
+	}
+
 	if input.InverseUsername != nil {
 		creator.InverseUsername = input.InverseUsername
 	}
@@ -179,7 +184,12 @@ func (r *mutationResolver) EditUserProfile(ctx context.Context, input model.Edit
 		}
 	}
 
-	err = r.CreatorRepository.UpdateCreatorProfile(creator)
+	if input.AaWallet != nil {
+		creator.AAWalletAddress = *input.AaWallet
+		signer.WalletAddress = *input.AaWallet
+	}
+
+	err = r.CreatorRepository.UpdateCreatorProfile(creator, signer)
 	if err != nil {
 		return nil, err
 	}
