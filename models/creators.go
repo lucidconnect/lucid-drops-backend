@@ -29,6 +29,7 @@ func (c *Creator) ToGraphData() *model.CreatorDetails {
 		CreatorID:       c.ID.String(),
 		InverseUsername: c.InverseUsername,
 		FirstPayment:    c.FirstPayment,
+		AaWallet: &c.AAWalletAddress,
 	}
 }
 
@@ -45,5 +46,6 @@ func (c *Creator) CreatorToProfileData() *model.UserProfileType {
 			Github:    c.Github,
 			Warpcast:  c.Warpcast,
 		},
+		AaWallet: &c.AAWalletAddress,
 	}
 }

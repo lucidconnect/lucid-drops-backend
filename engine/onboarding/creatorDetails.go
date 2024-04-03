@@ -27,6 +27,11 @@ func EditUserProfile(input model.EditUserProfileInputType, authDetails *internal
 		return nil, err
 	}
 
+	signer, err := engine.GetAltSignerByCreatorID(creator.ID.String())
+	if err != nil {
+		return nil, err
+	}
+
 	if input.InverseUsername != nil {
 		creator.InverseUsername = input.InverseUsername
 	}
@@ -60,8 +65,15 @@ func EditUserProfile(input model.EditUserProfileInputType, authDetails *internal
 			creator.Warpcast = input.Socials.Warpcast
 		}
 	}
-
+	if input.AaWallet != nil {
+		creator.AAWalletAddress = *input.AaWallet
+		signer.WalletAddress = *input.AaWallet
+	}
 	err = engine.SaveModel(creator)
+	if err != nil {
+		return nil, err
+	}
+	err = engine.SaveModel(signer)
 	if err != nil {
 		return nil, err
 	}
