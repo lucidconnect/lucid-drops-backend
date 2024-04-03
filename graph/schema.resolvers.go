@@ -483,6 +483,15 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 
 	resp.Valid = true
 	resp.PassID = utils.GetStrPtr(newMint.ID.String())
+
+	if drop.GasIsCreatorSponsored {
+		// go ahead and mint
+		// authResponse, err := whitelist.GenerateSignatureForClaim(*newMint)
+		// if err != nil {
+		// 	log.Err()
+		// }
+	}
+
 	return resp, nil
 }
 
