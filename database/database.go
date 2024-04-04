@@ -215,7 +215,7 @@ func (db *DB) UpdateFarcasterCriteria(dropId string, criteriaUpdate *drops.Farca
 	return nil
 }
 
-func (db *DB) RemoveFarcasterCriteria(dropId *drops.Drop) error {
+func (db *DB) RemoveFarcasterCriteria(dropId string) error {
 	if err := db.database.Unscoped().Where("drop_id = ?", dropId).Delete(&drops.FarcasterCriteria{}).Error; err != nil {
 		return err
 	}

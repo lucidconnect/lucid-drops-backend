@@ -18,7 +18,7 @@ type NFTRepository interface {
 	DeleteDrop(drop *Drop) error
 	AddFarcasterCriteriaToDrop(drop *Drop, criteria *FarcasterCriteria) error
 	UpdateFarcasterCriteria(dropId string, criteriaUpdate *FarcasterCriteria) error
-	RemoveFarcasterCriteria(drop *Drop) error
+	RemoveFarcasterCriteria(dropId string) error
 	FetchDropItems(dropId string, includeDeleted bool) ([]Item, error)
 	FindFeaturedDrops() ([]Drop, error)
 	FindClaimedDropsByAddress(addresss string) ([]Item, error)

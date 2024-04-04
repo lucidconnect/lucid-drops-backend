@@ -253,7 +253,6 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		Name:        *input.Name,
 		Image:       *input.Image,
 		Description: *input.Description,
-		// DropID:       newDrop.ID
 		TokenID:      int64(1),
 		DropAddress:  contractAdddress,
 		UserLimit:    input.UserLimit,
@@ -379,7 +378,7 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 
 	if drop.Criteria != "" {
 		//Delete Existing criteria
-		err := r.NFTRepository.RemoveFarcasterCriteria(drop)
+		err := r.NFTRepository.RemoveFarcasterCriteria(drop.ID.String())
 		if err != nil {
 			return nil, err
 		}
