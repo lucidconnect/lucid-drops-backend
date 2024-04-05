@@ -21,15 +21,6 @@ type CreatorDetails struct {
 	InverseUsername *string `json:"inverseUsername,omitempty"`
 	FirstPayment    bool    `json:"firstPayment"`
 	AaWallet        *string `json:"aaWallet,omitempty"`
-<<<<<<< HEAD
-=======
-}
-
-type DeploymentInfo struct {
-	DropID          string  `json:"dropId"`
-	DeploymentHash  string  `json:"deploymentHash"`
-	ContractAddress *string `json:"contractAddress,omitempty"`
->>>>>>> origin/main
 }
 
 type Drop struct {
@@ -76,14 +67,6 @@ type EditUserProfileInputType struct {
 	Bio             *string       `json:"bio,omitempty"`
 	Socials         *SocialsInput `json:"socials,omitempty"`
 	AaWallet        *string       `json:"aaWallet,omitempty"`
-<<<<<<< HEAD
-=======
-}
-
-type EmailClaimInput struct {
-	ItemID       string `json:"itemID"`
-	EmailAddress string `json:"emailAddress"`
->>>>>>> origin/main
 }
 
 type GenerateClaimSignatureInput struct {
