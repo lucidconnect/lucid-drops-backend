@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	telegrambot "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/lucidconnect/inverse/engine"
 )
 
 type BotImplementation struct {
@@ -49,36 +48,36 @@ func (bot *BotImplementation) processTelegramUpdates(update *telegrambot.Update)
 	}
 }
 
-func (bot *BotImplementation) processNewMemberEvent(update *telegrambot.Update) {
+// func (bot *BotImplementation) processNewMemberEvent(update *telegrambot.Update) {
 
-	config := telegrambot.ChatInviteLinkConfig{
-		ChatConfig: telegrambot.ChatConfig{
-			ChatID:             update.Message.Chat.ID,
-			SuperGroupUsername: "",
-		},
-	}
+// 	config := telegrambot.ChatInviteLinkConfig{
+// 		ChatConfig: telegrambot.ChatConfig{
+// 			ChatID:             update.Message.Chat.ID,
+// 			SuperGroupUsername: "",
+// 		},
+// 	}
 
-	link, err := bot.localBot.GetInviteLink(config)
-	if err != nil {
-		log.Print(err)
-		return
-	}
+// 	link, err := bot.localBot.GetInviteLink(config)
+// 	if err != nil {
+// 		log.Print(err)
+// 		return
+// 	}
 
-	criteria, err := engine.FetchTelegramCriteriaByLink(link)
-	if err != nil {
-		log.Print(err)
-		return
-	}
+// 	criteria, err := engine.FetchTelegramCriteriaByLink(link)
+// 	if err != nil {
+// 		log.Print(err)
+// 		return
+// 	}
 
-	criteria.GroupID = getChatID(update.Message)
-	// criteria.BotAdded = true
+// 	criteria.GroupID = getChatID(update.Message)
+// 	// criteria.BotAdded = true
 
-	err = engine.SaveModel(criteria)
-	if err != nil {
-		log.Print(err)
-		return
-	}
-}
+// 	err = engine.SaveModel(criteria)
+// 	if err != nil {
+// 		log.Print(err)
+// 		return
+// 	}
+// }
 
 func isNewMember(update *telegrambot.Update) bool {
 	botID, _ := strconv.Atoi(os.Getenv("TELEGRAM_BOT_ID"))

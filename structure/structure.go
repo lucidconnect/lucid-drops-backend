@@ -3,5 +3,6 @@ package structure
 type ErrorCode string
 
 const (
-	InverseInternalError ErrorCode = "INVERSE_INTERNAL_ERROR"
+	LucidInternalError  ErrorCode = "LUCID_INTERNAL_ERROR"
+	InvalidRequestError ErrorCode = "LUCID_REQUEST_INVALID"
 )

@@ -9,13 +9,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi"
-	"github.com/lucidconnect/inverse/dbutils"
-	"github.com/lucidconnect/inverse/engine/whitelist"
+	"github.com/lucidconnect/inverse/database"
 	"github.com/lucidconnect/inverse/graph"
 	"github.com/lucidconnect/inverse/internal"
-	"github.com/lucidconnect/inverse/jobs"
 	"github.com/lucidconnect/inverse/route"
-	"github.com/lucidconnect/inverse/services"
 	"github.com/lucidconnect/inverse/utils"
 	"github.com/robfig/cron/v3"
 	"github.com/rs/cors"
@@ -48,9 +45,12 @@ func main() {
 	}
 
 	SetupCronJobs()
-	dbutils.SetupDB(dsn)
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	db := database.SetupDB(dsn)
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{
+		CreatorRepository: db,
+		NFTRepository:     db,
+	}}))
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.Options{})
@@ -58,20 +58,15 @@ func main() {
 
 	router := chi.NewRouter()
 	loadCORS(router)
+	server := route.NewServer(port, db, router)
 
 	router.Use(internal.UserAuthMiddleWare())
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/health", http.HandlerFunc(route.HealthCheckHandler))
 	router.Handle("/query", srv)
-	router.Handle("/metadata/{contract}/{itemid}", http.HandlerFunc(route.MetadataHandler))
-	router.Handle("/twitter01/callback/", http.HandlerFunc(route.TwitterCallBack))
-	router.Handle("/telegram/callback/", http.HandlerFunc(route.TelegramCallBack))
-	// router.Handle("/patreon/callback/", http.HandlerFunc(route.PatreonCallBack))
-	// router.Handle("/whitelist/patreon/callback/", http.HandlerFunc(route.PatreonWhitelistCallBack))
-	router.Handle("/handle-stripe-webhook", http.HandlerFunc(route.HandleStripeWebhook))
-	router.HandleFunc("/mintPass", route.CreateMintPass)
-	router.HandleFunc("/claim", route.GenerateSignatureForClaim)
-	router.HandleFunc("/fetchTokenUri", route.FetchTokenUri)
+	router.HandleFunc("/mintPass", server.CreateMintPass)
+	router.HandleFunc("/claim", server.GenerateSignatureForClaim)
+	// router.HandleFunc("/fetchTokenUri", route.FetchTokenUri)
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
 
 	httpServer := &http.Server{
@@ -79,8 +74,9 @@ func main() {
 		Handler: router,
 	}
 
-	go createTelegramBotInstance()
+	// go createTelegramBotInstance()
 	// go addresswatcher.SubscribeToInverseContractDeployments()
+	log.Err(server.HttpServer.ListenAndServe())
 	log.Err(httpServer.ListenAndServe())
 }
 
@@ -98,7 +94,7 @@ func SetupCronJobs() {
 		),
 	)
 
-	c.AddFunc("@every 0h0m15s", func() { jobs.VerifyItemTokenIDs() })
+	// c.AddFunc("@every 0h0m15s", func() { jobs.VerifyItemTokenIDs() })
 	// c.AddFunc("@every 0h0m3s", func() { jobs.FillOutContractAddresses() })
 	c.Start()
 }
@@ -116,6 +112,6 @@ func loadCORS(router *chi.Mux) {
 	}).Handler)
 }
 
-func createTelegramBotInstance() {
-	whitelist.InverseBot = services.InitTelegramBot()
-}
+// func createTelegramBotInstance() {
+// 	whitelist.InverseBot = services.InitTelegramBot()
+// }

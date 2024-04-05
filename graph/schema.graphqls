@@ -8,134 +8,29 @@ directive @goField(
 type Query {
   getCreatorDetails: CreatorDetails!
   getWallet: Wallet!
-  getOnboardinProgress: OnboardingProgress!
   isInverseNameIsAvailable(input: NewUsernameRegisgration!): Boolean!
-  getUserProfileDetails (userName: String!): userProfileType
-
-  fetchClaimedItems(address: String!): [Item!]!
-
   fetchDropById(dropID: String!): Drop!
   fetchCreatorDrops: [Drop!]!
-
-  fetchItemsInDrop(dropID: String!): [Item!]!
-  fetchItemById(itemID: String!): Item!
-  fetchCriteriaAuthorizedEmails(itemID: String!): [String!]
-  fetchCriteriaAuthorizedWalletAddresses(itemID: String!): [String!]
-
   getImageSuggestions(prompt: String!, preset: AiImageStyle ): [ImageResponse]!
-  getTweetDetails(tweetLink: String!): TweetDetails!
-  getTwitterUserDetails(userName: String!): UserDetails!
-
-  fetchQuestionsByItemId(itemId: String!): [QuestionnaireType!]!
-  fetchFeaturedItems: [Item!]!
   fetchFeaturedDrops: [Drop!]!
-
-  queryImageStatus(taskID: String!, position: Int): ImageStatusResponse!
 }
 
 type Mutation {
   registerInverseUsername(input: NewUsernameRegisgration!): CreatorDetails!
   editUserProfile (input: EditUserProfileInputType!):userProfileType
-
   createDrop(input: DropInput!): Drop!
   updateDrop(dropID: String!,input: DropInput!): Drop!
   deleteDrop(dropID: String!): Drop!
-
-  # createItem(input: ItemInput!): Item!
-  # tempCreateItem(input: ItemInput!, creatorAddress: String!): Item!
-  # updateItem(itemID: String!,input: ItemInput!): Item!
-  # deleteItem(itemID: String!): Item!
-  # addItemDeadline(itemID: String!, deadline: String!): Item!
-
-  # createWalletAddressWhitelistForItem(input: NewWalletAddressWhitelistInput!): Item!
-  # createTwitterCriteriaForItem(input: NewTwitterCriteriaInput!): Item!
-  # createTelegramCriteriaForItem(input: NewTelegramCriteriaInput!): Item!
-  createEmptyCriteriaForDrop(input: NewEmptyCriteriaInput!): Drop!
   createFarcasterCriteriaForDrop(input: NewFarcasterCriteriaInput!): Drop!
-  # createMintPassForNoCriteriaItem(itemID: String!, walletAddress: String!): ValidationRespoonse
   createMintPass(dropID:String!, walletAddress: String!): ValidationRespoonse
-  # validateTwitterCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
-  # validateTelegramCriteriaForItem(itemID: String!, authID: String): ValidationRespoonse
-  # validateWalletCriteriaForItem(itemID: String!, walletAddress: String!): ValidationRespoonse
-  validateFarcasterCriteriaForDrop(dropID: String!, farcasterAddress: String!): ValidationRespoonse
-  createJWTToken(input: CreateJWTTokenInput): JWTCreationResponse!
-  createPaymentIntentSecretKey(amount: Int!): String
-
-  # startEmailVerificationForClaim(input: EmailClaimInput!): StartEmailVerificationResponse!
-  # completeEmailVerificationForClaim(input: CompleteEmailVerificationInput!): CompleteEmailVerificationResponse!
   generateSignatureForClaim(input: GenerateClaimSignatureInput!): MintAuthorizationResponse!
-
-  storeSignerInfo(input: SignerInfo!): Boolean!
-  generateMobileWalletConfigs: MobileWalletConfig!
-  storeHashForDeployment(input: DeploymentInfo!): Boolean
 }
 """ Time formated in the time.RFC3339Nano Format """
 scalar Time
 
-input CreateJWTTokenInput{
-  address:   String!
-  aaWallet:  String!
-  signature: String!
-}
-
-input NewEmailWhitelistInput {
-  itemID: String!
-  authorizedEmails: [String!]!
-}
-
-input NewWalletAddressWhitelistInput {
-  itemID: String!
-  authorizedWalletAddresses: [String!]!
-}
-
-input QuestionnaireCriteriaInput {
-  itemID: String!
-  questionType: QuestionType!
-  openEndedInput: [OpenEndedInputType!]
-  multiChoiceInput: [MultiChoiceInputType!]
-  claimCode: Boolean
-}
-
-input MultiChoiceInputType {
-  question: String!
-  choices: [String!]!
-  correctChoice: String!
-}
-
-input OpenEndedInputType {
-  question: String!
-  answers: [String!]!
-}
-
-input QuestionnaireAnswerInput{
-  answer: String!
-  questionId: String!
-}
-
-input EmailClaimInput {
-  itemID: String!
-  emailAddress: String!
-}
-
-input CompleteEmailVerificationInput {
-  otp: String!
-  otpRequestID: String!
-}
-
-input CompleteEmailClaimInput {
-  otp: String!
-  otpRequestID: String!
-}
-
 input GenerateClaimSignatureInput {
   otpRequestID: String!
   claimingAddress: String!
-}
-
-input NewEmailDomainWhitelistInput {
-  itemID: String!
-  visible: Boolean!
-  authorizedSubdomains: [String!]!
 }
 
 input NewUsernameRegisgration {
@@ -159,19 +54,6 @@ input DropInput {
   gasIsCreatorSponsored: Boolean!
 }
 
-input ItemInput {
-	name: String
-	image: String
-	description: String
-	dropID: String
-  userLimit: Int
-  editionLimit: Int
-  """
-  This should typically be in cents
-  """
-  claimFee: Int
-}
-
 input NewFarcasterCriteriaInput {
   dropID: String!
   castUrl: String
@@ -179,47 +61,6 @@ input NewFarcasterCriteriaInput {
   farcasterUserName: String
   interaction: [InteractionType]
   criteriaType: [ClaimCriteriaType]!
-}
-
-input NewTwitterCriteriaInput {
-	itemID: String!
-	profileID: String
-	tweetLink: String
-	interaction: [InteractionType]
-  criteriaType: [ClaimCriteriaType]!
-  twitterAuthID: String!
-  """
-  Format: 2006-01-02T15:04:05Z07:00 i.e YYYY-MM-DDTHH:MM:SSZ
-  """
-	cutOffDate: String
-}
-
-input NewTelegramCriteriaInput {
-	itemID: String!
-  groupID: String!
-}
-
-input NewEmptyCriteriaInput {
-	dropID: String!
-}
-
-input NewPatreonCriteriaInput {
-  itemID: String!
-  authID: String!
-  campaignID: String
-  campaignName: String
-}
-
-input SignerInfo {
-  address: String!
-  signature: String
-  provider: SignerProvider!
-}
-
-input DeploymentInfo{
-  dropId: String!
-  deploymentHash: String!
-  contractAddress: String
 }
 
 input EditUserProfileInputType{
@@ -290,11 +131,6 @@ type Drop {
   claimDetails: [ClaimDetails]
 }
 
-type OnboardingProgress{
-  creator: CreatorDetails
-  registerdInverseUsername: Boolean!
-}
-
 type CreatorDetails {
   creatorID: ID!
   address: String!
@@ -326,27 +162,10 @@ type Item {
   holders: [String!]! @goField(forceResolver: true)
 }
 
-type QuestionnaireType {
-  """ Choices will only contain a list of potential answers when the `questionType` is `multiChoice` """
-  choices: [String!]
-  question: String!
-  questionId: String!
-  questionType: QuestionType!
-  claimCode: Boolean
-}
-
 type ImageResponse {
   image: String!
   format: ImageResolveFormaat!
   taskID: String
-}
-
-type StartEmailVerificationResponse {
-  otpRequestID: String!
-}
-
-type CompleteEmailVerificationResponse {
-  otpRequestID: String!
 }
 
 type MintAuthorizationResponse {
@@ -360,26 +179,6 @@ type MintAuthorizationResponse {
   smartContractAddress: String!
 }
 
-type TweetDetails {
-  profilePhoto: String!
-  profileName: String!
-  profileHandle: String!
-  tweetText: String!
-}
-
-type UserDetails {
-  id: String!
-  name: String!
-  username: String!
-
-}
-
-type MobileWalletConfig {
-  publicKey: String!
-  privateKey: String!
-  aaWallet: String!
-}
-
 type ImageStatusResponse {
   status: String
   image: String
@@ -389,17 +188,14 @@ type ImageStatusResponse {
 type ValidationRespoonse {
   valid: Boolean!
   passID: String
+  message: String
+  transactionHash: String
 }
 
 type ClaimDetails {
 	claimTime: Time
 	claimerUsername: String
 	claimerAddress: String
-}
-
-enum QuestionType{
-  multiChoice
-  directAnswer
 }
 
 enum ClaimCriteriaType{

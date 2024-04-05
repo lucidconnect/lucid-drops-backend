@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/lucidconnect/inverse/jobs"
 	"github.com/rs/zerolog/log"
 )
 
@@ -14,7 +13,7 @@ type TokenURIReq struct {
 	IsBase          bool   `json:"isBase"`
 }
 
-func FetchTokenUri(w http.ResponseWriter, r *http.Request) {
+func (s *Server) FetchTokenUri(w http.ResponseWriter, r *http.Request) {
 	var requestBody TokenURIReq
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
@@ -23,7 +22,7 @@ func FetchTokenUri(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenID, err := jobs.FetchTokenUri(requestBody.ContractAddress, requestBody.ItemID, requestBody.IsBase)
+	tokenID, err := fetchTokenUri(requestBody.ContractAddress, requestBody.ItemID, requestBody.IsBase)
 	if err != nil {
 		return
 	}
