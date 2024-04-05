@@ -41,7 +41,9 @@ func NewServer(port string, nftRepo drops.NFTRepository, router *chi.Mux) *Serve
 }
 func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 	var err error
-	var pass *model.ValidationRespoonse
+	pass := &model.ValidationRespoonse{
+		Valid: false,
+	}
 
 	dropId := r.URL.Query().Get("dropId")
 	walletAddress := r.URL.Query().Get("wallet")
