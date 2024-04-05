@@ -108,7 +108,7 @@ func (d *Drop) ToGraphData(items []*model.Item) *model.Drop {
 	if d.FarcasterCriteria != nil {
 		mappedDrop.FarcasterClaimCriteriaInteractions = InteractionsToArr(d.FarcasterCriteria.Interactions)
 		mappedDrop.CastURL = &d.FarcasterCriteria.CastUrl
-		mappedDrop.FarcasterProfileID = &d.FarcasterCriteria.FarcasterProfileID
+		mappedDrop.FarcasterProfileID = &d.FarcasterCriteria.FarcasterUsername
 		mappedDrop.FarcasterChannelID = &d.FarcasterCriteria.ChannelID
 	}
 
