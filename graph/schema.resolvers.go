@@ -439,6 +439,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 	pass, err := r.NFTRepository.GetMintPassForWallet(dropID, walletAddress)
 	if err == nil {
 		if walletLimitReached(walletAddress, *pass) {
+			resp.Message = utils.GetStrPtr("limit reached for wallet")
 			return resp, nil
 		}
 	}
@@ -458,7 +459,8 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 			return nil, err
 		}
 		if int(count) >= *drop.EditionLimit {
-			return nil, errors.New("item edition limit reached")
+			resp.Message = utils.GetStrPtr("this nft has reached it's mint")
+			return resp, errors.New("item edition limit reached")
 		}
 	}
 
