@@ -12,6 +12,7 @@ import (
 
 	"github.com/lucidconnect/inverse/drops"
 	"github.com/lucidconnect/inverse/graph/model"
+	"github.com/lucidconnect/inverse/utils"
 	"github.com/rs/zerolog/log"
 )
 
@@ -85,15 +86,18 @@ func (nc *NeynarClient) ValidateFarcasterCriteriaForDrop(farcasterAddress string
 				switch *interaction {
 				case model.InteractionTypeReplies:
 					if !nc.validateFarcasterReplyCriteria(int32(userFid), *criteria) {
+						resp.Message = utils.GetStrPtr("farcaster account does not meet the `reply` criteria")
 						return resp, errors.New("farcaster account does not meet the reply criteria")
 					}
 				case model.InteractionTypeRecasts:
 					if !nc.validateFarcasterRecastCriteria(int32(userFid), *criteria) {
+						resp.Message = utils.GetStrPtr("farcaster account does not meet the `recast` criteria")
 						return resp, errors.New("farcaster account does not meet the recast criteria")
 					}
 				case model.InteractionTypeLikes:
 					if !nc.validateFarcasterLikeCriteria(int32(userFid), *criteria) {
-						return resp, errors.New("farcaster account does not meet the like criteria")
+						resp.Message = utils.GetStrPtr("farcaster account does not meet the like criteria")
+						return resp, errors.New("farcaster account does not meet the `like` criteria")
 					}
 				}
 			}
@@ -101,13 +105,15 @@ func (nc *NeynarClient) ValidateFarcasterCriteriaForDrop(farcasterAddress string
 
 		if criteriaType == model.ClaimCriteriaTypeFarcasterFollowing.String() {
 			if !nc.validateFarcasterAccountFollowerCriteria(int32(userFid), *criteria) {
-				return nil, errors.New("farcaster account does not meet the follower criteria")
+				resp.Message = utils.GetStrPtr("farcaster account does not meet the `follower` criteria")
+				return resp, errors.New("farcaster account does not meet the follower criteria")
 			}
 		}
 
 		if criteriaType == model.ClaimCriteriaTypeFarcasterChannel.String() {
 			if !nc.validateFarcasterChannelFollowerCriteria(int32(userFid), *criteria) {
-				return nil, errors.New("farcaster account does not meet the channel follower criteria")
+				resp.Message = utils.GetStrPtr("farcaster account must be following the required channel")
+				return resp, errors.New("farcaster account does not meet the channel follower criteria")
 			}
 		}
 	}

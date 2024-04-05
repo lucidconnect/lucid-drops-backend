@@ -188,6 +188,8 @@ type ImageStatusResponse {
 type ValidationRespoonse {
   valid: Boolean!
   passID: String
+  message: String
+  transactionHash: String
 }
 
 type ClaimDetails {

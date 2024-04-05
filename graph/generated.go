@@ -162,8 +162,10 @@ type ComplexityRoot struct {
 	}
 
 	ValidationRespoonse struct {
-		PassID func(childComplexity int) int
-		Valid  func(childComplexity int) int
+		Message         func(childComplexity int) int
+		PassID          func(childComplexity int) int
+		TransactionHash func(childComplexity int) int
+		Valid           func(childComplexity int) int
 	}
 
 	Wallet struct {
@@ -844,12 +846,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Socials.Warpcast(childComplexity), true
 
+	case "ValidationRespoonse.message":
+		if e.complexity.ValidationRespoonse.Message == nil {
+			break
+		}
+
+		return e.complexity.ValidationRespoonse.Message(childComplexity), true
+
 	case "ValidationRespoonse.passID":
 		if e.complexity.ValidationRespoonse.PassID == nil {
 			break
 		}
 
 		return e.complexity.ValidationRespoonse.PassID(childComplexity), true
+
+	case "ValidationRespoonse.transactionHash":
+		if e.complexity.ValidationRespoonse.TransactionHash == nil {
+			break
+		}
+
+		return e.complexity.ValidationRespoonse.TransactionHash(childComplexity), true
 
 	case "ValidationRespoonse.valid":
 		if e.complexity.ValidationRespoonse.Valid == nil {
@@ -4541,6 +4557,10 @@ func (ec *executionContext) fieldContext_Mutation_createMintPass(ctx context.Con
 				return ec.fieldContext_ValidationRespoonse_valid(ctx, field)
 			case "passID":
 				return ec.fieldContext_ValidationRespoonse_passID(ctx, field)
+			case "message":
+				return ec.fieldContext_ValidationRespoonse_message(ctx, field)
+			case "transactionHash":
+				return ec.fieldContext_ValidationRespoonse_transactionHash(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ValidationRespoonse", field.Name)
 		},
@@ -5485,6 +5505,88 @@ func (ec *executionContext) _ValidationRespoonse_passID(ctx context.Context, fie
 }
 
 func (ec *executionContext) fieldContext_ValidationRespoonse_passID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ValidationRespoonse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ValidationRespoonse_message(ctx context.Context, field graphql.CollectedField, obj *model.ValidationRespoonse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ValidationRespoonse_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ValidationRespoonse_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ValidationRespoonse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ValidationRespoonse_transactionHash(ctx context.Context, field graphql.CollectedField, obj *model.ValidationRespoonse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ValidationRespoonse_transactionHash(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TransactionHash, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ValidationRespoonse_transactionHash(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "ValidationRespoonse",
 		Field:      field,
@@ -9299,6 +9401,10 @@ func (ec *executionContext) _ValidationRespoonse(ctx context.Context, sel ast.Se
 			}
 		case "passID":
 			out.Values[i] = ec._ValidationRespoonse_passID(ctx, field, obj)
+		case "message":
+			out.Values[i] = ec._ValidationRespoonse_message(ctx, field, obj)
+		case "transactionHash":
+			out.Values[i] = ec._ValidationRespoonse_transactionHash(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

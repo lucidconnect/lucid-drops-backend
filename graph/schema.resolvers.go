@@ -250,9 +250,9 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 	}
 
 	newItem := &drops.Item{
-		Name:        *input.Name,
-		Image:       *input.Image,
-		Description: *input.Description,
+		Name:         *input.Name,
+		Image:        *input.Image,
+		Description:  *input.Description,
 		TokenID:      int64(1),
 		DropAddress:  contractAdddress,
 		UserLimit:    input.UserLimit,
@@ -495,10 +495,18 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 
 	if drop.GasIsCreatorSponsored {
 		// go ahead and mint
-		// authResponse, err := whitelist.GenerateSignatureForClaim(*newMint)
-		// if err != nil {
-		// 	log.Err()
-		// }
+		authResponse, err := whitelist.GenerateSignatureForClaim(*newMint)
+		if err != nil {
+			log.Err(err).Send()
+			return resp, err
+		}
+
+		tx, err := whitelist.MintNft(*authResponse, walletAddress)
+		if err != nil {
+			return resp, err
+		}
+		resp.TransactionHash = &tx
+		return resp, nil
 	}
 
 	return resp, nil

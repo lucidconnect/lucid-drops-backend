@@ -1,10 +1,13 @@
 package whitelist
 
 import (
+	"encoding/hex"
+	"fmt"
 	"math/big"
 	"os"
 	"regexp"
 
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -91,4 +94,63 @@ func getChainId(network model.BlockchainNetwork) *big.Int {
 		return nil
 	}
 	return chain
+}
+
+func MintNft(mintArgs model.MintAuthorizationResponse, walletAddress string) (string, error) {
+	claimer := common.HexToAddress(walletAddress)
+	contract := common.HexToAddress(mintArgs.SmartContractAddress)
+
+	amount, _ := new(big.Int).SetString(mintArgs.Amount, 10)
+	tokenId, _ := new(big.Int).SetString(mintArgs.TokenID, 10)
+	nonce, _ := new(big.Int).SetString(mintArgs.Nonce, 10)
+	// amount.SetString(signatureResponse.Amount, 10)
+	// tokenId.SetString(signatureResponse.TokenID, 10)
+	// nonce.SetString(signatureResponse.Nonce, 10)
+	signature, err := hex.DecodeString(mintArgs.MintingSignature)
+	if err != nil {
+		err = fmt.Errorf("decoding signature failed with error %v", err)
+		log.Info().Msgf("signature %v", mintArgs.MintingSignature)
+		log.Err(err).Send()
+		return "", err
+	}
+
+	return mint(contract, claimer, amount, tokenId, nonce, signature, int64(mintArgs.Chain))
+}
+
+func mint(contractAddress, claimAddress common.Address, amount, tokenId, nonce *big.Int, signature []byte, chain int64) (string, error) {
+	rpc := os.Getenv("RPC")
+	privateKey := os.Getenv("PRIVATE_KEY")
+	backend := getEthBackend(rpc)
+	lucidNftCaller, err := lucidNft.NewLucidNft(contractAddress, backend)
+	if err != nil {
+		log.Err(err).Send()
+		return "", err
+	}
+
+	transactOpt, err := getTransactor(privateKey, chain)
+	if err != nil {
+		log.Err(err).Send()
+		return "", err
+	}
+	tx, err := lucidNftCaller.Mint(transactOpt, claimAddress, amount, tokenId, nonce, signature)
+	if err != nil {
+		return "", err
+	}
+
+	return tx.Hash().Hex(), nil
+}
+
+func getTransactor(privateKey string, chain int64) (*bind.TransactOpts, error) {
+	key, err := crypto.HexToECDSA(privateKey[2:])
+	if err != nil {
+		return nil, err
+	}
+
+	chainId := big.NewInt(chain)
+
+	transactionOpts, err := bind.NewKeyedTransactorWithChainID(key, chainId)
+	if err != nil {
+		return nil, err
+	}
+	return transactionOpts, nil
 }

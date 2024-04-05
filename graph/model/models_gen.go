@@ -153,8 +153,10 @@ type SocialsInput struct {
 }
 
 type ValidationRespoonse struct {
-	Valid  bool    `json:"valid"`
-	PassID *string `json:"passID,omitempty"`
+	Valid           bool    `json:"valid"`
+	PassID          *string `json:"passID,omitempty"`
+	Message         *string `json:"message,omitempty"`
+	TransactionHash *string `json:"transactionHash,omitempty"`
 }
 
 type Wallet struct {
