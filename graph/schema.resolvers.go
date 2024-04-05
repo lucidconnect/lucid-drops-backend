@@ -433,16 +433,9 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 
 // CreateMintPass is the resolver for the createMintPass field.
 func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, walletAddress string) (*model.ValidationRespoonse, error) {
+	var mintPass *drops.MintPass
 	resp := &model.ValidationRespoonse{
 		Valid: false,
-	}
-
-	pass, err := r.NFTRepository.GetMintPassForWallet(dropID, walletAddress)
-	if err == nil {
-		if walletLimitReached(walletAddress, *pass) {
-			resp.Message = utils.GetStrPtr("limit reached for wallet")
-			return resp, nil
-		}
 	}
 
 	drop, err := r.NFTRepository.FindDropById(dropID)
@@ -451,56 +444,65 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		return nil, errors.New("drop not found")
 	}
 
-	if drop.AAContractAddress == nil {
-		return nil, errors.New("drop contract address not found")
-	}
-	if drop.EditionLimit != nil {
-		count, err := r.NFTRepository.CountMintPassesForDrop(dropID)
-		if err != nil {
+	mintPass, err = r.NFTRepository.GetMintPassForWallet(dropID, walletAddress)
+	if err != nil {
+		if drop.AAContractAddress == nil {
+			return nil, errors.New("drop contract address not found")
+		}
+		if drop.EditionLimit != nil {
+			count, err := r.NFTRepository.CountMintPassesForDrop(dropID)
+			if err != nil {
+				return nil, err
+			}
+			if int(count) >= *drop.EditionLimit {
+				resp.Message = utils.GetStrPtr("this nft has reached it's mint")
+				return resp, errors.New("item edition limit reached")
+			}
+		}
+
+		if drop.Criteria != "" {
+			switch {
+			case (drop.FarcasterCriteria != nil):
+				apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
+				neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
+				if err != nil {
+					log.Err(err).Send()
+					return resp, err
+				}
+
+				resp, err := neynarClient.ValidateFarcasterCriteriaForDrop(walletAddress, *drop)
+				if err != nil {
+					return resp, err
+				}
+			default:
+				return resp, nil
+			}
+		}
+
+		mintPass = &drops.MintPass{
+			DropID:              dropID,
+			DropContractAddress: *drop.AAContractAddress,
+			BlockchainNetwork:   drop.BlockchainNetwork,
+			MinterAddress:       walletAddress,
+			TokenID:             "1",
+		}
+		if err = r.NFTRepository.CreateMintPass(mintPass); err != nil {
 			return nil, err
 		}
-		if int(count) >= *drop.EditionLimit {
-			resp.Message = utils.GetStrPtr("this nft has reached it's mint")
-			return resp, errors.New("item edition limit reached")
-		}
-	}
 
-	if drop.Criteria != "" {
-		switch {
-		case (drop.FarcasterCriteria != nil):
-			apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
-			neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
-			if err != nil {
-				log.Err(err).Send()
-				return resp, err
-			}
-
-			resp, err := neynarClient.ValidateFarcasterCriteriaForDrop(walletAddress, *drop)
-			if err != nil {
-				return resp, err
-			}
-		default:
+		resp.Valid = true
+		resp.PassID = utils.GetStrPtr(mintPass.ID.String())
+	} else {
+		if walletLimitReached(walletAddress, *mintPass) {
+			resp.Message = utils.GetStrPtr("limit reached for wallet")
 			return resp, nil
 		}
+		mintPass.MinterAddress = walletAddress
 	}
-
-	newMint := &drops.MintPass{
-		DropID:              dropID,
-		DropContractAddress: *drop.AAContractAddress,
-		BlockchainNetwork:   drop.BlockchainNetwork,
-		MinterAddress: walletAddress,
-		TokenID: "1",
-	}
-	if err = r.NFTRepository.CreateMintPass(newMint); err != nil {
-		return nil, err
-	}
-
-	resp.Valid = true
-	resp.PassID = utils.GetStrPtr(newMint.ID.String())
 
 	if drop.GasIsCreatorSponsored {
 		// go ahead and mint
-		authResponse, err := whitelist.GenerateSignatureForClaim(*newMint)
+		authResponse, err := whitelist.GenerateSignatureForClaim(*mintPass)
 		if err != nil {
 			log.Err(err).Send()
 			return resp, err
