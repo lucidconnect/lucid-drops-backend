@@ -397,6 +397,7 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 		DropId:       drop.ID,
 		CreatorID:    creator.ID,
 		CriteriaType: criteriaTypes,
+		Interactions: interactions,
 	}
 
 	if input.CastURL != nil {
