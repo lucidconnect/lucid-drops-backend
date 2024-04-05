@@ -7,7 +7,10 @@ import (
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 
-	"github.com/lucidconnect/inverse/models"
+	// "github.com/lucidconnect/inverse/models"
+
+	// "github.com/lucidconnect/inverse/models"
+
 	"github.com/lucidconnect/inverse/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -35,8 +38,8 @@ func (l *Ledger) Transfer(tx *gorm.DB, instruction TransferInstruction) error {
 		return errors.New("ledger instruction amount cannot be negative")
 	}
 
-	var sourceAccount models.Wallet
-	var destinationAccount models.Wallet
+	var sourceAccount Wallet
+	var destinationAccount Wallet
 	var creditID = fmt.Sprintf("%s-%s", instruction.TxRef, utils.RandUpperCaseAlphaNumericRunes(5))
 	var debitID = fmt.Sprintf("%s-%s", instruction.TxRef, utils.RandUpperCaseAlphaNumericRunes(5))
 
@@ -62,7 +65,7 @@ func (l *Ledger) Transfer(tx *gorm.DB, instruction TransferInstruction) error {
 		}
 	}
 
-	creditSideLedgeEntry := models.DoubleEntryLedger{
+	creditSideLedgeEntry := DoubleEntryLedger{
 		TransactionReference: instruction.TxRef,
 		SourceAccoountID:     sourceAccount.ID,
 		DestinationAccountID: destinationAccount.ID,
@@ -72,7 +75,7 @@ func (l *Ledger) Transfer(tx *gorm.DB, instruction TransferInstruction) error {
 		PartnerID:            &debitID,
 	}
 
-	debitSideLedgeEntry := models.DoubleEntryLedger{
+	debitSideLedgeEntry := DoubleEntryLedger{
 		TransactionReference: instruction.TxRef,
 		SourceAccoountID:     destinationAccount.ID,
 		DestinationAccountID: sourceAccount.ID,
@@ -84,7 +87,7 @@ func (l *Ledger) Transfer(tx *gorm.DB, instruction TransferInstruction) error {
 
 	//create ledger entries
 
-	entries := []models.DoubleEntryLedger{creditSideLedgeEntry, debitSideLedgeEntry}
+	entries := []DoubleEntryLedger{creditSideLedgeEntry, debitSideLedgeEntry}
 	for _, entry := range entries {
 		err := tx.Create(&entry).Error
 		if err != nil {
@@ -125,9 +128,9 @@ func (l *Ledger) Transfer(tx *gorm.DB, instruction TransferInstruction) error {
 	return nil
 }
 
-func (l *Ledger) fetchAccountsByCreatorID(creatorID string) (*models.Wallet, error) {
+func (l *Ledger) fetchAccountsByCreatorID(creatorID string) (*Wallet, error) {
 
-	var accounts models.Wallet
+	var accounts Wallet
 	err := l.DB.Where("creator_id = ?", creatorID).First(&accounts).Error
 	if err != nil {
 		return nil, err
@@ -136,9 +139,9 @@ func (l *Ledger) fetchAccountsByCreatorID(creatorID string) (*models.Wallet, err
 	return &accounts, nil
 }
 
-func (l *Ledger) fetchSysAccount() (*models.Wallet, error) {
-	var sysAccount models.Wallet
-	err := l.DB.Model(&models.Wallet{}).Where("can_be_negative = ?", true).First(&sysAccount).Error
+func (l *Ledger) fetchSysAccount() (*Wallet, error) {
+	var sysAccount Wallet
+	err := l.DB.Model(&Wallet{}).Where("can_be_negative = ?", true).First(&sysAccount).Error
 	if err != nil {
 		return nil, err
 	}
@@ -147,9 +150,9 @@ func (l *Ledger) fetchSysAccount() (*models.Wallet, error) {
 	return &sysAccount, nil
 }
 
-func (l *Ledger) fetchAndLockTransferScope(tx *gorm.DB, instruction TransferInstruction) ([]models.Wallet, error) {
+func (l *Ledger) fetchAndLockTransferScope(tx *gorm.DB, instruction TransferInstruction) ([]Wallet, error) {
 
-	accounts := make([]models.Wallet, 2)
+	accounts := make([]Wallet, 2)
 	sysAccount, err := l.fetchSysAccount()
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch sys account %v", err)
@@ -164,7 +167,7 @@ func (l *Ledger) fetchAndLockTransferScope(tx *gorm.DB, instruction TransferInst
 
 	accounts[1] = *userAccount
 
-	err = l.lockTransferScope(tx, &accounts)
+	err = l.lockTransferScope(tx, accounts)
 	if err != nil {
 		return nil, fmt.Errorf("unable to lock transfer scope %v", err)
 	}
@@ -173,10 +176,10 @@ func (l *Ledger) fetchAndLockTransferScope(tx *gorm.DB, instruction TransferInst
 	return accounts, nil
 }
 
-func (l *Ledger) lockTransferScope(tx *gorm.DB, accounts *[]models.Wallet) error {
+func (l *Ledger) lockTransferScope(tx *gorm.DB, accounts []Wallet) error {
 
 	err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
-		Where("id IN (?)", []uuid.UUID{(*accounts)[0].ID, (*accounts)[1].ID}).
+		Where("id IN (?)", []uuid.UUID{(accounts)[0].ID, (accounts)[1].ID}).
 		Find(&accounts).Error
 	if err != nil {
 		return err
