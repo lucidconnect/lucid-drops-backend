@@ -488,6 +488,8 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		DropID:              dropID,
 		DropContractAddress: *drop.AAContractAddress,
 		BlockchainNetwork:   drop.BlockchainNetwork,
+		MinterAddress: walletAddress,
+		TokenID: "1",
 	}
 	if err = r.NFTRepository.CreateMintPass(newMint); err != nil {
 		return nil, err
