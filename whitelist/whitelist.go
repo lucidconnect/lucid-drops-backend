@@ -118,7 +118,7 @@ func MintNft(mintArgs model.MintAuthorizationResponse, walletAddress string) (st
 }
 
 func mint(contractAddress, claimAddress common.Address, amount, tokenId, nonce *big.Int, signature []byte, chain int64) (string, error) {
-	rpc := os.Getenv("RPC")
+	rpc := os.Getenv("RPC_PROVIDER")
 	privateKey := os.Getenv("PRIVATE_KEY")
 	backend := getEthBackend(rpc)
 	lucidNftCaller, err := lucidNft.NewLucidNft(contractAddress, backend)
