@@ -419,6 +419,7 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 			return nil, err
 		}
 		criteria.FarcasterProfileID = fmt.Sprint(fid)
+		criteria.FarcasterUsername = *input.FarcasterUserName
 	}
 
 	drop.Criteria = criteriaTypes
