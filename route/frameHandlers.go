@@ -40,12 +40,13 @@ func NewServer(port string, nftRepo drops.NFTRepository, router *chi.Mux) *Serve
 	}
 }
 func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
+	var err error
+	var pass *model.ValidationRespoonse
+
 	dropId := r.URL.Query().Get("dropId")
 	walletAddress := r.URL.Query().Get("wallet")
 	drop, _ := s.nftRepo.FindDropById(dropId)
 
-	var pass *model.ValidationRespoonse
-	var err error
 	if drop.FarcasterCriteria != nil {
 		apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 		neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
@@ -57,7 +58,7 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 		pass, err = neynarClient.ValidateFarcasterCriteriaForDrop(walletAddress, *drop)
 		if err != nil {
 			log.Err(err).Caller().Msg("GenerateSignatureForClaim")
-			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(pass)
 			return
 		}
 	}
