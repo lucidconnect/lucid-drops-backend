@@ -55,6 +55,7 @@ func (c *Creator) ToGraphData() *model.CreatorDetails {
 		CreatorID:       c.ID.String(),
 		InverseUsername: c.InverseUsername,
 		FirstPayment:    c.FirstPayment,
+		AaWallet: &c.AAWalletAddress,
 	}
 }
 
