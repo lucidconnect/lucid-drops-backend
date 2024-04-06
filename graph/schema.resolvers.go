@@ -233,6 +233,11 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		contractAdddress = *input.ContractAddress
 	}
 
+	gasIsSponsored := false
+	if input.GasIsCreatorSponsored {
+		gasIsSponsored = true
+	}
+
 	newDrop := &drops.Drop{
 		CreatorID:              creator.ID,
 		CreatorAddress:         signerInfo.WalletAddress,
@@ -244,7 +249,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		AAWalletDeploymentHash: &input.DeploymentHash,
 		AAContractAddress:      &contractAdddress,
 		MintPrice:              input.MintPrice,
-		GasIsCreatorSponsored:  input.GasIsCreatorSponsored,
+		GasIsCreatorSponsored:  gasIsSponsored,
 		UserLimit:              input.UserLimit,
 		EditionLimit:           input.EditionLimit,
 	}
