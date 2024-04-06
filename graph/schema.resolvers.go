@@ -506,21 +506,21 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		mintPass.MinterAddress = walletAddress
 	}
 
-	if drop.GasIsCreatorSponsored {
-		// go ahead and mint
-		authResponse, err := whitelist.GenerateSignatureForClaim(*mintPass)
-		if err != nil {
-			log.Err(err).Send()
-			return resp, err
-		}
+	// if drop.GasIsCreatorSponsored {
+	// 	// go ahead and mint
+	// 	authResponse, err := whitelist.GenerateSignatureForClaim(*mintPass)
+	// 	if err != nil {
+	// 		log.Err(err).Send()
+	// 		return resp, err
+	// 	}
 
-		tx, err := whitelist.MintNft(*authResponse, walletAddress)
-		if err != nil {
-			return resp, err
-		}
-		resp.TransactionHash = &tx
-		return resp, nil
-	}
+	// 	tx, err := whitelist.MintNft(*authResponse, walletAddress)
+	// 	if err != nil {
+	// 		return resp, err
+	// 	}
+	// 	resp.TransactionHash = &tx
+	// 	return resp, nil
+	// }
 
 	return resp, nil
 }
