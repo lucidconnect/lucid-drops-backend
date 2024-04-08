@@ -41,7 +41,7 @@ type Drop struct {
 	ClaimCriteria                      []*ClaimCriteriaType `json:"claimCriteria,omitempty"`
 	CastURL                            *string              `json:"castUrl,omitempty"`
 	FarcasterProfileID                 *string              `json:"farcasterProfileID,omitempty"`
-	FarcasterChannelID                 *string              `json:"farcasterChannelId,omitempty"`
+	FarcasterChannelID                 []string             `json:"farcasterChannelId,omitempty"`
 	ClaimDetails                       []*ClaimDetails      `json:"claimDetails,omitempty"`
 }
 

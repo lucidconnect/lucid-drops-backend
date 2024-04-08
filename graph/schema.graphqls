@@ -128,7 +128,7 @@ type Drop {
   claimCriteria: [ClaimCriteriaType]
   castUrl: String
   farcasterProfileID: String
-  farcasterChannelId: String
+  farcasterChannelId: [String!]
   claimDetails: [ClaimDetails]
 }
 

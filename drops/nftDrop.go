@@ -109,7 +109,8 @@ func (d *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		mappedDrop.FarcasterClaimCriteriaInteractions = InteractionsToArr(d.FarcasterCriteria.Interactions)
 		mappedDrop.CastURL = &d.FarcasterCriteria.CastUrl
 		mappedDrop.FarcasterProfileID = &d.FarcasterCriteria.FarcasterUsername
-		mappedDrop.FarcasterChannelID = &d.FarcasterCriteria.ChannelID
+		channelIds := strings.Split(d.FarcasterCriteria.ChannelID, ",")
+		mappedDrop.FarcasterChannelID = channelIds
 	}
 
 	var mintPasses []*model.ClaimDetails
