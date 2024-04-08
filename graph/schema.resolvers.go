@@ -688,6 +688,40 @@ func (r *queryResolver) FetchFeaturedDrops(ctx context.Context) ([]*model.Drop, 
 	return mappedDrops, nil
 }
 
+// GetUserProfileDetails is the resolver for the getUserProfileDetails field.
+func (r *queryResolver) GetUserProfileDetails(ctx context.Context, userName string) (*model.UserProfileType, error) {
+	creator, err := r.CreatorRepository.FindCreatorByUsername(userName)
+	if err != nil {
+		return nil, err
+	}
+
+	profileData := creator.CreatorToProfileData()
+
+	creatorDrops, err := r.NFTRepository.FindDropByCreatorId(creator.ID.String())
+	if err != nil {
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
+
+	var allItems []*model.Item
+	for _, drop := range creatorDrops {
+		items, err := r.NFTRepository.FetchDropItems(drop.ID.String(), false)
+		if err != nil {
+			continue
+		}
+		for _, item := range items {
+			allItems = append(allItems, item.ToGraphData())
+		}
+	}
+
+	mappedDrops := make([]*model.Drop, len(creatorDrops))
+	for idx, drop := range creatorDrops {
+		mappedDrops[idx] = drop.ToGraphData(allItems)
+	}
+	profileData.Drops = mappedDrops
+
+	return profileData, nil
+}
+
 // Drop returns DropResolver implementation.
 func (r *Resolver) Drop() DropResolver { return &dropResolver{r} }
 
