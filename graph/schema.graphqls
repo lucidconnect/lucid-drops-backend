@@ -13,6 +13,7 @@ type Query {
   fetchCreatorDrops: [Drop!]!
   getImageSuggestions(prompt: String!, preset: AiImageStyle ): [ImageResponse]!
   fetchFeaturedDrops: [Drop!]!
+  getUserProfileDetails (userName: String!): userProfileType
 }
 
 type Mutation {
