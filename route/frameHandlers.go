@@ -68,6 +68,8 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 		DropID:              dropId,
 		DropContractAddress: *drop.AAContractAddress,
 		BlockchainNetwork:   drop.BlockchainNetwork,
+		MinterAddress:       walletAddress,
+		TokenID:             "1",
 	}
 	if err = s.nftRepo.CreateMintPass(newMint); err != nil {
 		log.Err(err).Send()
