@@ -409,7 +409,12 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 		criteria.CastUrl = *input.CastURL
 	}
 	if input.ChannelID != nil {
-		criteria.ChannelID = *input.ChannelID
+		var channels string
+		for _, channel := range input.ChannelID {
+			channels += fmt.Sprintf("%v,", channel)
+		}
+
+		criteria.ChannelID = channels
 	}
 	if input.FarcasterUserName != nil {
 		// resolve farcaster id by username

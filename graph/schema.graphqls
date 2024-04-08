@@ -58,7 +58,7 @@ input DropInput {
 input NewFarcasterCriteriaInput {
   dropID: String!
   castUrl: String
-  channelId: String
+  channelId: [String]
   farcasterUserName: String
   interaction: [InteractionType]
   criteriaType: [ClaimCriteriaType]!
