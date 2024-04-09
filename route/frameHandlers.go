@@ -130,7 +130,7 @@ func (s *Server) GenerateSignatureForClaim(w http.ResponseWriter, r *http.Reques
 	mintPass.UsedAt = &now
 	err = s.nftRepo.UpdateMintPass(mintPass)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return
 	}
 
