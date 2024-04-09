@@ -54,7 +54,7 @@ func TestNeynaClient_ValidateFarcasterChannelFollowers(t *testing.T) {
 	criteria := drops.FarcasterCriteria{
 		ChannelID: "goat,higher",
 	}
-	valid := neynarClient.validateFarcasterChannelFollowerCriteria(2037, criteria)
+	valid := neynarClient.validateFarcasterChannelFollowerCriteria(2308, criteria)
 	if !valid {
 		t.FailNow()
 	}

@@ -119,15 +119,14 @@ func (s *Server) GenerateSignatureForClaim(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	passes, err := s.nftRepo.CountMintPassesForAddress(mintPass.DropID, input.ClaimingAddress)
-	if err == nil {
-		if passes != 0 {
-			err = errors.New("more than one mint pass found for this minter address")
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-	}
+	// passes, err := s.nftRepo.CountMintPassesForAddress(mintPass.DropID, input.ClaimingAddress)
+	// if err == nil {
+	// 	if passes != 0 {
+	// 		err = errors.New("more than one mint pass found for this minter address")
+	// 		w.WriteHeader(http.StatusInternalServerError)
+	// 	}
+	// }
 
-	mintPass.MinterAddress = input.ClaimingAddress
 	mintPass.UsedAt = &now
 	err = s.nftRepo.UpdateMintPass(mintPass)
 	if err != nil {
