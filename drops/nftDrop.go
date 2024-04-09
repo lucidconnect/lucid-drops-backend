@@ -26,6 +26,7 @@ type NFTRepository interface {
 	UpdateMintPass(mintPass *MintPass) error
 	GetMintPassById(passId string) (*MintPass, error)
 	GetMintPassForWallet(dropId, walletAddress string) (*MintPass, error)
+	GetMintPassesForWallet(dropId, walletAddress string) (int64, error)
 	CountMintPassesForAddress(dropId, address string) (int64, error)
 	CountMintPassesForDrop(dropId string) (int64, error)
 	FetchMintPassesForItems(itemID string) ([]MintPass, error)

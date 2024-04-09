@@ -358,3 +358,12 @@ func (db *DB) CountMintPassesForDrop(dropId string) (int64, error) {
 	}
 	return editionCount, nil
 }
+
+func (db *DB) GetMintPassesForWallet(dropId, walletAddress string) (int64, error) {
+	var walletCount int64
+	err := db.database.Model(&drops.MintPass{}).Where("drop_id = ? AND used_at <> NULL", dropId).Count(&walletCount).Error
+	if err != nil {
+		return 0, err
+	}
+	return walletCount, nil
+}

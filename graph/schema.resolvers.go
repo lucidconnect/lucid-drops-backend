@@ -504,11 +504,17 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		resp.Valid = true
 		resp.PassID = utils.GetStrPtr(mintPass.ID.String())
 	} else {
-		if walletLimitReached(walletAddress, *mintPass) {
+		// get used mint passes
+		mintPassCount, err := r.NFTRepository.GetMintPassesForWallet(dropID, walletAddress)
+		if err != nil {
+			return nil, err
+		}
+		if mintPassCount < int64(*drop.UserLimit) {
+			mintPass.MinterAddress = walletAddress
+		} else {
 			resp.Message = utils.GetStrPtr("limit reached for wallet")
 			return resp, nil
 		}
-		mintPass.MinterAddress = walletAddress
 	}
 
 	// if drop.GasIsCreatorSponsored {
