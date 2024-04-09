@@ -26,6 +26,7 @@ type NFTRepository interface {
 	UpdateMintPass(mintPass *MintPass) error
 	GetMintPassById(passId string) (*MintPass, error)
 	GetMintPassForWallet(dropId, walletAddress string) (*MintPass, error)
+	GetMintPassesForWallet(dropId, walletAddress string) (int64, error)
 	CountMintPassesForAddress(dropId, address string) (int64, error)
 	CountMintPassesForDrop(dropId string) (int64, error)
 	FetchMintPassesForItems(itemID string) ([]MintPass, error)
@@ -109,7 +110,8 @@ func (d *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		mappedDrop.FarcasterClaimCriteriaInteractions = InteractionsToArr(d.FarcasterCriteria.Interactions)
 		mappedDrop.CastURL = &d.FarcasterCriteria.CastUrl
 		mappedDrop.FarcasterProfileID = &d.FarcasterCriteria.FarcasterUsername
-		mappedDrop.FarcasterChannelID = &d.FarcasterCriteria.ChannelID
+		channelIds := strings.Split(d.FarcasterCriteria.ChannelID, ",")
+		mappedDrop.FarcasterChannelID = channelIds
 	}
 
 	var mintPasses []*model.ClaimDetails

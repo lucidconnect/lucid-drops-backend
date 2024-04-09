@@ -2489,9 +2489,9 @@ func (ec *executionContext) _Drop_farcasterChannelId(ctx context.Context, field 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Drop_farcasterChannelId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8379,7 +8379,7 @@ func (ec *executionContext) unmarshalInputNewFarcasterCriteriaInput(ctx context.
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("channelId"))
-			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}

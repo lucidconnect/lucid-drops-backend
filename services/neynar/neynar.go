@@ -360,25 +360,42 @@ func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated
 }
 
 func (nc *NeynarClient) validateFarcasterChannelFollowerCriteria(fid int32, criteria drops.FarcasterCriteria) bool {
-	var followers ChannelFollowers
+	var allFollowers []UserDehydrated
 
-	followers, err := nc.RetrieveChannelFollowers(criteria.ChannelID, fid, "")
-	if err != nil {
-		return false
-	}
-	for {
-		for _, follower := range followers.Users {
-			if follower.Fid == fid {
-				return true
+	channels := strings.Split(criteria.ChannelID, ",")
+
+	// retrieve all followers
+	// for {
+	// 	followers, err = nc.RetrieveChannelFollowers(channel, fid, "")
+	// }
+
+	for _, channel := range channels {
+		followers, err := nc.RetrieveChannelFollowers(channel, fid, "")
+		if err != nil {
+			log.Err(err).Send()
+			break
+			// return false
+		}
+		allFollowers = append(allFollowers, followers.Users...)
+		for {
+			if followers.Next.Cursor == "" {
+				break
+			} else {
+				followers, err = nc.RetrieveChannelFollowers(channel, fid, followers.Next.Cursor)
+				if err != nil {
+					log.Err(err).Send()
+					break
+				}
+				allFollowers = append(allFollowers, followers.Users...)
 			}
 		}
-		if followers.Next.Cursor == "" {
-			return false
-		} else {
-			followers, err = nc.RetrieveChannelFollowers(criteria.ChannelID, fid, followers.Next.Cursor)
-			if err != nil {
-				return false
-			}
+	}
+	// fmt.Println(allFollowers)
+	// fmt.Println(len(allFollowers))
+
+	for _, v := range allFollowers {
+		if v.Fid == fid {
+			return true
 		}
 	}
 

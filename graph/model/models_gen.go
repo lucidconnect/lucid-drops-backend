@@ -41,7 +41,7 @@ type Drop struct {
 	ClaimCriteria                      []*ClaimCriteriaType `json:"claimCriteria,omitempty"`
 	CastURL                            *string              `json:"castUrl,omitempty"`
 	FarcasterProfileID                 *string              `json:"farcasterProfileID,omitempty"`
-	FarcasterChannelID                 *string              `json:"farcasterChannelId,omitempty"`
+	FarcasterChannelID                 []string             `json:"farcasterChannelId,omitempty"`
 	ClaimDetails                       []*ClaimDetails      `json:"claimDetails,omitempty"`
 }
 
@@ -126,7 +126,7 @@ type MintAuthorizationResponse struct {
 type NewFarcasterCriteriaInput struct {
 	DropID            string               `json:"dropID"`
 	CastURL           *string              `json:"castUrl,omitempty"`
-	ChannelID         *string              `json:"channelId,omitempty"`
+	ChannelID         []string             `json:"channelId,omitempty"`
 	FarcasterUserName *string              `json:"farcasterUserName,omitempty"`
 	Interaction       []*InteractionType   `json:"interaction,omitempty"`
 	CriteriaType      []*ClaimCriteriaType `json:"criteriaType"`

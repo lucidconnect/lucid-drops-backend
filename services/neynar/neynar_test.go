@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
+	"github.com/lucidconnect/inverse/drops"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -38,6 +39,23 @@ func TestNeynarClient_FetchFarcasterUserByEthAddress(t *testing.T) {
 		t.FailNow()
 	}
 	if !assert.Equal(t, int32(2037), fid) {
+		t.FailNow()
+	}
+}
+
+func TestNeynaClient_ValidateFarcasterChannelFollowers(t *testing.T) {
+	godotenv.Load("../../.env.test")
+	apiKeyOpt := WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
+	neynarClient, err := NewNeynarClient(apiKeyOpt)
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
+	criteria := drops.FarcasterCriteria{
+		ChannelID: "goat,higher",
+	}
+	valid := neynarClient.validateFarcasterChannelFollowerCriteria(2308, criteria)
+	if !valid {
 		t.FailNow()
 	}
 }

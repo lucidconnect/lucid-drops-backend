@@ -409,7 +409,12 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 		criteria.CastUrl = *input.CastURL
 	}
 	if input.ChannelID != nil {
-		criteria.ChannelID = *input.ChannelID
+		var channels string
+		for _, channel := range input.ChannelID {
+			channels += fmt.Sprintf("%v,", channel)
+		}
+
+		criteria.ChannelID = channels
 	}
 	if input.FarcasterUserName != nil {
 		// resolve farcaster id by username
@@ -499,28 +504,34 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		resp.Valid = true
 		resp.PassID = utils.GetStrPtr(mintPass.ID.String())
 	} else {
-		if walletLimitReached(walletAddress, *mintPass) {
+		// get used mint passes
+		mintPassCount, err := r.NFTRepository.GetMintPassesForWallet(dropID, walletAddress)
+		if err != nil {
+			return nil, err
+		}
+		if mintPassCount < int64(*drop.UserLimit) {
+			mintPass.MinterAddress = walletAddress
+		} else {
 			resp.Message = utils.GetStrPtr("limit reached for wallet")
 			return resp, nil
 		}
-		mintPass.MinterAddress = walletAddress
 	}
 
-	// if drop.GasIsCreatorSponsored {
-	// 	// go ahead and mint
-	// 	authResponse, err := whitelist.GenerateSignatureForClaim(*mintPass)
-	// 	if err != nil {
-	// 		log.Err(err).Send()
-	// 		return resp, err
-	// 	}
+	if drop.GasIsCreatorSponsored {
+		// go ahead and mint
+		authResponse, err := whitelist.GenerateSignatureForClaim(*mintPass)
+		if err != nil {
+			log.Err(err).Send()
+			return resp, err
+		}
 
-	// 	tx, err := whitelist.MintNft(*authResponse, walletAddress)
-	// 	if err != nil {
-	// 		return resp, err
-	// 	}
-	// 	resp.TransactionHash = &tx
-	// 	return resp, nil
-	// }
+		tx, err := whitelist.MintNft(*authResponse, walletAddress)
+		if err != nil {
+			return resp, err
+		}
+		resp.TransactionHash = &tx
+		return resp, nil
+	}
 
 	return resp, nil
 }

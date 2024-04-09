@@ -49,11 +49,24 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 	walletAddress := r.URL.Query().Get("wallet")
 	drop, _ := s.nftRepo.FindDropById(dropId)
 
+	if drop.EditionLimit != nil {
+		count, err := s.nftRepo.CountMintPassesForDrop(dropId)
+		if err != nil {
+			log.Err(err).Caller().Send()
+			json.NewEncoder(w).Encode(pass)
+		}
+		if int(count) >= *drop.EditionLimit {
+			pass.Message = utils.GetStrPtr("this nft has reached it's mint")
+			log.Err(err).Caller().Send()
+			json.NewEncoder(w).Encode(pass)
+		}
+	}
+
 	if drop.FarcasterCriteria != nil {
 		apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 		neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
 		if err != nil {
-			log.Err(err).Send()
+			log.Err(err).Caller().Send()
 			return
 		}
 
@@ -68,9 +81,11 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 		DropID:              dropId,
 		DropContractAddress: *drop.AAContractAddress,
 		BlockchainNetwork:   drop.BlockchainNetwork,
+		MinterAddress:       walletAddress,
+		TokenID:             "1",
 	}
 	if err = s.nftRepo.CreateMintPass(newMint); err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -104,19 +119,18 @@ func (s *Server) GenerateSignatureForClaim(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	passes, err := s.nftRepo.CountMintPassesForAddress(mintPass.DropID, input.ClaimingAddress)
-	if err == nil {
-		if passes != 0 {
-			err = errors.New("more than one mint pass found for this minter address")
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-	}
+	// passes, err := s.nftRepo.CountMintPassesForAddress(mintPass.DropID, input.ClaimingAddress)
+	// if err == nil {
+	// 	if passes != 0 {
+	// 		err = errors.New("more than one mint pass found for this minter address")
+	// 		w.WriteHeader(http.StatusInternalServerError)
+	// 	}
+	// }
 
-	mintPass.MinterAddress = input.ClaimingAddress
 	mintPass.UsedAt = &now
 	err = s.nftRepo.UpdateMintPass(mintPass)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return
 	}
 

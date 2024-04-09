@@ -25,11 +25,6 @@ func LoadEnvironmentVariables() {
 			log.Fatal().Msg("Error loading .env.test.local file")
 		}
 	default:
-		log.Print("Loading configurations...Test")
-		err := godotenv.Load(".env.test.local")
-		if err != nil {
-			log.Fatal().Msg("Error loading .env.test.local file")
-		}
 	}
 }
 
