@@ -49,6 +49,19 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 	walletAddress := r.URL.Query().Get("wallet")
 	drop, _ := s.nftRepo.FindDropById(dropId)
 
+	if drop.EditionLimit != nil {
+		count, err := s.nftRepo.CountMintPassesForDrop(dropId)
+		if err != nil {
+			log.Err(err).Send()
+			json.NewEncoder(w).Encode(pass)
+		}
+		if int(count) >= *drop.EditionLimit {
+			pass.Message = utils.GetStrPtr("this nft has reached it's mint")
+			log.Err(err).Send()
+			json.NewEncoder(w).Encode(pass)
+		}
+	}
+
 	if drop.FarcasterCriteria != nil {
 		apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 		neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
