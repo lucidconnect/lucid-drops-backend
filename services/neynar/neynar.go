@@ -390,8 +390,8 @@ func (nc *NeynarClient) validateFarcasterChannelFollowerCriteria(fid int32, crit
 			}
 		}
 	}
-	fmt.Println(allFollowers)
-	fmt.Println(len(allFollowers))
+	// fmt.Println(allFollowers)
+	// fmt.Println(len(allFollowers))
 
 	for _, v := range allFollowers {
 		if v.Fid == fid {
