@@ -372,7 +372,7 @@ func (nc *NeynarClient) validateFarcasterChannelFollowerCriteria(fid int32, crit
 	for _, channel := range channels {
 		followers, err := nc.RetrieveChannelFollowers(channel, fid, "")
 		if err != nil {
-			log.Err(err).Send()
+			log.Err(err).Caller().Send()
 			break
 			// return false
 		}
@@ -383,7 +383,7 @@ func (nc *NeynarClient) validateFarcasterChannelFollowerCriteria(fid int32, crit
 			} else {
 				followers, err = nc.RetrieveChannelFollowers(channel, fid, followers.Next.Cursor)
 				if err != nil {
-					log.Err(err).Send()
+					log.Err(err).Caller().Send()
 					break
 				}
 				allFollowers = append(allFollowers, followers.Users...)
@@ -434,13 +434,13 @@ func (nc *NeynarClient) validateFarcasterRecastCriteria(fid int32, criteria drop
 func (nc *NeynarClient) validateFarcasterReplyCriteria(fid int32, criteria drops.FarcasterCriteria) bool {
 	rootCast, err := nc.RetrieveCastByUrl(criteria.CastUrl)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
 	casts, err := nc.RetrieveCastsByThreadHash(rootCast.Hash)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
@@ -457,7 +457,7 @@ func (nc *NeynarClient) validateFarcasterAccountFollowerCriteria(fid int32, crit
 
 	creatorFid, err := strconv.Atoi(criteria.FarcasterProfileID)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 	followers, err = nc.FetchRelvantFollowers(int32(creatorFid))

@@ -75,13 +75,13 @@ func walletLimitReached(walletAddress string, pass drops.MintPass) bool {
 	alchemyOpts = append(alchemyOpts, apiKeyOpt, urlOpt)
 	alchemyClient, err := services.NewAlchemyClient(alchemyOpts...)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
 	holders, err := alchemyClient.GetOwnersForNft(pass.DropContractAddress, "1")
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
@@ -167,7 +167,7 @@ func validateFarcasterChannelFollowerCriteria(fid int32, criteria drops.Farcaste
 	apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 	neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
@@ -195,7 +195,7 @@ func validateFarcasterLikeCriteria(fid int32, criteria drops.FarcasterCriteria) 
 	apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 	neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
@@ -217,7 +217,7 @@ func validateFarcasterRecastCriteria(fid int32, criteria drops.FarcasterCriteria
 	apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 	neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
@@ -238,19 +238,19 @@ func validateFarcasterReplyCriteria(fid int32, criteria drops.FarcasterCriteria)
 	apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 	neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
 	rootCast, err := neynarClient.RetrieveCastByUrl(criteria.CastUrl)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
 	casts, err := neynarClient.RetrieveCastsByThreadHash(rootCast.Hash)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
@@ -267,13 +267,13 @@ func validateFarcasterAccountFollowerCriteria(fid int32, criteria drops.Farcaste
 	apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 	neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 
 	creatorFid, err := strconv.Atoi(criteria.FarcasterProfileID)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return false
 	}
 	followers, err = neynarClient.FetchRelvantFollowers(int32(creatorFid))
@@ -296,13 +296,13 @@ func fetchNftHolders(item *model.Item) ([]string, error) {
 	alchemyOpts = append(alchemyOpts, apiKeyOpt, urlOpt)
 	alchemyClient, err := services.NewAlchemyClient(alchemyOpts...)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, err
 	}
 
 	holders, err := alchemyClient.GetOwnersForNft(item.DropAddress, "1")
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, err
 	}
 	return holders, nil
@@ -354,7 +354,7 @@ func IsThisAValidEthAddress(maybeAddress string) bool {
 func getEthBackend(rpc string) *ethclient.Client {
 	conn, err := ethclient.Dial(rpc)
 	if err != nil {
-		log.Err(err).Msg("Failed to connect to the Ethereum client")
+		log.Err(err).Caller().Msg("Failed to connect to the Ethereum client")
 	}
 	return conn
 }

@@ -88,13 +88,13 @@ func (r *itemResolver) Holders(ctx context.Context, obj *model.Item) ([]string, 
 	alchemyOpts = append(alchemyOpts, apiKeyOpt, urlOpt)
 	alchemyClient, err := services.NewAlchemyClient(alchemyOpts...)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, err
 	}
 
 	holders, err := alchemyClient.GetOwnersForNft(obj.DropAddress, "1")
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, err
 	}
 
@@ -206,7 +206,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 
 	creator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, customError.ErrToGraphQLError(structure.InvalidRequestError, err.Error(), ctx)
 	}
 	if input.Name == nil || input.Image == nil || input.Thumbnail == nil || input.Description == nil {
@@ -215,7 +215,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 
 	signerInfo, err := r.CreatorRepository.FindSignerByCreatorId(creator.ID.String())
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
@@ -265,7 +265,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 	}
 
 	if err = r.NFTRepository.CreateDrop(newDrop, newItem); err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
@@ -276,7 +276,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 	}
 	newDrop.MintUrl = url
 	if err = r.NFTRepository.UpdateDropDetails(newDrop); err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
@@ -421,7 +421,7 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 		apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 		neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
 		if err != nil {
-			log.Err(err).Send()
+			log.Err(err).Caller().Send()
 			return nil, err
 		}
 
@@ -435,7 +435,7 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 
 	drop.Criteria = criteriaTypes
 	if err = r.NFTRepository.AddFarcasterCriteriaToDrop(drop, criteria); err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, err
 	}
 
@@ -450,7 +450,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 
 	drop, err := r.NFTRepository.FindDropById(dropID)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, errors.New("drop not found")
 	}
 
@@ -474,7 +474,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 			apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 			neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
 			if err != nil {
-				log.Err(err).Send()
+				log.Err(err).Caller().Send()
 				return resp, err
 			}
 
@@ -532,13 +532,21 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		// go ahead and mint
 		authResponse, err := whitelist.GenerateSignatureForClaim(*mintPass)
 		if err != nil {
-			log.Err(err).Send()
+			log.Err(err).Caller().Send()
 			return resp, err
 		}
 
 		tx, err := whitelist.MintNft(*authResponse, walletAddress)
 		if err != nil {
 			return resp, err
+		}
+
+		now := time.Now()
+		mintPass.UsedAt = &now
+		err = r.NFTRepository.UpdateMintPass(mintPass)
+		if err != nil {
+			log.Err(err).Caller().Send()
+			return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 		}
 		resp.TransactionHash = &tx
 		return resp, nil
@@ -578,7 +586,7 @@ func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input 
 	mintPass.UsedAt = &now
 	err = r.NFTRepository.UpdateMintPass(mintPass)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
@@ -590,7 +598,7 @@ func (r *queryResolver) GetCreatorDetails(ctx context.Context) (*model.CreatorDe
 	// var creator drops.Creator
 	authenticationDetails, err := internal.GetAuthDetailsFromContext(ctx)
 	if err != nil {
-		log.Err(err).Msg("auth details returned an error")
+		log.Err(err).Caller().Msg("auth details returned an error")
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
@@ -631,7 +639,7 @@ func (r *queryResolver) IsInverseNameIsAvailable(ctx context.Context, input mode
 func (r *queryResolver) FetchDropByID(ctx context.Context, dropID string) (*model.Drop, error) {
 	drop, err := r.NFTRepository.FindDropById(dropID)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return nil, errors.New("drop not found")
 	}
 
@@ -645,7 +653,7 @@ func (r *queryResolver) FetchDropByID(ctx context.Context, dropID string) (*mode
 	for _, item := range mappedItems {
 		holders, err := fetchNftHolders(item)
 		if err != nil {
-			log.Err(err).Send()
+			log.Err(err).Caller().Send()
 		}
 		item.Holders = holders
 	}

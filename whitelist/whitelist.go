@@ -76,7 +76,7 @@ func isThisAValidEthAddress(maybeAddress string) bool {
 func getEthBackend(rpc string) *ethclient.Client {
 	conn, err := ethclient.Dial(rpc)
 	if err != nil {
-		log.Err(err).Msg("Failed to connect to the Ethereum client")
+		log.Err(err).Caller().Msg("Failed to connect to the Ethereum client")
 	}
 	return conn
 }
@@ -110,7 +110,7 @@ func MintNft(mintArgs model.MintAuthorizationResponse, walletAddress string) (st
 	if err != nil {
 		err = fmt.Errorf("decoding signature failed with error %v", err)
 		log.Info().Msgf("signature %v", mintArgs.MintingSignature)
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return "", err
 	}
 
@@ -123,13 +123,13 @@ func mint(contractAddress, claimAddress common.Address, amount, tokenId, nonce *
 	backend := getEthBackend(rpc)
 	lucidNftCaller, err := lucidNft.NewLucidNft(contractAddress, backend)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return "", err
 	}
 
 	transactOpt, err := getTransactor(privateKey, chain)
 	if err != nil {
-		log.Err(err).Send()
+		log.Err(err).Caller().Send()
 		return "", err
 	}
 	tx, err := lucidNftCaller.Mint(transactOpt, claimAddress, amount, tokenId, nonce, signature)
