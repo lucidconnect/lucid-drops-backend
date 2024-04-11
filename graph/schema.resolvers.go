@@ -444,7 +444,6 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 
 // CreateMintPass is the resolver for the createMintPass field.
 func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, walletAddress string) (*model.ValidationRespoonse, error) {
-	var mintPass *drops.MintPass
 	resp := &model.ValidationRespoonse{
 		Valid: false,
 	}
@@ -455,21 +454,54 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		return nil, errors.New("drop not found")
 	}
 
-	mintPass, err = r.NFTRepository.GetMintPassForWallet(dropID, walletAddress)
-	if err != nil {
-		if drop.AAContractAddress == nil {
-			return nil, errors.New("drop contract address not found")
+	if drop.AAContractAddress == nil {
+		return nil, errors.New("drop contract address not found")
+	}
+	if drop.EditionLimit != nil {
+		count, err := r.NFTRepository.CountMintPassesForDrop(dropID)
+		if err != nil {
+			return nil, err
 		}
-		if drop.EditionLimit != nil {
-			count, err := r.NFTRepository.CountMintPassesForDrop(dropID)
+		if int(count) >= *drop.EditionLimit {
+			resp.Message = utils.GetStrPtr("this nft has reached it's mint")
+			return resp, errors.New("item edition limit reached")
+		}
+	}
+
+	if drop.Criteria != "" {
+		switch {
+		case (drop.FarcasterCriteria != nil):
+			apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
+			neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
 			if err != nil {
-				return nil, err
+				log.Err(err).Send()
+				return resp, err
 			}
-			if int(count) >= *drop.EditionLimit {
-				resp.Message = utils.GetStrPtr("this nft has reached it's mint")
-				return resp, errors.New("item edition limit reached")
+
+			resp, err := neynarClient.ValidateFarcasterCriteriaForDrop(walletAddress, *drop)
+			if err != nil {
+				return resp, err
 			}
+		default:
+			return resp, nil
 		}
+	}
+
+	mintPass, err := r.NFTRepository.GetMintPassForWallet(dropID, walletAddress)
+	if err == nil {
+		// mintPass = &drops.MintPass{
+		// 	DropID:              dropID,
+		// 	DropContractAddress: *drop.AAContractAddress,
+		// 	BlockchainNetwork:   drop.BlockchainNetwork,
+		// 	MinterAddress:       walletAddress,
+		// 	TokenID:             "1",
+		// }
+		// if err = r.NFTRepository.CreateMintPass(mintPass); err != nil {
+		// 	return nil, err
+		// }
+
+		// resp.Valid = true
+		// resp.PassID = utils.GetStrPtr(mintPass.ID.String())
 
 		if drop.UserLimit != nil {
 			passes, err := r.NFTRepository.CountMintPassesForAddress(mintPass.DropID, walletAddress)
@@ -481,25 +513,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 			}
 		}
 
-		if drop.Criteria != "" {
-			switch {
-			case (drop.FarcasterCriteria != nil):
-				apiKeyOpt := neynar.WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
-				neynarClient, err := neynar.NewNeynarClient(apiKeyOpt)
-				if err != nil {
-					log.Err(err).Send()
-					return resp, err
-				}
-
-				resp, err := neynarClient.ValidateFarcasterCriteriaForDrop(walletAddress, *drop)
-				if err != nil {
-					return resp, err
-				}
-			default:
-				return resp, nil
-			}
-		}
-
+	} else {
 		mintPass = &drops.MintPass{
 			DropID:              dropID,
 			DropContractAddress: *drop.AAContractAddress,
@@ -510,23 +524,10 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		if err = r.NFTRepository.CreateMintPass(mintPass); err != nil {
 			return nil, err
 		}
-
-		resp.Valid = true
-		resp.PassID = utils.GetStrPtr(mintPass.ID.String())
-	} else {
-		// get used mint passes
-		mintPassCount, err := r.NFTRepository.GetMintPassesForWallet(dropID, walletAddress)
-		if err != nil {
-			return nil, err
-		}
-		if mintPassCount < int64(*drop.UserLimit) {
-			mintPass.MinterAddress = walletAddress
-		} else {
-			resp.Message = utils.GetStrPtr("limit reached for wallet")
-			return resp, nil
-		}
 	}
 
+	resp.Valid = true
+	resp.PassID = utils.GetStrPtr(mintPass.ID.String())
 	if drop.GasIsCreatorSponsored {
 		// go ahead and mint
 		authResponse, err := whitelist.GenerateSignatureForClaim(*mintPass)
