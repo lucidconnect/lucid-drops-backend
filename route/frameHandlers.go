@@ -57,7 +57,7 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if int(count) >= *drop.EditionLimit {
-			pass.Message = utils.GetStrPtr("this nft has reached it's mint")
+			pass.Message = utils.GetStrPtr("this nft has reached it's mint limit")
 			log.Err(err).Caller().Send()
 			json.NewEncoder(w).Encode(pass)
 			return
