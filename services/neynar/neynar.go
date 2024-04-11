@@ -364,11 +364,6 @@ func (nc *NeynarClient) validateFarcasterChannelFollowerCriteria(fid int32, crit
 
 	channels := strings.Split(criteria.ChannelID, ",")
 
-	// retrieve all followers
-	// for {
-	// 	followers, err = nc.RetrieveChannelFollowers(channel, fid, "")
-	// }
-	fmt.Println(channels)
 	for _, channel := range channels {
 		followers, err := nc.RetrieveChannelFollowers(channel, fid, "")
 		if err != nil {

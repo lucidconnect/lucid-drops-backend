@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql"
@@ -414,7 +415,7 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 			channels += fmt.Sprintf("%v,", channel)
 		}
 
-		criteria.ChannelID = channels
+		criteria.ChannelID = strings.Trim(channels, ",")
 	}
 	if input.FarcasterUserName != nil {
 		// resolve farcaster id by username
@@ -489,25 +490,10 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 
 	mintPass, err := r.NFTRepository.GetMintPassForWallet(dropID, walletAddress)
 	if err == nil {
-		// mintPass = &drops.MintPass{
-		// 	DropID:              dropID,
-		// 	DropContractAddress: *drop.AAContractAddress,
-		// 	BlockchainNetwork:   drop.BlockchainNetwork,
-		// 	MinterAddress:       walletAddress,
-		// 	TokenID:             "1",
-		// }
-		// if err = r.NFTRepository.CreateMintPass(mintPass); err != nil {
-		// 	return nil, err
-		// }
-
-		// resp.Valid = true
-		// resp.PassID = utils.GetStrPtr(mintPass.ID.String())
 		fmt.Println("drop user limit", *drop.UserLimit)
 		if drop.UserLimit != nil {
 			passes, err := r.NFTRepository.CountMintPassesForAddress(dropID, walletAddress)
 			if err == nil {
-				fmt.Println("drop user passes", passes)
-
 				if int(passes) >= *drop.UserLimit {
 					resp.Message = utils.GetStrPtr("mint limit exhausted for wallet")
 					return resp, errors.New(*resp.Message)
