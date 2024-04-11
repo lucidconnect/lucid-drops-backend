@@ -54,11 +54,24 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Err(err).Caller().Send()
 			json.NewEncoder(w).Encode(pass)
+			return
 		}
 		if int(count) >= *drop.EditionLimit {
 			pass.Message = utils.GetStrPtr("this nft has reached it's mint")
 			log.Err(err).Caller().Send()
 			json.NewEncoder(w).Encode(pass)
+			return
+		}
+	}
+
+	if drop.UserLimit != nil {
+		passes, err := s.nftRepo.CountMintPassesForAddress(dropId, walletAddress)
+		if err == nil {
+			if int(passes) >= *drop.UserLimit {
+				pass.Message = utils.GetStrPtr("mint limit exhausted for wallet")
+				json.NewEncoder(w).Encode(pass)
+				return
+			}
 		}
 	}
 
