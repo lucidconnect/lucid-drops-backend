@@ -18,6 +18,10 @@ type DB struct {
 	database *gorm.DB
 }
 
+func (db *DB) GetDatabase() *gorm.DB {
+	return db.database
+}
+
 func SetupDB(dsn string) *DB {
 	var err error
 
@@ -308,7 +312,7 @@ func (db *DB) GetMintPassForWallet(dropId, walletAddress string) (*drops.MintPas
 
 func (db *DB) CountMintPassesForAddress(dropId, address string) (int64, error) {
 	var passes int64
-	err := db.database.Model(&drops.MintPass{}).Where("drop_id = ?", dropId).Where("minter_address = ?", address).Where("used_at <> NULL").Count(&passes).Error
+	err := db.database.Model(&drops.MintPass{}).Where("drop_id = ?", dropId).Where("minter_address = ?", address).Where("used_at IS NOT NULL").Count(&passes).Error
 	if err != nil {
 		log.Err(err).Caller().Send()
 		return 0, err
