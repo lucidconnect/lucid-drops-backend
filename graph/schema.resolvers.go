@@ -504,7 +504,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		// resp.PassID = utils.GetStrPtr(mintPass.ID.String())
 		fmt.Println("drop user limit", *drop.UserLimit)
 		if drop.UserLimit != nil {
-			passes, err := r.NFTRepository.CountMintPassesForAddress(mintPass.DropID, walletAddress)
+			passes, err := r.NFTRepository.CountMintPassesForAddress(dropID, walletAddress)
 			if err == nil {
 				fmt.Println("drop user passes", passes)
 
