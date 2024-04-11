@@ -298,6 +298,7 @@ func (db *DB) GetMintPassForWallet(dropId, walletAddress string) (*drops.MintPas
 	var pass drops.MintPass
 
 	err := db.database.Where("drop_id = ?", dropId).Where("minter_address = ?", walletAddress).First(&pass).Error
+	log.Print(err)
 	if err != nil {
 		return nil, err
 	}
