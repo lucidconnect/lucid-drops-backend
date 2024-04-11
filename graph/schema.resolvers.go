@@ -502,7 +502,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 
 		// resp.Valid = true
 		// resp.PassID = utils.GetStrPtr(mintPass.ID.String())
-		fmt.Println("drop user limit", drop.UserLimit)
+		fmt.Println("drop user limit", *drop.UserLimit)
 		if drop.UserLimit != nil {
 			passes, err := r.NFTRepository.CountMintPassesForAddress(mintPass.DropID, walletAddress)
 			if err == nil {
@@ -577,12 +577,12 @@ func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input 
 		return nil, errors.New("mint pass has already been used")
 	}
 
-	passes, err := r.NFTRepository.CountMintPassesForAddress(mintPass.DropID, input.ClaimingAddress)
-	if err == nil {
-		if passes != 0 {
-			return nil, errors.New("more than one mint pass found for this minter address")
-		}
-	}
+	// passes, err := r.NFTRepository.CountMintPassesForAddress(mintPass.DropID, input.ClaimingAddress)
+	// if err == nil {
+	// 	if passes != 0 {
+	// 		return nil, errors.New("more than one mint pass found for this minter address")
+	// 	}
+	// }
 
 	mintPass.MinterAddress = input.ClaimingAddress
 	mintPass.UsedAt = &now

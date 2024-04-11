@@ -308,10 +308,11 @@ func (db *DB) GetMintPassForWallet(dropId, walletAddress string) (*drops.MintPas
 
 func (db *DB) CountMintPassesForAddress(dropId, address string) (int64, error) {
 	var passes int64
-	err := db.database.Model(&drops.MintPass{}).Where("drop_id = ? AND minter_address = ? AND used_at <> NULL", dropId, address).Count(&passes).Error
+	err := db.database.Model(&drops.MintPass{}).Where("used_at <> NULL").Where("drop_id = ? AND minter_address = ?", dropId, address).Count(&passes).Error
 	if err != nil {
 		return 0, err
 	}
+	fmt.Println("passes", passes)
 	return passes, nil
 }
 
