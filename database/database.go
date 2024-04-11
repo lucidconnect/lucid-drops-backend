@@ -310,6 +310,7 @@ func (db *DB) CountMintPassesForAddress(dropId, address string) (int64, error) {
 	var passes int64
 	err := db.database.Model(&drops.MintPass{}).Where("used_at <> NULL").Where("drop_id = ? AND minter_address = ?", dropId, address).Count(&passes).Error
 	if err != nil {
+		log.Err(err).Caller().Send()
 		return 0, err
 	}
 	fmt.Println("passes", passes)
