@@ -86,6 +86,7 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 			passes, err := s.nftRepo.CountMintPassesForAddress(dropId, walletAddress)
 			if err == nil {
 				if int(passes) >= *drop.UserLimit {
+					pass.Valid = false
 					pass.Message = utils.GetStrPtr("limit reached for wallet")
 					json.NewEncoder(w).Encode(pass)
 					return
@@ -108,7 +109,7 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pass.PassID = utils.GetStrPtr(mintPass.ID.String())
-
+	pass.Valid = true
 	if err = json.NewEncoder(w).Encode(pass); err != nil {
 		log.Err(err).Caller().Send()
 		w.WriteHeader(http.StatusInternalServerError)
