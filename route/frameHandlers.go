@@ -54,11 +54,13 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Err(err).Caller().Send()
 			json.NewEncoder(w).Encode(pass)
+			return
 		}
 		if int(count) >= *drop.EditionLimit {
 			pass.Message = utils.GetStrPtr("this nft has reached it's mint")
 			log.Err(err).Caller().Send()
 			json.NewEncoder(w).Encode(pass)
+			return
 		}
 	}
 
@@ -77,19 +79,35 @@ func (s *Server) CreateMintPass(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	newMint := &drops.MintPass{
-		DropID:              dropId,
-		DropContractAddress: *drop.AAContractAddress,
-		BlockchainNetwork:   drop.BlockchainNetwork,
-		MinterAddress:       walletAddress,
-		TokenID:             "1",
+
+	mintPass, err := s.nftRepo.GetMintPassForWallet(dropId, walletAddress)
+	if err == nil {
+		if drop.UserLimit != nil {
+			passes, err := s.nftRepo.CountMintPassesForAddress(dropId, walletAddress)
+			if err == nil {
+				if int(passes) >= *drop.UserLimit {
+					pass.Message = utils.GetStrPtr("limit reached for wallet")
+					json.NewEncoder(w).Encode(pass)
+					return
+				}
+			}
+		}
+	} else {
+		mintPass = &drops.MintPass{
+			DropID:              dropId,
+			DropContractAddress: *drop.AAContractAddress,
+			BlockchainNetwork:   drop.BlockchainNetwork,
+			MinterAddress:       walletAddress,
+			TokenID:             "1",
+		}
+		if err = s.nftRepo.CreateMintPass(mintPass); err != nil {
+			log.Err(err).Caller().Send()
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 	}
-	if err = s.nftRepo.CreateMintPass(newMint); err != nil {
-		log.Err(err).Caller().Send()
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	pass.PassID = utils.GetStrPtr(newMint.ID.String())
+
+	pass.PassID = utils.GetStrPtr(mintPass.ID.String())
 
 	if err = json.NewEncoder(w).Encode(pass); err != nil {
 		log.Err(err).Caller().Send()

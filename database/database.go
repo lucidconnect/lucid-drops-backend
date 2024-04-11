@@ -18,6 +18,10 @@ type DB struct {
 	database *gorm.DB
 }
 
+func (db *DB) GetDatabase() *gorm.DB {
+	return db.database
+}
+
 func SetupDB(dsn string) *DB {
 	var err error
 
@@ -298,6 +302,7 @@ func (db *DB) GetMintPassForWallet(dropId, walletAddress string) (*drops.MintPas
 	var pass drops.MintPass
 
 	err := db.database.Where("drop_id = ?", dropId).Where("minter_address = ?", walletAddress).First(&pass).Error
+	log.Print(err)
 	if err != nil {
 		return nil, err
 	}
@@ -307,7 +312,7 @@ func (db *DB) GetMintPassForWallet(dropId, walletAddress string) (*drops.MintPas
 
 func (db *DB) CountMintPassesForAddress(dropId, address string) (int64, error) {
 	var passes int64
-	err := db.database.Model(&drops.MintPass{}).Where("drop_id = ? AND minter_address = ? AND used_at <> NULL", dropId, address).Count(&passes).Error
+	err := db.database.Model(&drops.MintPass{}).Where("drop_id = ?", dropId).Where("minter_address = ?", address).Where("used_at IS NOT NULL").Count(&passes).Error
 	if err != nil {
 		return 0, err
 	}
@@ -361,7 +366,7 @@ func (db *DB) CountMintPassesForDrop(dropId string) (int64, error) {
 
 func (db *DB) GetMintPassesForWallet(dropId, walletAddress string) (int64, error) {
 	var walletCount int64
-	err := db.database.Model(&drops.MintPass{}).Where("drop_id = ? AND used_at <> NULL", dropId).Count(&walletCount).Error
+	err := db.database.Model(&drops.MintPass{}).Where("minter_address = ?", walletAddress).Where("drop_id = ? AND used_at <> NULL", dropId).Count(&walletCount).Error
 	if err != nil {
 		return 0, err
 	}

@@ -81,7 +81,7 @@ func SendEmail(object EmailData) (*EmailResponse, error) {
 
 	response, messageId, err := mg.Send(message)
 	if err != nil {
-		log.Err(err).Msg("Error sending email")
+		log.Err(err).Caller().Msg("Error sending email")
 		return nil, err
 	}
 
