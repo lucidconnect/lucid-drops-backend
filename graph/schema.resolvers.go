@@ -434,7 +434,7 @@ func (r *mutationResolver) CreateFarcasterCriteriaForDrop(ctx context.Context, i
 		criteria.FarcasterUsername = *input.FarcasterUserName
 	}
 
-	drop.Criteria = criteriaTypes
+	drop.Criteria = strings.Trim(criteriaTypes, ",")
 	if err = r.NFTRepository.AddFarcasterCriteriaToDrop(drop, criteria); err != nil {
 		log.Err(err).Caller().Send()
 		return nil, err
