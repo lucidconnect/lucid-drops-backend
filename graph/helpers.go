@@ -255,7 +255,7 @@ func validateFarcasterReplyCriteria(fid int32, criteria drops.FarcasterCriteria)
 	}
 
 	for _, cast := range casts {
-		if cast.Authour.Fid == fid {
+		if cast.Author.Fid == fid {
 			return true
 		}
 	}
