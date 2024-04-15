@@ -166,10 +166,10 @@ func (nc *NeynarClient) RetrieveCastByUrl(castUrl string) (Cast, error) {
 	if err != nil {
 		return Cast{}, err
 	}
-
 	return cast, nil
 }
 
+// Now deprecated, use v2/cast/conversation. Gets all casts, including root cast and all replies for a given thread hash. No limit the depth of replies.
 func (nc *NeynarClient) RetrieveCastsByThreadHash(hash string) ([]Cast, error) {
 	url, err := url.Parse(fmt.Sprintf("%v/v1/farcaster/all-casts-in-thread", nc.neynarUrl))
 	if err != nil {
@@ -310,13 +310,13 @@ func decodeRelevantFollowers(response io.ReadCloser) (FarcasterFollowers, error)
 
 func decodeCastObject(response io.ReadCloser) (Cast, error) {
 	var err error
-	cast := Cast{}
+	responseBody := RetrieveCastResponse{}
 
-	if err = json.NewDecoder(response).Decode(&cast); err != nil {
+	if err = json.NewDecoder(response).Decode(&responseBody); err != nil {
 		err = fmt.Errorf("failed to decode response body: %v", err)
 		return Cast{}, err
 	}
-	return cast, nil
+	return responseBody.Cast, nil
 }
 
 func decodeChannelFollowers(response io.ReadCloser) (ChannelFollowers, error) {
@@ -402,7 +402,7 @@ func (nc *NeynarClient) validateFarcasterLikeCriteria(fid int32, criteria drops.
 	if err != nil {
 		return false
 	}
-
+	fmt.Println("Likes - ", cast)
 	for _, like := range cast.Reactions.Likes {
 		if like.Fid == fid {
 			return true
@@ -440,7 +440,7 @@ func (nc *NeynarClient) validateFarcasterReplyCriteria(fid int32, criteria drops
 	}
 
 	for _, cast := range casts {
-		if cast.Authour.Fid == fid {
+		if cast.Author.Fid == fid {
 			return true
 		}
 	}

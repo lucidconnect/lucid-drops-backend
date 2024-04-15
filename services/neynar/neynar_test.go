@@ -1,6 +1,7 @@
 package neynar
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -43,7 +44,7 @@ func TestNeynarClient_FetchFarcasterUserByEthAddress(t *testing.T) {
 	}
 }
 
-func TestNeynaClient_ValidateFarcasterChannelFollowers(t *testing.T) {
+func TestNeynarClient_ValidateFarcasterChannelFollowers(t *testing.T) {
 	godotenv.Load("../../.env.test")
 	apiKeyOpt := WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 	neynarClient, err := NewNeynarClient(apiKeyOpt)
@@ -56,6 +57,41 @@ func TestNeynaClient_ValidateFarcasterChannelFollowers(t *testing.T) {
 	}
 	valid := neynarClient.validateFarcasterChannelFollowerCriteria(2308, criteria)
 	if !valid {
+		t.FailNow()
+	}
+}
+
+func TestNeynarClient_ValidateFarcasterLikeCriteria(t *testing.T) {
+	godotenv.Load("../../.env.test")
+	apiKeyOpt := WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
+	neynarClient, err := NewNeynarClient(apiKeyOpt)
+	if !assert.NoError(t, err) {
+		t.Logf("client initialization error %v", err)
+		t.FailNow()
+	}
+
+	farcasterAddress := "0xb77ce6ec08b85dcc468b94cea7cc539a3bbf9510"
+
+	userFid, err := neynarClient.FetchFarcasterUserFidByEthAddress(farcasterAddress)
+	if !assert.NoError(t, err) {
+		t.Logf("error fetching farcaster user %v", err)
+		t.Fail()
+	}
+
+	if !assert.Equal(t, userFid, int32(2037)) {
+		t.Logf("fid %v", userFid)
+		t.FailNow()
+	}
+
+	criteria := drops.FarcasterCriteria{
+		CastUrl: "https://warpcast.com/shay/0x63a6e387",
+	}
+
+	valid := neynarClient.validateFarcasterLikeCriteria(userFid, criteria)
+	fmt.Println(valid)
+	assert.Equal(t, valid, true)
+	if !valid {
+		t.Logf("user is eligible - %v", valid)
 		t.FailNow()
 	}
 }

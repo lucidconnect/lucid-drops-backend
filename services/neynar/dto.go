@@ -21,11 +21,14 @@ type UserDehydrated struct {
 	Fid int32 `json:"fid"`
 }
 
+type RetrieveCastResponse struct {
+	Cast Cast `json:"cast"`
+}
 type Cast struct {
 	Object    string   `json:"object"`
 	Hash      string   `json:"hash"`
 	Reactions Reaction `json:"reactions"`
-	Authour   Author   `json:"author"`
+	Author   Author   `json:"author"`
 }
 
 type Author struct {
