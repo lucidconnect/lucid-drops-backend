@@ -86,12 +86,12 @@ func (nc *NeynarClient) ValidateFarcasterCriteriaForDrop(farcasterAddress string
 				switch *interaction {
 				case model.InteractionTypeReplies:
 					if !nc.validateFarcasterReplyCriteria(int32(userFid), *criteria) {
-						resp.Message = utils.GetStrPtr("farcaster account does not meet the `reply` criteria")
+						resp.Message = utils.GetStrPtr("farcaster account does not meet the reply criteria")
 						return resp, errors.New("farcaster account does not meet the reply criteria")
 					}
 				case model.InteractionTypeRecasts:
 					if !nc.validateFarcasterRecastCriteria(int32(userFid), *criteria) {
-						resp.Message = utils.GetStrPtr("farcaster account does not meet the `recast` criteria")
+						resp.Message = utils.GetStrPtr("farcaster account does not meet the recast criteria")
 						return resp, errors.New("farcaster account does not meet the recast criteria")
 					}
 				case model.InteractionTypeLikes:
@@ -105,7 +105,7 @@ func (nc *NeynarClient) ValidateFarcasterCriteriaForDrop(farcasterAddress string
 
 		if criteriaType == model.ClaimCriteriaTypeFarcasterFollowing.String() {
 			if !nc.validateFarcasterAccountFollowerCriteria(int32(userFid), *criteria) {
-				resp.Message = utils.GetStrPtr("farcaster account does not meet the `follower` criteria")
+				resp.Message = utils.GetStrPtr("farcaster account does not meet the follower criteria")
 				return resp, errors.New("farcaster account does not meet the follower criteria")
 			}
 		}
