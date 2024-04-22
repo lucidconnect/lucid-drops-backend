@@ -194,35 +194,6 @@ func (nc *NeynarClient) RetrieveCastsByThreadHash(hash string) ([]Cast, error) {
 	return cast, nil
 }
 
-func (nc *NeynarClient) retrieveUsersChannels(fid int32, cursor string) (UserChannels, error) {
-	url, err := url.Parse(fmt.Sprintf("%v/v2/farcaster/user/channels", nc.neynarUrl))
-	if err != nil {
-		return UserChannels{}, err
-	}
-	query := url.Query()
-	query.Add("fid", strconv.FormatInt(int64(fid), 10))
-	query.Add("limit", "100")
-	if cursor != "" {
-		query.Add("cursor", cursor)
-	}
-
-	url.RawQuery = query.Encode()
-	fmt.Println(url.String())
-
-	response, err := nc.makeRequest(http.MethodGet, url.String(), "", nil)
-	if err != nil {
-		return UserChannels{}, err
-	}
-	defer response.Body.Close()
-
-	channels, err := decodeUserChannels(response.Body)
-	if err != nil {
-		return UserChannels{}, err
-	}
-
-	return channels, err
-}
-
 func (nc *NeynarClient) RetrieveChannelFollowers(channelID string, fid int32, cursor string) (ChannelFollowers, error) {
 	url, err := url.Parse(fmt.Sprintf("%v/v2/farcaster/channel/followers", nc.neynarUrl))
 	if err != nil {
@@ -299,6 +270,35 @@ func (nc *NeynarClient) FetchFarcasterUserByUsername(username string) (int32, er
 	return int32(fid), nil
 }
 
+func (nc *NeynarClient) retrieveUsersChannels(fid int32, cursor string) (UserChannels, error) {
+	url, err := url.Parse(fmt.Sprintf("%v/v2/farcaster/user/channels", nc.neynarUrl))
+	if err != nil {
+		return UserChannels{}, err
+	}
+	query := url.Query()
+	query.Add("fid", strconv.FormatInt(int64(fid), 10))
+	query.Add("limit", "100")
+	if cursor != "" {
+		query.Add("cursor", cursor)
+	}
+
+	url.RawQuery = query.Encode()
+	fmt.Println(url.String())
+
+	response, err := nc.makeRequest(http.MethodGet, url.String(), "", nil)
+	if err != nil {
+		return UserChannels{}, err
+	}
+	defer response.Body.Close()
+
+	channels, err := decodeUserChannels(response.Body)
+	if err != nil {
+		return UserChannels{}, err
+	}
+
+	return channels, err
+}
+
 func (nc *NeynarClient) makeRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {
 	httpRequest, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -324,91 +324,6 @@ func (nc *NeynarClient) makeRequest(method, url, contentType string, body io.Rea
 	}
 
 	return resp, nil
-}
-
-func decodeRelevantFollowers(response io.ReadCloser) (FarcasterFollowers, error) {
-	var err error
-	relevantFollowers := FarcasterFollowers{}
-
-	if err = json.NewDecoder(response).Decode(&relevantFollowers); err != nil {
-		err = fmt.Errorf("failed to decode response body: %v", err)
-		return FarcasterFollowers{}, err
-	}
-
-	return relevantFollowers, nil
-}
-
-func decodeCastObject(response io.ReadCloser) (Cast, error) {
-	var err error
-	responseBody := RetrieveCastResponse{}
-
-	if err = json.NewDecoder(response).Decode(&responseBody); err != nil {
-		err = fmt.Errorf("failed to decode response body: %v", err)
-		return Cast{}, err
-	}
-	return responseBody.Cast, nil
-}
-
-func decodeChannelFollowers(response io.ReadCloser) (ChannelFollowers, error) {
-	var err error
-	followers := ChannelFollowers{}
-
-	if err = json.NewDecoder(response).Decode(&followers); err != nil {
-		err = fmt.Errorf("failed to decode response body: %v", err)
-		return ChannelFollowers{}, err
-	}
-	return followers, nil
-}
-
-func decodeUserChannels(response io.ReadCloser) (UserChannels, error) {
-	var err error
-	channels := UserChannels{}
-
-	if err = json.NewDecoder(response).Decode(&channels); err != nil {
-		err = fmt.Errorf("failed to decode response body: %v", err)
-		return UserChannels{}, err
-	}
-
-	return channels, nil
-}
-
-func decodeThreadCasts(response io.ReadCloser) ([]Cast, error) {
-	var err error
-	cast := ThreadCasts{}
-
-	if err = json.NewDecoder(response).Decode(&cast); err != nil {
-		err = fmt.Errorf("failed to decode response body: %v", err)
-		return nil, err
-	}
-
-	return cast.Result.Casts, nil
-}
-
-func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated, error) {
-	var err error
-
-	responseBody := map[string][]UserDehydrated{}
-	// u := &UserDehydrated{}
-	if err = json.NewDecoder(response).Decode(&responseBody); err != nil {
-		err = fmt.Errorf("failed to decode response body: %v", err)
-		return UserDehydrated{}, err
-	}
-	fmt.Println(responseBody)
-	if len(responseBody) == 0 {
-		return UserDehydrated{}, fmt.Errorf("address %v is not connected with a farcaster account", address)
-	}
-	userI := responseBody[strings.ToLower(address)][0]
-	return userI, nil
-}
-
-func appendUserChannels(userChannels UserChannels) []string {
-	var channelIDs []string
-
-	for _, channel := range userChannels.Channels {
-		channelIDs = append(channelIDs, channel.Id)
-	}
-
-	return channelIDs
 }
 
 func (nc *NeynarClient) validateFarcasterChannelFollowerCriteria(fid int32, criteria drops.FarcasterCriteria) bool {
@@ -520,18 +435,87 @@ func (nc *NeynarClient) validateFarcasterAccountFollowerCriteria(fid int32, crit
 	return false
 }
 
-/** map[
-active_status:inactive
-custody_address:0x9f2246e50e285b571117ad024f79a0609124b209
-display_name:Gb
-fid:2037
-follower_count:236
-following_count:234
-object:user
-pfp_url:https://ipfs.decentralized-content.com/ipfs/bafybeia7rlf5p2ghv4cabub3gvsyq4zs4qrxee3tx7d4scm3oa76dis3ni profile:map[
-	bio:map[text:Building lucidconnect.xyz]]
-	username:tezza
-	verifications:[0xccb9f5faf66f15684a6154785f6ae524db6132e5]
-	verified_addresses:map[eth_addresses:[0xccb9f5faf66f15684a6154785f6ae524db6132e5] sol_addresses:[]]
-]
-*/
+func decodeRelevantFollowers(response io.ReadCloser) (FarcasterFollowers, error) {
+	var err error
+	relevantFollowers := FarcasterFollowers{}
+
+	if err = json.NewDecoder(response).Decode(&relevantFollowers); err != nil {
+		err = fmt.Errorf("failed to decode response body: %v", err)
+		return FarcasterFollowers{}, err
+	}
+
+	return relevantFollowers, nil
+}
+
+func decodeCastObject(response io.ReadCloser) (Cast, error) {
+	var err error
+	responseBody := RetrieveCastResponse{}
+
+	if err = json.NewDecoder(response).Decode(&responseBody); err != nil {
+		err = fmt.Errorf("failed to decode response body: %v", err)
+		return Cast{}, err
+	}
+	return responseBody.Cast, nil
+}
+
+func decodeChannelFollowers(response io.ReadCloser) (ChannelFollowers, error) {
+	var err error
+	followers := ChannelFollowers{}
+
+	if err = json.NewDecoder(response).Decode(&followers); err != nil {
+		err = fmt.Errorf("failed to decode response body: %v", err)
+		return ChannelFollowers{}, err
+	}
+	return followers, nil
+}
+
+func decodeUserChannels(response io.ReadCloser) (UserChannels, error) {
+	var err error
+	channels := UserChannels{}
+
+	if err = json.NewDecoder(response).Decode(&channels); err != nil {
+		err = fmt.Errorf("failed to decode response body: %v", err)
+		return UserChannels{}, err
+	}
+
+	return channels, nil
+}
+
+func decodeThreadCasts(response io.ReadCloser) ([]Cast, error) {
+	var err error
+	cast := ThreadCasts{}
+
+	if err = json.NewDecoder(response).Decode(&cast); err != nil {
+		err = fmt.Errorf("failed to decode response body: %v", err)
+		return nil, err
+	}
+
+	return cast.Result.Casts, nil
+}
+
+func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated, error) {
+	var err error
+
+	responseBody := map[string][]UserDehydrated{}
+	// u := &UserDehydrated{}
+	if err = json.NewDecoder(response).Decode(&responseBody); err != nil {
+		err = fmt.Errorf("failed to decode response body: %v", err)
+		return UserDehydrated{}, err
+	}
+	fmt.Println(responseBody)
+	if len(responseBody) == 0 {
+		return UserDehydrated{}, fmt.Errorf("address %v is not connected with a farcaster account", address)
+	}
+	userI := responseBody[strings.ToLower(address)][0]
+	return userI, nil
+}
+
+func appendUserChannels(userChannels UserChannels) []string {
+	var channelIDs []string
+
+	for _, channel := range userChannels.Channels {
+		channelIDs = append(channelIDs, channel.Id)
+	}
+
+	return channelIDs
+}
