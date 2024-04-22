@@ -28,7 +28,7 @@ type Cast struct {
 	Object    string   `json:"object"`
 	Hash      string   `json:"hash"`
 	Reactions Reaction `json:"reactions"`
-	Author   Author   `json:"author"`
+	Author    Author   `json:"author"`
 }
 
 type Author struct {
@@ -58,6 +58,17 @@ type ThreadCastsResult struct {
 
 type ThreadCasts struct {
 	Result ThreadCastsResult `json:"result"`
+}
+
+type Channel struct {
+	Id string
+}
+
+type UserChannels struct {
+	Channels []Channel `json:"channels"`
+	Next     struct {
+		Cursor string `json:"cursor"`
+	} `json:"next"`
 }
 
 // type FarcasterUser struct {

@@ -11,7 +11,7 @@ import (
 )
 
 func TestNeynarClient_FetchFarcasterUserByUsername(t *testing.T) {
-	godotenv.Load("../../.env.test.local")
+	godotenv.Load("../../.env.test")
 	apiKeyOpt := WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 	neynarClient, err := NewNeynarClient(apiKeyOpt)
 	if !assert.NoError(t, err) {
@@ -28,7 +28,7 @@ func TestNeynarClient_FetchFarcasterUserByUsername(t *testing.T) {
 }
 
 func TestNeynarClient_FetchFarcasterUserByEthAddress(t *testing.T) {
-	godotenv.Load("../../.env.test.local")
+	godotenv.Load("../../.env.test")
 	apiKeyOpt := WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
 	neynarClient, err := NewNeynarClient(apiKeyOpt)
 	if !assert.NoError(t, err) {
@@ -55,7 +55,7 @@ func TestNeynarClient_ValidateFarcasterChannelFollowers(t *testing.T) {
 	criteria := drops.FarcasterCriteria{
 		ChannelID: "goat,higher",
 	}
-	valid := neynarClient.validateFarcasterChannelFollowerCriteria(2308, criteria)
+	valid := neynarClient.validateFarcasterChannelFollowerCriteria(2037, criteria)
 	if !valid {
 		t.FailNow()
 	}
@@ -92,6 +92,25 @@ func TestNeynarClient_ValidateFarcasterLikeCriteria(t *testing.T) {
 	assert.Equal(t, valid, true)
 	if !valid {
 		t.Logf("user is eligible - %v", valid)
+		t.FailNow()
+	}
+}
+
+func TestNeynarClient_ValidateFarcasterAccountFolloweCriteria(t *testing.T) {
+	godotenv.Load("../../.env.test")
+	apiKeyOpt := WithNeynarApiKey(os.Getenv("NEYNAR_API_KEY"))
+	neynarClient, err := NewNeynarClient(apiKeyOpt)
+	if !assert.NoError(t, err) {
+		t.Logf("client initialization error %v", err)
+		t.FailNow()
+	}
+
+	criteria := drops.FarcasterCriteria{
+		FarcasterProfileID: "478517",
+	}
+
+	valid := neynarClient.validateFarcasterAccountFollowerCriteria(13555, criteria)
+	if !valid {
 		t.FailNow()
 	}
 }

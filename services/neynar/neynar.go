@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -16,7 +17,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-/** TODO
+/**
 * User
 	- use fid for validations
 	- fetch a creators following
@@ -85,17 +86,17 @@ func (nc *NeynarClient) ValidateFarcasterCriteriaForDrop(farcasterAddress string
 			for _, interaction := range drops.InteractionsToArr(criteria.Interactions) {
 				switch *interaction {
 				case model.InteractionTypeReplies:
-					if !nc.validateFarcasterReplyCriteria(int32(userFid), *criteria) {
+					if !nc.validateFarcasterReplyCriteria(userFid, *criteria) {
 						resp.Message = utils.GetStrPtr("farcaster account does not meet the reply criteria")
 						return resp, errors.New("farcaster account does not meet the reply criteria")
 					}
 				case model.InteractionTypeRecasts:
-					if !nc.validateFarcasterRecastCriteria(int32(userFid), *criteria) {
+					if !nc.validateFarcasterRecastCriteria(userFid, *criteria) {
 						resp.Message = utils.GetStrPtr("farcaster account does not meet the recast criteria")
 						return resp, errors.New("farcaster account does not meet the recast criteria")
 					}
 				case model.InteractionTypeLikes:
-					if !nc.validateFarcasterLikeCriteria(int32(userFid), *criteria) {
+					if !nc.validateFarcasterLikeCriteria(userFid, *criteria) {
 						resp.Message = utils.GetStrPtr("farcaster account does not meet the like criteria")
 						return resp, errors.New("farcaster account does not meet the `like` criteria")
 					}
@@ -104,14 +105,14 @@ func (nc *NeynarClient) ValidateFarcasterCriteriaForDrop(farcasterAddress string
 		}
 
 		if criteriaType == model.ClaimCriteriaTypeFarcasterFollowing.String() {
-			if !nc.validateFarcasterAccountFollowerCriteria(int32(userFid), *criteria) {
+			if !nc.validateFarcasterAccountFollowerCriteria(userFid, *criteria) {
 				resp.Message = utils.GetStrPtr("farcaster account does not meet the follower criteria")
 				return resp, errors.New("farcaster account does not meet the follower criteria")
 			}
 		}
 
 		if criteriaType == model.ClaimCriteriaTypeFarcasterChannel.String() {
-			if !nc.validateFarcasterChannelFollowerCriteria(int32(userFid), *criteria) {
+			if !nc.validateFarcasterChannelFollowerCriteria(userFid, *criteria) {
 				resp.Message = utils.GetStrPtr("farcaster account must be following the required channel")
 				return resp, errors.New("farcaster account does not meet the channel follower criteria")
 			}
@@ -191,6 +192,35 @@ func (nc *NeynarClient) RetrieveCastsByThreadHash(hash string) ([]Cast, error) {
 	}
 
 	return cast, nil
+}
+
+func (nc *NeynarClient) retrieveUsersChannels(fid int32, cursor string) (UserChannels, error) {
+	url, err := url.Parse(fmt.Sprintf("%v/v2/farcaster/user/channels", nc.neynarUrl))
+	if err != nil {
+		return UserChannels{}, err
+	}
+	query := url.Query()
+	query.Add("fid", strconv.FormatInt(int64(fid), 10))
+	query.Add("limit", "100")
+	if cursor != "" {
+		query.Add("cursor", cursor)
+	}
+
+	url.RawQuery = query.Encode()
+	fmt.Println(url.String())
+
+	response, err := nc.makeRequest(http.MethodGet, url.String(), "", nil)
+	if err != nil {
+		return UserChannels{}, err
+	}
+	defer response.Body.Close()
+
+	channels, err := decodeUserChannels(response.Body)
+	if err != nil {
+		return UserChannels{}, err
+	}
+
+	return channels, err
 }
 
 func (nc *NeynarClient) RetrieveChannelFollowers(channelID string, fid int32, cursor string) (ChannelFollowers, error) {
@@ -330,6 +360,18 @@ func decodeChannelFollowers(response io.ReadCloser) (ChannelFollowers, error) {
 	return followers, nil
 }
 
+func decodeUserChannels(response io.ReadCloser) (UserChannels, error) {
+	var err error
+	channels := UserChannels{}
+
+	if err = json.NewDecoder(response).Decode(&channels); err != nil {
+		err = fmt.Errorf("failed to decode response body: %v", err)
+		return UserChannels{}, err
+	}
+
+	return channels, nil
+}
+
 func decodeThreadCasts(response io.ReadCloser) ([]Cast, error) {
 	var err error
 	cast := ThreadCasts{}
@@ -359,41 +401,49 @@ func decodeFarcasterUser(response io.ReadCloser, address string) (UserDehydrated
 	return userI, nil
 }
 
-func (nc *NeynarClient) validateFarcasterChannelFollowerCriteria(fid int32, criteria drops.FarcasterCriteria) bool {
-	var allFollowers []UserDehydrated
+func appendUserChannels(userChannels UserChannels) []string {
+	var channelIDs []string
 
+	for _, channel := range userChannels.Channels {
+		channelIDs = append(channelIDs, channel.Id)
+	}
+
+	return channelIDs
+}
+
+func (nc *NeynarClient) validateFarcasterChannelFollowerCriteria(fid int32, criteria drops.FarcasterCriteria) bool {
+	var userChannels []string
 	channels := strings.Split(criteria.ChannelID, ",")
 
-	for _, channel := range channels {
-		followers, err := nc.RetrieveChannelFollowers(channel, fid, "")
-		if err != nil {
-			log.Err(err).Caller().Send()
+	channelObject, err := nc.retrieveUsersChannels(fid, "")
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return false
+	}
+
+	userChannels = appendUserChannels(channelObject)
+
+	for {
+		if channelObject.Next.Cursor == "" {
 			break
-			// return false
-		}
-		allFollowers = append(allFollowers, followers.Users...)
-		for {
-			if followers.Next.Cursor == "" {
+		} else {
+			channelObject, err := nc.retrieveUsersChannels(fid, "")
+			if err != nil {
+				log.Err(err).Caller().Send()
 				break
-			} else {
-				followers, err = nc.RetrieveChannelFollowers(channel, fid, followers.Next.Cursor)
-				if err != nil {
-					log.Err(err).Caller().Send()
-					break
-				}
-				allFollowers = append(allFollowers, followers.Users...)
 			}
+			userChannels = append(userChannels, appendUserChannels(channelObject)...)
 		}
 	}
-	// fmt.Println(allFollowers)
-	// fmt.Println(len(allFollowers))
+	sort.Strings(userChannels)
+	fmt.Printf("user %v channels: %v", fid, userChannels)
 
-	for _, v := range allFollowers {
-		if v.Fid == fid {
+	for _, channel := range channels {
+		idx := sort.SearchStrings(userChannels, channel)
+		if userChannels[idx] == channel {
 			return true
 		}
 	}
-
 	return false
 }
 
@@ -459,6 +509,8 @@ func (nc *NeynarClient) validateFarcasterAccountFollowerCriteria(fid int32, crit
 	if err != nil {
 		return false
 	}
+
+	fmt.Println(followers)
 
 	for _, follower := range followers {
 		if follower.User.Fid == fid {
