@@ -223,12 +223,12 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 	var contractAdddress string
 	if input.ContractAddress == nil {
 		// Introduce an artificial delay for before fethcing the actual contract address
-		time.Sleep(time.Second * 3)
+		// time.Sleep(time.Second * 3)
 
-		contractAdddress, err = services.GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
-		if err != nil {
-			log.Err(err)
-		}
+		// contractAdddress, err = services.GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
+		// if err != nil {
+		// 	log.Err(err)
+		// }
 
 	} else {
 		contractAdddress = *input.ContractAddress
@@ -247,7 +247,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		Thumbnail:              *input.Thumbnail,
 		Description:            *input.Description,
 		BlockchainNetwork:      input.Network,
-		AAWalletDeploymentHash: &input.DeploymentHash,
+		AAWalletDeploymentHash: input.DeploymentHash,
 		AAContractAddress:      &contractAdddress,
 		MintPrice:              input.MintPrice,
 		GasIsCreatorSponsored:  gasIsSponsored,
