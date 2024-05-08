@@ -204,7 +204,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
-
+	var item *drops.Item
 	creator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
 	if err != nil {
 		log.Err(err).Caller().Send()
@@ -255,36 +255,41 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		EditionLimit:           input.EditionLimit,
 	}
 
-	newItem := &drops.Item{
-		Name:         *input.Name,
-		Image:        *input.Image,
-		Description:  *input.Description,
-		TokenID:      int64(1),
-		DropAddress:  contractAdddress,
-		UserLimit:    input.UserLimit,
-		EditionLimit: input.EditionLimit,
+	if input.DraftMode != nil && *input.DraftMode {
+		item = &drops.Item{
+			Name:         *input.Name,
+			Image:        *input.Image,
+			Description:  *input.Description,
+			TokenID:      int64(1),
+			DropAddress:  contractAdddress,
+			UserLimit:    input.UserLimit,
+			EditionLimit: input.EditionLimit,
+		}
 	}
 
-	if err = r.NFTRepository.CreateDrop(newDrop, newItem); err != nil {
+	if err = r.NFTRepository.CreateDrop(newDrop, item); err != nil {
 		log.Err(err).Caller().Send()
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
+	if item != nil {
+		url, err := createMintUrl(newDrop.ID.String(), item.Image, *newDrop.AAContractAddress)
+		if err != nil {
+			log.Err(err).Caller().Send()
+			return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, "generating frame url failed", ctx)
+		}
+		newDrop.MintUrl = url
+		if err = r.NFTRepository.UpdateDropDetails(newDrop); err != nil {
+			log.Err(err).Caller().Send()
+			return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+		}
 
-	url, err := createMintUrl(newDrop.ID.String(), newItem.Image, *newDrop.AAContractAddress)
-	if err != nil {
-		log.Err(err).Caller().Send()
-		return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, "generating frame url failed", ctx)
-	}
-	newDrop.MintUrl = url
-	if err = r.NFTRepository.UpdateDropDetails(newDrop); err != nil {
-		log.Err(err).Caller().Send()
-		return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+		var items []*model.Item
+		newItem := item.ToGraphData()
+		items = append(items, newItem)
+		return newDrop.ToGraphData(items), nil
 	}
 
-	var items []*model.Item
-	item := newItem.ToGraphData()
-	items = append(items, item)
-	return newDrop.ToGraphData(items), nil
+	return newDrop.ToGraphData(nil), nil
 }
 
 // UpdateDrop is the resolver for the updateDrop field.

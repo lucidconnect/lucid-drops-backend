@@ -168,10 +168,12 @@ func (db *DB) CreateDrop(drop *drops.Drop, item *drops.Item) error {
 		return err
 	}
 
-	item.DropID = drop.ID
-	if err := tx.Create(item).Error; err != nil {
-		tx.Rollback()
-		return err
+	if item != nil {
+		item.DropID = drop.ID
+		if err := tx.Create(item).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	if err := tx.Commit().Error; err != nil {

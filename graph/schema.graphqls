@@ -53,6 +53,7 @@ input DropInput {
   claimFee: Int
   mintPrice: Float
   gasIsCreatorSponsored: Boolean!
+  draftMode: Boolean
 }
 
 input NewFarcasterCriteriaInput {
