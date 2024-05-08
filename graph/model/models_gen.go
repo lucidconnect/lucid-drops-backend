@@ -43,6 +43,7 @@ type Drop struct {
 	FarcasterProfileID                 *string              `json:"farcasterProfileID,omitempty"`
 	FarcasterChannelID                 []string             `json:"farcasterChannelId,omitempty"`
 	ClaimDetails                       []*ClaimDetails      `json:"claimDetails,omitempty"`
+	URI                                *string              `json:"uri,omitempty"`
 }
 
 type DropInput struct {

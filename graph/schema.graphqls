@@ -132,6 +132,7 @@ type Drop {
   farcasterProfileID: String
   farcasterChannelId: [String!]
   claimDetails: [ClaimDetails]
+  uri: String
 }
 
 type CreatorDetails {

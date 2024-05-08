@@ -287,6 +287,14 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		newItem := item.ToGraphData()
 		items = append(items, newItem)
 		return newDrop.ToGraphData(items), nil
+	} else {
+		baseUri := os.Getenv("BASE_URI")
+		uri := fmt.Sprintf("%v/%v/{id}", baseUri, newDrop.ID.String())
+		newDrop.DropUri = uri
+		if err = r.NFTRepository.UpdateDropDetails(newDrop); err != nil {
+			log.Err(err).Caller().Send()
+			return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+		}
 	}
 
 	return newDrop.ToGraphData(nil), nil

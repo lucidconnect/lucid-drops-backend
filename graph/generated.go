@@ -82,6 +82,7 @@ type ComplexityRoot struct {
 		Name                               func(childComplexity int) int
 		Network                            func(childComplexity int) int
 		Thumbnail                          func(childComplexity int) int
+		URI                                func(childComplexity int) int
 	}
 
 	ImageResponse struct {
@@ -421,6 +422,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Drop.Thumbnail(childComplexity), true
+
+	case "Drop.uri":
+		if e.complexity.Drop.URI == nil {
+			break
+		}
+
+		return e.complexity.Drop.URI(childComplexity), true
 
 	case "ImageResponse.format":
 		if e.complexity.ImageResponse.Format == nil {
@@ -2556,6 +2564,47 @@ func (ec *executionContext) fieldContext_Drop_claimDetails(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Drop_uri(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_uri(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URI, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_uri(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ImageResponse_image(ctx context.Context, field graphql.CollectedField, obj *model.ImageResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ImageResponse_image(ctx, field)
 	if err != nil {
@@ -4243,6 +4292,8 @@ func (ec *executionContext) fieldContext_Mutation_createDrop(ctx context.Context
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
+			case "uri":
+				return ec.fieldContext_Drop_uri(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -4338,6 +4389,8 @@ func (ec *executionContext) fieldContext_Mutation_updateDrop(ctx context.Context
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
+			case "uri":
+				return ec.fieldContext_Drop_uri(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -4433,6 +4486,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteDrop(ctx context.Context
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
+			case "uri":
+				return ec.fieldContext_Drop_uri(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -4528,6 +4583,8 @@ func (ec *executionContext) fieldContext_Mutation_createFarcasterCriteriaForDrop
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
+			case "uri":
+				return ec.fieldContext_Drop_uri(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -4919,6 +4976,8 @@ func (ec *executionContext) fieldContext_Query_fetchDropById(ctx context.Context
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
+			case "uri":
+				return ec.fieldContext_Drop_uri(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5014,6 +5073,8 @@ func (ec *executionContext) fieldContext_Query_fetchCreatorDrops(ctx context.Con
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
+			case "uri":
+				return ec.fieldContext_Drop_uri(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5161,6 +5222,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedDrops(ctx context.Co
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
+			case "uri":
+				return ec.fieldContext_Drop_uri(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -7889,6 +7952,8 @@ func (ec *executionContext) fieldContext_userProfileType_drops(ctx context.Conte
 				return ec.fieldContext_Drop_farcasterChannelId(ctx, field)
 			case "claimDetails":
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
+			case "uri":
+				return ec.fieldContext_Drop_uri(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -8749,6 +8814,8 @@ func (ec *executionContext) _Drop(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Drop_farcasterChannelId(ctx, field, obj)
 		case "claimDetails":
 			out.Values[i] = ec._Drop_claimDetails(ctx, field, obj)
+		case "uri":
+			out.Values[i] = ec._Drop_uri(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
