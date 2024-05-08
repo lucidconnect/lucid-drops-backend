@@ -66,7 +66,7 @@ func main() {
 	router.Handle("/query", srv)
 	router.HandleFunc("/mintPass", server.CreateMintPass)
 	router.HandleFunc("/claim", server.GenerateSignatureForClaim)
-	// router.HandleFunc("/fetchTokenUri", route.FetchTokenUri)
+	router.HandleFunc("/metadata/{dropId}/{id}", server.MetadataHandler)
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
 
 	httpServer := &http.Server{

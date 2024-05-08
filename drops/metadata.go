@@ -8,6 +8,8 @@ import (
 type MetaData struct {
 	ID          uuid.UUID `gorm:"type:uuid;primary_key;"`
 	DropId      uuid.UUID `gorm:"index;"`
+	ItemId      uuid.UUID
+	TokenId     string
 	Name        string
 	Description string
 	Properties  any

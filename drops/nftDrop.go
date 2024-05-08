@@ -33,7 +33,7 @@ type NFTRepository interface {
 	FindItemsWithUnresolvesTokenIDs() ([]Item, error)
 	CreateMetadata(metadata *MetaData) error
 	ReadMetadata(id string) (*MetaData, error)
-	ReadMetadataByDropId(dropId string) (*MetaData, error)
+	ReadMetadataByDropId(dropId, tokenId string) (*MetaData, error)
 }
 
 type Drop struct {
@@ -60,6 +60,7 @@ type Drop struct {
 	UserLimit              *int               `gorm:"default:null"`
 	EditionLimit           *int               `gorm:"default:null"`
 	MintPasses             []MintPass         `gorm:"foreignKey:DropID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+	DropUri                string
 }
 
 func (d *Drop) BeforeCreate(scope *gorm.DB) error {
@@ -115,6 +116,10 @@ func (d *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		mappedDrop.FarcasterProfileID = &d.FarcasterCriteria.FarcasterUsername
 		channelIds := strings.Split(d.FarcasterCriteria.ChannelID, ",")
 		mappedDrop.FarcasterChannelID = channelIds
+	}
+
+	if d.DropUri != "" {
+		mappedDrop.URI = &d.DropUri
 	}
 
 	var mintPasses []*model.ClaimDetails

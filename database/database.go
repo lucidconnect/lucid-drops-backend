@@ -386,9 +386,9 @@ func (db *DB) ReadMetadata(id string) (*drops.MetaData, error) {
 
 	return &md, nil
 }
-func (db *DB) ReadMetadataByDropId(dropId string) (*drops.MetaData, error) {
+func (db *DB) ReadMetadataByDropId(dropId, tokenId string) (*drops.MetaData, error) {
 	var md drops.MetaData
-	if err := db.database.Model(&drops.MetaData{}).Where("drop_id = ?", dropId).First(&md).Error; err != nil {
+	if err := db.database.Model(&drops.MetaData{}).Where("drop_id = ?", dropId).Where("token_id = ?", tokenId).First(&md).Error; err != nil {
 		return nil, err
 	}
 
