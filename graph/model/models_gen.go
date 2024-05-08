@@ -51,7 +51,7 @@ type DropInput struct {
 	Image                 *string            `json:"image,omitempty"`
 	Thumbnail             *string            `json:"thumbnail,omitempty"`
 	Network               *BlockchainNetwork `json:"network,omitempty"`
-	DeploymentHash        string             `json:"deploymentHash"`
+	DeploymentHash        *string            `json:"deploymentHash,omitempty"`
 	ContractAddress       *string            `json:"contractAddress,omitempty"`
 	EditionLimit          *int               `json:"editionLimit,omitempty"`
 	UserLimit             *int               `json:"userLimit,omitempty"`

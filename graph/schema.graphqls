@@ -46,7 +46,7 @@ input DropInput {
 	image: String
 	thumbnail: String
   network: BlockchainNetwork
-  deploymentHash: String!
+  deploymentHash: String
   contractAddress: String
   editionLimit: Int
   userLimit: Int
