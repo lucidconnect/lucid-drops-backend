@@ -374,3 +374,23 @@ func (db *DB) GetMintPassesForWallet(dropId, walletAddress string) (int64, error
 	}
 	return walletCount, nil
 }
+
+func (db *DB) CreateMetadata(metadata *drops.MetaData) error {
+	return db.database.Create(metadata).Error
+}
+func (db *DB) ReadMetadata(id string) (*drops.MetaData, error) {
+	var md drops.MetaData
+	if err := db.database.Model(&drops.MetaData{}).Where("id = ?", id).First(&md).Error; err != nil {
+		return nil, err
+	}
+
+	return &md, nil
+}
+func (db *DB) ReadMetadataByDropId(dropId string) (*drops.MetaData, error) {
+	var md drops.MetaData
+	if err := db.database.Model(&drops.MetaData{}).Where("drop_id = ?", dropId).First(&md).Error; err != nil {
+		return nil, err
+	}
+
+	return &md, nil
+}

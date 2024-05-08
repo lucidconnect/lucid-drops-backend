@@ -31,6 +31,9 @@ type NFTRepository interface {
 	CountMintPassesForDrop(dropId string) (int64, error)
 	FetchMintPassesForItems(itemID string) ([]MintPass, error)
 	FindItemsWithUnresolvesTokenIDs() ([]Item, error)
+	CreateMetadata(metadata *MetaData) error
+	ReadMetadata(id string) (*MetaData, error)
+	ReadMetadataByDropId(dropId string) (*MetaData, error)
 }
 
 type Drop struct {
