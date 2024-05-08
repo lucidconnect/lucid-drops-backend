@@ -54,6 +54,7 @@ input DropInput {
   mintPrice: Float
   gasIsCreatorSponsored: Boolean!
   draftMode: Boolean
+  uri: String
 }
 
 input NewFarcasterCriteriaInput {

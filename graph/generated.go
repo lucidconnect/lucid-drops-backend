@@ -8110,7 +8110,7 @@ func (ec *executionContext) unmarshalInputDropInput(ctx context.Context, obj int
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "description", "image", "thumbnail", "network", "deploymentHash", "contractAddress", "editionLimit", "userLimit", "claimFee", "mintPrice", "gasIsCreatorSponsored", "draftMode"}
+	fieldsInOrder := [...]string{"name", "description", "image", "thumbnail", "network", "deploymentHash", "contractAddress", "editionLimit", "userLimit", "claimFee", "mintPrice", "gasIsCreatorSponsored", "draftMode", "uri"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -8234,6 +8234,15 @@ func (ec *executionContext) unmarshalInputDropInput(ctx context.Context, obj int
 				return it, err
 			}
 			it.DraftMode = data
+		case "uri":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uri"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.URI = data
 		}
 	}
 

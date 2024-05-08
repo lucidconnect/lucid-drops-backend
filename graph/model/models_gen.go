@@ -59,6 +59,7 @@ type DropInput struct {
 	MintPrice             *float64           `json:"mintPrice,omitempty"`
 	GasIsCreatorSponsored bool               `json:"gasIsCreatorSponsored"`
 	DraftMode             *bool              `json:"draftMode,omitempty"`
+	URI                   *string            `json:"uri,omitempty"`
 }
 
 type EditUserProfileInputType struct {
