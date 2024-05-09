@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -487,17 +488,20 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		}
 	}
 
-	tokenId := "1"
+	var tokenId string
 	items, _ := r.NFTRepository.FetchDropItems(dropID, false)
 	if len(items) > 1 {
 		for _, item := range items {
 			if item.Claimed {
 				continue
 			} else {
-				tokenId = fmt.Sprint(item.TokenID)
+				fmt.Println("token id",item.TokenID)
+				tokenId = strconv.FormatInt(item.TokenID, 10)
 				break
 			}
 		}
+	} else {
+		tokenId = "1"
 	}
 
 	if drop.Criteria != "" {
