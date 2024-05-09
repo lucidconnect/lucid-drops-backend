@@ -66,13 +66,12 @@ func SetupDB(dsn string) *DB {
 	db.AutoMigrate(
 		// &drops.Creator{},
 		&ledger.Wallet{},
-		&drops.SignerInfo{},
+		// &drops.SignerInfo{},
 		&drops.FarcasterCriteria{},
 		&drops.MintPass{},
 		&drops.Drop{},
 		&drops.Item{},
 		&drops.MetaData{},
-		// &drops.SignerInfo{},
 	)
 	return &DB{database: db}
 }
