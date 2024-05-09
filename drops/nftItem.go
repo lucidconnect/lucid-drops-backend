@@ -30,6 +30,7 @@ type Item struct {
 	Featured             bool `gorm:"default:false"`
 	UserLimit            *int `gorm:"default:null"`
 	EditionLimit         *int `gorm:"default:null"`
+	Claimed              bool `gorm:"default:false"`
 	// MintPasses           []MintPass        `gorm:"foreignKey:ItemId;references:ID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 

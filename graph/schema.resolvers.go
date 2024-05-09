@@ -486,6 +486,18 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 		}
 	}
 
+	tokenId := "1"
+	items, _ := r.NFTRepository.FetchDropItems(dropID, false)
+	if len(items) > 1 {
+		for _, item := range items {
+			if item.Claimed {
+				continue
+			} else {
+				tokenId = fmt.Sprint(item.TokenID)
+			}
+		}
+	}
+
 	if drop.Criteria != "" {
 		switch {
 		case (drop.FarcasterCriteria != nil):
@@ -523,7 +535,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 			DropContractAddress: *drop.AAContractAddress,
 			BlockchainNetwork:   drop.BlockchainNetwork,
 			MinterAddress:       walletAddress,
-			TokenID:             "1",
+			TokenID:             tokenId,
 		}
 		if err = r.NFTRepository.CreateMintPass(mintPass); err != nil {
 			return nil, err
@@ -585,12 +597,22 @@ func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input 
 	// 		return nil, errors.New("more than one mint pass found for this minter address")
 	// 	}
 	// }
+	item, err := r.NFTRepository.FindItemById(mintPass.ItemId)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
 
 	mintPass.MinterAddress = input.ClaimingAddress
 	mintPass.UsedAt = &now
 	err = r.NFTRepository.UpdateMintPass(mintPass)
 	if err != nil {
 		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
+	item.Claimed = true
+	if err = r.NFTRepository.UpdateItemDetails(item); err != nil {
+		log.Err(err).Send()
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 

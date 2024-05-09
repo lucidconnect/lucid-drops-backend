@@ -41,7 +41,7 @@ func GenerateSignatureForClaim(mintPass drops.MintPass) (*model.MintAuthorizatio
 		utils.EncodeAddress(mintPass.MinterAddress), // Some Addresss
 		utils.EncodeAddress(contractAddress.Hex()),
 		utils.EncodeUint256(chainId.String()),
-		utils.EncodeUint256("1"),
+		utils.EncodeUint256(mintPass.TokenID),
 		utils.EncodeUint256(mints.String()),
 	)
 
@@ -53,7 +53,7 @@ func GenerateSignatureForClaim(mintPass drops.MintPass) (*model.MintAuthorizatio
 
 	return &model.MintAuthorizationResponse{
 		Amount:               "1",
-		TokenID:              "1",
+		TokenID:              mintPass.TokenID,
 		Nonce:                mints.String(),
 		Chain:                int(chainId.Int64()),
 		PackedData:           rawData,

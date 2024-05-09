@@ -15,6 +15,7 @@ type NFTRepository interface {
 	UpdateDropDetails(drop *Drop) error
 	FindDropByCreatorId(creatorId string) ([]Drop, error)
 	FindItemById(itemId string) (*Item, error)
+	UpdateItemDetails(item *Item) error
 	DeleteDrop(drop *Drop) error
 	AddFarcasterCriteriaToDrop(drop *Drop, criteria *FarcasterCriteria) error
 	UpdateFarcasterCriteria(dropId string, criteriaUpdate *FarcasterCriteria) error
