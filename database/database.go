@@ -71,6 +71,7 @@ func SetupDB(dsn string) *DB {
 		&drops.Drop{},
 		&drops.Item{},
 		&drops.MetaData{},
+		&drops.SignerInfo{},
 	)
 	return &DB{database: db}
 }
