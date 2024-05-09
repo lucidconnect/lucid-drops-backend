@@ -496,7 +496,6 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 			if item.Claimed {
 				continue
 			} else {
-				fmt.Println("token id", item.TokenID)
 				tokenId = strconv.FormatInt(item.TokenID, 10)
 				itemToMint = item
 				break
