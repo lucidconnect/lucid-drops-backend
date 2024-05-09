@@ -61,9 +61,10 @@ func SetupDB(dsn string) *DB {
 	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
+	// weird shit happening with the automigrations of commented tables
 	log.Print("Successfully connected!")
 	db.AutoMigrate(
-		&drops.Creator{},
+		// &drops.Creator{},
 		&ledger.Wallet{},
 		&drops.SignerInfo{},
 		&drops.FarcasterCriteria{},
@@ -71,7 +72,7 @@ func SetupDB(dsn string) *DB {
 		&drops.Drop{},
 		&drops.Item{},
 		&drops.MetaData{},
-		&drops.SignerInfo{},
+		// &drops.SignerInfo{},
 	)
 	return &DB{database: db}
 }
