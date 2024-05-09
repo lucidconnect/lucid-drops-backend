@@ -342,6 +342,10 @@ func (db *DB) FetchMintPassesForItems(itemID string) ([]drops.MintPass, error) {
 	return mintPasses, nil
 }
 
+func (db *DB) UpdateItemDetails(item *drops.Item) error {
+	return db.database.Save(item).Error
+}
+
 func (db *DB) FindItemsWithUnresolvesTokenIDs() ([]drops.Item, error) {
 	var items []drops.Item
 	oneHourAgo := time.Now().Add(-1 * time.Hour)
