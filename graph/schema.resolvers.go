@@ -290,7 +290,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		return newDrop.ToGraphData(items), nil
 	} else {
 		baseUri := os.Getenv("BASE_URI")
-		uri := fmt.Sprintf("%v/%v/{id}", baseUri, newDrop.ID.String())
+		uri := fmt.Sprintf("%v/%v/{id}.json", baseUri, newDrop.ID.String())
 		newDrop.DropUri = uri
 		if err = r.NFTRepository.UpdateDropDetails(newDrop); err != nil {
 			log.Err(err).Caller().Send()
