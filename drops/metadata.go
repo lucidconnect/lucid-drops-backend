@@ -12,7 +12,7 @@ type MetaData struct {
 	TokenId     string
 	Name        string
 	Description string
-	Properties  any
+	Properties  map[string]any `gorm:"serializer:json"`
 }
 
 func (md *MetaData) BeforeCreate(scope *gorm.DB) error {
