@@ -489,19 +489,22 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 	}
 
 	var tokenId string
+	var itemToMint drops.Item
 	items, _ := r.NFTRepository.FetchDropItems(dropID, false)
 	if len(items) > 1 {
 		for _, item := range items {
 			if item.Claimed {
 				continue
 			} else {
-				fmt.Println("token id",item.TokenID)
+				fmt.Println("token id", item.TokenID)
 				tokenId = strconv.FormatInt(item.TokenID, 10)
+				itemToMint = item
 				break
 			}
 		}
 	} else {
 		tokenId = "1"
+		itemToMint = items[0]
 	}
 
 	if drop.Criteria != "" {
@@ -534,13 +537,13 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 				}
 			}
 		}
-
 	} else {
 		mintPass = &drops.MintPass{
 			DropID:              dropID,
 			DropContractAddress: *drop.AAContractAddress,
 			BlockchainNetwork:   drop.BlockchainNetwork,
 			MinterAddress:       walletAddress,
+			ItemId:              itemToMint.ID.String(),
 			TokenID:             tokenId,
 		}
 		if err = r.NFTRepository.CreateMintPass(mintPass); err != nil {
