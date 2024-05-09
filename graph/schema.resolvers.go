@@ -255,7 +255,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		EditionLimit:           input.EditionLimit,
 	}
 
-	if input.DraftMode != nil && *input.DraftMode {
+	if input.DraftMode == nil || !*input.DraftMode {
 		item = &drops.Item{
 			Name:         *input.Name,
 			Image:        *input.Image,
@@ -478,6 +478,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 	if drop.EditionLimit != nil {
 		count, err := r.NFTRepository.CountMintPassesForDrop(dropID)
 		if err != nil {
+			log.Err(err).Send()
 			return nil, err
 		}
 		if int(count) >= *drop.EditionLimit {
@@ -494,6 +495,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 				continue
 			} else {
 				tokenId = fmt.Sprint(item.TokenID)
+				break
 			}
 		}
 	}
@@ -538,6 +540,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 			TokenID:             tokenId,
 		}
 		if err = r.NFTRepository.CreateMintPass(mintPass); err != nil {
+			log.Err(err).Send()
 			return nil, err
 		}
 	}
@@ -554,6 +557,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 
 		tx, err := whitelist.MintNft(*authResponse, walletAddress)
 		if err != nil {
+			log.Err(err).Send()
 			return resp, err
 		}
 
