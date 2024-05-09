@@ -66,6 +66,11 @@ func SetupDB(dsn string) *DB {
 		&drops.Creator{},
 		&ledger.Wallet{},
 		&drops.SignerInfo{},
+		&drops.FarcasterCriteria{},
+		&drops.MintPass{},
+		&drops.Drop{},
+		&drops.Item{},
+		&drops.MetaData{},
 	)
 	return &DB{database: db}
 }
