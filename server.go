@@ -61,12 +61,15 @@ func main() {
 	server := route.NewServer(port, db, router)
 
 	router.Use(internal.UserAuthMiddleWare())
-	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "https://luciddrops.xyz", http.StatusFound)
+	})
+	router.Handle("/playground", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/health", http.HandlerFunc(route.HealthCheckHandler))
 	router.Handle("/query", srv)
 	router.HandleFunc("/mintPass", server.CreateMintPass)
 	router.HandleFunc("/claim", server.GenerateSignatureForClaim)
-	// router.HandleFunc("/fetchTokenUri", route.FetchTokenUri)
+	router.HandleFunc("/metadata/{dropId}/{id}.json", server.MetadataHandler)
 	log.Info().Msgf("connect to http://localhost:%s/ for GraphQL playground", port)
 
 	httpServer := &http.Server{

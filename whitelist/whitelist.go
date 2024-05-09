@@ -53,7 +53,7 @@ func GenerateSignatureForClaim(mintPass drops.MintPass) (*model.MintAuthorizatio
 
 	return &model.MintAuthorizationResponse{
 		Amount:               "1",
-		TokenID:              "1",
+		TokenID:              mintPass.TokenID,
 		Nonce:                mints.String(),
 		Chain:                int(chainId.Int64()),
 		PackedData:           rawData,
@@ -106,6 +106,7 @@ func MintNft(mintArgs model.MintAuthorizationResponse, walletAddress string) (st
 	// amount.SetString(signatureResponse.Amount, 10)
 	// tokenId.SetString(signatureResponse.TokenID, 10)
 	// nonce.SetString(signatureResponse.Nonce, 10)
+	fmt.Println("tokenId", tokenId)
 	signature, err := hex.DecodeString(mintArgs.MintingSignature)
 	if err != nil {
 		err = fmt.Errorf("decoding signature failed with error %v", err)

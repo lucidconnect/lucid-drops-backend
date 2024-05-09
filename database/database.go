@@ -61,11 +61,17 @@ func SetupDB(dsn string) *DB {
 	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
+	// weird shit happening with the automigrations of commented tables
 	log.Print("Successfully connected!")
 	db.AutoMigrate(
-		&drops.Creator{},
+		// &drops.Creator{},
 		&ledger.Wallet{},
-		&drops.SignerInfo{},
+		// &drops.SignerInfo{},
+		&drops.FarcasterCriteria{},
+		&drops.MintPass{},
+		&drops.Drop{},
+		&drops.Item{},
+		&drops.MetaData{},
 	)
 	return &DB{database: db}
 }
@@ -168,10 +174,12 @@ func (db *DB) CreateDrop(drop *drops.Drop, item *drops.Item) error {
 		return err
 	}
 
-	item.DropID = drop.ID
-	if err := tx.Create(item).Error; err != nil {
-		tx.Rollback()
-		return err
+	if item != nil {
+		item.DropID = drop.ID
+		if err := tx.Create(item).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	if err := tx.Commit().Error; err != nil {
@@ -334,6 +342,10 @@ func (db *DB) FetchMintPassesForItems(itemID string) ([]drops.MintPass, error) {
 	return mintPasses, nil
 }
 
+func (db *DB) UpdateItemDetails(item *drops.Item) error {
+	return db.database.Save(item).Error
+}
+
 func (db *DB) FindItemsWithUnresolvesTokenIDs() ([]drops.Item, error) {
 	var items []drops.Item
 	oneHourAgo := time.Now().Add(-1 * time.Hour)
@@ -371,4 +383,24 @@ func (db *DB) GetMintPassesForWallet(dropId, walletAddress string) (int64, error
 		return 0, err
 	}
 	return walletCount, nil
+}
+
+func (db *DB) CreateMetadata(metadata *drops.MetaData) error {
+	return db.database.Create(metadata).Error
+}
+func (db *DB) ReadMetadata(id string) (*drops.MetaData, error) {
+	var md drops.MetaData
+	if err := db.database.Model(&drops.MetaData{}).Where("id = ?", id).First(&md).Error; err != nil {
+		return nil, err
+	}
+
+	return &md, nil
+}
+func (db *DB) ReadMetadataByDropId(dropId, tokenId string) (*drops.MetaData, error) {
+	var md drops.MetaData
+	if err := db.database.Model(&drops.MetaData{}).Where("drop_id = ?", dropId).Where("token_id = ?", tokenId).First(&md).Error; err != nil {
+		return nil, err
+	}
+
+	return &md, nil
 }

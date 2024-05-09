@@ -3,6 +3,7 @@ package utils
 import (
 	"bytes"
 	"encoding/hex"
+	"fmt"
 	"log"
 	"math/big"
 
@@ -36,6 +37,7 @@ func EncodeAddress(v string) []byte {
 }
 
 func EncodeUint256(v string) []byte {
+	fmt.Println(v)
 	bn := new(big.Int)
 	bn.SetString(v, 10)
 	return math.U256Bytes(bn)

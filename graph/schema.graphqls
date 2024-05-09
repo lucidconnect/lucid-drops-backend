@@ -46,13 +46,15 @@ input DropInput {
 	image: String
 	thumbnail: String
   network: BlockchainNetwork
-  deploymentHash: String!
+  deploymentHash: String
   contractAddress: String
   editionLimit: Int
   userLimit: Int
   claimFee: Int
   mintPrice: Float
   gasIsCreatorSponsored: Boolean!
+  draftMode: Boolean
+  uri: String
 }
 
 input NewFarcasterCriteriaInput {
@@ -130,6 +132,7 @@ type Drop {
   farcasterProfileID: String
   farcasterChannelId: [String!]
   claimDetails: [ClaimDetails]
+  uri: String
 }
 
 type CreatorDetails {

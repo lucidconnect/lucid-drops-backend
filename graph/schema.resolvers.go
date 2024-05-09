@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -204,7 +205,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 	if err != nil {
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
-
+	var item *drops.Item
 	creator, err := r.CreatorRepository.FindCreatorByEthereumAddress(authenticationDetails.Address.Hex())
 	if err != nil {
 		log.Err(err).Caller().Send()
@@ -223,12 +224,12 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 	var contractAdddress string
 	if input.ContractAddress == nil {
 		// Introduce an artificial delay for before fethcing the actual contract address
-		time.Sleep(time.Second * 3)
+		// time.Sleep(time.Second * 3)
 
-		contractAdddress, err = services.GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
-		if err != nil {
-			log.Err(err)
-		}
+		// contractAdddress, err = services.GetOnchainContractAddressFromDeploymentHash(input.DeploymentHash)
+		// if err != nil {
+		// 	log.Err(err)
+		// }
 
 	} else {
 		contractAdddress = *input.ContractAddress
@@ -247,7 +248,7 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		Thumbnail:              *input.Thumbnail,
 		Description:            *input.Description,
 		BlockchainNetwork:      input.Network,
-		AAWalletDeploymentHash: &input.DeploymentHash,
+		AAWalletDeploymentHash: input.DeploymentHash,
 		AAContractAddress:      &contractAdddress,
 		MintPrice:              input.MintPrice,
 		GasIsCreatorSponsored:  gasIsSponsored,
@@ -255,36 +256,49 @@ func (r *mutationResolver) CreateDrop(ctx context.Context, input model.DropInput
 		EditionLimit:           input.EditionLimit,
 	}
 
-	newItem := &drops.Item{
-		Name:         *input.Name,
-		Image:        *input.Image,
-		Description:  *input.Description,
-		TokenID:      int64(1),
-		DropAddress:  contractAdddress,
-		UserLimit:    input.UserLimit,
-		EditionLimit: input.EditionLimit,
+	if input.DraftMode == nil || !*input.DraftMode {
+		item = &drops.Item{
+			Name:         *input.Name,
+			Image:        *input.Image,
+			Description:  *input.Description,
+			TokenID:      int64(1),
+			DropAddress:  contractAdddress,
+			UserLimit:    input.UserLimit,
+			EditionLimit: input.EditionLimit,
+		}
 	}
 
-	if err = r.NFTRepository.CreateDrop(newDrop, newItem); err != nil {
+	if err = r.NFTRepository.CreateDrop(newDrop, item); err != nil {
 		log.Err(err).Caller().Send()
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
+	if item != nil {
+		url, err := createMintUrl(newDrop.ID.String(), item.Image, *newDrop.AAContractAddress)
+		if err != nil {
+			log.Err(err).Caller().Send()
+			return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, "generating frame url failed", ctx)
+		}
+		newDrop.MintUrl = url
+		if err = r.NFTRepository.UpdateDropDetails(newDrop); err != nil {
+			log.Err(err).Caller().Send()
+			return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+		}
 
-	url, err := createMintUrl(newDrop.ID.String(), newItem.Image, *newDrop.AAContractAddress)
-	if err != nil {
-		log.Err(err).Caller().Send()
-		return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, "generating frame url failed", ctx)
-	}
-	newDrop.MintUrl = url
-	if err = r.NFTRepository.UpdateDropDetails(newDrop); err != nil {
-		log.Err(err).Caller().Send()
-		return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+		var items []*model.Item
+		newItem := item.ToGraphData()
+		items = append(items, newItem)
+		return newDrop.ToGraphData(items), nil
+	} else {
+		baseUri := os.Getenv("BASE_URI")
+		uri := fmt.Sprintf("%v/%v/{id}.json", baseUri, newDrop.ID.String())
+		newDrop.DropUri = uri
+		if err = r.NFTRepository.UpdateDropDetails(newDrop); err != nil {
+			log.Err(err).Caller().Send()
+			return newDrop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+		}
 	}
 
-	var items []*model.Item
-	item := newItem.ToGraphData()
-	items = append(items, item)
-	return newDrop.ToGraphData(items), nil
+	return newDrop.ToGraphData(nil), nil
 }
 
 // UpdateDrop is the resolver for the updateDrop field.
@@ -324,6 +338,10 @@ func (r *mutationResolver) UpdateDrop(ctx context.Context, dropID string, input 
 
 	if input.Description != nil {
 		drop.Description = *input.Description
+	}
+
+	if input.ContractAddress != nil {
+		drop.AAContractAddress = input.ContractAddress
 	}
 
 	if err = r.NFTRepository.UpdateDropDetails(drop); err != nil {
@@ -461,12 +479,31 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 	if drop.EditionLimit != nil {
 		count, err := r.NFTRepository.CountMintPassesForDrop(dropID)
 		if err != nil {
+			log.Err(err).Send()
 			return nil, err
 		}
 		if int(count) >= *drop.EditionLimit {
 			resp.Message = utils.GetStrPtr("this nft has reached it's mint limit")
 			return resp, errors.New("item edition limit reached")
 		}
+	}
+
+	var tokenId string
+	var itemToMint drops.Item
+	items, _ := r.NFTRepository.FetchDropItems(dropID, false)
+	if len(items) > 1 {
+		for _, item := range items {
+			if item.Claimed {
+				continue
+			} else {
+				tokenId = strconv.FormatInt(item.TokenID, 10)
+				itemToMint = item
+				break
+			}
+		}
+	} else {
+		tokenId = "1"
+		itemToMint = items[0]
 	}
 
 	if drop.Criteria != "" {
@@ -499,16 +536,17 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 				}
 			}
 		}
-
 	} else {
 		mintPass = &drops.MintPass{
 			DropID:              dropID,
 			DropContractAddress: *drop.AAContractAddress,
 			BlockchainNetwork:   drop.BlockchainNetwork,
 			MinterAddress:       walletAddress,
-			TokenID:             "1",
+			ItemId:              itemToMint.ID.String(),
+			TokenID:             tokenId,
 		}
 		if err = r.NFTRepository.CreateMintPass(mintPass); err != nil {
+			log.Err(err).Send()
 			return nil, err
 		}
 	}
@@ -525,6 +563,7 @@ func (r *mutationResolver) CreateMintPass(ctx context.Context, dropID string, wa
 
 		tx, err := whitelist.MintNft(*authResponse, walletAddress)
 		if err != nil {
+			log.Err(err).Send()
 			return resp, err
 		}
 
@@ -568,12 +607,22 @@ func (r *mutationResolver) GenerateSignatureForClaim(ctx context.Context, input 
 	// 		return nil, errors.New("more than one mint pass found for this minter address")
 	// 	}
 	// }
+	item, err := r.NFTRepository.FindItemById(mintPass.ItemId)
+	if err != nil {
+		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
 
 	mintPass.MinterAddress = input.ClaimingAddress
 	mintPass.UsedAt = &now
 	err = r.NFTRepository.UpdateMintPass(mintPass)
 	if err != nil {
 		log.Err(err).Caller().Send()
+		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+	}
+	item.Claimed = true
+	if err = r.NFTRepository.UpdateItemDetails(item); err != nil {
+		log.Err(err).Send()
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 	}
 
