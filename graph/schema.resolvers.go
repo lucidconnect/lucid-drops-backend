@@ -343,7 +343,19 @@ func (r *mutationResolver) UpdateDrop(ctx context.Context, dropID string, input 
 	if input.ContractAddress != nil {
 		drop.AAContractAddress = input.ContractAddress
 	}
-
+	if drop.MintUrl == "" {
+		url, err := createMintUrl(drop.ID.String(), drop.Image, *drop.AAContractAddress)
+		if err != nil {
+			log.Err(err).Caller().Send()
+			return drop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, "generating frame url failed", ctx)
+		}
+		drop.MintUrl = url
+		if err = r.NFTRepository.UpdateDropDetails(drop); err != nil {
+			log.Err(err).Caller().Send()
+			return drop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
+		}
+	}
+	
 	if err = r.NFTRepository.UpdateDropDetails(drop); err != nil {
 		log.Err(err).Caller().Send()
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, "drop update failed", ctx)

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/lucidconnect/inverse/drops"
-	"github.com/lucidconnect/inverse/ledger"
 	"github.com/lucidconnect/inverse/utils"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
@@ -64,8 +63,8 @@ func SetupDB(dsn string) *DB {
 	// weird shit happening with the automigrations of commented tables
 	log.Print("Successfully connected!")
 	if err = db.AutoMigrate(
-		// &drops.Creator{},
-		&ledger.Wallet{},
+		&drops.Creator{},
+		// &ledger.Wallet{},
 		// &drops.SignerInfo{},
 		&drops.FarcasterCriteria{},
 		&drops.MintPass{},
