@@ -63,7 +63,7 @@ func SetupDB(dsn string) *DB {
 
 	// weird shit happening with the automigrations of commented tables
 	log.Print("Successfully connected!")
-	db.AutoMigrate(
+	if err = db.AutoMigrate(
 		// &drops.Creator{},
 		&ledger.Wallet{},
 		// &drops.SignerInfo{},
@@ -72,7 +72,9 @@ func SetupDB(dsn string) *DB {
 		&drops.Drop{},
 		&drops.Item{},
 		&drops.MetaData{},
-	)
+	); err != nil {
+		log.Err(err).Send()
+	}
 	return &DB{database: db}
 }
 
