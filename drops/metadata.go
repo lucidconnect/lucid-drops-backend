@@ -12,6 +12,8 @@ type MetaData struct {
 	TokenId     string
 	Name        string
 	Description string
+	Author      string         `json:"author"`
+	Address     string         `json:"address"`
 	Properties  map[string]any `gorm:"serializer:json"`
 }
 

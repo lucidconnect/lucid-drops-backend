@@ -11,6 +11,8 @@ import (
 type JsonMetadata struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Author      string `json:"author"`
+	Address     string `json:"address"`
 	Image       string `json:"image"`
 	Properties  any    `json:"properties"`
 }
