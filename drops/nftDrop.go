@@ -90,6 +90,7 @@ func (d *Drop) ToGraphData(items []*model.Item) *model.Drop {
 		Network:               d.BlockchainNetwork,
 		MintURL:               d.MintUrl,
 		GasIsCreatorSponsored: d.GasIsCreatorSponsored,
+		EditionLimit:          d.EditionLimit,
 		// ClaimCriteria:         d.Criteria,
 	}
 

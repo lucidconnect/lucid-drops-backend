@@ -44,6 +44,7 @@ type Drop struct {
 	FarcasterChannelID                 []string             `json:"farcasterChannelId,omitempty"`
 	ClaimDetails                       []*ClaimDetails      `json:"claimDetails,omitempty"`
 	URI                                *string              `json:"uri,omitempty"`
+	EditionLimit                       *int                 `json:"editionLimit,omitempty"`
 }
 
 type DropInput struct {

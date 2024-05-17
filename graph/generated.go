@@ -70,6 +70,7 @@ type ComplexityRoot struct {
 		CreatedAt                          func(childComplexity int) int
 		CreatorID                          func(childComplexity int) int
 		Description                        func(childComplexity int) int
+		EditionLimit                       func(childComplexity int) int
 		FarcasterChannelID                 func(childComplexity int) int
 		FarcasterClaimCriteriaInteractions func(childComplexity int) int
 		FarcasterProfileID                 func(childComplexity int) int
@@ -338,6 +339,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Drop.Description(childComplexity), true
+
+	case "Drop.editionLimit":
+		if e.complexity.Drop.EditionLimit == nil {
+			break
+		}
+
+		return e.complexity.Drop.EditionLimit(childComplexity), true
 
 	case "Drop.farcasterChannelId":
 		if e.complexity.Drop.FarcasterChannelID == nil {
@@ -2605,6 +2613,47 @@ func (ec *executionContext) fieldContext_Drop_uri(ctx context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Drop_editionLimit(ctx context.Context, field graphql.CollectedField, obj *model.Drop) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Drop_editionLimit(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EditionLimit, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*int)
+	fc.Result = res
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Drop_editionLimit(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Drop",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ImageResponse_image(ctx context.Context, field graphql.CollectedField, obj *model.ImageResponse) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ImageResponse_image(ctx, field)
 	if err != nil {
@@ -4294,6 +4343,8 @@ func (ec *executionContext) fieldContext_Mutation_createDrop(ctx context.Context
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			case "uri":
 				return ec.fieldContext_Drop_uri(ctx, field)
+			case "editionLimit":
+				return ec.fieldContext_Drop_editionLimit(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -4391,6 +4442,8 @@ func (ec *executionContext) fieldContext_Mutation_updateDrop(ctx context.Context
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			case "uri":
 				return ec.fieldContext_Drop_uri(ctx, field)
+			case "editionLimit":
+				return ec.fieldContext_Drop_editionLimit(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -4488,6 +4541,8 @@ func (ec *executionContext) fieldContext_Mutation_deleteDrop(ctx context.Context
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			case "uri":
 				return ec.fieldContext_Drop_uri(ctx, field)
+			case "editionLimit":
+				return ec.fieldContext_Drop_editionLimit(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -4585,6 +4640,8 @@ func (ec *executionContext) fieldContext_Mutation_createFarcasterCriteriaForDrop
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			case "uri":
 				return ec.fieldContext_Drop_uri(ctx, field)
+			case "editionLimit":
+				return ec.fieldContext_Drop_editionLimit(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -4978,6 +5035,8 @@ func (ec *executionContext) fieldContext_Query_fetchDropById(ctx context.Context
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			case "uri":
 				return ec.fieldContext_Drop_uri(ctx, field)
+			case "editionLimit":
+				return ec.fieldContext_Drop_editionLimit(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5075,6 +5134,8 @@ func (ec *executionContext) fieldContext_Query_fetchCreatorDrops(ctx context.Con
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			case "uri":
 				return ec.fieldContext_Drop_uri(ctx, field)
+			case "editionLimit":
+				return ec.fieldContext_Drop_editionLimit(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -5224,6 +5285,8 @@ func (ec *executionContext) fieldContext_Query_fetchFeaturedDrops(ctx context.Co
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			case "uri":
 				return ec.fieldContext_Drop_uri(ctx, field)
+			case "editionLimit":
+				return ec.fieldContext_Drop_editionLimit(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -7954,6 +8017,8 @@ func (ec *executionContext) fieldContext_userProfileType_drops(ctx context.Conte
 				return ec.fieldContext_Drop_claimDetails(ctx, field)
 			case "uri":
 				return ec.fieldContext_Drop_uri(ctx, field)
+			case "editionLimit":
+				return ec.fieldContext_Drop_editionLimit(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Drop", field.Name)
 		},
@@ -8816,6 +8881,8 @@ func (ec *executionContext) _Drop(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._Drop_claimDetails(ctx, field, obj)
 		case "uri":
 			out.Values[i] = ec._Drop_uri(ctx, field, obj)
+		case "editionLimit":
+			out.Values[i] = ec._Drop_editionLimit(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

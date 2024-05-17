@@ -133,6 +133,7 @@ type Drop {
   farcasterChannelId: [String!]
   claimDetails: [ClaimDetails]
   uri: String
+  editionLimit: Int
 }
 
 type CreatorDetails {
