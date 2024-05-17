@@ -94,7 +94,8 @@ func (r *itemResolver) Holders(ctx context.Context, obj *model.Item) ([]string, 
 		return nil, err
 	}
 
-	holders, err := alchemyClient.GetOwnersForNft(obj.DropAddress, "1")
+	tokenId := strconv.FormatInt(int64(*obj.TokenID), 10)
+	holders, err := alchemyClient.GetOwnersForNft(obj.DropAddress, tokenId)
 	if err != nil {
 		log.Err(err).Caller().Send()
 		return nil, err
