@@ -356,7 +356,7 @@ func (r *mutationResolver) UpdateDrop(ctx context.Context, dropID string, input 
 			return drop.ToGraphData(nil), customError.ErrToGraphQLError(structure.LucidInternalError, err.Error(), ctx)
 		}
 	}
-	
+
 	if err = r.NFTRepository.UpdateDropDetails(drop); err != nil {
 		log.Err(err).Caller().Send()
 		return nil, customError.ErrToGraphQLError(structure.LucidInternalError, "drop update failed", ctx)
