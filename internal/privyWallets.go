@@ -41,7 +41,7 @@ func FetchPrivyUser(userDid string) (*PrivyUserResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("fetching user with did %v from privy", userDid)
+	log.Printf("fetching user with did %v from privy \n", userDid)
 	privyAppId, privyAppSecret := GetPrivyAppIdAndSecret()
 
 	req.SetBasicAuth(privyAppId, privyAppSecret)
