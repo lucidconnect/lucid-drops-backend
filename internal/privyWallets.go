@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -83,7 +84,7 @@ retry:
 	if err != nil {
 		return nil, errors.New("couldn't get privy user details")
 	}
-
+	log.Println("privy user response", userResponse)
 	var embededWallet *common.Address
 
 	for _, accounts := range userResponse.LinkedAccounts {
